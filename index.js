@@ -14,7 +14,13 @@ module.exports = function createContextMiddleware(options) {
 
   return function createContext(req, res, next) {
     // TODO context should be an independent module
-    req.ctx = require('flow-engine').createContext('apim');
+    // create the APIm context used for the following middlewares
+    let ctx = require('flow-engine').createContext('apim');
+    ctx.req = req;
+    ctx.res = res;
+
+    req.ctx = ctx;
+
     next();
   };
 };
