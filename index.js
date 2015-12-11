@@ -14,8 +14,10 @@ module.exports = function createPreflowMiddleware(options) {
   return function preflow(req, res, next) {
     // if the URL doesn't being with /apim, then skip the preflow
     // the reason is not to break existing StrongGateway's test cases
-    if (req.originalUrl.search(/^apim\//) == -1) {
+    if (req.originalUrl.search(/^\/apim\//) === -1) {
+      debug('Skip ' + req.originalUrl + ' non-apim traffics');
       next();
+      return;
     }
 
     let ctx = req.ctx;
