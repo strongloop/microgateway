@@ -11,10 +11,11 @@ module.exports = function createAssemblyMiddleware(options) {
 
   return function assembly(req, res, next) {
     let ctx = req.ctx;
-    
     // if there is no assembly defined, skip the flow-engine
     if (ctx === undefined || ctx.get('flowAssembly') === undefined) {
+      debug('Skip ' + req.originalUrl + ' non-apim traffics');
       next();
+      return;
     }
     
     debug('ctx.flowAssembly: ' + 
@@ -23,10 +24,10 @@ module.exports = function createAssemblyMiddleware(options) {
     const FlowCtor = require('flow-engine').Flow;
     let options = {};
     options.paramResolver = paramResolver;
-    options.ctxScope = 'apim';
+    options.context = ctx;
 
     let flow = new FlowCtor(ctx.get('flowAssembly'), options);
-    flow.prepare(req, res, next);
+    flow.prepare(ctx, next);
     flow.run();
   };
 };
