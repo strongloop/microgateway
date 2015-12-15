@@ -28,11 +28,11 @@ module.exports = function createPreflowMiddleware(options) {
     // - gets clientId from url param and places it in context.clientId
     mockFetchClientId(req);
 
-    let ctx = req.ctx;
+    var ctx = req.ctx;
 
     console.log('ClientId: -->'+ctx.get('client-id'));
 
-//    let assembly =
+//    var assembly =
 //        'assembly:\n' +
 //        '  execute:\n' +
 //        '    - invoke-api:\n' +
@@ -101,7 +101,7 @@ module.exports = function createPreflowMiddleware(options) {
  */
 function mockFetchClientId(req) {
 
-  let ctx = req.ctx;
+  var ctx = req.ctx;
 
   var clientId = req.query['client_id'];
   console.log('Client Id: ' + clientId);
