@@ -16,20 +16,21 @@ module.exports = function createPreflowMiddleware(options) {
     console.log('Enter Preflow');
     // if the URL doesn't being with /apim, then skip the preflow
     // the reason is not to break existing StrongGateway's test cases
-//    if (req.originalUrl.search(/^\/apim\//) === -1) {
-//      console.log('Not Mine');
-//      debug('Skip ' + req.originalUrl + ' non-apim traffics');
-//      next();
-//      return;
-//    }
+    if (req.originalUrl.search(/^\/apim\//) === -1) {
+      console.log('Not Mine');
+      debug('Skip ' + req.originalUrl + ' non-apim traffics');
+      next();
+      return;
+    }
 
     // Call a Mock function to get the clientId - always uses URL param.
     // - creates a json object and calls it 'context', adds it to req
     // - gets clientId from url param and places it in context.clientId
     mockFetchClientId(req);
-    console.log('ClientId: -->'+ctx.get('client-id'));
 
     let ctx = req.ctx;
+
+    console.log('ClientId: -->'+ctx.get('client-id'));
 
 //    let assembly =
 //        'assembly:\n' +
@@ -104,7 +105,7 @@ function mockFetchClientId(req) {
 
   var clientId = req.query['client_id'];
   console.log('Client Id: ' + clientId);
-  ctx.set('client-id') = clientId;
+  ctx.set('client-id', clientId);
   console.log('Return');
 }
 
@@ -120,12 +121,14 @@ function mockResourceLookup(url, method, clientId) {
   var matchingApis = [];
   var api1 = {
     flow: {
-      execute: [{
-        'invoke-api': {
-          'target-url':
-            'https://127.0.0.1:3001/_internal/Applications'
-        }
-      }]
+      assembly: {
+        execute: [{
+          'invoke-api': {
+            'target-url':
+              'http://127.0.0.1:8889/api1'
+          }
+        }]
+      }
     },
     context: {
       api: {
@@ -153,12 +156,14 @@ function mockResourceLookup(url, method, clientId) {
 
   var api2 = {
     flow: {
-      execute: [{
-        'invoke-api': {
-          'target-url':
-            'https://127.0.0.1:3001/_external/Applications'
-        }
-      }]
+      assembly: {
+        execute: [{
+          'invoke-api': {
+            'target-url':
+              'http://127.0.0.1:8889/api2'
+          }
+        }]
+      }
     },
     context: {
       api: {
