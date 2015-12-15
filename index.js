@@ -6,18 +6,15 @@
 var debug = require('debug')('strong-gateway:preflow');
 
 module.exports = function createPreflowMiddleware(options) {
-  console.log('Enter Export');
   debug('configuration', options);
 
   // TODO - assembly is currently hardcoded.
   // To be replaced with file or Jon's config-mgmt model
 
   return function preflow(req, res, next) {
-    console.log('Enter Preflow');
     // if the URL doesn't being with /apim, then skip the preflow
     // the reason is not to break existing StrongGateway's test cases
     if (req.originalUrl.search(/^\/apim\//) === -1) {
-      console.log('Not Mine');
       debug('Skip ' + req.originalUrl + ' non-apim traffics');
       next();
       return;
@@ -29,8 +26,6 @@ module.exports = function createPreflowMiddleware(options) {
     mockFetchClientId(req);
 
     var ctx = req.ctx;
-
-    console.log('ClientId: -->'+ctx.get('client-id'));
 
 //    var assembly =
 //        'assembly:\n' +
@@ -59,10 +54,10 @@ module.exports = function createPreflowMiddleware(options) {
       ctx.set('client', apis[0].context.client);
     } else if (apis.length === 0) {
       // TODO: Do something here to indicate a 404
-      console.log('No APIs found');
+      debug('No APIs found');
 
     } else {
-      console.log('Multiple API matches found: ' + apis.length);
+      debug('Multiple API matches found: ', apis.length);
       // More than one matching API was returned, get the right one, these
       // headers may help
       //X-IBM-Plan-Id
@@ -88,7 +83,7 @@ module.exports = function createPreflowMiddleware(options) {
       }
       if (matchFound === false) {
         // TODO: Do something here to indicate a 404
-        console.log('No APIs found based on header match');
+        debug('No APIs found based on header match');
       }
     }
 
