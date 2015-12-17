@@ -69,6 +69,10 @@ request(
 		debug('error: ', error);
                 debug('body: %j' , body);
                 debug('response: %j' , response);
+                if (error) {
+                    cb(error, undefined);
+                    return;
+                }
 		var listOfEntries = JSON.parse(body);
 		async.each(listOfEntries, function(possibleEntryMatch, done) {
 			async.each(possibleEntryMatch['api-paths'], function(pathObject, done) {	
@@ -113,7 +117,7 @@ request(
         				}
 				});
 			});
-		cb(matches);
+		cb(undefined, matches);
 	}); 
 }
 
