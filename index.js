@@ -4,6 +4,10 @@
  */
 'use strict';
 var debug = require('debug')('strong-gateway:preflow');
+var async = require('async');
+var apimlookup = require('./apim-lookup');
+var contextget = apimlookup.contextget;
+
 
 module.exports = function createPreflowMiddleware(options) {
   debug('configuration', options);
@@ -38,55 +42,128 @@ module.exports = function createPreflowMiddleware(options) {
 //    ctx.set('target-host', 'http://9.42.102.139:3030');
 //    ctx.set('request.path', req.originalUrl);
 //    ctx.set('request.verb', req.method);
-
-    var apis = mockResourceLookup(req.originalUrl,
+    var apis = [];
+    var lookup = 'real';
+    var options = {};
+    
+    if (lookup === 'mock')
+	{
+    	apis = mockResourceLookup(req.originalUrl,
                                   req.method,
                                   ctx.get('client-id'));
+    	if (apis.length === 1) {
+      		ctx.set('flowAssembly', apis[0].flow);
+      		ctx.set('target-host', 'http://9.42.102.139:3030'); // TODO: real env
+      		ctx.set('request.path', req.originalUrl);           // TODO: real env
+      		ctx.set('request.verb', req.method);                // TODO: real env
 
-    if (apis.length === 1) {
-      ctx.set('flowAssembly', apis[0].flow);
-      ctx.set('target-host', 'http://9.42.102.139:3030'); // TODO: real env
-      ctx.set('request.path', req.originalUrl);           // TODO: real env
-      ctx.set('request.verb', req.method);                // TODO: real env
+      		ctx.set('api', apis[0].context.api);
+      		ctx.set('plan', apis[0].context.plan);
+      		ctx.set('client', apis[0].context.client);
+    	} else if (apis.length === 0) {
+      		// TODO: Do something here to indicate a 404
+      		debug('No APIs found');
+    	} else {
+      		debug('Multiple API matches found: ', apis.length);
+      		// More than one matching API was returned, get the right one, these
+      		// headers may help
+      		//X-IBM-Plan-Id
+      		//X-IBM-Plan-Version
+      		//X-IBM-Api-Version
+      		var planId = req.headers['x-ibm-plan-id'];
+      		var planVersion = req.headers['x-ibm-plan-version'];
+      		var matchFound = false;
+      		for (var i=0; i < apis.length; i++) {
+        		if (apis[i].context.plan.planId === planId &&
+            		    apis[i].context.plan.version === planVersion) {
+          			ctx.set('flowAssembly', apis[i].flow);
+          			ctx.set('target-host', 'http://9.42.102.139:3030'); 
+					// TODO: real env
+          			ctx.set('request.path', req.originalUrl);           
+					// TODO: real env
+          			ctx.set('request.verb', req.method);                
+					// TODO: real env
 
-      ctx.set('api', apis[0].context.api);
-      ctx.set('plan', apis[0].context.plan);
-      ctx.set('client', apis[0].context.client);
-    } else if (apis.length === 0) {
-      // TODO: Do something here to indicate a 404
-      debug('No APIs found');
+          			ctx.set('api', apis[i].context.api);
+          			ctx.set('plan', apis[i].context.plan);
+          			ctx.set('client', apis[i].context.client);
+          			matchFound = true;
+          			break;
+        			}
+      			}
+      		if (matchFound === false) {
+        		// TODO: Do something here to indicate a 404
+        		debug('No APIs found based on header match');
+      			}
+    		}
+	}
+    else
+	{
+	options['path'] = req.originalUrl;
+	options['method'] = req.method;
+	options['clientid'] = ctx.get('client-id');
+	async.series([
+	function(callback) {
+		contextget(options,function(response) {
+        		console.log(response);
+			apis = response;
+			console.log('apis inside:  ' + apis);
+			callback();
+			});
+		},
+	function(callback) {
+		console.log('apis after: ' + apis);
+		if (apis.length === 1) {
+      			console.log('got one');
+      			ctx.set('flowAssembly', apis[0].flow);
+      			ctx.set('target-host', 'http://9.42.102.139:3030'); 
+				// TODO: real env
+      			ctx.set('request.path', req.originalUrl);           
+				// TODO: real env
+      			ctx.set('request.verb', req.method);                
+				// TODO: real env
 
-    } else {
-      debug('Multiple API matches found: ', apis.length);
-      // More than one matching API was returned, get the right one, these
-      // headers may help
-      //X-IBM-Plan-Id
-      //X-IBM-Plan-Version
-      //X-IBM-Api-Version
-      var planId = req.headers['x-ibm-plan-id'];
-      var planVersion = req.headers['x-ibm-plan-version'];
-      var matchFound = false;
-      for (var i=0; i < apis.length; i++) {
-        if (apis[i].context.plan.planId === planId &&
-            apis[i].context.plan.version === planVersion) {
-          ctx.set('flowAssembly', apis[i].flow);
-          ctx.set('target-host', 'http://9.42.102.139:3030'); // TODO: real env
-          ctx.set('request.path', req.originalUrl);           // TODO: real env
-          ctx.set('request.verb', req.method);                // TODO: real env
+      			ctx.set('api', apis[0].context.api);
+      			ctx.set('plan', apis[0].context.plan);
+      			ctx.set('client', apis[0].context.client);
+    		} else if (apis.length === 0) {
+      			// TODO: Do something here to indicate a 404
+      			debug('No APIs found');
 
-          ctx.set('api', apis[i].context.api);
-          ctx.set('plan', apis[i].context.plan);
-          ctx.set('client', apis[i].context.client);
-          matchFound = true;
-          break;
-        }
-      }
-      if (matchFound === false) {
-        // TODO: Do something here to indicate a 404
-        debug('No APIs found based on header match');
-      }
-    }
+    		} else {
+      			debug('Multiple API matches found: ', apis.length);
+      			// More than one matching API was returned, get the right one, these
+      			// headers may help
+      			//X-IBM-Plan-Id
+      			//X-IBM-Plan-Version
+      			//X-IBM-Api-Version
+      			var planId = req.headers['x-ibm-plan-id'];
+      			var matchFound = false;
+      			for (var i=0; i < apis.length; i++) {
+        			if (apis[i].context.plan.planId === planId) {
+          				ctx.set('flowAssembly', apis[i].flow);
+          				ctx.set('target-host', 'http://9.42.102.139:3030'); 
+						// TODO: real env
+          				ctx.set('request.path', req.originalUrl);           
+						// TODO: real env
+          				ctx.set('request.verb', req.method);                
+						// TODO: real env
 
+          				ctx.set('api', apis[i].context.api);
+          				ctx.set('plan', apis[i].context.plan);
+          				ctx.set('client', apis[i].context.client);
+          				matchFound = true;
+          				break;
+        				}
+      				}
+      			if (matchFound === false) {
+        			// TODO: Do something here to indicate a 404
+        			debug('No APIs found based on header match');
+      				}
+    		}
+		callback();
+		}]);
+	}
     next();
   };
 };
