@@ -4,6 +4,7 @@
 
 var async = require('async');
 var request = require('request');
+var debug = require('debug')('strong-gateway:preflow');
 
 /**
  * Module exports
@@ -24,16 +25,16 @@ var host = '127.0.0.1';
 var port = '5000';
 
 var clientID = opts.clientid;
-console.log('clientID: ' + clientID);
+debug('clientID: ', clientID);
 
 var endOfOrgName = opts.path.indexOf('/', 1);
 var orgName = opts.path.substring(1, endOfOrgName);
-console.log('orgName: ' + orgName);
+debug('orgName: ', orgName);
 
 var endOfCatName = opts.path.indexOf('/', endOfOrgName+1);
 var catName = opts.path.substring(endOfOrgName+1, 
 					endOfCatName);
-console.log('catName: ' + catName);
+debug('catName: ', catName);
 
 
 var beginOfFilters = opts.path.indexOf('?', endOfCatName+1);
@@ -46,7 +47,7 @@ else
 	{
 	inboundPath = opts.path.substring(endOfCatName);
 	}
-console.log('inboundPath: ' + inboundPath);
+debug('inboundPath: ', inboundPath);
 
 var clientIDFilter = '{%22client-id%22:%20%22' + clientID + '%22}';
 var catalogNameFilter = '{%22catalog-name%22:%20%22' + catName + '%22}';
@@ -65,14 +66,14 @@ request(
             url : queryurl
             },
         function (error, response, body) {
-		console.log('error: ' + error);
-                console.log('body: %j' , body);
-                console.log('response: %j' , response);
+		debug('error: ', error);
+                debug('body: %j' , body);
+                debug('response: %j' , response);
 		var listOfEntries = JSON.parse(body);
 		async.each(listOfEntries, function(possibleEntryMatch, done) {
 			async.each(possibleEntryMatch['api-paths'], function(pathObject, done) {	
 				var path = pathObject.path;
-				console.log('path: ' + pathObject.path);
+				debug('path: ' , pathObject.path);
 	            		var braceBegin = -1;
 				var braceEnd = -1;
         	    		do {
@@ -84,21 +85,21 @@ request(
               				}
             			} while (braceBegin >= 0);	
 				path = '^' + possibleEntryMatch['api-base-path'] + path + '$';
-				console.log('path after: ' + path);
+				debug('path after: ', path);
 
 				var re = new RegExp(path);
         			var found = re.test(inboundPath);
 
         			if (found) {
 					var pathMethods = pathObject['path-methods'];
-          				console.log('Path match found: ' + path);
-					console.log('Path mthd: ' + JSON.stringify(pathMethods,null,4));
-					console.log('method map: ' + JSON.stringify({method: opts.method}));
+          				debug('Path match found: ', path);
+					debug('Path mthd: ' , JSON.stringify(pathMethods,null,4));
+					debug('method map: ' , JSON.stringify({method: opts.method}));
 					async.each(pathMethods, 
 						   function(possibleMethodMatch, done) {
 						if (possibleMethodMatch.method === opts.method)
 							{
-							console.log('and method/verb matches!');
+							debug('and method/verb matches!');
 							var match = buildPreflowFormat(possibleEntryMatch,
 										       pathObject.path,
 										       possibleMethodMatch);
@@ -106,7 +107,7 @@ request(
 							}
 						else
 							{
-							console.log('no method/verb match though');
+							debug('no method/verb match though');
 							}
 						});
         				}
@@ -182,7 +183,7 @@ function buildPreflowFormat(EntryMatch, PathMatch, MethodMatch) {
 			client: client
 			}
 		};
-	console.log('body: ' +  JSON.stringify(body,null,4));
+	debug('body: ' ,  JSON.stringify(body,null,4));
 	
 	return body;
 }

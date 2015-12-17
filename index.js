@@ -96,6 +96,7 @@ module.exports = function createPreflowMiddleware(options) {
         		debug('No APIs found based on header match');
       			}
     		}
+	next();
 	}
     else
 	{
@@ -105,16 +106,13 @@ module.exports = function createPreflowMiddleware(options) {
 	async.series([
 	function(callback) {
 		contextget(options,function(response) {
-        		console.log(response);
+        		debug('contextget: ', response);
 			apis = response;
-			console.log('apis inside:  ' + apis);
 			callback();
 			});
 		},
 	function(callback) {
-		console.log('apis after: ' + apis);
 		if (apis.length === 1) {
-      			console.log('got one');
       			ctx.set('flowAssembly', apis[0].flow);
       			ctx.set('target-host', 'http://9.42.102.139:3030'); 
 				// TODO: real env
@@ -162,9 +160,12 @@ module.exports = function createPreflowMiddleware(options) {
       				}
     		}
 		callback();
+		},
+	function(callback) {
+		next();
+		callback();
 		}]);
 	}
-    next();
   };
 };
 
@@ -204,23 +205,22 @@ function mockResourceLookup(url, method, clientId) {
     },
     context: {
       api: {
-        id: '343543622',
+        id: '564b7b44e4b0869c782eddd2',
         basepath: '/v1',
         properties: {LDAP: 'bluepages.ibm.com'},
-        operationId: 'routeAdd',
-        path: '/route/{route}',
-        method: 'POST'
+        operationId: 'list',
+        path: '/ascents/{ascents}',
+        method: 'GET'
       },
       plan: {
-        planId: '908422812349',
-        version: '1.0',
-        name: 'gold',
+        planId: 'apim:1.0.0:trial',
+        name: 'trial',
         'rate-limit': '10/sec'
       },
       client: {
         app: {
-          id: '123098456765',
-          secret: 'blah-blah-secret'
+          id: 'fb82cb59-ba95-4c34-8612-e63697d7b845',
+          secret: 'Bk7lTzdlvMh+P22zHG2IIT/sJhKTgiaiG2OHliFHfkE='
         }
       }
     }
@@ -239,32 +239,31 @@ function mockResourceLookup(url, method, clientId) {
     },
     context: {
       api: {
-        id: '343543622',
+        id: '564b7b44e4b0869c782eddd2',
         basepath: '/v1',
         properties: {LDAP: 'bluepages.ibm.com'},
         operationId: 'routeAdd',
-        path: '/route/{route}',
-        method: 'POST'
+        path: '/ascents/{ascents}',
+        method: 'GET'
       },
       plan: {
-        planId: '908422812349',
-        version: '2.0',
+        planId: 'apim:1.0.0:gold',
         name: 'gold',
         'rate-limit': '10/sec'
       },
       client: {
         app: {
-          id: '123098456765',
-          secret: 'blah-blah-secret'
+          id: '612caa59-9649-491f-99b7-d9a941c4bd2e',
+          secret: '4rRnUbv3vRT9hhA82fdmVCXu+mTqOWfI2F1hJYlUixI='
         }
       }
     }
   };
 
-  if (clientId === '123098456765' || clientId === '123098456766') {
+  if (clientId === 'fb82cb59-ba95-4c34-8612-e63697d7b845') {
     matchingApis.push(api1);
   }
-  if (clientId === '123098456766') {
+  if (clientId === '612caa59-9649-491f-99b7-d9a941c4bd2e') {
     matchingApis.push(api2);
   }
   return matchingApis;
