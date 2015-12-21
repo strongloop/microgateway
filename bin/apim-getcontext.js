@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 var program = require('commander');
-var apimlookup = require('../apim-lookup');
+var apimlookup = require('../../server/middleware/preflow/apim-lookup');
 var contextget = apimlookup.contextget;
 
 var options = {};
@@ -18,6 +18,6 @@ options['method'] = program.method;
 options['clientid'] = program.clientid;
 
 
-contextget(options,function(response) {
-        console.log(response);
+contextget(options,function(error, response) {
+        console.log('context: ' + JSON.stringify(response,null,4));
 });
