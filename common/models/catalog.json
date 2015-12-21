@@ -1,0 +1,35 @@
+{
+  "name": "catalog",
+  "base": "PersistedModel",
+  "idInjection": false,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "default": "boolean",
+    "gateway-cluster": {
+      "host-name": "string",
+      "id": "string",
+      "title": "string"
+    },
+    "id": {
+      "type": "string",
+      "generated": false,
+      "defaultFn": "uuid",
+      "id": true
+    },
+    "name": "string",
+    "organization": {
+      "id": "string",
+      "name": "string",
+      "title": "string"
+    },
+    "sandbox": "boolean",
+    "title": "string",
+    "url": "string"
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

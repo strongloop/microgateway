@@ -1,0 +1,34 @@
+{
+  "name": "optimizedData",
+  "base": "PersistedModel",
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "subscription-id": "string",
+    "client-id": "string",
+    "client-secret": "string",
+    "catalog-id": "string",
+    "catalog-name": "string",
+    "organization-id": "string",
+    "organization-name": "string",
+    "product-id": "string",
+    "product-name": "string",
+    "plan-id": "string",
+    "plan-name": "string",
+    "api-id": "string",
+    "api-base-path": "string",
+    "api-paths": [{
+      "path": "string",
+      "path-methods": [{
+		"method": "string",
+		"operationId": "string"
+      		}]
+    }],
+    "snapshot-id": "string"
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

@@ -1,0 +1,90 @@
+{
+  "name": "product",
+  "base": "PersistedModel",
+  "idInjection": false,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "catalog": {
+      "default": "boolean",
+      "id": "string",
+      "name": "string",
+      "sandbox": "boolean",
+      "title": "string",
+      "url": "string"
+    },
+    "document": {
+      "apis": [
+        {
+          "$ref": "string"
+        }
+      ],
+      "info": {
+        "name": "string",
+        "title": "string",
+        "version": "string"
+      },
+      "plans": {
+        "gold": {
+          "apis": [
+            {
+              "$ref": "string"
+            }
+          ],
+          "rate-limit": {
+            "hard-limit": "boolean",
+            "value": "string"
+          },
+          "title": "string"
+        }
+      },
+      "product": "string",
+      "visibility": {
+        "subscribe": {
+          "enabled": "boolean",
+          "orgs": "array",
+          "tags": "array",
+          "type": "string"
+        },
+        "view": {
+          "enabled": "boolean",
+          "orgs": "array",
+          "tags": "array",
+          "type": "string"
+        }
+      }
+    },
+    "id": {
+      "type": "string",
+      "generated": false,
+      "defaultFn": "uuid",
+      "id": true
+    },
+    "organization": {
+      "id": "string",
+      "name": "string",
+      "title": "string"
+    },
+    "state": "string",
+    "url": "string",
+    "visibility": {
+      "subscribe": {
+        "enabled": "boolean",
+        "orgs": "array",
+        "tags": "array",
+        "type": "string"
+      },
+      "view": {
+        "enabled": "boolean",
+        "orgs": "array",
+        "tags": "array",
+        "type": "string"
+      }
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}
