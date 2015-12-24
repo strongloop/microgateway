@@ -4,7 +4,7 @@
  *  with the actual context variable value.
  *
  *  For example, 
- *  - invoke-api:
+ *  - invoke:
  *      url: "https://$(target-host)/services/climbing/$(reqest.path)
  *
  *  The url after replaced will be:
