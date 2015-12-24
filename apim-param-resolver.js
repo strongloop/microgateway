@@ -17,10 +17,10 @@
  */
 'use strict';
 var debug = require('debug')('strong-gateway:apim-param-resolver');
-var util = require('util');
+var _ = require('lodash');
 
 module.exports = function(context, name, value) {
-  if (util.isString(value)) {
+  if (_.isString(value)) {
     var newValue = value.replace(/\$\(([^)]+)\)/gm, function(m, g1) {
         return context.get(g1);
     }); 
