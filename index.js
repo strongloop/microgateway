@@ -89,7 +89,7 @@ module.exports = function createPreflowMiddleware(options) {
 //    var assembly =
 //        'assembly:\n' +
 //        '  execute:\n' +
-//        '    - invoke-api:\n' +
+//        '    - invoke:\n' +
 //        '        target-url: "http://$(target-host)/$(request.path)"\n'+
 //        '        verb: $(request.verb)\n';
 //
@@ -159,7 +159,7 @@ function mockResourceLookup(url, method, clientId) {
     flow: {
       assembly: {
         execute: [{
-          'invoke-api': {
+          'invoke': {
             'target-url':
               'http://127.0.0.1:8889/api1'
           }
@@ -193,7 +193,7 @@ function mockResourceLookup(url, method, clientId) {
     flow: {
       assembly: {
         execute: [{
-          'invoke-api': {
+          'invoke': {
             'target-url':
               'http://127.0.0.1:8889/api2'
           }
