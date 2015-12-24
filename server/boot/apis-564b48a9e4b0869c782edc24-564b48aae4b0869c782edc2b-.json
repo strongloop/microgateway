@@ -386,7 +386,7 @@
             "x-ibm-configuration": {
                 "assembly": {
                     "execute": [{
-                	"invoke-api": {
+                	"invoke": {
                         	"target-url": "http://127.0.0.1:8889/api0"
                         	}
                                 }]
@@ -758,7 +758,7 @@
             "x-ibm-configuration": {
                 "assembly": {
                     "execute": [{
-                        "invoke-api": {
+                        "invoke": {
                                 "target-url": "http://127.0.0.1:8889/api1"
                                 }
                                 }]
@@ -1106,7 +1106,7 @@
             "x-ibm-configuration": {
                 "assembly": {
                     "execute": [{
-                        "invoke-api": {
+                        "invoke": {
                                 "target-url": "http://127.0.0.1:8889/api2"
                                 }
                                 }]
@@ -1722,7 +1722,7 @@
             "x-ibm-configuration": {
 		"assembly": {
                     "execute": [{
-                        "invoke-api": {
+                        "invoke": {
                                 "target-url": "http://127.0.0.1:8889/api3"
                                 }
                                 }]
