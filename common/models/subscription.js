@@ -1,17 +1,15 @@
 var async = require('async');
 var app = require('../../server/server');
+var debug = require('debug')('strong-gateway:data-store');
 
-
-//apis.findById("string", function(err, api)
-//apis.find({where: {id: "string"}}, function(err, api)
 
 module.exports = function(Subscriptions) {
 
 Subscriptions.observe('after save', function(ctx, next) {
-  console.log('supports isNewInstance?', ctx.isNewInstance !== undefined);
+  debug('supports isNewInstance?', ctx.isNewInstance !== undefined);
   if (ctx.isNewInstance)
 	{
-        console.log('new subscription received: ' + 
+        debug('new subscription received: ', 
 		JSON.stringify(ctx.instance,null,4));
 	var locals = {};
 	locals.ctx = ctx;
@@ -73,7 +71,7 @@ function grabOrg(catalog, cb) {
 
 function grabAPIs(plan, cb) {
         var apis = [];
-	console.log('found plan: %j', plan);
+	debug('found plan: %j', plan);
 	async.each(plan.apis, function(api, done) {
 		app.models.api.find({}, function(err, listOfApis) {
                 	if (err) throw err;
@@ -83,7 +81,7 @@ function grabAPIs(plan, cb) {
 			      DBapi.document.info['x-ibm-name'] === 
 						api.document.info['x-ibm-name'])
 			  	  {
-				  console.log('found api in db: %j', DBapi);
+				  debug('found api in db: %j', DBapi);
 				  apis.push(DBapi);
 				  }
 				});
@@ -98,18 +96,18 @@ function createOptimizedDataEntries(pieces, cb) {
 		function(credential, done) { //each clientid
 		async.each(pieces.apis, function(api, done) {  // each api
 			var apiPaths = [];
-			console.log('pathsProp ' + 
+			debug('pathsProp ' + 
 				Object.getOwnPropertyNames(api.document['paths']));
 			async.each(Object.getOwnPropertyNames(api.document['paths']), 
 				function(propname, done) {
 				var method = [];
 				if (propname.indexOf('/') > -1)
 					{
-					console.log('propname: ' + propname);
+					debug('propname: ' + propname);
 					async.each(Object.getOwnPropertyNames(api.document.paths[propname]), 
 						function(methodname, done) {
-						console.log('propname method: %j', methodname);
-						console.log('propname operationId: %j', 
+						debug('propname method: %j', methodname);
+						debug('propname operationId: %j', 
 							api.document.paths[propname][methodname].operationId);
 						method.push({	
 							method: methodname.toUpperCase(),
@@ -143,7 +141,7 @@ function createOptimizedDataEntries(pieces, cb) {
                 	}],
            	TODO: "snapshot-id": "string"
             	*/
-		console.log('pieces: ' + JSON.stringify(pieces,null,4));
+		debug('pieces: ' + JSON.stringify(pieces,null,4));
                 var newOptimizedDataEntry = {
                 	'subscription-id': pieces.ctx.instance.id,
                         'client-id': credential['client-id'],
@@ -166,7 +164,7 @@ function createOptimizedDataEntries(pieces, cb) {
                         app.models.optimizedData.create(newOptimizedDataEntry, 
 				function(err, optimizedData) {
                                 if (err) throw err;
-                                console.log('optimizedData created: %j', 
+                                debug('optimizedData created: %j', 
 					optimizedData);
                                 });
                         });
