@@ -1,5 +1,5 @@
 {
-  "name": "apim-datastore",
+  "name": "data-store",
   "version": "1.0.0",
   "main": "server/server.js",
   "scripts": {
