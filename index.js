@@ -20,8 +20,6 @@ function populateAPImCtx(req, ctx, apis) {
   if (apis.length === 1) {
     ctx.set('flowAssembly', apis[0].flow);
     ctx.set('target-host', 'http://9.42.102.139:3030'); // TODO: real env
-    ctx.set('request.path', req.originalUrl);           // TODO: real env
-    ctx.set('request.verb', req.method);                // TODO: real env
 
     ctx.set('api', apis[0].context.api);
     ctx.set('plan', apis[0].context.plan);
@@ -47,8 +45,6 @@ function populateAPImCtx(req, ctx, apis) {
         // apis[i].context.plan.version === planVersion
         ctx.set('flowAssembly', apis[i].flow);
         ctx.set('target-host', 'http://9.42.102.139:3030'); // TODO: real env
-        ctx.set('request.path', req.originalUrl);           // TODO: real env
-        ctx.set('request.verb', req.method);                // TODO: real env
 
         ctx.set('api', apis[i].context.api);
         ctx.set('plan', apis[i].context.plan);
