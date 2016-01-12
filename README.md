@@ -6,11 +6,11 @@ The `preflow` middleware has 2 basic responsibilities.
 
 To achieve these goals, the preflow must determine which API is being called by the request. The information used to determine an API match are the request URI, the HTTP Method, and the clientID (if available).
 
-The algorithm to determine an API match can be described as follows.
-1. Check for an exact match (request matches URLPath + ClientID + Method)
-2. Check for ClientID + Method, but URLPath with missing default environment (e.g. missing "prod" in org/prod)
-3. Check for URLPath + Method but see if an API is available that does not require ClientID
-4. Check for URLPath with missing environment name + Method but see if an API is available that does not require ClientID
+The algorithm to determine an API match can be described as follows:
+ 1. Check for an exact match (request matches URLPath + ClientID + Method)
+ 1. Check for ClientID + Method, but URLPath with missing default environment (e.g. missing "prod" in org/prod)
+ 1. Check for URLPath + Method but see if an API is available that does not require ClientID
+ 1. Check for URLPath with missing environment name + Method but see if an API is available that does not require ClientID
 
 In all of these scenarios, if multiple API matches are found, the most specific API match is used. Specificity is determined by ranking the matches by the number of path parameters (and TBD possibly their position).
 Boring implementation detail: Path parameters are replaced by regex wildcards, the more wildcards a path has the higher its score is. The matching logic picks the lowest possible score from matching paths.
