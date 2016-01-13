@@ -20,10 +20,11 @@
     "api-base-path": "string",
     "api-paths": [{
       "path": "string",
+      "path-regex": "string",
       "path-methods": [{
-		"method": "string",
-		"operationId": "string"
-      		}]
+        "method": "string",
+        "operationId": "string"
+      }]
     }],
     "snapshot-id": "string"
   },
