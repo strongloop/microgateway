@@ -260,10 +260,8 @@ function findContext(filter, body) {
     listOfEntries.forEach(function(possibleEntryMatch) {
         debug('possibleEntryMatch ', possibleEntryMatch);
         possibleEntryMatch['api-paths'].forEach(function(pathObject) {
-            // build path match regular expression
-            var path = buildPathMatch(
-                           pathObject.path,
-                           possibleEntryMatch['api-base-path']);
+            // get path match regular expression
+            var path = pathObject['path-regex'];
 
             // use regular expression matching to see if there are any
             // APIs that match the request
@@ -288,34 +286,6 @@ function findContext(filter, body) {
 
     debug ('findContext exit');
     return matches;
-}
-
-/**
- * Builds a regular expression of the API path to match
- * @param {string} origPath - OpenAPI spec's API path
- * @param {string} basePath - OpenAPI spec's API base path
- * @returns {string} - regular expression string to match against
- */
-function buildPathMatch(origPath, basePath) {
-
-    debug('buildPathMatch entry');
-    debug('path: ' , origPath);
-    var path = origPath;
-    var braceBegin = -1;
-    var braceEnd = -1;
-    // replace path templates w/ wildcards
-    do {
-        braceBegin = path.indexOf('{');
-        if (braceBegin >= 0) {
-            braceEnd = path.indexOf('}') + 1;
-            var variablePath = path.substring(braceBegin, braceEnd);
-            path = path.replace(variablePath, '.*');
-        }
-    } while (braceBegin >= 0);
-    path = '^' + basePath + path + '$';
-    debug('path after: ', path);
-    debug('buildPathMatch exit');
-    return path;
 }
 
 /**
