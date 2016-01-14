@@ -37,16 +37,16 @@ function apimcontextget (opts, cb) {
 
     // build request to send to data-store
     var clientIDFilter = '{"client-id": "' + filters.clientid + '"}';
-    var catalogNameFilter = 
+    var catalogNameFilter =
         '{"catalog-name": "' + filters.catName + '"}';
-    var organizationNameFilter = 
+    var organizationNameFilter =
         '{"organization-name": "' + filters.orgName + '"}';
-    var queryfilter = 
-        '{"where": { "and":[' + 
-        clientIDFilter + ',' + 
-        catalogNameFilter + ',' + 
+    var queryfilter =
+        '{"where": { "and":[' +
+        clientIDFilter + ',' +
+        catalogNameFilter + ',' +
         organizationNameFilter + ']}}';
-    var queryurl = 'http://' + host + ':' + port + 
+    var queryurl = 'http://' + host + ':' + port +
         '/api/optimizedData?filter=' +
         encodeURIComponent(queryfilter);
 
@@ -77,7 +77,46 @@ function apimcontextget (opts, cb) {
                     localcontexts = contexts;
                     cb(err, localcontexts);
                 }
-            );                
+            );
+        }
+    );
+}
+
+/**
+ * Finds the default catalog/environment for a specific provider organization
+ * @param {string} orgName - Name or provider organization
+ * @param {callback} cb - The callback that handles the error or output context
+ */
+function apimGetDefaultCatalog(orgName, cb) {
+    var orgNameFilter = '{%22organization.name%22:%20%22' + orgName + '%22}';
+    var defaultOrgFilter = '{%22default%22:%20%22true%22}';
+    var queryfilter =
+        '{%22where%22:%20{%20%22and%22:[' +
+        orgNameFilter + ',' +
+        defaultOrgFilter + ']}}';
+    var queryurl = 'http://' + host + ':' + port +
+        '/api/catalogs?filter=' + queryfilter;
+
+    request(
+        {
+            url: queryurl
+        },
+        function(error, response, body) {
+            debug('error: ', error);
+            debug('body: %j', body);
+            debug('response: %j', response);
+            if (error) {
+                cb(error, undefined);
+                return;
+            }
+
+            var catalogs = JSON.parse(body);
+            debug('catalog returned: %j', catalogs);
+            if (catalogs.length === 1) {
+                cb(null, catalogs[0].name);
+            } else {
+                cb(null, undefined);
+            }
         }
     );
 }
@@ -85,7 +124,7 @@ function apimcontextget (opts, cb) {
 /**
  * Adds flow information from each API in the array of contexts
  * @param {Array} contexts - array of context objects
- * @param {callback} callback - The callback that handles the error 
+ * @param {callback} callback - The callback that handles the error
  *                              or output context
  */
 function addFlows(contexts, callback) {
@@ -93,7 +132,7 @@ function addFlows(contexts, callback) {
     debug('addFlows entry');
     debug('addFlows contexts:', contexts);
     var localContexts = [];
-    async.forEach(contexts, 
+    async.forEach(contexts,
         function(context, callback) {
             debug('addFlows middle context:', context);
             grabAPI(context, function(err, apiDef) {
@@ -104,19 +143,19 @@ function addFlows(contexts, callback) {
                 debug('addFlows callback end');
                 callback();
             });
-        }, 
+        },
         function(err) {
             debug('addFlows error callback');
             callback(err, localContexts);
         }
     );
     debug('addFlows exit1');
-}    
-    
+}
+
 /**
  * Adds flow information from API in the context
  * @param {Object} context - context object
- * @param {callback} callback - The callback that handles the error 
+ * @param {callback} callback - The callback that handles the error
  *                              or output context
  */
 function grabAPI(context, callback) {
@@ -146,7 +185,7 @@ function grabAPI(context, callback) {
     );
     debug('grabAPI exit');
 }
-    
+
 /**
  * Extracts client ID, organization, catalog, method and remaining path
  * @param {Object} opts - request options
@@ -169,7 +208,7 @@ function grabFilters(opts) {
         // extract org name
         orgName = uri[1];
         debug('orgName: ', orgName);
-    
+
         if (uri.length > 2) {
             // extract catalog name
             catName = uri[2];
@@ -183,11 +222,11 @@ function grabFilters(opts) {
     }
     debug('inboundPath: ', inboundPath);
     debug('grabFilters exit');
-    
-    return {clientid: opts.clientid, 
-            orgName: orgName, 
-            catName: catName, 
-            inboundPath: inboundPath, 
+
+    return {clientid: opts.clientid,
+            orgName: orgName,
+            catName: catName,
+            inboundPath: inboundPath,
             method: opts.method};
 }
 
@@ -224,9 +263,9 @@ function findContext(filter, body) {
             var re = new RegExp(path);
             var foundPath = re.test(filter.inboundPath);
 
-            if (foundPath) { // path found... 
+            if (foundPath) { // path found...
                 // now let's see if the Method exists
-                var MatchingMethod = 
+                var MatchingMethod =
                     findMethodMatch(filter.method,
                                     pathObject['path-methods'],
                                     possibleEntryMatch.method);
@@ -269,7 +308,7 @@ function buildPathMatch(origPath, basePath) {
     path = '^' + basePath + path + '$';
     debug('path after: ', path);
     debug('buildPathMatch exit');
-    return path;    
+    return path;
 }
 
 /**
