@@ -32,6 +32,12 @@ var port = '5000';      // data-store's listening port
  * @param {callback} cb - The callback that handles the error or output context
  */
 function apimcontextget (opts, cb) {
+
+// hack test
+//apimGetDefaultCatalog('hikeon', function(error, value) {
+// console.log('default catalog: ' +  value);
+//});
+
     // extract filters from request
     var filters = grabFilters(opts);
 
@@ -87,6 +93,7 @@ function apimcontextget (opts, cb) {
  * @param {string} orgName - Name or provider organization
  * @param {callback} cb - The callback that handles the error or output context
  */
+/*exported apimGetDefaultCatalog */
 function apimGetDefaultCatalog(orgName, cb) {
     var orgNameFilter = '{%22organization.name%22:%20%22' + orgName + '%22}';
     var defaultOrgFilter = '{%22default%22:%20%22true%22}';
