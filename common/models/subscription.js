@@ -199,12 +199,10 @@ function calculateMatchingScore(apiPath) {
   var pathArray = apiPath.split('/');
   var pathScore = 0;
   for (var i=1; i < pathArray.length; i++) {
-    console.log('pathArray[' + i + ']=' + pathArray[i]);
     if (pathArray[i].indexOf('{') >= 0) {
       pathScore += i;
     }
   }
 
-  console.log('path: ' + apiPath + ' score: ', pathScore);
   return pathScore;
 }
