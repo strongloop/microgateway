@@ -1,0 +1,1747 @@
+[
+    {
+        "catalog": {
+            "default": false,
+            "id": "564b48aae4b0869c782edc2b",
+            "name": "sb",
+            "sandbox": true,
+            "title": "Sandbox",
+            "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+        },
+        "document": {
+            "basePath": "/v1",
+            "definitions": {
+                "Activities": {
+                    "properties": {
+                        "count": {
+                            "description": "Total number of items available.",
+                            "format": "int32",
+                            "type": "integer"
+                        },
+                        "history": {
+                            "items": {
+                                "$ref": "#/definitions/Activity"
+                            },
+                            "type": "array"
+                        },
+                        "limit": {
+                            "description": "Number of items to retrieve (100 max).",
+                            "format": "int32",
+                            "type": "integer"
+                        },
+                        "offset": {
+                            "description": "Position in pagination.",
+                            "format": "int32",
+                            "type": "integer"
+                        }
+                    }
+                },
+                "Activity": {
+                    "properties": {
+                        "uuid": {
+                            "description": "Unique identifier for the activity",
+                            "type": "string"
+                        }
+                    }
+                },
+                "Error": {
+                    "properties": {
+                        "code": {
+                            "format": "int32",
+                            "type": "integer"
+                        },
+                        "fields": {
+                            "type": "string"
+                        },
+                        "message": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "PriceEstimate": {
+                    "properties": {
+                        "currency_code": {
+                            "description": "[ISO 4217](http://en.wikipedia.org/wiki/ISO_4217) currency code.",
+                            "type": "string"
+                        },
+                        "display_name": {
+                            "description": "Display name of product.",
+                            "type": "string"
+                        },
+                        "estimate": {
+                            "description": "Formatted string of estimate in local currency of the start location. Estimate could be a range, a single number (flat rate) or \"Metered\" for TAXI.",
+                            "type": "string"
+                        },
+                        "high_estimate": {
+                            "description": "Upper bound of the estimated price.",
+                            "type": "number"
+                        },
+                        "low_estimate": {
+                            "description": "Lower bound of the estimated price.",
+                            "type": "number"
+                        },
+                        "product_id": {
+                            "description": "Unique identifier representing a specific product for a given latitude & longitude. For example, uberX in San Francisco will have a different product_id than uberX in Los Angeles",
+                            "type": "string"
+                        },
+                        "surge_multiplier": {
+                            "description": "Expected surge multiplier. Surge is active if surge_multiplier is greater than 1. Price estimate already factors in the surge multiplier.",
+                            "type": "number"
+                        }
+                    }
+                },
+                "Product": {
+                    "properties": {
+                        "capacity": {
+                            "description": "Capacity of product. For example, 4 people.",
+                            "type": "string"
+                        },
+                        "description": {
+                            "description": "Description of product.",
+                            "type": "string"
+                        },
+                        "display_name": {
+                            "description": "Display name of product.",
+                            "type": "string"
+                        },
+                        "image": {
+                            "description": "Image URL representing the product.",
+                            "type": "string"
+                        },
+                        "product_id": {
+                            "description": "Unique identifier representing a specific product for a given latitude & longitude. For example, uberX in San Francisco will have a different product_id than uberX in Los Angeles.",
+                            "type": "string"
+                        }
+                    }
+                },
+                "Profile": {
+                    "properties": {
+                        "email": {
+                            "description": "Email address of the Uber user",
+                            "type": "string"
+                        },
+                        "first_name": {
+                            "description": "First name of the Uber user.",
+                            "type": "string"
+                        },
+                        "last_name": {
+                            "description": "Last name of the Uber user.",
+                            "type": "string"
+                        },
+                        "picture": {
+                            "description": "Image URL of the Uber user.",
+                            "type": "string"
+                        },
+                        "promo_code": {
+                            "description": "Promo code of the Uber user.",
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "host": "api.uber.com",
+            "info": {
+                "description": "Move your app forward with the Uber API",
+                "title": "Uber API",
+                "version": "1.0.0",
+                "x-ibm-name": "uber-api"
+            },
+            "paths": {
+                "/estimates/price": {
+                    "get": {
+                        "deprecated": false,
+                        "description": "The Price Estimates endpoint returns an estimated price range\nfor each product offered at a given location. The price estimate is\nprovided as a formatted string with the full price range and the localized\ncurrency symbol.<br><br>The response also includes low and high estimates,\nand the [ISO 4217](http://en.wikipedia.org/wiki/ISO_4217) currency code for\nsituations requiring currency conversion. When surge is active for a particular\nproduct, its surge_multiplier will be greater than 1, but the price estimate\nalready factors in this multiplier.\n",
+                        "parameters": [
+                            {
+                                "description": "Latitude component of start location.",
+                                "format": "double",
+                                "in": "query",
+                                "name": "start_latitude",
+                                "required": true,
+                                "type": "number"
+                            },
+                            {
+                                "description": "Longitude component of start location.",
+                                "format": "double",
+                                "in": "query",
+                                "name": "start_longitude",
+                                "required": true,
+                                "type": "number"
+                            },
+                            {
+                                "description": "Latitude component of end location.",
+                                "format": "double",
+                                "in": "query",
+                                "name": "end_latitude",
+                                "required": true,
+                                "type": "number"
+                            },
+                            {
+                                "description": "Longitude component of end location.",
+                                "format": "double",
+                                "in": "query",
+                                "name": "end_longitude",
+                                "required": true,
+                                "type": "number"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "An array of price estimates by product",
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/definitions/PriceEstimate"
+                                    },
+                                    "type": "array"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Price Estimates",
+                        "tags": [
+                            "Estimates"
+                        ]
+                    }
+                },
+                "/estimates/time": {
+                    "get": {
+                        "deprecated": false,
+                        "description": "The Time Estimates endpoint returns ETAs for all products offered at a given location, with the responses expressed as integers in seconds. We recommend that this endpoint be called every minute to provide the most accurate, up-to-date ETAs.",
+                        "parameters": [
+                            {
+                                "description": "Latitude component of start location.",
+                                "format": "double",
+                                "in": "query",
+                                "name": "start_latitude",
+                                "required": true,
+                                "type": "number"
+                            },
+                            {
+                                "description": "Longitude component of start location.",
+                                "format": "double",
+                                "in": "query",
+                                "name": "start_longitude",
+                                "required": true,
+                                "type": "number"
+                            },
+                            {
+                                "description": "Unique customer identifier to be used for experience customization.",
+                                "format": "uuid",
+                                "in": "query",
+                                "name": "customer_uuid",
+                                "type": "string"
+                            },
+                            {
+                                "description": "Unique identifier representing a specific product for a given latitude & longitude.",
+                                "in": "query",
+                                "name": "product_id",
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "An array of products",
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/definitions/Product"
+                                    },
+                                    "type": "array"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Time Estimates",
+                        "tags": [
+                            "Estimates"
+                        ]
+                    }
+                },
+                "/history": {
+                    "get": {
+                        "deprecated": false,
+                        "description": "The User Activity endpoint returns data about a user's lifetime activity with Uber. The response will include pickup locations and times, dropoff locations and times, the distance of past requests, and information about which products were requested.<br><br>The history array in the response will have a maximum length based on the limit parameter. The response value count may exceed limit, therefore subsequent API requests may be necessary.",
+                        "parameters": [
+                            {
+                                "description": "Offset the list of returned results by this amount. Default is zero.",
+                                "format": "int32",
+                                "in": "query",
+                                "name": "offset",
+                                "type": "integer"
+                            },
+                            {
+                                "description": "Number of items to retrieve. Default is 5, maximum is 100.",
+                                "format": "int32",
+                                "in": "query",
+                                "name": "limit",
+                                "type": "integer"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "History information for the given user",
+                                "schema": {
+                                    "$ref": "#/definitions/Activities"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "User Activity",
+                        "tags": [
+                            "User"
+                        ]
+                    }
+                },
+                "/me": {
+                    "get": {
+                        "deprecated": false,
+                        "description": "The User Profile endpoint returns information about the Uber user that has authorized with the application.",
+                        "responses": {
+                            "200": {
+                                "description": "Profile information for a user",
+                                "schema": {
+                                    "$ref": "#/definitions/Profile"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "User Profile",
+                        "tags": [
+                            "User"
+                        ]
+                    }
+                },
+                "/products": {
+                    "get": {
+                        "deprecated": false,
+                        "description": "The Products endpoint returns information about the *Uber* products\noffered at a given location. The response includes the display name\nand other details about each product, and lists the products in the\nproper display order.\n",
+                        "parameters": [
+                            {
+                                "description": "Latitude component of location.",
+                                "format": "double",
+                                "in": "query",
+                                "name": "latitude",
+                                "required": true,
+                                "type": "number"
+                            },
+                            {
+                                "description": "Longitude component of location.",
+                                "format": "double",
+                                "in": "query",
+                                "name": "longitude",
+                                "required": true,
+                                "type": "number"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "An array of products",
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/definitions/Product"
+                                    },
+                                    "type": "array"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Product Types",
+                        "tags": [
+                            "Products"
+                        ]
+                    }
+                }
+            },
+            "produces": [
+                "application/json"
+            ],
+            "schemes": [
+                "https"
+            ],
+            "swagger": "2.0",
+            "x-ibm-configuration": {
+                "assembly": {
+                    "execute": [{
+                	"invoke": {
+                        	"target-url": "http://127.0.0.1:8889/api0"
+                        	}
+                                }]
+                },
+                "cors": {
+                    "enabled": false
+                },
+                "enforced": true,
+                "phase": "identified",
+                "testable": false
+            }
+        },
+        "id": "564b7b3ae4b0869c782eddae",
+        "organization": {
+            "id": "564b48a9e4b0869c782edc24",
+            "name": "apim",
+            "title": "Climb On"
+        },
+        "state": "running",
+        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+    },
+    {
+        "catalog": {
+            "default": false,
+            "id": "564b48aae4b0869c782edc2b",
+            "name": "sb",
+            "sandbox": true,
+            "title": "Sandbox",
+            "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+        },
+        "document": {
+            "basePath": "/v1",
+            "consumes": [
+                "application/json"
+            ],
+            "definitions": {
+                "Ascent": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "date": {
+                            "type": "string"
+                        },
+                        "id": {
+                            "type": "string"
+                        },
+                        "route": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "AscentCreate": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "date": {
+                            "type": "string"
+                        },
+                        "route": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "route"
+                    ],
+                    "type": "object"
+                },
+                "AscentList": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "results": {
+                            "items": [
+                                {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "date": {
+                                            "type": "string"
+                                        },
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "route": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            ],
+                            "type": "array"
+                        },
+                        "total_results": {
+                            "type": "integer"
+                        }
+                    },
+                    "type": "object"
+                },
+                "AscentUpdate": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "date": {
+                            "type": "string"
+                        },
+                        "route": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "Error": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "message": {
+                            "type": [
+                                "string",
+                                "array"
+                            ]
+                        },
+                        "status": {
+                            "type": "integer"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "host": "localhost:3000",
+            "info": {
+                "contact": {
+                    "email": "joedeveloper@someemailservice.com",
+                    "name": "Joe API Developer",
+                    "url": "http://developer.acme.com/contacturl"
+                },
+                "description": "The /v1 set of Ascent APIs",
+                "license": {
+                    "name": "License Name Goes Here...",
+                    "url": "http://developer.acme.com/licenseurl"
+                },
+                "termsOfService": "The Terms of Service for the API are ...",
+                "title": "ascents",
+                "version": "1.0.0",
+                "x-ibm-name": "ascents"
+            },
+            "paths": {
+                "/ascents": {
+                    "get": {
+                        "deprecated": false,
+                        "description": "List Ascent",
+                        "operationId": "list",
+                        "parameters": [
+                            {
+                                "description": "What element to start the list at, default is 0",
+                                "in": "query",
+                                "name": "offset",
+                                "required": false,
+                                "type": "string"
+                            },
+                            {
+                                "description": "Total number of items to return, default is 10",
+                                "in": "query",
+                                "name": "limit",
+                                "required": false,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Success",
+                                "schema": {
+                                    "$ref": "#/definitions/AscentList"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "List Ascent",
+                        "tags": [
+                            "Ascent"
+                        ]
+                    },
+                    "post": {
+                        "deprecated": false,
+                        "description": "Create a Ascent",
+                        "parameters": [
+                            {
+                                "description": "Ascent to create",
+                                "in": "body",
+                                "name": "payload",
+                                "required": true,
+                                "schema": {
+                                    "$ref": "#/definitions/AscentCreate"
+                                }
+                            }
+                        ],
+                        "responses": {
+                            "201": {
+                                "description": "Successful create",
+                                "schema": {
+                                    "$ref": "#/definitions/Ascent"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Create a Ascent",
+                        "tags": [
+                            "Ascent"
+                        ]
+                    }
+                },
+                "/ascents/{ascent}": {
+                    "delete": {
+                        "deprecated": false,
+                        "description": "Delete the Ascent",
+                        "operationId": "del",
+                        "parameters": [
+                            {
+                                "description": "Ascent id",
+                                "in": "path",
+                                "name": "ascent",
+                                "required": true,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "204": {
+                                "description": "Successful delete"
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Delete the Ascent",
+                        "tags": [
+                            "Ascent"
+                        ]
+                    },
+                    "get": {
+                        "deprecated": false,
+                        "description": "Retrieve the Ascent",
+                        "parameters": [
+                            {
+                                "description": "Ascent id",
+                                "in": "path",
+                                "name": "ascent",
+                                "required": true,
+                                "type": "string"
+                            },
+                            {
+                                "description": "Return a subset of the fields",
+                                "in": "query",
+                                "name": "fields",
+                                "required": false,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Success",
+                                "schema": {
+                                    "$ref": "#/definitions/Ascent"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Retrieve the Ascent",
+                        "tags": [
+                            "Ascent"
+                        ]
+                    },
+                    "put": {
+                        "deprecated": false,
+                        "description": "Update Ascent",
+                        "parameters": [
+                            {
+                                "description": "Ascent id",
+                                "in": "path",
+                                "name": "ascent",
+                                "required": true,
+                                "type": "string"
+                            },
+                            {
+                                "description": "Ascent to update",
+                                "in": "body",
+                                "name": "payload",
+                                "required": true,
+                                "schema": {
+                                    "$ref": "#/definitions/AscentUpdate"
+                                }
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Success",
+                                "schema": {
+                                    "$ref": "#/definitions/Ascent"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Update Ascent",
+                        "tags": [
+                            "Ascent"
+                        ]
+                    }
+                }
+            },
+            "produces": [
+                "application/json"
+            ],
+            "schemes": [
+                "https"
+            ],
+            "securityDefinitions": {
+                "oauthImplicit": {
+                    "authorizationUrl": "http://swagger.io/api/oauth/dialog",
+                    "flow": "implicit",
+                    "scopes": {
+                        "scope1": "blah description",
+                        "scope2": "blah blah description"
+                    },
+                    "type": "oauth2",
+                    "x-ibm-oauth2": {
+                        "authentication": [
+                            "basicAuth",
+                            "form"
+                        ],
+                        "authenticationForm": {
+                            "tlsClient": "Some SSL Profile Configuration Name",
+                            "url": "https://somehost.com/authenticate"
+                        },
+                        "authenticationRegistry": "Some Registry Configuration Name",
+                        "authenticationUrl": {
+                            "tlsClient": "Some SSL Profile Configuration Name",
+                            "url": "https://somehost.com/authenticate"
+                        },
+                        "authorization": "form",
+                        "authorizationForm": {
+                            "tlsClient": "Some SSL Profile Configuration Name",
+                            "url": "https://somehost.com/authorization"
+                        },
+                        "refreshToken": false,
+                        "revocationUrl": {
+                            "tlsClient": "Some SSL Profile Configuration Name",
+                            "url": "https://somehost.com/revoke"
+                        }
+                    }
+                }
+            },
+            "swagger": "2.0",
+            "x-ibm-configuration": {
+                "assembly": {
+                    "execute": [{
+                        "invoke": {
+                                "target-url": "http://127.0.0.1:8889/api1"
+                                }
+                                }]
+                },
+                "cors": {
+                    "enabled": false
+                },
+                "enforced": true,
+                "phase": "identified",
+                "testable": false
+            }
+        },
+        "id": "564b7b44e4b0869c782eddd2",
+        "organization": {
+            "id": "564b48a9e4b0869c782edc24",
+            "name": "apim",
+            "title": "Climb On"
+        },
+        "state": "running",
+        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b44e4b0869c782eddd2"
+    },
+    {
+        "catalog": {
+            "default": false,
+            "id": "564b48aae4b0869c782edc2b",
+            "name": "sb",
+            "sandbox": true,
+            "title": "Sandbox",
+            "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+        },
+        "document": {
+            "basePath": "/v1",
+            "consumes": [
+                "application/json"
+            ],
+            "definitions": {
+                "Error": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "message": {
+                            "type": [
+                                "string",
+                                "array"
+                            ]
+                        },
+                        "status": {
+                            "type": "integer"
+                        }
+                    },
+                    "type": "object"
+                },
+                "Forecast": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "conditions": {
+                            "type": "string"
+                        },
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "ForecastCreate": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "conditions": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "name"
+                    ],
+                    "type": "object"
+                },
+                "ForecastList": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "results": {
+                            "items": [
+                                {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "conditions": {
+                                            "type": "string"
+                                        },
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            ],
+                            "type": "array"
+                        },
+                        "total_results": {
+                            "type": "integer"
+                        }
+                    },
+                    "type": "object"
+                },
+                "ForecastUpdate": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "conditions": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "host": "localhost:3000",
+            "info": {
+                "contact": {
+                    "email": "joedeveloper@someemailservice.com",
+                    "name": "Joe API Developer",
+                    "url": "http://developer.acme.com/contacturl"
+                },
+                "description": "The /v1 set of Forecast APIs",
+                "license": {
+                    "name": "License Name Goes Here...",
+                    "url": "http://developer.acme.com/licenseurl"
+                },
+                "termsOfService": "The Terms of Service for the API are ...",
+                "title": "forecasts",
+                "version": "1.0.0",
+                "x-ibm-name": "forecasts"
+            },
+            "paths": {
+                "/forecasts": {
+                    "get": {
+                        "deprecated": false,
+                        "description": "List Forecast",
+                        "operationId": "list",
+                        "parameters": [
+                            {
+                                "description": "What element to start the list at, default is 0",
+                                "in": "query",
+                                "name": "offset",
+                                "required": false,
+                                "type": "string"
+                            },
+                            {
+                                "description": "Total number of items to return, default is 10",
+                                "in": "query",
+                                "name": "limit",
+                                "required": false,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Success",
+                                "schema": {
+                                    "$ref": "#/definitions/ForecastList"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "List Forecast",
+                        "tags": [
+                            "Forecast"
+                        ]
+                    },
+                    "post": {
+                        "deprecated": false,
+                        "description": "Create a Forecast",
+                        "parameters": [
+                            {
+                                "description": "Forecast to create",
+                                "in": "body",
+                                "name": "payload",
+                                "required": true,
+                                "schema": {
+                                    "$ref": "#/definitions/ForecastCreate"
+                                }
+                            }
+                        ],
+                        "responses": {
+                            "201": {
+                                "description": "Successful create",
+                                "schema": {
+                                    "$ref": "#/definitions/Forecast"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Create a Forecast",
+                        "tags": [
+                            "Forecast"
+                        ]
+                    }
+                },
+                "/forecasts/{forecast}": {
+                    "delete": {
+                        "deprecated": false,
+                        "description": "Delete the Forecast",
+                        "operationId": "del",
+                        "parameters": [
+                            {
+                                "description": "Forecast id",
+                                "in": "path",
+                                "name": "forecast",
+                                "required": true,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "204": {
+                                "description": "Successful delete"
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Delete the Forecast",
+                        "tags": [
+                            "Forecast"
+                        ]
+                    },
+                    "get": {
+                        "deprecated": false,
+                        "description": "Retrieve the Forecast",
+                        "parameters": [
+                            {
+                                "description": "Forecast id",
+                                "in": "path",
+                                "name": "forecast",
+                                "required": true,
+                                "type": "string"
+                            },
+                            {
+                                "description": "Return a subset of the fields",
+                                "in": "query",
+                                "name": "fields",
+                                "required": false,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Success",
+                                "schema": {
+                                    "$ref": "#/definitions/Forecast"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Retrieve the Forecast",
+                        "tags": [
+                            "Forecast"
+                        ]
+                    },
+                    "put": {
+                        "deprecated": false,
+                        "description": "Update Forecast",
+                        "parameters": [
+                            {
+                                "description": "Forecast id",
+                                "in": "path",
+                                "name": "forecast",
+                                "required": true,
+                                "type": "string"
+                            },
+                            {
+                                "description": "Forecast to update",
+                                "in": "body",
+                                "name": "payload",
+                                "required": true,
+                                "schema": {
+                                    "$ref": "#/definitions/ForecastUpdate"
+                                }
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Success",
+                                "schema": {
+                                    "$ref": "#/definitions/Forecast"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Update Forecast",
+                        "tags": [
+                            "Forecast"
+                        ]
+                    }
+                }
+            },
+            "produces": [
+                "application/json"
+            ],
+            "schemes": [
+                "https"
+            ],
+            "securityDefinitions": {
+                "apikeyHeader": {
+                    "in": "header",
+                    "name": "client_id",
+                    "type": "apiKey"
+                },
+                "apikeyQueryParameter": {
+                    "in": "query",
+                    "name": "client_id",
+                    "type": "apiKey"
+                }
+            },
+            "swagger": "2.0",
+            "x-ibm-configuration": {
+                "assembly": {
+                    "execute": [{
+                        "invoke": {
+                                "target-url": "http://127.0.0.1:8889/api2"
+                                }
+                                }]
+                },
+		"cors": {
+                    "enabled": false
+                },
+                "enforced": true,
+                "phase": "identified",
+                "testable": false
+            }
+        },
+        "id": "564b7b44e4b0869c782eddd5",
+        "organization": {
+            "id": "564b48a9e4b0869c782edc24",
+            "name": "apim",
+            "title": "Climb On"
+        },
+        "state": "running",
+        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b44e4b0869c782eddd5"
+    },
+    {
+        "catalog": {
+            "default": false,
+            "id": "564b48aae4b0869c782edc2b",
+            "name": "sb",
+            "sandbox": true,
+            "title": "Sandbox",
+            "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+        },
+        "document": {
+            "basePath": "/v1",
+            "consumes": [
+                "application/xml",
+                "text/xml",
+                "application/x-www-form-urlencoded",
+                "application/json"
+            ],
+            "definitions": {
+                "Error": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "message": {
+                            "type": [
+                                "string",
+                                "array"
+                            ]
+                        },
+                        "status": {
+                            "type": "integer"
+                        }
+                    },
+                    "type": "object"
+                },
+                "routes": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "difficulty": {
+                            "type": "string"
+                        },
+                        "fa": {
+                            "type": "string"
+                        },
+                        "ffa": {
+                            "type": "string"
+                        },
+                        "ffs": {
+                            "type": "string"
+                        },
+                        "height": {
+                            "type": "string"
+                        },
+                        "id": {
+                            "format": "double",
+                            "type": "number"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "pitches": {
+                            "type": "string"
+                        },
+                        "style": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "info": {
+                "contact": {
+                    "email": "joedeveloper@someemailservice.com",
+                    "name": "Joe API Developer",
+                    "url": "http://developer.acme.com/contacturl"
+                },
+                "description": "The /v1 set of Routes APIs",
+                "license": {
+                    "name": "License Name Goes Here...",
+                    "url": "http://developer.acme.com/licenseurl"
+                },
+                "termsOfService": "The Terms of Service for the API are ...",
+                "title": "routes",
+                "version": "1.0.0",
+                "x-ibm-name": "routes"
+            },
+            "paths": {
+                "/routes": {
+                    "get": {
+                        "deprecated": false,
+                        "description": "",
+                        "operationId": "routes.find",
+                        "parameters": [
+                            {
+                                "description": "Filter defining fields, where, include, order, offset, and limit",
+                                "format": "JSON",
+                                "in": "query",
+                                "name": "filter",
+                                "required": false,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Request was successful",
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/definitions/routes"
+                                    },
+                                    "type": "array"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Find all instances of the model matched by filter from the data source.",
+                        "tags": [
+                            "routes"
+                        ]
+                    },
+                    "post": {
+                        "deprecated": false,
+                        "description": "",
+                        "operationId": "routes.create",
+                        "parameters": [
+                            {
+                                "description": "Model instance data",
+                                "in": "body",
+                                "name": "data",
+                                "required": false,
+                                "schema": {
+                                    "$ref": "#/definitions/routes"
+                                }
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Request was successful",
+                                "schema": {
+                                    "$ref": "#/definitions/routes"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Create a new instance of the model and persist it into the data source.",
+                        "tags": [
+                            "routes"
+                        ]
+                    },
+                    "put": {
+                        "deprecated": false,
+                        "description": "",
+                        "operationId": "routes.upsert",
+                        "parameters": [
+                            {
+                                "description": "Model instance data",
+                                "in": "body",
+                                "name": "data",
+                                "required": false,
+                                "schema": {
+                                    "$ref": "#/definitions/routes"
+                                }
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Request was successful",
+                                "schema": {
+                                    "$ref": "#/definitions/routes"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Update an existing model instance or insert a new one into the data source.",
+                        "tags": [
+                            "routes"
+                        ]
+                    }
+                },
+                "/routes/change-stream": {
+                    "get": {
+                        "deprecated": false,
+                        "description": "",
+                        "operationId": "routes.get.createChangeStream",
+                        "parameters": [
+                            {
+                                "format": "JSON",
+                                "in": "query",
+                                "name": "options",
+                                "required": false,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Request was successful",
+                                "schema": {
+                                    "type": "object"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Create a change stream.",
+                        "tags": [
+                            "routes"
+                        ]
+                    },
+                    "post": {
+                        "deprecated": false,
+                        "description": "",
+                        "operationId": "routes.post.createChangeStream",
+                        "responses": {
+                            "200": {
+                                "description": "Request was successful",
+                                "schema": {
+                                    "type": "object"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Create a change stream.",
+                        "tags": [
+                            "routes"
+                        ]
+                    }
+                },
+                "/routes/count": {
+                    "get": {
+                        "deprecated": false,
+                        "description": "",
+                        "operationId": "routes.count",
+                        "parameters": [
+                            {
+                                "description": "Criteria to match model instances",
+                                "format": "JSON",
+                                "in": "query",
+                                "name": "where",
+                                "required": false,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Request was successful",
+                                "schema": {
+                                    "type": "object"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Count instances of the model matched by where from the data source.",
+                        "tags": [
+                            "routes"
+                        ]
+                    }
+                },
+                "/routes/findOne": {
+                    "get": {
+                        "deprecated": false,
+                        "description": "",
+                        "operationId": "routes.findOne",
+                        "parameters": [
+                            {
+                                "description": "Filter defining fields, where, include, order, offset, and limit",
+                                "format": "JSON",
+                                "in": "query",
+                                "name": "filter",
+                                "required": false,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Request was successful",
+                                "schema": {
+                                    "$ref": "#/definitions/routes"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Find first instance of the model matched by filter from the data source.",
+                        "tags": [
+                            "routes"
+                        ]
+                    }
+                },
+                "/routes/update": {
+                    "post": {
+                        "deprecated": false,
+                        "description": "",
+                        "operationId": "routes.updateAll",
+                        "parameters": [
+                            {
+                                "description": "Criteria to match model instances",
+                                "format": "JSON",
+                                "in": "query",
+                                "name": "where",
+                                "required": false,
+                                "type": "string"
+                            },
+                            {
+                                "description": "An object of model property name/value pairs",
+                                "in": "body",
+                                "name": "data",
+                                "required": false,
+                                "schema": {
+                                    "$ref": "#/definitions/routes"
+                                }
+                            }
+                        ],
+                        "responses": {
+                            "204": {
+                                "description": "Request was successful"
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Update instances of the model matched by where from the data source.",
+                        "tags": [
+                            "routes"
+                        ]
+                    }
+                },
+                "/routes/{id}": {
+                    "delete": {
+                        "deprecated": false,
+                        "description": "",
+                        "operationId": "routes.deleteById",
+                        "parameters": [
+                            {
+                                "description": "Model id",
+                                "format": "JSON",
+                                "in": "path",
+                                "name": "id",
+                                "required": true,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "204": {
+                                "description": "Request was successful"
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Delete a model instance by id from the data source.",
+                        "tags": [
+                            "routes"
+                        ]
+                    },
+                    "get": {
+                        "deprecated": false,
+                        "description": "",
+                        "operationId": "routes.findById",
+                        "parameters": [
+                            {
+                                "description": "Model id",
+                                "format": "JSON",
+                                "in": "path",
+                                "name": "id",
+                                "required": true,
+                                "type": "string"
+                            },
+                            {
+                                "description": "Filter defining fields and include",
+                                "format": "JSON",
+                                "in": "query",
+                                "name": "filter",
+                                "required": false,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Request was successful",
+                                "schema": {
+                                    "$ref": "#/definitions/routes"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Find a model instance by id from the data source.",
+                        "tags": [
+                            "routes"
+                        ]
+                    },
+                    "head": {
+                        "deprecated": false,
+                        "description": "",
+                        "operationId": "routes.id.exists",
+                        "parameters": [
+                            {
+                                "description": "Model id",
+                                "format": "JSON",
+                                "in": "path",
+                                "name": "id",
+                                "required": true,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Request was successful",
+                                "schema": {
+                                    "type": "object"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Check whether a model instance exists in the data source.",
+                        "tags": [
+                            "routes"
+                        ]
+                    },
+                    "put": {
+                        "deprecated": false,
+                        "description": "",
+                        "operationId": "routes.prototype.updateAttributes",
+                        "parameters": [
+                            {
+                                "description": "An object of model property name/value pairs",
+                                "in": "body",
+                                "name": "data",
+                                "required": false,
+                                "schema": {
+                                    "$ref": "#/definitions/routes"
+                                }
+                            },
+                            {
+                                "description": "PersistedModel id",
+                                "format": "JSON",
+                                "in": "path",
+                                "name": "id",
+                                "required": true,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Request was successful",
+                                "schema": {
+                                    "$ref": "#/definitions/routes"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Update attributes for a model instance and persist it into the data source.",
+                        "tags": [
+                            "routes"
+                        ]
+                    }
+                },
+                "/routes/{id}/exists": {
+                    "get": {
+                        "deprecated": false,
+                        "description": "",
+                        "operationId": "routes.exists",
+                        "parameters": [
+                            {
+                                "description": "Model id",
+                                "format": "JSON",
+                                "in": "path",
+                                "name": "id",
+                                "required": true,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Request was successful",
+                                "schema": {
+                                    "type": "object"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Check whether a model instance exists in the data source.",
+                        "tags": [
+                            "routes"
+                        ]
+                    }
+                }
+            },
+            "produces": [
+                "application/xml",
+                "application/javascript",
+                "text/javascript",
+                "text/xml",
+                "application/json"
+            ],
+            "schemes": [
+                "https"
+            ],
+            "security": [
+                {
+                    "apiSecretHeader": [],
+                    "apikeyHeader": [],
+                    "basicAuthentication": []
+                }
+            ],
+            "securityDefinitions": {
+                "apiSecretHeader": {
+                    "in": "header",
+                    "name": "client_secret",
+                    "type": "apiKey"
+                },
+                "apikeyHeader": {
+                    "in": "header",
+                    "name": "client_id",
+                    "type": "apiKey"
+                },
+                "basicAuthentication": {
+                    "type": "basic",
+                    "x-ibm-authentication-registry": "corporate-idp"
+                },
+                "basicAuthenticationSSL": {
+                    "type": "basic",
+                    "x-ibm-authentication-url": {
+                        "tls-profile": "new-ssl-profile",
+                        "url": "https://httpbin.org/basic-auth/username1/password1"
+                    }
+                }
+            },
+            "swagger": "2.0",
+            "tags": [
+                {
+                    "name": "User"
+                },
+                {
+                    "name": "routes"
+                }
+            ],
+            "x-ibm-configuration": {
+		"assembly": {
+                    "execute": [{
+                        "invoke": {
+                                "target-url": "http://127.0.0.1:8889/api3"
+                                }
+                                }]
+                },
+                "cors": {
+                    "enabled": false
+                },
+                "enforced": true,
+                "phase": "identified",
+                "testable": false
+            }
+        },
+        "id": "564b7b44e4b0869c782ede0a",
+        "organization": {
+            "id": "564b48a9e4b0869c782edc24",
+            "name": "apim",
+            "title": "Climb On"
+        },
+        "state": "running",
+        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b44e4b0869c782ede0a"
+    }
+]
