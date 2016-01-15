@@ -15,8 +15,8 @@ function ModelType(name, prefix) {
 }
 
 module.exports = function(app) {
-
-    var files = fs.readdirSync(__dirname);
+    var dir = __dirname + '/../../../config/current/';
+    var files = fs.readdirSync(dir);
     debug('files: ', files);
 
     // Associate models with file names containing data that should be used
@@ -51,7 +51,7 @@ module.exports = function(app) {
         function(model) {
             model.files.forEach(
                 function(typefile) {
-                    var file = path.join(__dirname, typefile);
+                    var file = path.join(dir, typefile);
                     debug('Loading data from %s', file);
                     var readfile = JSON.parse(fs.readFileSync(file));
                     debug('filecontents: ', readfile);
