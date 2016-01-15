@@ -8,7 +8,7 @@ var debug = require('debug')('strong-gateway:data-store');
  * @param {string} name - name of the model
  * @param {string} prefix - file name prefix associated with the model
  */ 
-function modelType(name, prefix) {
+function ModelType(name, prefix) {
     this.name = name;
     this.prefix = prefix;
     this.files = [];
@@ -24,13 +24,13 @@ module.exports = function(app) {
     // This section would need to be updated whenever new models are added
     // to the data-store
     var models = [];
-    models[models.length] = new modelType('catalog',
+    models[models.length] = new ModelType('catalog',
                                        'catalogs-');
-    models[models.length] = new modelType('product', 
+    models[models.length] = new ModelType('product', 
                                        'products-');
-    models[models.length] = new modelType('api',
+    models[models.length] = new ModelType('api',
                                        'apis-');
-    models[models.length] = new modelType('subscription',
+    models[models.length] = new ModelType('subscription',
                                        'subs-');
 
     // read the content of the files into memory
