@@ -58,6 +58,7 @@ function apimcontextget (opts, cb) {
       apimGetDefaultCatalog(filters.orgName,
                             function(err, defaultCat) {
                                      filters.dfltCatName = defaultCat;
+                                     callback(err, defaultCat);
                             });
     },
     function(prevResult, callback) {
