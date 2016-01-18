@@ -97,39 +97,26 @@ module.exports = function createPreflowMiddleware(options) {
 //    ctx.set('target-host', 'http://9.42.102.139:3030');
 //    ctx.set('request.path', req.originalUrl);
 //    ctx.set('request.verb', req.method);
-    var lookup = req.headers['x-strong-gateway-preflow-lookup'];
+    debug('Use apim-lookup()');
+    var contextgetOptions = {};
+    contextgetOptions['path'] = req.originalUrl;
+    contextgetOptions['method'] = req.method;
+    contextgetOptions['clientid'] = ctx.get('client-id');
 
-    if (lookup === 'mock')
-    {
-      debug('Use mockResourceLookup()');
-      var apis = mockResourceLookup(req.originalUrl,
-                                    req.method,
-                                    ctx.get('client-id'));
-      populateAPImCtx(req, ctx, apis);
-      next();
-    }
-    else
-    {
-      debug('Use apim-lookup()');
-      var contextgetOptions = {};
-      contextgetOptions['path'] = req.originalUrl;
-      contextgetOptions['method'] = req.method;
-      contextgetOptions['clientid'] = ctx.get('client-id');
+    // TODO what if contextget gives error, ex: network error ?
+    //      first param of contextget callback should be error
+    contextget(contextgetOptions, function(error, apis) {
+       if (error) {
+           // there was an error with the contextget
+           debug('contextget: ', error, apis);
+       } else {
+           if (apis !== undefined) {
+               populateAPImCtx(req, ctx, apis);
+           }
+       }
+       next();
+    });
 
-      // TODO what if contextget gives error, ex: network error ?
-      //      first param of contextget callback should be error
-      contextget(contextgetOptions, function(error, apis) {
-         if (error) {
-             // there was an error with the contextget
-             debug('contextget: ', error, apis);
-         } else {
-             if (apis !== null) {
-                 populateAPImCtx(req, ctx, apis);
-             }
-         }
-         next();
-      });
-    }
   };
 };
 
@@ -142,91 +129,4 @@ function mockFetchClientId(req) {
   var clientId = req.query['client_id'];
   debug('Client Id: ' + clientId);
   ctx.set('client-id', clientId);
-}
-
-/**
- * Function that returns mock API info
-   - Jon and Jeremy will write the real implementation later
-   Usage:
-     ClientID=123098456765 returns one API
-     ClientID=123098456766 returns two APIs
-     all other clientIDs return no APIs
- */
-function mockResourceLookup(url, method, clientId) {
-  var matchingApis = [];
-  var api1 = {
-    flow: {
-      assembly: {
-        execute: [{
-          'invoke': {
-            'target-url':
-              'http://127.0.0.1:8889/api1'
-          }
-        }]
-      }
-    },
-    context: {
-      api: {
-        id: '564b7b44e4b0869c782eddd2',
-        basepath: '/v1',
-        properties: {LDAP: 'bluepages.ibm.com'},
-        operationId: 'list',
-        path: '/ascents/{ascents}',
-        method: 'GET'
-      },
-      plan: {
-        planId: 'apim:1.0.0:trial',
-        name: 'trial',
-        'rate-limit': '10/sec'
-      },
-      client: {
-        app: {
-          id: 'fb82cb59-ba95-4c34-8612-e63697d7b845',
-          secret: 'Bk7lTzdlvMh+P22zHG2IIT/sJhKTgiaiG2OHliFHfkE='
-        }
-      }
-    }
-  };
-
-  var api2 = {
-    flow: {
-      assembly: {
-        execute: [{
-          'invoke': {
-            'target-url':
-              'http://127.0.0.1:8889/api2'
-          }
-        }]
-      }
-    },
-    context: {
-      api: {
-        id: '564b7b44e4b0869c782eddd2',
-        basepath: '/v1',
-        properties: {LDAP: 'bluepages.ibm.com'},
-        operationId: 'routeAdd',
-        path: '/ascents/{ascents}',
-        method: 'GET'
-      },
-      plan: {
-        planId: 'apim:1.0.0:gold',
-        name: 'gold',
-        'rate-limit': '10/sec'
-      },
-      client: {
-        app: {
-          id: '612caa59-9649-491f-99b7-d9a941c4bd2e',
-          secret: '4rRnUbv3vRT9hhA82fdmVCXu+mTqOWfI2F1hJYlUixI='
-        }
-      }
-    }
-  };
-
-  if (clientId === 'fb82cb59-ba95-4c34-8612-e63697d7b845') {
-    matchingApis.push(api1);
-  }
-  if (clientId === '612caa59-9649-491f-99b7-d9a941c4bd2e') {
-    matchingApis.push(api2);
-  }
-  return matchingApis;
 }
