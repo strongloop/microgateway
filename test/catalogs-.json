@@ -9,7 +9,7 @@
     "name": "apim",
     "title": "Climb On"
   },
-  "default": false,
+  "default": true,
   "gateway-cluster": {
     "id": "564b45c1e4b0869c782ed85b",
     "title": "Gateway",
