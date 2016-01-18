@@ -10,11 +10,11 @@ var contextget = apimlookup.contextget;
 /**
  * This function populates APIm context variables with data from
  * the request object and the API definitions.
- * 
+ *
  * @param req the request object from the wire
  * @param ctx the APIm context object
  * @param apis an array of API swagger definition objects
- * 
+ *
  */
 function populateAPImCtx(req, ctx, apis) {
   if (apis.length === 1) {
@@ -98,7 +98,7 @@ module.exports = function createPreflowMiddleware(options) {
 //    ctx.set('request.path', req.originalUrl);
 //    ctx.set('request.verb', req.method);
     var lookup = req.headers['x-strong-gateway-preflow-lookup'];
-    
+
     if (lookup === 'mock')
     {
       debug('Use mockResourceLookup()');
@@ -115,20 +115,19 @@ module.exports = function createPreflowMiddleware(options) {
       contextgetOptions['path'] = req.originalUrl;
       contextgetOptions['method'] = req.method;
       contextgetOptions['clientid'] = ctx.get('client-id');
-      
+
       // TODO what if contextget gives error, ex: network error ?
       //      first param of contextget callback should be error
-      contextget(contextgetOptions,function(error, response) {
-        debug('contextget: ', error, response);
-        // there was an error with the contextget
-        if (error) {
-          // TODO error handling
-          next();
-        } else {
-          var apis = response;
-          populateAPImCtx(req, ctx, apis);
-          next();
-        }
+      contextget(contextgetOptions, function(error, apis) {
+         if (error) {
+             // there was an error with the contextget
+             debug('contextget: ', error, apis);
+         } else {
+             if (apis !== null) {
+                 populateAPImCtx(req, ctx, apis);
+             }
+         }
+         next();
       });
     }
   };

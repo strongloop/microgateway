@@ -32,54 +32,134 @@ var port = '5000';      // data-store's listening port
  * @param {callback} cb - The callback that handles the error or output context
  */
 function apimcontextget (opts, cb) {
-    // extract filters from request
-    var filters = grabFilters(opts);
 
-    // build request to send to data-store
-    var clientIDFilter = '{"client-id": "' + filters.clientid + '"}';
-    var catalogNameFilter =
-        '{"catalog-name": "' + filters.catName + '"}';
-    var organizationNameFilter =
-        '{"organization-name": "' + filters.orgName + '"}';
-    var queryfilter =
-        '{"where": { "and":[' +
-        clientIDFilter + ',' +
-        catalogNameFilter + ',' +
-        organizationNameFilter + ']}}';
-    var queryurl = 'http://' + host + ':' + port +
-        '/api/optimizedData?filter=' +
-        encodeURIComponent(queryfilter);
+  debug('apimcontextget entry');
 
-    // send request to optimizedData model from data-store
-    // for matching API(s)
-    request(
-        {
-            url : queryurl
-        },
-        function (error, response, body) {
-            debug('error: ', error);
-            debug('body: %j' , body);
-            debug('response: %j' , response);
-            // exit early on error
-            if (error) {
-                cb(error, undefined);
-                return;
-            }
-            // build context(s) of matching APIs
-            var localcontexts = [];
-            localcontexts = findContext(filters, body);
-            debug('contexts after findContext: %j', localcontexts);
-            // add flow(s) from API declaration
-            addFlows(
-                localcontexts,
-                function (err, contexts) {
-                    debug('contexts: %j', contexts);
-                    localcontexts = contexts;
-                    cb(err, localcontexts);
+  // extract filters from request
+  var filters = grabFilters(opts);
+
+  async.waterfall([
+    function(callback) {
+      // Pass 1 - all filters available
+      debug('apimcontextget pass 1');
+      doOptimizedDataRequest(filters.orgName,
+                             filters.catName,
+                             filters.clientid,
+                             filters.inboundPath,
+                             filters.method,
+                             function(err, apis) {
+                               callback(!err && apis.length ? 'done' : err,
+                                        apis);
+                             });
+      },
+    function(prevResult, callback) {
+      // Get the default catalog name
+      debug('apimcontextget get default context');
+      apimGetDefaultCatalog(filters.orgName,
+                            function(err, defaultCat) {
+                                     filters.dfltCatName = defaultCat;
+                            });
+    },
+    function(prevResult, callback) {
+      // Pass 2 - use the default catalog name
+      debug('apimcontextget pass 2');
+      doOptimizedDataRequest(filters.orgName,
+                             filters.dfltCatName,
+                             filters.clientid,
+                             filters.inboundPathAlt,
+                             filters.method,
+                             function(err, apis) {
+                               callback(!err && apis.length ? 'done' : err,
+                                        apis);
+                             });
+    },
+    function(prevResult, callback) {
+      // Pass 3 - no client ID
+      debug('apimcontextget pass 3');
+      doOptimizedDataRequest(filters.orgName,
+                             filters.catName,
+                             '',
+                             filters.inboundPath,
+                             filters.method,
+                             function(err, apis) {
+                               callback(!err && apis.length ? 'done' : err,
+                                        apis);
+                             });
+    },
+    function(prevResult, callback) {
+      // Pass 4 - no client ID and default catalog name
+      debug('apimcontextget pass 4');
+      doOptimizedDataRequest(filters.orgName,
+                             filters.dfltCatName,
+                             '',
+                             filters.inboundPathAlt,
+                             filters.method,
+                             function(err, apis) {
+                               callback(!err && apis.length ? 'done' : err,
+                                        apis);
+                             });
+    },
+  ], function (err, apis) {
+    // Got final result
+    debug('apimcontextget final count: ', apis.length, ' err: ', err,
+          ' value: ', JSON.stringify(apis));
+    cb(err === 'done' ? null : err, apis);
+  });
+
+  debug('apimcontextget exit');
+}
+
+function doOptimizedDataRequest(orgName, catName, clientId, path, method, cb) {
+        debug('doOptimizedDataRequest entry orgName:' + orgName +
+                                          ' catName:' + catName +
+                                          ' clientId:' + clientId +
+                                          ' path:' + path +
+                                          ' method:' + method );
+        // build request to send to data-store
+        var clientIDFilter = '{"client-id": "' + clientId + '"}';
+        var catalogNameFilter =
+            '{"catalog-name": "' + catName + '"}';
+        var organizationNameFilter =
+            '{"organization-name": "' + orgName + '"}';
+        var queryfilter =
+            '{"where": { "and":[' +
+            clientIDFilter + ',' +
+            catalogNameFilter + ',' +
+            organizationNameFilter + ']}}';
+        var queryurl = 'http://' + host + ':' + port +
+            '/api/optimizedData?filter=' +
+            encodeURIComponent(queryfilter);
+
+        // send request to optimizedData model from data-store
+        // for matching API(s)
+        request(
+            {
+                url : queryurl
+            },
+            function (error, response, body) {
+                debug('error: ', error);
+                debug('body: %j' , body);
+                debug('response: %j' , response);
+                 // exit early on error
+                if (error) {
+                    cb(Error(error), null);
+                    return;
                 }
-            );
-        }
-    );
+                // build context(s) of matching APIs
+                var localcontexts = [];
+                localcontexts = findContext(path, method, body);
+                debug('contexts after findContext: %j', localcontexts);
+                // add flow(s) from API declaration
+                addFlows(
+                    localcontexts,
+                    function (err, contexts) {
+                        debug('contexts: %j', contexts);
+                        localcontexts = contexts;
+                        cb(err, localcontexts);
+                    }
+                );
+            }
+        );
 }
 
 /**
@@ -87,39 +167,38 @@ function apimcontextget (opts, cb) {
  * @param {string} orgName - Name or provider organization
  * @param {callback} cb - The callback that handles the error or output context
  */
-/*exported apimGetDefaultCatalog */
 function apimGetDefaultCatalog(orgName, cb) {
-    var orgNameFilter = '{%22organization.name%22:%20%22' + orgName + '%22}';
-    var defaultOrgFilter = '{%22default%22:%20%22true%22}';
-    var queryfilter =
-        '{%22where%22:%20{%20%22and%22:[' +
-        orgNameFilter + ',' +
-        defaultOrgFilter + ']}}';
-    var queryurl = 'http://' + host + ':' + port +
-        '/api/catalogs?filter=' + queryfilter;
+      var orgNameFilter = '{%22organization.name%22:%20%22' + orgName + '%22}';
+      var defaultOrgFilter = '{%22default%22:%20%22true%22}';
+      var queryfilter =
+          '{%22where%22:%20{%20%22and%22:[' +
+          orgNameFilter + ',' +
+          defaultOrgFilter + ']}}';
+      var queryurl = 'http://' + host + ':' + port +
+          '/api/catalogs?filter=' + queryfilter;
 
-    request(
-        {
-            url: queryurl
-        },
-        function(error, response, body) {
-            debug('error: ', error);
-            debug('body: %j', body);
-            debug('response: %j', response);
-            if (error) {
-                cb(error, undefined);
-                return;
-            }
+      request(
+          {
+              url: queryurl
+          },
+          function(error, response, body) {
+              debug('error: ', error);
+              debug('body: %j', body);
+              debug('response: %j', response);
+              if (error) {
+                  cb(Error(error), null);
+                  return;
+              }
 
-            var catalogs = JSON.parse(body);
-            debug('catalog returned: %j', catalogs);
-            if (catalogs.length === 1) {
-                cb(null, catalogs[0].name);
-            } else {
-                cb(null, undefined);
-            }
-        }
-    );
+              var catalogs = JSON.parse(body);
+              debug('catalog returned: %j', catalogs);
+              if (catalogs.length === 1) {
+                  cb(null, catalogs[0].name);
+              } else {
+                  cb(null, null);
+              }
+          }
+      );
 }
 
 /**
@@ -211,7 +290,7 @@ function grabFilters(opts) {
         debug('orgName: ', orgName);
 
         if (uri.length > 2) {
-            // extract catalog name
+            // extract catalog name. Note that this value may be omitted....
             catName = uri[2];
             debug('catName: ', catName);
         }
@@ -221,6 +300,12 @@ function grabFilters(opts) {
     for (var i = 3; i < uri.length; i++) {
         inboundPath += '/' + uri[i];
     }
+
+    var inboundPathAlt = (uri.length === 2) ? '/' : '';
+    for (i = 2; i < uri.length; i++) {
+        inboundPathAlt += '/' + uri[i];
+    }
+
     debug('inboundPath: ', inboundPath);
     debug('grabFilters exit');
 
@@ -228,6 +313,7 @@ function grabFilters(opts) {
             orgName: orgName,
             catName: catName,
             inboundPath: inboundPath,
+            inboundPathAlt: inboundPathAlt,
             method: opts.method};
 }
 
@@ -243,7 +329,7 @@ function grabFilters(opts) {
  *                        matching filter
  * @param {Array} - array of context objects representing matching entries
  */
-function findContext(filter, body) {
+function findContext(reqpath, reqmethod, body) {
 
     debug ('findContext entry');
     // loop through each API maching the initial filters trying to
@@ -260,12 +346,12 @@ function findContext(filter, body) {
             // use regular expression matching to see if there are any
             // APIs that match the request
             var re = new RegExp(path);
-            var foundPath = re.test(filter.inboundPath);
+            var foundPath = re.test(reqpath);
 
             if (foundPath) { // path found...
                 // now let's see if the Method exists
                 var MatchingMethod =
-                    findMethodMatch(filter.method,
+                    findMethodMatch(reqmethod,
                                     pathObject['path-methods'],
                                     possibleEntryMatch.method);
                 if (MatchingMethod !== {}) { // found the method too..
