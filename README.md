@@ -3,7 +3,7 @@
 ## What does it do?
 Currently, it grabs local files that are downloads from APIm, and populates the data model from them..
 
-## How do I use it?
+## How do I use it manually?
 
 1. Using the apim-export cli, put the data in ./data-store/server/boot
   - How to run it:

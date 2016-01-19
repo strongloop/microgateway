@@ -1,6 +1,15 @@
 var fs = require('fs');
 var path = require('path');
+var async = require('async');
 var debug = require('debug')('strong-gateway:data-store');
+var sgwapimpull = require('../../../data-fetch/apim-pull');
+var apimpull = sgwapimpull.pull;
+
+var rootConfigPath = '/../../../config/';
+var configFileName = 'apim.config';
+var configFile = __dirname + rootConfigPath + configFileName;
+var currentDefinitionsDir = __dirname + rootConfigPath + 'current/';
+var latestDefinitionsDir = __dirname + rootConfigPath + 'latest/';
 
 /**
  * Creates a model type 
@@ -15,7 +24,58 @@ function ModelType(name, prefix) {
 }
 
 module.exports = function(app) {
-    var dir = __dirname + '/../../../config/current/';
+    async.series([
+        // if no apim.config, load what you have
+        // if apim.config, grab fresh data if you can
+        function(callback) {
+            fs.access(configFile, fs.R_OK, function (err) {
+                if (err) 
+                {
+                debug('apim.config not found, loading from local files');
+                } 
+                else 
+                {
+                debug('Found and have access to %s', configFile);
+                // Have an APIm, grab latest if we can..
+                var config = JSON.parse(fs.readFileSync(configFile));
+                
+                var options = {};
+                options['host'] = config['apim-ip'];
+                options['outdir'] = latestDefinitionsDir;
+                debug('apimpull start');
+                apimpull(options,function(err, response) {
+                        if (err) {
+                            console.error(err);
+                        }
+                        debug(response);
+                        debug('apimpull end');
+                        callback();
+                    });
+                }
+            });
+            callback();
+            },
+        // load current config
+        function(callback) {
+            debug('loadConfigFromFS start');
+            
+            loadConfigFromFS(app, currentDefinitionsDir, function(callback)
+                {
+                debug('loadConfigFromFS end');
+                }); 
+            callback();
+            },
+        // load current config
+        function(callback) {
+            debug('Load Complete');
+            process.send('Load Complete');
+            callback();
+            }
+        ]);
+};
+
+function loadConfigFromFS(app, dir, callback)
+    {
     var files = fs.readdirSync(dir);
     debug('files: ', files);
 
@@ -74,4 +134,5 @@ module.exports = function(app) {
             );
         }
     );
-};
+    callback();
+}
