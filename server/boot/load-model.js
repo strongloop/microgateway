@@ -2,7 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var async = require('async');
 var debug = require('debug')('strong-gateway:data-store');
-var sgwapimpull = require('../../../data-fetch/apim-pull');
+var sgwapimpull = require('../../apim-pull');
 var apimpull = sgwapimpull.pull;
 
 var rootConfigPath = '/../../../config/';
