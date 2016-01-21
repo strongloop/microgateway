@@ -155,7 +155,13 @@ function pullcatalog (opts, cb) {
             response.apis = [];
             response.api = [];
             response.subs = [];
-            var catalogsJSON = JSON.parse(result.contents);
+            var catalogsJSON;
+            try {
+                catalogsJSON = JSON.parse(result.contents);
+            } catch (e) {
+                cb(e);
+                return;
+            }
             var catalogs = [];
             catalogsJSON.forEach(function(obj) {
                 catalogs.push({
@@ -189,7 +195,13 @@ function pullapis (opts, catalog, cb) {
         }
         else if ('object' === typeof result) {
             response.apis.push(result.file);
-            var apisJSON = JSON.parse(result.contents);
+            var apisJSON;
+            try {
+                apisJSON = JSON.parse(result.contents);
+            } catch (e) {
+                cb(e);
+                return;
+            }
             var fileParts = result.file.split('-');
             var etag = fileParts[fileParts.length - 1].split('.')[0];
             async.each(apisJSON,
