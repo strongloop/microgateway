@@ -76,7 +76,7 @@ function getapisproductsandsubs(options, catalogs, cb) {
                         console.error(err);
                     }
                     else {
-                        catalogsWithAPIs[catalogsWithAPIs.length] = catalog;
+                        catalogsWithAPIs.push(catalog);
                     }
                     callback();
                 });
@@ -158,10 +158,10 @@ function pullcatalog (opts, cb) {
             var catalogsJSON = JSON.parse(result.contents);
             var catalogs = [];
             catalogsJSON.forEach(function(obj) {
-                catalogs[catalogs.length] = {
+                catalogs.push({
                     org : obj.organization.id,
                     cat : obj.id
-                }; 
+                }); 
             });
             cb(null, catalogs);
         }
@@ -188,7 +188,7 @@ function pullapis (opts, catalog, cb) {
             cb(err);
         }
         else if ('object' === typeof result) {
-            response.apis[response.apis.length] = result.file;
+            response.apis.push(result.file);
             var apisJSON = JSON.parse(result.contents);
             var fileParts = result.file.split('-');
             var etag = fileParts[fileParts.length - 1].split('.')[0];
@@ -199,7 +199,7 @@ function pullapis (opts, catalog, cb) {
                         '-' + obj.document.info.version + '-' + etag +
                         '.yml';
                     var outstream = fs.createWriteStream(filename);
-                    response.api[response.api.length] = filename;
+                    response.api.push(filename);
                     outstream.write(jsyaml.safeDump(obj.document));
                     outstream.end();
                     outstream.on('finish', function() {
@@ -231,7 +231,7 @@ function pullproducts (opts, catalog, cb) {
             cb(err);
         }
         else if ('object' === typeof result) {
-            response.products[response.products.length] = result.file;
+            response.products.push(result.file);
             cb();
         }
         else {
@@ -255,7 +255,7 @@ function pullsubs (opts, catalog, cb) {
             cb(err);
         }
         else if ('object' === typeof result) {
-            response.subs[response.subs.length] = result.file;
+            response.subs.push(result.file);
             cb();
         }
         else {
