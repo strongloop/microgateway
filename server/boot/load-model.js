@@ -32,6 +32,7 @@ module.exports = function(app) {
                 if (err) 
                 {
                 debug('apim.config not found, loading from local files');
+		callback();
                 } 
                 else 
                 {
@@ -53,7 +54,6 @@ module.exports = function(app) {
                     });
                 }
             });
-            callback();
             },
         // load current config
         function(callback) {
