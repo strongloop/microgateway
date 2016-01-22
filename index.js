@@ -79,10 +79,8 @@ module.exports = function createPreflowMiddleware(options) {
       return;
     }
 
-    // Call a Mock function to get the clientId - always uses URL param.
-    // - creates a json object and calls it 'context', adds it to req
-    // - gets clientId from url param and places it in context.clientId
-    mockFetchClientId(req);
+    // Retrieve the clientId from url param or header and place it in context
+    fetchClientId(req);
 
     var ctx = req.ctx;
 
@@ -121,12 +119,18 @@ module.exports = function createPreflowMiddleware(options) {
 };
 
 /**
- * Function that creates a mock context and adds clientId to it
+ * Function that retrieves the client ID from either the request headers or the
+ * URL query parameters
  */
-function mockFetchClientId(req) {
+function fetchClientId(req) {
   var ctx = req.ctx;
 
   var clientId = req.query['client_id'];
-  debug('Client Id: ' + clientId);
+  debug('Query Client Id: ' + clientId);
+  if (!clientId) {
+    clientId = req.headers['x-ibm-client-id'];
+    debug('Header Client Id: ' + clientId);
+  }
+
   ctx.set('client-id', clientId);
 }
