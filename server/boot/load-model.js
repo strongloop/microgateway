@@ -8,7 +8,7 @@ var apimpull = sgwapimpull.pull;
 var rootConfigPath = '/../../../config/';
 var configFileName = 'apim.config';
 var configFile = __dirname + rootConfigPath + configFileName;
-var currentDefinitionsDir = __dirname + rootConfigPath + 'current/';
+var currentDefinitionsDir = __dirname + rootConfigPath + 'current';
 var uniqueDefinitionsDir = '';
 var snapshotID;
 var currentID;
@@ -119,7 +119,7 @@ module.exports = function(app) {
       debug('loadConfigFromFS start');
 
       var dirToLoad = (uniqueDefinitionsDir === '') ?
-                        currentDefinitionsDir :
+                        (currentDefinitionsDir + '/') :
                         uniqueDefinitionsDir;
       loadConfigFromFS(app, dirToLoad, snapshotID, function(err) {
           debug('loadConfigFromFS end');
