@@ -1,3 +1,5 @@
+var app = require('../../server/server');
+
 module.exports = function(Snapshot) {
   Snapshot.observe('after save', function(ctx,next) {
   	  // delete instance when reference count is zero
@@ -6,7 +8,29 @@ module.exports = function(Snapshot) {
       	  ctx.data.refcount === '0' &&
       	  typeof ctx.where !== 'undefined' &&
       	  typeof ctx.where.id !== 'undefined') {
+      	// remove from snapshot model
         Snapshot.destroyById(ctx.where.id, function(err) {
+          }
+        );
+        var models = ['catalog', 'product', 'api', 'subscription'];
+
+        var query = {
+          'where' : {
+            'snapshot-id' : ctx.where.id
+          }
+        };
+        // remove from all other models
+        models.forEach(function(model) {
+            app.dataSources.db.automigrate(
+              model,
+              function(err) {
+                if (!err) {
+              	  app.models[model].destroyAll(query, function(err, info) {
+                    }
+                  );
+                }
+              }
+            );
           }
         );
       }
@@ -22,7 +46,6 @@ module.exports = function(Snapshot) {
           return;
         }
         
-        console.log('add refCount: ' + instance.refcount);
         var refCount = parseInt(instance.refcount) + 1;
         Snapshot.updateAll(
           {'id' : id },
@@ -32,7 +55,6 @@ module.exports = function(Snapshot) {
               cb(err);
               return;
             }
-            console.log('added refCount: ' + refCount);
           }
         );
         cb(null, refCount);
@@ -57,7 +79,6 @@ module.exports = function(Snapshot) {
           return;
         }
         
-        console.log('pre-release refCount: ' + instance.refcount);
         var refCount = parseInt(instance.refcount) - 1;
         Snapshot.updateAll(
           {'id' : id },
@@ -67,7 +88,6 @@ module.exports = function(Snapshot) {
               cb(err);
               return;
             }
-            console.log('released refCount: ' + refCount);
           }
         );
         cb(null, refCount);
