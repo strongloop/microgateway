@@ -16,10 +16,13 @@ module.exports = {
 /**
  * Module constants
  */
-var APIM_CATALOG_ENDP = '/v1/catalogs/',
+var APIM_CATALOG_ENDP = '/v1/catalogs',
     APIM_APIS_ENDP = '/apis',
     APIM_PRODUCTS_ENDP= '/products',
-    APIM_SUBS_ENDP= '/subscriptions';
+    APIM_SUBS_ENDP= '/subscriptions',
+    APIM_TYPE_FILTER= 'strong-gateway',
+    APIM_CLIENT_ID_EQ= 'client_id=',
+    APIM_TYPE_EQ='type=';
 
 /**
  * Globals
@@ -47,7 +50,8 @@ function apimpull (opts, cb) {
     clikey : opts.clikey ? fs.readFileSync(key) : null,
     clipass : opts.clipass,
     clicert : opts.clicert ? fs.readFileSync(cert)  : null,
-    outdir : opts.outdir || 'apim'
+    outdir : opts.outdir || 'apim',
+    clientid : opts.clientid || '1111-1111'
   };
   /* First, start w/ catalogs */
   pullcatalog(options, function(err, catalogs) {
@@ -124,6 +128,7 @@ function getproductsandsubs(options, catalogsWithAPIs, cb) {
  * Fetches APIm subscriptions for each catalog that contains APIs
  */
 function getsubs(options, catalogsWithAPIs, cb) {
+
   async.each(catalogsWithAPIs,
     function(catalog, callback) {
       /* Finally, go to subscriptions for each catalog */
@@ -146,7 +151,10 @@ function getsubs(options, catalogsWithAPIs, cb) {
  * filesystem '<outdir>/catalogs-<etag>.json'
  */
 function pullcatalog (opts, cb) {
-  opts.path = APIM_CATALOG_ENDP;
+  opts.path = APIM_CATALOG_ENDP + 
+              '?' + // filter parms
+              APIM_CLIENT_ID_EQ + opts.clientid + '&' + 
+              APIM_TYPE_EQ + APIM_TYPE_FILTER;
   opts.prefix = '/catalogs-';
   opts.suffix = '.json';
   fetch(opts, function (err, file) {
@@ -192,7 +200,11 @@ function pullcatalog (opts, cb) {
  * '<outdir>/api-<org>-<catalog>-<apiname>-<apiver>-<etag>.yml'
  */
 function pullapis (opts, catalog, cb) {
-  opts.path = APIM_CATALOG_ENDP + catalog.cat + APIM_APIS_ENDP;
+  opts.path = APIM_CATALOG_ENDP + '/' + catalog.cat + APIM_APIS_ENDP +
+              '?' + // filter parms
+              APIM_CLIENT_ID_EQ + opts.clientid + '&' +
+              APIM_TYPE_EQ + APIM_TYPE_FILTER;
+
   opts.prefix = '/apis-' + catalog.org + '-' + catalog.cat + '-';
   opts.suffix = '.json';
   fetch(opts, function (err, result) {
@@ -243,7 +255,10 @@ function pullapis (opts, catalog, cb) {
  * filesystem '<outdir>/products-<org>-<catalog>-<etag>.json'
  */
 function pullproducts (opts, catalog, cb) {
-  opts.path = APIM_CATALOG_ENDP + catalog.cat + APIM_PRODUCTS_ENDP;
+  opts.path = APIM_CATALOG_ENDP + '/' + catalog.cat + APIM_PRODUCTS_ENDP + 
+              '?' + // filter parms
+              APIM_CLIENT_ID_EQ + opts.clientid + '&' +
+              APIM_TYPE_EQ + APIM_TYPE_FILTER;
   opts.prefix = '/products-' + catalog.org + '-' + catalog.cat + '-';
   opts.suffix = '.json';
   fetch(opts, function (err, result) {
@@ -268,7 +283,10 @@ function pullproducts (opts, catalog, cb) {
  * response to the filesystem '<outdir>/subs-<org>-<catalog>-<etag>.json'
  */
 function pullsubs (opts, catalog, cb) {
-  opts.path = APIM_CATALOG_ENDP + catalog.cat + APIM_SUBS_ENDP;
+  opts.path = APIM_CATALOG_ENDP + '/' + catalog.cat + APIM_SUBS_ENDP + 
+              '?' + // filter parms
+              APIM_CLIENT_ID_EQ + opts.clientid + '&' +
+              APIM_TYPE_EQ + APIM_TYPE_FILTER;
   opts.prefix = '/subs-' + catalog.org + '-' + catalog.cat + '-';
   opts.suffix = '.json';
   fetch(opts, function (err, result) {
@@ -317,7 +335,7 @@ function fetch (opts, cb) {
                        new Buffer(etag).toString('base64') +
                        opts.suffix;
         var outstream = fs.createWriteStream(filename);
-        outstream.write(body);
+        outstream.write(JSON.stringify(JSON.parse(body),null,4));
         outstream.end();
         outstream.on('finish', function() {
             result = {

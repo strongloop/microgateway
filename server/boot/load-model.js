@@ -38,13 +38,13 @@ module.exports = function(app) {
                 {
                 debug('Found and have access to %s', configFile);
                 // Have an APIm, grab latest if we can..
-                var config = JSON.parse(fs.readFileSync(configFile));
-                
-                var options = {};
-                options['host'] = config['apim-ip'];
-                options['outdir'] = latestDefinitionsDir;
-                debug('apimpull start');
-                apimpull(options,function(err, response) {
+                fs.mkdir(latestDefinitionsDir, function() {
+                  var config = JSON.parse(fs.readFileSync(configFile));
+                  var options = {};
+                  options['host'] = config['apim-ip'];
+                  options['outdir'] = latestDefinitionsDir;
+                  debug('apimpull start');
+                  apimpull(options,function(err, response) {
                         if (err) {
                             console.error(err);
                         }
@@ -52,6 +52,7 @@ module.exports = function(app) {
                         debug('apimpull end');
                         callback();
                     });
+                });
                 }
             });
             },
