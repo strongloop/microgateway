@@ -93,14 +93,10 @@ function loadConfigFromFS(app, dir, callback) {
   // This section would need to be updated whenever new models are added
   // to the data-store
   var models = [];
-  models[models.length] = new ModelType('catalog',
-                     'catalogs-');
-  models[models.length] = new ModelType('product', 
-                     'products-');
-  models[models.length] = new ModelType('api',
-                     'apis-');
-  models[models.length] = new ModelType('subscription',
-                     'subs-');
+  models.push(new ModelType('catalog', 'catalogs-'));
+  models.push(new ModelType('product', 'products-'));
+  models.push(new ModelType('api', 'apis-'));
+  models.push(new ModelType('subscription', 'subs-'));
 
   // read the content of the files into memory
   files.forEach(
