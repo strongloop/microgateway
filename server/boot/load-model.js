@@ -32,12 +32,20 @@ module.exports = function(app) {
           if (err) {
             debug('apim.config not found, loading from local files');
             callback();
-          } 
+          }
           else {
             debug('Found and have access to %s', configFile);
             // Have an APIm, grab latest if we can..
             fs.mkdir(latestDefinitionsDir, function() {
-                var config = JSON.parse(fs.readFileSync(configFile));
+                var config;
+                try {
+                  config = JSON.parse(fs.readFileSync(configFile));
+                } catch (e) {
+                  console.error(e);
+                  // try loading from local files
+                  callback();
+                  return;
+                }        
                 var options = {};
                 options['host'] = config['apim-ip'];
                 options['outdir'] = latestDefinitionsDir;
@@ -114,16 +122,28 @@ function loadConfigFromFS(app, dir, callback) {
         function(typefile) {
           var file = path.join(dir, typefile);
           debug('Loading data from %s', file);
-          var readfile = JSON.parse(fs.readFileSync(file));
+          var readfile;
+          try {
+            readfile = JSON.parse(fs.readFileSync(file));
+          } catch(e) {
+            callback(e);
+            return;
+          }
           debug('filecontents: ', readfile);
           app.dataSources.db.automigrate(
             model.name,
             function(err) {
-              if (err) throw err;
+              if (err) {
+                callback(err);
+                return;
+              }
               app.models[model.name].create(
                 readfile,
                 function(err, mymodel) {
-                  if (err) throw err;
+                  if (err) {
+                    callback(err);
+                    return;
+                  }
                   debug('%s created: %j',
                       model.name,
                       mymodel);
