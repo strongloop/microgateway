@@ -59,7 +59,7 @@
       "type": "string",
       "generated": false,
       "defaultFn": "uuid",
-      "id": true
+      "id": 2
     },
     "organization": {
       "id": "string",
@@ -81,6 +81,10 @@
         "tags": "array",
         "type": "string"
       }
+    },
+    "snapshot-id": {
+      "type": "string",
+      "id": 1
     }
   },
   "validations": [],

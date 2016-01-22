@@ -48,5 +48,9 @@
   "optimizedData": {
     "dataSource": "db",
     "public": true
+  },
+  "snapshot": {
+    "dataSource": "db",
+    "public": true
   }
 }

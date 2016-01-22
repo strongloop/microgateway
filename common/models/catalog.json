@@ -16,7 +16,7 @@
       "type": "string",
       "generated": false,
       "defaultFn": "uuid",
-      "id": true
+      "id": 2
     },
     "name": "string",
     "organization": {
@@ -26,7 +26,11 @@
     },
     "sandbox": "boolean",
     "title": "string",
-    "url": "string"
+    "url": "string",
+    "snapshot-id": {
+      "type": "string",
+      "id": 1
+    }
   },
   "validations": [],
   "relations": {},

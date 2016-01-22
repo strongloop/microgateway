@@ -9,7 +9,9 @@ var rootConfigPath = '/../../../config/';
 var configFileName = 'apim.config';
 var configFile = __dirname + rootConfigPath + configFileName;
 var currentDefinitionsDir = __dirname + rootConfigPath + 'current/';
-var latestDefinitionsDir = __dirname + rootConfigPath + 'latest/';
+var uniqueDefinitionsDir = '';
+var snapshotID;
+var currentID;
 
 /**
  * Creates a model type 
@@ -23,11 +25,19 @@ function ModelType(name, prefix) {
   this.files = [];
 }
 
+// Returns a random integer between 0 (included) 2^16 - 1 (included).
+// Hopefully there will not be this many concurrent configuration
+// updates.
+function getSnapshotID() {
+  return Math.floor(Math.random() * (65536));
+}
+
 module.exports = function(app) {
   async.series([
     // if no apim.config, load what you have
     // if apim.config, grab fresh data if you can
     function(callback) {
+      snapshotID = ('0000' + getSnapshotID()).slice(-5);
       fs.access(configFile, fs.R_OK, function (err) {
           if (err) {
             debug('apim.config not found, loading from local files');
@@ -36,7 +46,11 @@ module.exports = function(app) {
           else {
             debug('Found and have access to %s', configFile);
             // Have an APIm, grab latest if we can..
-            fs.mkdir(latestDefinitionsDir, function() {
+            uniqueDefinitionsDir =  __dirname +
+                                    rootConfigPath +
+                                    snapshotID +
+                                    '/';
+            fs.mkdir(uniqueDefinitionsDir, function() {
                 var config;
                 try {
                   config = JSON.parse(fs.readFileSync(configFile));
@@ -46,13 +60,18 @@ module.exports = function(app) {
                   callback();
                   return;
                 }        
+
                 var options = {};
                 options['host'] = config['apim-ip'];
-                options['outdir'] = latestDefinitionsDir;
+                options['outdir'] = uniqueDefinitionsDir;
                 debug('apimpull start');
                 apimpull(options,function(err, response) {
                     if (err) {
                       console.error(err);
+                      fs.unlinkSync(uniqueDefinitionsDir);
+                      uniqueDefinitionsDir = '';
+                      // falling through
+                      // try loading from local files
                     }
                     debug(response);
                     debug('apimpull end');
@@ -65,26 +84,68 @@ module.exports = function(app) {
         }
       );
     },
-    // load current config
+    // populate snapshot db
     function(callback) {
-      debug('loadConfigFromFS start');
-      
-      loadConfigFromFS(app, currentDefinitionsDir, function(callback) {
-          debug('loadConfigFromFS end');
+      debug('snapshot population start');
+
+      app.dataSources.db.automigrate(
+        'snapshot',
+        function(err) {
+          debug('snapshot automigrate');
+          if (err) {
+            callback(err);
+            return;
+          }
+          app.models.snapshot.create(
+            {
+              'id': snapshotID,
+              'refcount': '1'
+            },
+            function(err, mymodel) {
+              debug('snapshot create');
+              if (err) {
+                callback(err);
+                return;
+              }
+              debug('snapshot created: %j', mymodel);
+              callback();
+            }
+          );
         }
-      ); 
-      callback();
+      );
     },
     // load current config
     function(callback) {
-      debug('Load Complete');
-      process.send('Load Complete');
-      callback();
+      debug('loadConfigFromFS start');
+
+      var dirToLoad = (uniqueDefinitionsDir === '') ?
+                        currentDefinitionsDir :
+                        uniqueDefinitionsDir;
+      loadConfigFromFS(app, dirToLoad, snapshotID, function(err) {
+          debug('loadConfigFromFS end');
+          if (err) {
+            console.error(err);
+          }
+          else {
+            process.send('Load Complete');
+            // only update pointer to latest configuration
+            // when latest configuration successful loaded
+            if (uniqueDefinitionsDir === dirToLoad) {
+                fs.unlinkSync(currentDefinitionsDir);
+                fs.symlinkSync(uniqueDefinitionsDir,
+                               currentDefinitionsDir,
+                               'dir');
+            }
+            currentID = snapshotID;
+          }
+          callback();
+        }
+      );
     }
   ]);
 };
 
-function loadConfigFromFS(app, dir, callback) {
+function loadConfigFromFS(app, dir, uid, callback) {
   var files = fs.readdirSync(dir);
   debug('files: ', files);
 
@@ -126,6 +187,12 @@ function loadConfigFromFS(app, dir, callback) {
             return;
           }
           debug('filecontents: ', readfile);
+          // inject 'snapshot-id' property
+          readfile.forEach(
+            function(obj) {
+              obj['snapshot-id'] = uid;
+            }
+          );
           app.dataSources.db.automigrate(
             model.name,
             function(err) {

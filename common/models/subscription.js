@@ -18,11 +18,13 @@ module.exports = function(Subscriptions) {
           ctx.instance.application['app-credentials'];
         locals.plan = ctx.instance['plan-registration'];
         locals.product = ctx.instance['plan-registration'].product;
+        locals.snapshot = ctx.instance['snapshot-id'];
 
         async.series(
           [
             function(callback) {
               grabCatalog(
+                locals.snapshot,
                 locals.product,
                 function(err, catalog) {
                   if (err) {
@@ -36,6 +38,7 @@ module.exports = function(Subscriptions) {
             },
             function(callback) {
               grabOrg(
+                locals.snapshot,
                 locals.catalog,
                 function(err, org) {
                   if (err) {
@@ -49,6 +52,7 @@ module.exports = function(Subscriptions) {
             },
             function(callback) {
               grabAPIs(
+                locals.snapshot,
                 locals.plan,
                 function(err, apis) {
                   if (err) {
@@ -80,24 +84,36 @@ module.exports = function(Subscriptions) {
   );
 };
 
-function grabCatalog(product, cb) {
+function grabCatalog(snapshot, product, cb) {
   var catalog = {};
-  app.models.product.findById(product.id, function(err, myproduct) {
+  var query = {
+    'where' : {
+        'snapshot-id' : snapshot,
+        'id' : product.id
+    }
+  };
+  app.models.product.findOne(query, function(err, myproduct) {
       if (err) {
         cb(err);
         return;
       }
       catalog = myproduct.catalog;
-      console.log('id ' + product.id);
+      //console.log('snapshot ' + snapshot + ' id ' + product.id);
       cb(null, catalog);
     }
   );
 }
 
 
-function grabOrg(catalog, cb) {
+function grabOrg(snapshot, catalog, cb) {
   var org = {};
-  app.models.catalog.findById(catalog.id, function(err, mycatalog) {
+  var query = {
+    'where' : {
+        'snapshot-id' : snapshot,
+        'id' : catalog.id
+    }
+  };
+  app.models.catalog.findOne(query, function(err, mycatalog) {
       if (err) {
         cb(err);
         return;
@@ -109,16 +125,24 @@ function grabOrg(catalog, cb) {
 }
 
 
-function grabAPIs(plan, cb) {
+function grabAPIs(snapshot, plan, cb) {
   var apis = [];
   debug('found plan: %j', plan);
   async.each(
     plan.apis,
     function(api, done) {
+      var query = {
+        'where' : {
+          'snapshot-id' : snapshot
+        }
+      };
       app.models.api.find(
-        {},
+        query,
         function(err, listOfApis) {
-          if (err) throw err;
+          if (err) {
+            cb(err);
+            return;
+          }
           listOfApis.forEach(function(DBapi) {
               if (DBapi.document.info['version'] ===
                 api.document.info['version'] &&
@@ -223,17 +247,24 @@ function createOptimizedDataEntries(pieces, cb) {
             'organization-name': pieces.org.name,
             'api-id': api.id,
             'api-base-path': api.document.basePath,
-            'api-paths': apiPaths
+            'api-paths': apiPaths,
+            'snapshot-id' : pieces.snapshot
           };
 
           app.dataSources.db.automigrate(
             'optimizedData',
             function(err) {
-              if (err) throw err;
+              if (err) {
+                cb(err);
+                return;
+              }
               app.models.optimizedData.create(
                 newOptimizedDataEntry,
                 function(err, optimizedData) {
-                  if (err) throw err;
+                  if (err) {
+                    cb(err);
+                    return;
+                  }
                   debug('optimizedData created: %j',
                       optimizedData);
                   apidone();

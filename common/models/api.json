@@ -342,7 +342,7 @@
       "type": "string",
       "generated": false,
       "defaultFn": "uuid",
-      "id": true
+      "id": 2
     },
     "organization": {
       "id": "string",
@@ -350,7 +350,11 @@
       "title": "string"
     },
     "state": "string",
-    "url": "string"
+    "url": "string",
+    "snapshot-id": {
+      "type": "string",
+      "id": 1
+    }
   },
   "validations": [],
   "relations": {},
