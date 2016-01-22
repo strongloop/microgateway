@@ -131,7 +131,7 @@ var options = {
     methodPayloadFilter: {
       DELETE: 'reject',
       GET: 'reject',
-      HEAD: 'reject,
+      HEAD: 'reject',
       OPTIONS: 'ignore'
     }
   }
