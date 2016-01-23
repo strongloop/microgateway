@@ -186,7 +186,13 @@ function apimGetDefaultCatalog(orgName, cb) {
         return;
       }
 
-      var catalogs = JSON.parse(body);
+      var catalogs;
+      try {
+        catalogs = JSON.parse(body);
+      } catch (e) {
+        cb(e, null);
+        return;
+      }
       debug('catalog returned: %j', catalogs);
       if (catalogs.length === 1) {
         cb(null, catalogs[0].name);
@@ -255,7 +261,12 @@ function grabAPI(context, callback) {
         debug('grabAPI error exit');
         return;
       }
-      api = JSON.parse(body);
+      try {
+        api = JSON.parse(body);
+      } catch (e) {
+        callback(e, null);
+        return;
+      }
       debug('grabAPI request exit');
       callback(null, api);
     }
@@ -332,7 +343,13 @@ function findContext(reqpath, reqmethod, body) {
   // loop through each API maching the initial filters trying to
   // find the minimal set of ultimately matching APIs
   var matches = [];
-  var listOfEntries = JSON.parse(body);
+  var listOfEntries;
+  try {
+    listOfEntries = JSON.parse(body);
+  } catch (e) {
+    console.error(e);
+    return matches;
+  }
   debug('listOfEntries %j', listOfEntries);
   listOfEntries.forEach(function(possibleEntryMatch) {
       debug('possibleEntryMatch ', possibleEntryMatch);
