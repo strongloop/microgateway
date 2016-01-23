@@ -164,14 +164,14 @@ function doOptimizedDataRequest(orgName, catName, clientId, path, method, cb) {
  * @param {callback} cb - The callback that handles the error or output context
  */
 function apimGetDefaultCatalog(orgName, cb) {
-  var orgNameFilter = '{%22organization.name%22:%20%22' + orgName + '%22}';
-  var defaultOrgFilter = '{%22default%22:%20%22true%22}';
+  var orgNameFilter = '{"organization.name": "' + orgName + '"}';
+  var defaultOrgFilter = '{"default": "true"}';
   var queryfilter =
-    '{%22where%22:%20{%20%22and%22:[' +
+    '{"where": { "and":[' +
     orgNameFilter + ',' +
     defaultOrgFilter + ']}}';
   var queryurl = 'http://' + host + ':' + port +
-    '/api/catalogs?filter=' + queryfilter;
+    '/api/catalogs?filter=' + encodeURIComponent(queryfilter);
 
   request(
     {
