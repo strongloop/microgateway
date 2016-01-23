@@ -11,7 +11,7 @@ var debug = require('debug')('strong-gateway:preflow');
  * Module exports
  */
 module.exports = {
-    contextget: apimcontextget
+  contextget: apimcontextget
 };
 
 
@@ -111,56 +111,51 @@ function apimcontextget (opts, cb) {
 }
 
 function doOptimizedDataRequest(orgName, catName, clientId, path, method, cb) {
-        debug('doOptimizedDataRequest entry orgName:' + orgName +
-                                          ' catName:' + catName +
-                                          ' clientId:' + clientId +
-                                          ' path:' + path +
-                                          ' method:' + method );
-        // build request to send to data-store
-        var clientIDFilter = '{"client-id": "' + clientId + '"}';
-        var catalogNameFilter =
-            '{"catalog-name": "' + catName + '"}';
-        var organizationNameFilter =
-            '{"organization-name": "' + orgName + '"}';
-        var queryfilter =
-            '{"where": { "and":[' +
-            clientIDFilter + ',' +
-            catalogNameFilter + ',' +
-            organizationNameFilter + ']}}';
-        var queryurl = 'http://' + host + ':' + port +
-            '/api/optimizedData?filter=' +
-            encodeURIComponent(queryfilter);
+  debug('doOptimizedDataRequest entry orgName:' + orgName +
+                                    ' catName:' + catName +
+                                    ' clientId:' + clientId +
+                                    ' path:' + path +
+                                    ' method:' + method );
+  // build request to send to data-store
+  var clientIDFilter = '{"client-id": "' + clientId + '"}';
+  var catalogNameFilter = '{"catalog-name": "' + catName + '"}';
+  var organizationNameFilter ='{"organization-name": "' + orgName + '"}';
+  var queryfilter =
+    '{"where": { "and":[' + clientIDFilter + ',' +
+    catalogNameFilter + ',' + organizationNameFilter + ']}}';
+  var queryurl = 'http://' + host + ':' + port +
+    '/api/optimizedData?filter=' + encodeURIComponent(queryfilter);
 
-        // send request to optimizedData model from data-store
-        // for matching API(s)
-        request(
-            {
-                url : queryurl
-            },
-            function (error, response, body) {
-                debug('error: ', error);
-                debug('body: %j' , body);
-                debug('response: %j' , response);
-                 // exit early on error
-                if (error) {
-                    cb(Error(error), null);
-                    return;
-                }
-                // build context(s) of matching APIs
-                var localcontexts = [];
-                localcontexts = findContext(path, method, body);
-                debug('contexts after findContext: %j', localcontexts);
-                // add flow(s) from API declaration
-                addFlows(
-                    localcontexts,
-                    function (err, contexts) {
-                        debug('contexts: %j', contexts);
-                        localcontexts = contexts;
-                        cb(err, localcontexts);
-                    }
-                );
-            }
-        );
+  // send request to optimizedData model from data-store
+  // for matching API(s)
+  request(
+    {
+      url : queryurl
+    },
+    function (error, response, body) {
+      debug('error: ', error);
+      debug('body: %j' , body);
+      debug('response: %j' , response);
+      // exit early on error
+      if (error) {
+        cb(Error(error), null);
+        return;
+      }
+      // build context(s) of matching APIs
+      var localcontexts = [];
+      localcontexts = findContext(path, method, body);
+      debug('contexts after findContext: %j', localcontexts);
+      // add flow(s) from API declaration
+      addFlows(
+        localcontexts,
+        function (err, contexts) {
+          debug('contexts: %j', contexts);
+            localcontexts = contexts;
+            cb(err, localcontexts);
+        }
+      );
+    }
+  );
 }
 
 /**
@@ -169,37 +164,37 @@ function doOptimizedDataRequest(orgName, catName, clientId, path, method, cb) {
  * @param {callback} cb - The callback that handles the error or output context
  */
 function apimGetDefaultCatalog(orgName, cb) {
-      var orgNameFilter = '{%22organization.name%22:%20%22' + orgName + '%22}';
-      var defaultOrgFilter = '{%22default%22:%20%22true%22}';
-      var queryfilter =
-          '{%22where%22:%20{%20%22and%22:[' +
-          orgNameFilter + ',' +
-          defaultOrgFilter + ']}}';
-      var queryurl = 'http://' + host + ':' + port +
-          '/api/catalogs?filter=' + queryfilter;
+  var orgNameFilter = '{%22organization.name%22:%20%22' + orgName + '%22}';
+  var defaultOrgFilter = '{%22default%22:%20%22true%22}';
+  var queryfilter =
+    '{%22where%22:%20{%20%22and%22:[' +
+    orgNameFilter + ',' +
+    defaultOrgFilter + ']}}';
+  var queryurl = 'http://' + host + ':' + port +
+    '/api/catalogs?filter=' + queryfilter;
 
-      request(
-          {
-              url: queryurl
-          },
-          function(error, response, body) {
-              debug('error: ', error);
-              debug('body: %j', body);
-              debug('response: %j', response);
-              if (error) {
-                  cb(Error(error), null);
-                  return;
-              }
+  request(
+    {
+      url: queryurl
+    },
+    function(error, response, body) {
+      debug('error: ', error);
+      debug('body: %j', body);
+      debug('response: %j', response);
+      if (error) {
+        cb(Error(error), null);
+        return;
+      }
 
-              var catalogs = JSON.parse(body);
-              debug('catalog returned: %j', catalogs);
-              if (catalogs.length === 1) {
-                  cb(null, catalogs[0].name);
-              } else {
-                  cb(null, null);
-              }
-          }
-      );
+      var catalogs = JSON.parse(body);
+      debug('catalog returned: %j', catalogs);
+      if (catalogs.length === 1) {
+        cb(null, catalogs[0].name);
+      } else {
+        cb(null, null);
+      }
+    }
+  );
 }
 
 /**
@@ -210,27 +205,28 @@ function apimGetDefaultCatalog(orgName, cb) {
  */
 function addFlows(contexts, callback) {
 
-    debug('addFlows entry');
-    debug('addFlows contexts:', contexts);
-    var localContexts = [];
-    async.forEach(contexts,
-        function(context, callback) {
-            debug('addFlows middle context:', context);
-            grabAPI(context, function(err, apiDef) {
-                if (!err) {
-                    context.flow = apiDef.document['x-ibm-configuration'];
-                    localContexts.push(context);
-                }
-                debug('addFlows callback end');
-                callback();
-            });
-        },
-        function(err) {
-            debug('addFlows error callback');
-            callback(err, localContexts);
+  debug('addFlows entry');
+  debug('addFlows contexts:', contexts);
+  var localContexts = [];
+  async.forEach(contexts,
+    function(context, callback) {
+      debug('addFlows middle context:', context);
+      grabAPI(context, function(err, apiDef) {
+          if (!err) {
+            context.flow = apiDef.document['x-ibm-configuration'];
+            localContexts.push(context);
+          }
+          debug('addFlows callback end');
+          callback();
         }
-    );
-    debug('addFlows exit1');
+      );
+    },
+    function(err) {
+      debug('addFlows error callback');
+      callback(err, localContexts);
+    }
+  );
+  debug('addFlows exit1');
 }
 
 /**
@@ -241,30 +237,30 @@ function addFlows(contexts, callback) {
  */
 function grabAPI(context, callback) {
 
-    debug('grabAPI entry');
-    var queryurl = 'http://' + host + ':' + port +
-            '/api/apis/' + context.context.api.id;
-    var api = {};
+  debug('grabAPI entry');
+  var queryurl = 'http://' + host + ':' + port +
+    '/api/apis/' + context.context.api.id;
+  var api = {};
 
-    request(
-        {
-            url : queryurl
-        },
-        function (error, response, body) {
-            debug('error: ', error);
-            debug('body: %j' , body);
-            debug('response: %j' , response);
-            if (error) {
-                callback(error);
-                debug('grabAPI error exit');
-                return;
-            }
-            api = JSON.parse(body);
-            debug('grabAPI request exit');
-            callback(null, api);
-        }
-    );
-    debug('grabAPI exit');
+  request(
+    {
+      url : queryurl
+    },
+    function (error, response, body) {
+      debug('error: ', error);
+      debug('body: %j' , body);
+      debug('response: %j' , response);
+      if (error) {
+        callback(error);
+        debug('grabAPI error exit');
+        return;
+      }
+      api = JSON.parse(body);
+      debug('grabAPI request exit');
+      callback(null, api);
+    }
+  );
+  debug('grabAPI exit');
 }
 
 /**
@@ -277,45 +273,45 @@ function grabAPI(context, callback) {
  */
 function grabFilters(opts) {
 
-    debug('grabFilters entry');
-    debug('clientid: ', opts.clientid);
+  debug('grabFilters entry');
+  debug('clientid: ', opts.clientid);
 
-    var parsedUrl = url.parse(opts.path, true /* query string */);
-    var uri = parsedUrl.pathname.split('/');
-    var orgName;
-    var catName;
+  var parsedUrl = url.parse(opts.path, true /* query string */);
+  var uri = parsedUrl.pathname.split('/');
+  var orgName;
+  var catName;
 
-    if (uri.length > 1) {
-        // extract org name
-        orgName = uri[1];
-        debug('orgName: ', orgName);
+  if (uri.length > 1) {
+    // extract org name
+    orgName = uri[1];
+    debug('orgName: ', orgName);
 
-        if (uri.length > 2) {
-            // extract catalog name. Note that this value may be omitted....
-            catName = uri[2];
-            debug('catName: ', catName);
-        }
+    if (uri.length > 2) {
+      // extract catalog name. Note that this value may be omitted....
+      catName = uri[2];
+      debug('catName: ', catName);
     }
+  }
 
-    var inboundPath = (uri.length === 3) ? '/' : '';
-    for (var i = 3; i < uri.length; i++) {
-        inboundPath += '/' + uri[i];
-    }
+  var inboundPath = (uri.length === 3) ? '/' : '';
+  for (var i = 3; i < uri.length; i++) {
+    inboundPath += '/' + uri[i];
+  }
 
-    var inboundPathAlt = (uri.length === 2) ? '/' : '';
-    for (i = 2; i < uri.length; i++) {
-        inboundPathAlt += '/' + uri[i];
-    }
+  var inboundPathAlt = (uri.length === 2) ? '/' : '';
+  for (i = 2; i < uri.length; i++) {
+    inboundPathAlt += '/' + uri[i];
+  }
 
-    debug('inboundPath: ', inboundPath);
-    debug('grabFilters exit');
+  debug('inboundPath: ', inboundPath);
+  debug('grabFilters exit');
 
-    return {clientid: opts.clientid,
-            orgName: orgName,
-            catName: catName,
-            inboundPath: inboundPath,
-            inboundPathAlt: inboundPathAlt,
-            method: opts.method};
+  return {clientid: opts.clientid,
+          orgName: orgName,
+          catName: catName,
+          inboundPath: inboundPath,
+          inboundPathAlt: inboundPathAlt,
+          method: opts.method};
 }
 
 /**
@@ -332,41 +328,43 @@ function grabFilters(opts) {
  */
 function findContext(reqpath, reqmethod, body) {
 
-    debug ('findContext entry');
-    // loop through each API maching the initial filters trying to
-    // find the minimal set of ultimately matching APIs
-    var matches = [];
-    var listOfEntries = JSON.parse(body);
-    debug('listOfEntries %j', listOfEntries);
-    listOfEntries.forEach(function(possibleEntryMatch) {
-        debug('possibleEntryMatch ', possibleEntryMatch);
-        possibleEntryMatch['api-paths'].forEach(function(pathObject) {
-            // get path match regular expression
-            var path = pathObject['path-regex'];
+  debug ('findContext entry');
+  // loop through each API maching the initial filters trying to
+  // find the minimal set of ultimately matching APIs
+  var matches = [];
+  var listOfEntries = JSON.parse(body);
+  debug('listOfEntries %j', listOfEntries);
+  listOfEntries.forEach(function(possibleEntryMatch) {
+      debug('possibleEntryMatch ', possibleEntryMatch);
+      possibleEntryMatch['api-paths'].forEach(function(pathObject) {
+          // get path match regular expression
+          var path = pathObject['path-regex'];
 
-            // use regular expression matching to see if there are any
-            // APIs that match the request
-            var re = new RegExp(path);
-            var foundPath = re.test(reqpath);
+          // use regular expression matching to see if there are any
+          // APIs that match the request
+          var re = new RegExp(path);
+          var foundPath = re.test(reqpath);
 
-            if (foundPath) { // path found...
-                // now let's see if the Method exists
-                var MatchingMethod =
-                    findMethodMatch(reqmethod,
-                                    pathObject['path-methods'],
-                                    possibleEntryMatch.method);
-                if (MatchingMethod !== {}) { // found the method too..
-                    var match = buildPreflowContext(possibleEntryMatch,
-                                    pathObject.path,
-                                    MatchingMethod);
-                    matches.push(match);
-                }
+          if (foundPath) { // path found...
+            // now let's see if the Method exists
+            var MatchingMethod =
+              findMethodMatch(reqmethod,
+                              pathObject['path-methods'],
+                              possibleEntryMatch.method);
+            if (MatchingMethod !== {}) { // found the method too..
+              var match = buildPreflowContext(possibleEntryMatch,
+                          pathObject.path,
+                          MatchingMethod);
+              matches.push(match);
             }
-        });
-    });
+          }
+        }
+      );
+    }
+  );
 
-    debug ('findContext exit');
-    return matches;
+  debug ('findContext exit');
+  return matches;
 }
 
 /**
@@ -380,19 +378,20 @@ function findMethodMatch(filterMethod,
                          pathMethods,
                          possibleEntryMatchMethod) {
 
-    debug('findMethodMatch entry');
-    debug('Path methods: ' , JSON.stringify(pathMethods,null,4));
-    debug('method map: ' , JSON.stringify({method: filterMethod}));
-    pathMethods.forEach(function(possibleMethodMatch) {
-        if (possibleEntryMatchMethod === filterMethod) {
-            debug('and method/verb matches!');
-            debug('findMethodMatch exit');
-            return possibleMethodMatch;
-        }
-    });
-    debug('no method/verb match found');
-    debug('findMethodMatch exit');
-    return {};
+  debug('findMethodMatch entry');
+  debug('Path methods: ' , JSON.stringify(pathMethods,null,4));
+  debug('method map: ' , JSON.stringify({method: filterMethod}));
+  pathMethods.forEach(function(possibleMethodMatch) {
+      if (possibleEntryMatchMethod === filterMethod) {
+        debug('and method/verb matches!');
+        debug('findMethodMatch exit');
+        return possibleMethodMatch;
+      }
+    }
+  );
+  debug('no method/verb match found');
+  debug('findMethodMatch exit');
+  return {};
 }
 
 /**
@@ -404,49 +403,49 @@ function findMethodMatch(filterMethod,
  */
 function buildPreflowContext(EntryMatch, PathMatch, MethodMatch) {
 
-    debug('buildPreflowContext entry');
+  debug('buildPreflowContext entry');
 
-    var catalog = {
-        id: EntryMatch['catalog-id'],
-        name: EntryMatch['catalog-name']
-    };
-    var organization = {
-        id: EntryMatch['organization-id'],
-        name: EntryMatch['organization-name']
-    };
-    var product = {
-        id: EntryMatch['product-id'],
-        name: EntryMatch['product-name']
-    };
-    var plan = {
-        id: EntryMatch['plan-id'],
-        name: EntryMatch['plan-name']
-    };
-    var api = {
-        id: EntryMatch['api-id'],
-        basepath: EntryMatch['api-base-path'],
-        path: PathMatch,
-        method: MethodMatch.method,
-        operationId: MethodMatch.operationId
-    };
-    var client = {
-        app: {
-            id: EntryMatch['client-id'],
-            secret: EntryMatch['client-secret']
-        }
-    };
-    var context = {
-        context: {
-            catalog: catalog,
-            organization: organization,
-            product: product,
-            plan: plan,
-            api: api,
-            client: client
-        }
-    };
-    debug('buildPreflowContext context: ', context);
+  var catalog = {
+    id: EntryMatch['catalog-id'],
+    name: EntryMatch['catalog-name']
+  };
+  var organization = {
+    id: EntryMatch['organization-id'],
+    name: EntryMatch['organization-name']
+  };
+  var product = {
+    id: EntryMatch['product-id'],
+    name: EntryMatch['product-name']
+  };
+  var plan = {
+    id: EntryMatch['plan-id'],
+    name: EntryMatch['plan-name']
+  };
+  var api = {
+    id: EntryMatch['api-id'],
+    basepath: EntryMatch['api-base-path'],
+    path: PathMatch,
+    method: MethodMatch.method,
+    operationId: MethodMatch.operationId
+  };
+  var client = {
+    app: {
+      id: EntryMatch['client-id'],
+      secret: EntryMatch['client-secret']
+    }
+  };
+  var context = {
+    context: {
+      catalog: catalog,
+      organization: organization,
+      product: product,
+      plan: plan,
+      api: api,
+      client: client
+    }
+  };
+  debug('buildPreflowContext context: ', context);
 
-    debug('buildPreflowContext exit');
-    return context;
+  debug('buildPreflowContext exit');
+  return context;
 }
