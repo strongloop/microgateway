@@ -68,7 +68,15 @@ module.exports = function(app) {
                     if (err) {
                       console.error(err);
                       try {
-                        fs.unlinkSync(uniqueDefinitionsDir);
+                        fs.unlinkSync(uniqueDefinitionsDir + '.*');
+                      } catch(e) {
+                        if (e.code !== 'ENOENT') {
+                          console.error(e);
+                        }
+                        //continue
+                      }
+                      try {
+                        fs.rmdirSync(uniqueDefinitionsDir);
                       } catch(e) {
                         console.error(e);
                         //continue
