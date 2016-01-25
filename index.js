@@ -84,17 +84,6 @@ module.exports = function createPreflowMiddleware(options) {
 
     var ctx = req.ctx;
 
-//    var assembly =
-//        'assembly:\n' +
-//        '  execute:\n' +
-//        '    - invoke:\n' +
-//        '        target-url: "http://$(target-host)/$(request.path)"\n'+
-//        '        verb: $(request.verb)\n';
-//
-//    ctx.set('flowAssembly', require('yamljs').parse(assembly));
-//    ctx.set('target-host', 'http://9.42.102.139:3030');
-//    ctx.set('request.path', req.originalUrl);
-//    ctx.set('request.verb', req.method);
     debug('Use apim-lookup()');
     var contextgetOptions = {};
     contextgetOptions['path'] = req.originalUrl;
@@ -124,6 +113,8 @@ module.exports = function createPreflowMiddleware(options) {
  */
 function fetchClientId(req) {
   var ctx = req.ctx;
+
+  // TODO see if a middleware that ran before this set clientID in the context.
 
   var clientId = req.query['client_id'];
   debug('Query Client Id: ' + clientId);
