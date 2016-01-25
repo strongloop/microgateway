@@ -1,34 +1,16 @@
 var app = require('../../server/server');
 
 module.exports = function(Snapshot) {
-  Snapshot.observe('after save', function(ctx,next) {
-  	  // delete instance when reference count is zero
-      if (typeof ctx.data !=='undefined' &&
-      	  typeof ctx.data.refcount !== 'undefined' && 
-      	  ctx.data.refcount === '0' &&
-      	  typeof ctx.where !== 'undefined' &&
-      	  typeof ctx.where.id !== 'undefined') {
-      	// remove from snapshot model
-        Snapshot.destroyById(ctx.where.id, function(err) {
-          }
-        );
+  Snapshot.observe('after delete', function(ctx, next) {
+  	  if (typeof ctx.instance === 'object') {
+        // delete relevant snapshots from other models
         var models = ['catalog', 'product', 'api', 'subscription'];
-
+ 
         var query = {
-          'where' : {
-            'snapshot-id' : ctx.where.id
-          }
+          'snapshot-id' : ctx.instance.id
         };
-        // remove from all other models
         models.forEach(function(model) {
-            app.dataSources.db.automigrate(
-              model,
-              function(err) {
-                if (!err) {
-              	  app.models[model].destroyAll(query, function(err, info) {
-                    }
-                  );
-                }
+            app.models[model].destroyAll(query, function(err, info) {
               }
             );
           }
@@ -37,21 +19,23 @@ module.exports = function(Snapshot) {
       next();
     }
   );
+  
+
   // current
   // returns current snapshot id object (after incrementing reference count)
   Snapshot.current = function(cb) {
-  	Snapshot.findOne(
-  	  {
-  	  	'where' :
-  	  	  {
-  	  	  	'current' : 'true'
-  	  	  }
-  	  },
-  	  function(err, instance) {
-  	    if (err) {
-  	      cb(err);
-  	      return;
-  	    }
+    Snapshot.findOne(
+      {
+        'where' :
+          {
+            'current' : 'true'
+          }
+      },
+      function(err, instance) {
+        if (err) {
+          cb(err);
+          return;
+        }
         var refCount = parseInt(instance.refcount) + 1;
         instance.updateAttributes(
           {'refcount' : refCount.toString() },
@@ -63,8 +47,8 @@ module.exports = function(Snapshot) {
             cb(null, instance);
           }
         );
-  	  }
-  	);
+      }
+    );
   };
   Snapshot.remoteMethod (
     'current',
@@ -74,7 +58,7 @@ module.exports = function(Snapshot) {
     }
   );
 
-  // addRef
+  // release
   // decrements reference count and returns the updated count
   Snapshot.release = function(id, cb) {
     Snapshot.findById(id, function(err, instance) {
@@ -84,17 +68,26 @@ module.exports = function(Snapshot) {
         }
         
         var refCount = parseInt(instance.refcount) - 1;
-        Snapshot.updateAll(
-          {'id' : id },
-          {'refcount' : refCount.toString() },
-          function(err, info) {
-            if (err) {
-              cb(err);
-              return;
+        // delete if reference count is zero and return empty object
+        if (refCount === '0') {
+          instance.destroy(function(err) {
+              cb(null, {});
             }
-          }
-        );
-        cb(null, refCount);
+          );
+        }
+        // otherwise, update reference count
+        else {
+          instance.updateAttributes(
+            {'refcount' : refCount.toString() },
+            function(err, instance) {
+              if (err) {
+                cb(err);
+                return;
+              }
+              cb(null, instance);
+            }
+          );
+        }
       }
     );
   };
@@ -103,7 +96,7 @@ module.exports = function(Snapshot) {
     {
       http: {path: '/release', verb: 'get'},
       accepts: {arg: 'id', type: 'string', http: {source: 'query'}},
-      returns: {arg: 'refcount', type: 'string'}
+      returns: {arg: 'snapshot', type: 'object'}
     }
   );
 };
