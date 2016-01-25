@@ -67,7 +67,12 @@ module.exports = function(app) {
                 apimpull(options,function(err, response) {
                     if (err) {
                       console.error(err);
-                      fs.unlinkSync(uniqueDefinitionsDir);
+                      try {
+                        fs.unlinkSync(uniqueDefinitionsDir);
+                      } catch(e) {
+                        console.error(e);
+                        //continue
+                      }
                       uniqueDefinitionsDir = '';
                       // falling through
                       // try loading from local files
