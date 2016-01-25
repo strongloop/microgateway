@@ -11,7 +11,6 @@ var configFile = __dirname + rootConfigPath + configFileName;
 var currentDefinitionsDir = __dirname + rootConfigPath + 'current';
 var uniqueDefinitionsDir = '';
 var snapshotID;
-var currentID;
 
 /**
  * Creates a model type 
@@ -29,7 +28,7 @@ function ModelType(name, prefix) {
 // Hopefully there will not be this many concurrent configuration
 // updates.
 function getSnapshotID() {
-  return Math.floor(Math.random() * (65536));
+  return ('0000' + Math.floor(Math.random() * (65536))).slice(-5);
 }
 
 module.exports = function(app) {
@@ -37,7 +36,7 @@ module.exports = function(app) {
     // if no apim.config, load what you have
     // if apim.config, grab fresh data if you can
     function(callback) {
-      snapshotID = ('0000' + getSnapshotID()).slice(-5);
+      snapshotID = getSnapshotID();
       fs.access(configFile, fs.R_OK, function (err) {
           if (err) {
             debug('apim.config not found, loading from local files');
@@ -99,7 +98,8 @@ module.exports = function(app) {
           app.models.snapshot.create(
             {
               'id': snapshotID,
-              'refcount': '1'
+              'refcount': '1',
+              'current' : 'false'
             },
             function(err, mymodel) {
               debug('snapshot create');
@@ -125,20 +125,41 @@ module.exports = function(app) {
           debug('loadConfigFromFS end');
           if (err) {
             console.error(err);
+            callback(err);
+            return;
           }
           else {
-            process.send('Load Complete');
-            // only update pointer to latest configuration
-            // when latest configuration successful loaded
-            if (uniqueDefinitionsDir === dirToLoad) {
-                fs.unlinkSync(currentDefinitionsDir);
-                fs.symlinkSync(uniqueDefinitionsDir,
-                               currentDefinitionsDir,
-                               'dir');
-            }
-            currentID = snapshotID;
+            // update current snapshot pointer
+            app.models.snapshot.findById(snapshotID, function(err, instance) {
+                if (err) {
+                  callback(err);
+                  return;
+                }
+
+                instance.updateAttributes(
+                  {
+                    'current' : 'true'
+                  },
+                  function(err, instance) {
+                    if (err) {
+                      callback(err);
+                      return;
+                    }
+                    process.send('Load Complete');
+                    // only update pointer to latest configuration
+                    // when latest configuration successful loaded
+                    if (uniqueDefinitionsDir === dirToLoad) {
+                        fs.unlinkSync(currentDefinitionsDir);
+                        fs.symlinkSync(uniqueDefinitionsDir,
+                                       currentDefinitionsDir,
+                                       'dir');
+                    }
+                    callback();
+                  }
+                );
+              }
+            );
           }
-          callback();
         }
       );
     }

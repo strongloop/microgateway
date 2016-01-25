@@ -10,7 +10,8 @@
       "generated": false,
       "id": true
     },
-    "refcount": "string"
+    "refcount": "string",
+    "current" : "boolean"
   },
   "validations": [],
   "relations": {},

@@ -37,36 +37,40 @@ module.exports = function(Snapshot) {
       next();
     }
   );
-  // addRef
-  // increments reference count and returns the updated count
-  Snapshot.addRef = function(id, cb) {
-    Snapshot.findById(id, function(err, instance) {
-        if (err) {
-          cb(err);
-          return;
-        }
-        
+  // current
+  // returns current snapshot id object (after incrementing reference count)
+  Snapshot.current = function(cb) {
+  	Snapshot.findOne(
+  	  {
+  	  	'where' :
+  	  	  {
+  	  	  	'current' : 'true'
+  	  	  }
+  	  },
+  	  function(err, instance) {
+  	    if (err) {
+  	      cb(err);
+  	      return;
+  	    }
         var refCount = parseInt(instance.refcount) + 1;
-        Snapshot.updateAll(
-          {'id' : id },
+        instance.updateAttributes(
           {'refcount' : refCount.toString() },
-          function(err, info) {
+          function(err, instance) {
             if (err) {
               cb(err);
               return;
             }
+            cb(null, instance);
           }
         );
-        cb(null, refCount);
-      }
-    );
+  	  }
+  	);
   };
   Snapshot.remoteMethod (
-    'addRef',
+    'current',
     {
-      http: {path: '/addref', verb: 'get'},
-      accepts: {arg: 'id', type: 'string', http: {source: 'query'}},
-      returns: {arg: 'refcount', type: 'string'}
+      http: {path: '/current', verb: 'get'},
+      returns: {arg: 'snapshot', type: 'object'}
     }
   );
 
