@@ -37,12 +37,20 @@ function apimcontextget (opts, cb) {
 
   // extract filters from request
   var filters = grabFilters(opts);
+  var snapshot;
 
   async.waterfall([
     function(callback) {
+      getCurrentSnapshot(function(err, ss) {
+                           snapshot = ss;
+                           callback(err);
+                         });
+    },
+    function(callback) {
       // Pass 1 - all filters available
       debug('apimcontextget pass 1');
-      doOptimizedDataRequest(filters.orgName,
+      doOptimizedDataRequest(snapshot,
+                             filters.orgName,
                              filters.catName,
                              filters.clientid,
                              filters.inboundPath,
@@ -55,7 +63,8 @@ function apimcontextget (opts, cb) {
     function(prevResult, callback) {
       // Get the default catalog name
       debug('apimcontextget get default context');
-      apimGetDefaultCatalog(filters.orgName,
+      apimGetDefaultCatalog(snapshot,
+                            filters.orgName,
                             function(err, defaultCat) {
                                      filters.dfltCatName = defaultCat;
                                      callback(err, defaultCat);
@@ -64,7 +73,8 @@ function apimcontextget (opts, cb) {
     function(prevResult, callback) {
       // Pass 2 - use the default catalog name
       debug('apimcontextget pass 2');
-      doOptimizedDataRequest(filters.orgName,
+      doOptimizedDataRequest(snapshot,
+                             filters.orgName,
                              filters.dfltCatName,
                              filters.clientid,
                              filters.inboundPathAlt,
@@ -77,7 +87,8 @@ function apimcontextget (opts, cb) {
     function(prevResult, callback) {
       // Pass 3 - no client ID
       debug('apimcontextget pass 3');
-      doOptimizedDataRequest(filters.orgName,
+      doOptimizedDataRequest(snapshot,
+                             filters.orgName,
                              filters.catName,
                              '',
                              filters.inboundPath,
@@ -90,7 +101,8 @@ function apimcontextget (opts, cb) {
     function(prevResult, callback) {
       // Pass 4 - no client ID and default catalog name
       debug('apimcontextget pass 4');
-      doOptimizedDataRequest(filters.orgName,
+      doOptimizedDataRequest(snapshot,
+                             filters.orgName,
                              filters.dfltCatName,
                              '',
                              filters.inboundPathAlt,
@@ -110,18 +122,60 @@ function apimcontextget (opts, cb) {
   debug('apimcontextget exit');
 }
 
-function doOptimizedDataRequest(orgName, catName, clientId, path, method, cb) {
-  debug('doOptimizedDataRequest entry orgName:' + orgName +
+function getCurrentSnapshot(cb) {
+  debug('getCurrentSnapshot entry');
+  // build request to send to data-store
+  var queryurl = 'http://' + host + ':' + port +
+    '/api/snapshots/current';
+
+  // send request to optimizedData model from data-store
+  // for matching API(s)
+  request(
+    {
+      url : queryurl
+    },
+    function (error, response, body) {
+      debug('error: ', error);
+      debug('body: %j' , body);
+      debug('response: %j' , response);
+      // exit early on error
+      if (error) {
+        cb(Error(error), null);
+        return;
+      }
+      var snapshot;
+      try {
+        snapshot = JSON.parse(body);
+      } catch (e) {
+        cb(e, null);
+        return;
+      }
+      debug('snapshot: ', snapshot.snapshot.id);
+      cb(null, snapshot.snapshot.id);
+    }
+  );
+}
+
+function doOptimizedDataRequest(snapshot,
+                                orgName,
+                                catName,
+                                clientId,
+                                path,
+                                method,
+                                cb) {
+  debug('doOptimizedDataRequest entry snapshot:' + snapshot +
+                                    ' orgName:' + orgName +
                                     ' catName:' + catName +
                                     ' clientId:' + clientId +
                                     ' path:' + path +
                                     ' method:' + method );
   // build request to send to data-store
+  var snapshotFilter = '{"snapshot-id": "' + snapshot + '"}';
   var clientIDFilter = '{"client-id": "' + clientId + '"}';
   var catalogNameFilter = '{"catalog-name": "' + catName + '"}';
   var organizationNameFilter ='{"organization-name": "' + orgName + '"}';
   var queryfilter =
-    '{"where": { "and":[' + clientIDFilter + ',' +
+    '{"where": { "and":[' + snapshotFilter + ',' + clientIDFilter + ',' +
     catalogNameFilter + ',' + organizationNameFilter + ']}}';
   var queryurl = 'http://' + host + ':' + port +
     '/api/optimizedData?filter=' + encodeURIComponent(queryfilter);
@@ -160,14 +214,17 @@ function doOptimizedDataRequest(orgName, catName, clientId, path, method, cb) {
 
 /**
  * Finds the default catalog/environment for a specific provider organization
+ * @param {string} snapshot - Snapshot identifier
  * @param {string} orgName - Name or provider organization
  * @param {callback} cb - The callback that handles the error or output context
  */
-function apimGetDefaultCatalog(orgName, cb) {
+function apimGetDefaultCatalog(snapshot, orgName, cb) {
+  var snapshotFilter = '{"snapshot-id": "' + snapshot + '"}';
   var orgNameFilter = '{"organization.name": "' + orgName + '"}';
   var defaultOrgFilter = '{"default": "true"}';
   var queryfilter =
     '{"where": { "and":[' +
+    snapshotFilter + ',' +
     orgNameFilter + ',' +
     defaultOrgFilter + ']}}';
   var queryurl = 'http://' + host + ':' + port +
