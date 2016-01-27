@@ -4,7 +4,7 @@ and attach the context object to Express `req.ctx`.
 ## API
 ```js
 var express = require('express');
-var contextMiddlewareFactory = require('context');
+var contextMiddlewareFactory = require('./context');
 
 var app = express();
 app.use(contextMiddlewareFactory(options));
