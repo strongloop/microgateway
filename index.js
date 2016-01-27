@@ -32,7 +32,7 @@ module.exports = function createContextMiddleware(options) {
     try {
       var ctx = req.ctx;
       if (!ctx) {
-        ctx = createContext('apim');
+        ctx = createContext();
         req.ctx = ctx;
       }
 
