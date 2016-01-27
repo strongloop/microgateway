@@ -29,20 +29,24 @@ module.exports = function createContextMiddleware(options) {
 
   return function(req, res, next) {
     // create the APIm context used for the following middlewares
-    var ctx = req.ctx;
-    if (!ctx) {
-      ctx = createContext('apim');
-      req.ctx = ctx;
-    }
+    try {
+      var ctx = req.ctx;
+      if (!ctx) {
+        ctx = createContext('apim');
+        req.ctx = ctx;
+      }
 
-    ctx.req = req;
-    ctx.res = res;
+      ctx.req = req;
+      ctx.res = res;
 
-    populateRequestVariables(ctx, req);
-    populateSystemVariables(ctx);
-    populateMessageVariables(ctx, req, function(error) {
+      populateRequestVariables(ctx, req);
+      populateSystemVariables(ctx);
+      populateMessageVariables(ctx, req, function(error) {
+        next(error);
+      });
+    } catch (error) {
       next(error);
-    });
+    }
   };
 };
 
