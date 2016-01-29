@@ -69,7 +69,7 @@ module.exports = function(Snapshot) {
         
         var refCount = parseInt(instance.refcount) - 1;
         // delete if reference count is zero and return empty object
-        if (refCount === '0') {
+        if (refCount === 0) {
           instance.destroy(function(err) {
               cb(null, {});
             }
