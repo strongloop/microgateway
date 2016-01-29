@@ -6,6 +6,10 @@
     "validateUpsert": true
   },
   "properties": {
+    "dummyid": {
+      "type": "number",
+      "id": true
+    },
     "catalog": {
       "default": "boolean",
       "id": "string",
@@ -339,10 +343,7 @@
       }
     },
     "id": {
-      "type": "string",
-      "generated": false,
-      "defaultFn": "uuid",
-      "id": 2
+      "type": "string"
     },
     "organization": {
       "id": "string",
@@ -352,8 +353,7 @@
     "state": "string",
     "url": "string",
     "snapshot-id": {
-      "type": "string",
-      "id": 1
+      "type": "string"
     }
   },
   "validations": [],

@@ -6,6 +6,10 @@
     "validateUpsert": true
   },
   "properties": {
+    "dummyid": {
+      "type": "number",
+      "id": true
+    },
     "default": "boolean",
     "gateway-cluster": {
       "host-name": "string",
@@ -13,10 +17,7 @@
       "title": "string"
     },
     "id": {
-      "type": "string",
-      "generated": false,
-      "defaultFn": "uuid",
-      "id": 2
+      "type": "string"
     },
     "name": "string",
     "organization": {
@@ -28,8 +29,7 @@
     "title": "string",
     "url": "string",
     "snapshot-id": {
-      "type": "string",
-      "id": 1
+      "type": "string"
     }
   },
   "validations": [],

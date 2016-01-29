@@ -6,6 +6,10 @@
     "validateUpsert": true
   },
   "properties": {
+    "dummyid": {
+      "type": "number",
+      "id": true
+    },
     "active": "boolean",
     "application": {
       "app-credentials": [
@@ -37,10 +41,7 @@
       "title": "string"
     },
     "id": {
-      "type": "string",
-      "generated": false,
-      "defaultFn": "uuid",
-      "id": 2
+      "type": "string"
     },
     "organization": {
       "id": "string",
@@ -501,8 +502,7 @@
     },
     "url": "string",
     "snapshot-id": {
-      "type": "string",
-      "id": 1
+      "type": "string"
     }
   },
   "validations": [],
