@@ -128,6 +128,7 @@ function loadData(app, config, models, currdir, initial) {
 }
 
 function scheduleLoadData(app, config, models, dir) {
+/* temporary workaround for leak & performance issues
   setTimeout(loadData,
              15 * 1000, // 15 seconds TODO: make configurable
              app,
@@ -135,6 +136,7 @@ function scheduleLoadData(app, config, models, dir) {
              models,
              dir,
              false); // not first call to loadData()
+*/
 }
 
 /**
