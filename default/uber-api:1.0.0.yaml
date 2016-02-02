@@ -1,0 +1,99 @@
+basePath: /v1
+definitions:
+    Activities:
+        properties:
+            count: {description: 'Total number of items available.', format: int32, type: integer}
+            history: {items: {$ref: '#/definitions/Activity'}, type: array}
+            limit: {description: 'Number of items to retrieve (100 max).', format: int32, type: integer}
+            offset: {description: 'Position in pagination.', format: int32, type: integer}
+    Activity:
+        properties:
+            uuid: {description: 'Unique identifier for the activity', type: string}
+    Error:
+        properties:
+            code: {format: int32, type: integer}
+            fields: {type: string}
+            message: {type: string}
+    PriceEstimate:
+        properties:
+            currency_code: {description: '[ISO 4217](http://en.wikipedia.org/wiki/ISO_4217) currency code.', type: string}
+            display_name: {description: 'Display name of product.', type: string}
+            estimate: {description: 'Formatted string of estimate in local currency of the start location. Estimate could be a range, a single number (flat rate) or "Metered" for TAXI.', type: string}
+            high_estimate: {description: 'Upper bound of the estimated price.', type: number}
+            low_estimate: {description: 'Lower bound of the estimated price.', type: number}
+            product_id: {description: 'Unique identifier representing a specific product for a given latitude & longitude. For example, uberX in San Francisco will have a different product_id than uberX in Los Angeles', type: string}
+            surge_multiplier: {description: 'Expected surge multiplier. Surge is active if surge_multiplier is greater than 1. Price estimate already factors in the surge multiplier.', type: number}
+    Product:
+        properties:
+            capacity: {description: 'Capacity of product. For example, 4 people.', type: string}
+            description: {description: 'Description of product.', type: string}
+            display_name: {description: 'Display name of product.', type: string}
+            image: {description: 'Image URL representing the product.', type: string}
+            product_id: {description: 'Unique identifier representing a specific product for a given latitude & longitude. For example, uberX in San Francisco will have a different product_id than uberX in Los Angeles.', type: string}
+    Profile:
+        properties:
+            email: {description: 'Email address of the Uber user', type: string}
+            first_name: {description: 'First name of the Uber user.', type: string}
+            last_name: {description: 'Last name of the Uber user.', type: string}
+            picture: {description: 'Image URL of the Uber user.', type: string}
+            promo_code: {description: 'Promo code of the Uber user.', type: string}
+host: api.uber.com
+info:
+    description: 'Move your app forward with the Uber API'
+    title: 'Uber API'
+    version: 1.0.0
+    x-ibm-name: uber-api
+paths:
+    /estimates/price:
+        get:
+            deprecated: false
+            description: "The Price Estimates endpoint returns an estimated price range\nfor each product offered at a given location. The price estimate is\nprovided as a formatted string with the full price range and the localized\ncurrency symbol.<br><br>The response also includes low and high estimates,\nand the [ISO 4217](http://en.wikipedia.org/wiki/ISO_4217) currency code for\nsituations requiring currency conversion. When surge is active for a particular\nproduct, its surge_multiplier will be greater than 1, but the price estimate\nalready factors in this multiplier.\n"
+            parameters: [{description: 'Latitude component of start location.', format: double, in: query, name: start_latitude, required: true, type: number}, {description: 'Longitude component of start location.', format: double, in: query, name: start_longitude, required: true, type: number}, {description: 'Latitude component of end location.', format: double, in: query, name: end_latitude, required: true, type: number}, {description: 'Longitude component of end location.', format: double, in: query, name: end_longitude, required: true, type: number}]
+            responses: {'200': {description: 'An array of price estimates by product', schema: {items: {$ref: '#/definitions/PriceEstimate'}, type: array}}, default: {description: 'Unexpected error', schema: {$ref: '#/definitions/Error'}}}
+            summary: 'Price Estimates'
+            tags: [Estimates]
+    /estimates/time:
+        get:
+            deprecated: false
+            description: 'The Time Estimates endpoint returns ETAs for all products offered at a given location, with the responses expressed as integers in seconds. We recommend that this endpoint be called every minute to provide the most accurate, up-to-date ETAs.'
+            parameters: [{description: 'Latitude component of start location.', format: double, in: query, name: start_latitude, required: true, type: number}, {description: 'Longitude component of start location.', format: double, in: query, name: start_longitude, required: true, type: number}, {description: 'Unique customer identifier to be used for experience customization.', format: uuid, in: query, name: customer_uuid, type: string}, {description: 'Unique identifier representing a specific product for a given latitude & longitude.', in: query, name: product_id, type: string}]
+            responses: {'200': {description: 'An array of products', schema: {items: {$ref: '#/definitions/Product'}, type: array}}, default: {description: 'Unexpected error', schema: {$ref: '#/definitions/Error'}}}
+            summary: 'Time Estimates'
+            tags: [Estimates]
+    /history:
+        get:
+            deprecated: false
+            description: 'The User Activity endpoint returns data about a user''s lifetime activity with Uber. The response will include pickup locations and times, dropoff locations and times, the distance of past requests, and information about which products were requested.<br><br>The history array in the response will have a maximum length based on the limit parameter. The response value count may exceed limit, therefore subsequent API requests may be necessary.'
+            parameters: [{description: 'Offset the list of returned results by this amount. Default is zero.', format: int32, in: query, name: offset, type: integer}, {description: 'Number of items to retrieve. Default is 5, maximum is 100.', format: int32, in: query, name: limit, type: integer}]
+            responses: {'200': {description: 'History information for the given user', schema: {$ref: '#/definitions/Activities'}}, default: {description: 'Unexpected error', schema: {$ref: '#/definitions/Error'}}}
+            summary: 'User Activity'
+            tags: [User]
+    /me:
+        get:
+            deprecated: false
+            description: 'The User Profile endpoint returns information about the Uber user that has authorized with the application.'
+            responses: {'200': {description: 'Profile information for a user', schema: {$ref: '#/definitions/Profile'}}, default: {description: 'Unexpected error', schema: {$ref: '#/definitions/Error'}}}
+            summary: 'User Profile'
+            tags: [User]
+    /products:
+        get:
+            deprecated: false
+            description: "The Products endpoint returns information about the *Uber* products\noffered at a given location. The response includes the display name\nand other details about each product, and lists the products in the\nproper display order.\n"
+            parameters: [{description: 'Latitude component of location.', format: double, in: query, name: latitude, required: true, type: number}, {description: 'Longitude component of location.', format: double, in: query, name: longitude, required: true, type: number}]
+            responses: {'200': {description: 'An array of products', schema: {items: {$ref: '#/definitions/Product'}, type: array}}, default: {description: 'Unexpected error', schema: {$ref: '#/definitions/Error'}}}
+            summary: 'Product Types'
+            tags: [Products]
+produces:
+    - application/json
+schemes:
+    - https
+swagger: '2.0'
+x-ibm-configuration:
+    assembly:
+        execute:
+            - {invoke: {target-url: 'http://127.0.0.1:8889/api0'}}
+    cors:
+        enabled: false
+    enforced: true
+    phase: identified
+    testable: false

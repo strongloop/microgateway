@@ -1,0 +1,66 @@
+product: 1.0.0
+info:
+    name: apim
+    version: 1.0.0
+    title: ClimbOn
+    contact:
+        name: 'George O Jungle'
+        email: george.o.jungle@apim.com
+        url: 'http://www.apim.com'
+    license:
+        name: 'Free for all climbers'
+        url: 'http://www.apim.com/user-agreement'
+    termsOfService: 'Thy shalt not weigh more than thy fridge.'
+visibility:
+    view:
+        enabled: true
+        type: public
+        tags: []
+        orgs: []
+    subscribe:
+        enabled: true
+        type: custom
+        tags:
+            - tag1
+            - tag2
+        orgs:
+            - Consumer-Org-1
+            - Consumer-Org-2
+apis:
+    -
+        $ref: 'ascents:1.0.0'
+    -
+        $ref: 'forecasts:1.0.0'
+    -
+        $ref: 'routes:1.0.0'
+plans:
+    trial:
+        title: 'Trial Climb On'
+        description: 'blah blah'
+        approval: false
+        rate-limit:
+            hard-limit: true
+            value: 60/hour
+        apis:
+            - {$ref: 'ascents:1.0.0'}
+    silver:
+        title: 'Silver Climb On'
+        description: 'blah blah'
+        approval: true
+        rate-limit:
+            hard-limit: false
+            value: 100/min
+        apis:
+            - {$ref: 'ascents:1.0.0'}
+            - {$ref: 'forecasts:1.0.0'}
+    gold:
+        title: 'Gold Climb On'
+        description: 'blah blah'
+        approval: true
+        rate-limit:
+            hard-limit: false
+            value: 1000/min
+        apis:
+            - {$ref: 'ascents:1.0.0'}
+            - {$ref: 'forecasts:1.0.0'}
+            - {$ref: 'routes:1.0.0'}
