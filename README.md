@@ -5,7 +5,7 @@ Currently, it grabs local files that are downloads from APIm, and populates the 
 
 ## How do I use it manually?
 
-1. Using the apim-export cli, put the data wherever you want (this example uses ./data-store/server/boot).. then softlink to ./config/current
+1. Using the apim-export cli, put the data wherever you want (this example uses ./data-store/server/boot).. then specify this as the CONFIG_DIR ENV Var for the gateway..
   - How to run it:
   
     ```
@@ -71,19 +71,7 @@ apimpull(options, function(response) {});
 ```
 ## CLI help
 ```  
-Usage: apim-export [options] < host >
-
-  Options:
-
-    -h, --help              output usage information
-    -V, --version           output the version number
-    -p, --port <number>     Port to connect to
-    -t, --timeout <number>  Timeout in seconds
-    -s, --srvca <name>      Server CA to use
-    -k, --key <name>        Key to use
-    -P, --pass <name>       Passphrase for key
-    -c, --cert <name>       Cert to use
-    -o, --outdir <path>     Directory for output
+apim-export -h
 ```
 
 ## What still needs work?

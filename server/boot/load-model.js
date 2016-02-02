@@ -1,14 +1,19 @@
 var fs = require('fs');
 var path = require('path');
 var async = require('async');
+var YAML = require('yamljs');
 var debug = require('debug')('strong-gateway:data-store');
 var sgwapimpull = require('../../apim-pull');
 var apimpull = sgwapimpull.pull;
+var environment = require('../../../utils/environment');
+var APIMANAGER = require('../../../utils/environment').APIMANAGER;
+var CONFIGDIR = require('../../../utils/environment').CONFIGDIR;
 
 var rootConfigPath = '/../../../config/';
-var configFileName = 'apim.config';
-var configFile = __dirname + rootConfigPath + configFileName;
-var currentDefinitionsDir = __dirname + rootConfigPath + 'current';
+var defaultDefinitionsDir = __dirname + rootConfigPath + 'default';
+var definitionsDir = defaultDefinitionsDir;
+
+var laptopexperience = true;
 
 /**
  * Creates a model type 
@@ -47,10 +52,40 @@ module.exports = function(app) {
   // add new models above this line
   models.push(new ModelType('snapshot', 'snapshots-')); // hack, removed later
 
-  var config;
+  var apimanager;
 
   async.series(
     [
+      function(callback) {
+      // get CONFIG_DIR.. two basic paths APIm load or local
+      // if no apim.config or ENV var, load default dir.. APIm 
+      // if apim.config or ENV var, 
+      //    if apimanager specified, dir = "last known config"..
+      //    if no apimanager specified, dir will be loaded.. 
+      environment.getVariable(CONFIGDIR, 
+                        function(value) 
+                          {
+                          // Load local files... 
+                          if (value) 
+                            {
+                            definitionsDir=value;
+                            }
+                          },
+                        callback);
+      },
+      function(callback) {
+      // get apimanager ip
+      // if no apim.config or ENV var, load what you have
+      // if apim.config or ENV var, grab fresh data if you can
+      environment.getVariable(APIMANAGER, 
+                      function(value) 
+                        {
+                          apimanager = value;
+                          if (apimanager)
+                            laptopexperience=false;
+                        },
+                      callback);
+      },
       // stage the models
       function(callback) {
         stageModels(app, models, function(err) {
@@ -58,23 +93,15 @@ module.exports = function(app) {
             callback(err);
           }
        );
-      },
-      // load config pointing to APIm, otherwise use persisted files
-      function(callback) {
-        loadAPImConfig(configFile, function(err, cfg) {
-            config = cfg;
-            callback();
-          }
-        );
       }
     ],
     // load the data into the models
     function(err, results) {
       if (!err) {
         loadData(app,
-                    config,
+                    apimanager,
                     models,
-                    currentDefinitionsDir,
+                    definitionsDir,
                     true); // first call to loadData()
       }
     }
@@ -90,13 +117,13 @@ module.exports = function(app) {
  * @param {boolean} initial - whether or not this is the first call to
  *                            loadData()
  */
-function loadData(app, config, models, currdir, initial) {
+function loadData(app, apimanager, models, currdir, initial) {
   var snapshotID, snapdir;
   async.series(
     [
       function(callback) {
         snapshotID = getSnapshotID();
-        pullFromAPIm(config, snapshotID, function(err, dir) {
+        pullFromAPIm(apimanager, snapshotID, function(err, dir) {
             snapdir = dir;
             callback();
           }
@@ -120,7 +147,7 @@ function loadData(app, config, models, currdir, initial) {
     function(err, results) {
       setImmediate(scheduleLoadData,
                    app,
-                   config,
+                   apimanager,
                    models,
                    currdir);
     }
@@ -132,7 +159,7 @@ function scheduleLoadData(app, config, models, dir) {
   setTimeout(loadData,
              15 * 1000, // 15 seconds TODO: make configurable
              app,
-             config,
+             apimanager,
              models,
              dir,
              false); // not first call to loadData()
@@ -166,47 +193,15 @@ function stageModels(app, models, cb) {
 }
 
 /**
- * Loads configuration pointing to APIm server
- * @param {string} file - path to configuration file
- * @param {callback} cb - callback that handles error or configuration
- */
-function loadAPImConfig(file, cb) {
-  debug('loadAPImConfig');
-  fs.access(file, fs.R_OK, function (err) {
-      if (err) {
-        debug('apim.config not found, loading from local files');
-        debug('loadAPImConfig exit(1)');
-        cb(null, null);
-      }
-      else {
-        debug('Found and have access to %s', file);
-        var config;
-        try {
-          config = JSON.parse(fs.readFileSync(file));
-        } catch (e) {
-          console.error(e);
-          // try loading from local files
-          debug('loadAPImConfig exit(2)');
-          cb(null, null);
-          return;
-        }
-        debug('loadAPImConfig exit(3)');
-        cb(null, config);
-      }
-    }
-  );
-}
-
-/**
  * Attempt to request data from APIm server and persist to disk
  * @param {Object} config - configuration pointing to APIm server
  * @param {string} uid - snapshot identifier
  * @param {callback} cb - callback that handles error or path to
  *                        snapshot directory
  */
-function pullFromAPIm(config, uid, cb) {
+function pullFromAPIm(apimanager, uid, cb) {
   debug('pullFromAPIm entry');
-  if (config) {
+  if (apimanager) {
     // Have an APIm, grab latest if we can..
     var snapdir =  __dirname +
                    rootConfigPath +
@@ -220,21 +215,12 @@ function pullFromAPIm(config, uid, cb) {
         }
 
         var options = {};
-        options['host'] = config['apim-ip'];
+        options['host'] = apimanager;
         options['outdir'] = snapdir;
         debug('apimpull start');
         apimpull(options,function(err, response) {
             if (err) {
               console.error(err);
-              // failed, so try to clean up directory
-              try {
-                fs.unlinkSync(snapdir + '.*');
-              } catch(e) {
-                if (e.code !== 'ENOENT') {
-                  console.error(e);
-                }
-                //continue
-              }
               try {
                 fs.rmdirSync(snapdir);
               } catch(e) {
@@ -296,10 +282,8 @@ function loadConfig(app, models, currdir, snapdir, uid, initial, cb) {
             // only update pointer to latest configuration
             // when latest configuration successful loaded
             if (snapdir === dirToLoad) {
-                fs.unlinkSync(currdir);
-                fs.symlinkSync(snapdir,
-                               currdir,
-                               'dir');
+                environment.setConfigFileVariable(CONFIGDIR, 
+                            snapdir);
             }
             debug('loadConfig exit');
             cb();
@@ -328,27 +312,168 @@ function loadConfigFromFS(app, models, dir, uid, cb) {
     cb(e);
     return;
   }
+  var YAMLfiles = [];
   debug('files: ', files);
+  var jsonFile = new RegExp(/.*\.json$/);
+  var yamlFile = new RegExp(/(.*\.yaml$)|(.*\.yml$)/);
 
   // correlate files with appropriate model
   files.forEach(
     function(file) {
-      for(var i = 0; i < models.length; i++) {
-        if(file.indexOf(models[i].prefix) > -1) {
-          debug('%s file: %s', models[i].name, file);
-          if (i === 0) {
-            // clear out existing files from model structure
-            models[i].files = [];
+      debug('file match jsonFile: ', file.match(jsonFile));
+      debug('file match yamlFile: ', file.match(yamlFile));
+      // apim pull scenario (only json, no yaml)
+      if (!laptopexperience && 
+          file.match(jsonFile))
+        {
+        for(var i = 0; i < models.length; i++) {
+          if(file.indexOf(models[i].prefix) > -1) {
+            debug('%s file: %s', models[i].name, file);
+            if (i === 0) {
+              // clear out existing files from model structure
+              models[i].files = [];
+            }
+            models[i].files.push(file);
+            break;
           }
-          models[i].files.push(file);
-          break;
         }
-      }
-    }
+        }
+      // laptop experience scenario (only yaml, no json)
+      if (laptopexperience && 
+          file.match(yamlFile))
+          {
+          YAMLfiles.push(file);
+          }
+        }
   );
+  
+  if (laptopexperience)
+    {
+    populateModelsWithLocalData(app, YAMLfiles, dir, cb);
+    }
+  else
+    {
+    // populate data-store models with the file contents
+    populateModelsWithAPImData(app, models, dir, uid, cb);
+    }
+  
+}
 
-  // populate data-store models with the file contents
-  populateModels(app, models, dir, uid, cb);
+/**
+ * Populates data-store models with persisted content
+ * @param {???} app - loopback application
+ * @param {Array} YAMLfiles - list of yaml files to process
+ * @param {string} dir - path to directory containing persisted data to load
+ * @param {callback} cb - callback that handles error or successful completion
+ */
+function populateModelsWithLocalData(app, YAMLfiles, dir, cb) {
+  debug('populateModelsWithLocalData entry');
+  async.forEach(YAMLfiles,
+      function(typefile, fileCallback) {
+        var file = path.join(dir, typefile);
+        debug('Loading data from %s', file);
+        var readfile;
+        try {
+          // read the content of the files into memory
+          // and parse as JSON
+          readfile = YAML.load(file);
+
+        } catch(e) {
+          fileCallback(e);
+          return;
+        }
+        // convert to json.. determine model
+        
+        // Product=
+        // product: 1.0.0
+        // info:
+        //  name: climb-on
+        //  title: Climb On
+        //  version: 1.0.0
+  
+        // API=
+        //  swagger: '2.0'
+        //  info:
+        //    x-ibm-name: route
+        //    title: Route
+        //    version: 1.0.0
+        
+        debug('readfile %s', JSON.stringify(readfile));
+        debug('Product %s', readfile.product);
+        debug('Swagger %s', readfile.swagger);
+        var model = {};
+        // looks like a product
+        if (readfile.product)
+          {
+          model.name = 'product';
+          // add the apis
+          var apisInProduct = readfile['apis'];
+          if (apisInProduct)
+              {
+              var apis = [];
+              for(var i = 0; i < apisInProduct.length; i++) 
+                  {
+                  var apiFile = path.join(dir, 
+                    apisInProduct[i]['$ref']);
+                  var api;
+                  try 
+                    {api = YAML.load(apiFile);}
+                  catch(e)
+                    {
+                    debug('Load failed of: ', apiFile);
+                    api = YAML.load(apiFile+'.yaml');
+                    }
+                  apis.push(api);
+                  }
+              readfile['apis'] = apis;
+              }
+          }
+        // looks like an API
+        if (readfile.swagger)
+          {
+          model.name = 'api';
+          // add the assembly
+          if (readfile['x-ibm-configuration'] && 
+              readfile['x-ibm-configuration'].assembly && 
+              readfile['x-ibm-configuration'].assembly['$ref'])
+              {
+              var assemblyFile = path.join(dir, 
+                readfile['x-ibm-configuration'].assembly['$ref']);
+              var assembly = YAML.load(assemblyFile);
+              readfile['x-ibm-configuration'].assembly = assembly;
+              }
+          }
+        
+        if (model.name)
+          {
+          // no catalog
+          readfile.catalog = {};
+          app.models[model.name].create(
+            readfile,
+            function(err, mymodel) {
+              if (err) {
+                console.error(err);
+                fileCallback(err);
+                return;
+              }
+              debug('%s created: %j',
+                    model.name,
+                    mymodel);
+              fileCallback();
+            }
+          );
+          }
+        else
+          {
+          fileCallback();
+          }
+        
+    },
+    function(err) {
+      debug('populateModelsWithLocalData exit');
+      cb(err);
+    }
+  ); 
 }
 
 /**
@@ -359,8 +484,8 @@ function loadConfigFromFS(app, models, dir, uid, cb) {
  * @param {string} uid - snapshot identifier
  * @param {callback} cb - callback that handles error or successful completion
  */
-function populateModels(app, models, dir, uid, cb) {
-  debug('populateModels entry');
+function populateModelsWithAPImData(app, models, dir, uid, cb) {
+  debug('populateModelsWithAPImData entry');
   async.forEach(models,
     function(model, modelCallback) {
       async.forEach(model.files,
@@ -405,7 +530,7 @@ function populateModels(app, models, dir, uid, cb) {
       );
     },
     function(err) {
-      debug('populateModels exit');
+      debug('populateModelsWithAPImData exit');
       cb(err);
     }
   ); 
