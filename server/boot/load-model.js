@@ -157,8 +157,7 @@ function loadData(app, apimanager, models, currdir, initial) {
   );
 }
 
-function scheduleLoadData(app, config, models, dir) {
-/* temporary workaround for leak & performance issues
+function scheduleLoadData(app, apimanager, models, dir) {
   setTimeout(loadData,
              15 * 1000, // 15 seconds TODO: make configurable
              app,
@@ -166,7 +165,6 @@ function scheduleLoadData(app, config, models, dir) {
              models,
              dir,
              false); // not first call to loadData()
-*/
 }
 
 /**
@@ -320,6 +318,13 @@ function loadConfigFromFS(app, models, dir, uid, cb) {
   var jsonFile = new RegExp(/.*\.json$/);
   var yamlFile = new RegExp(/(.*\.yaml$)|(.*\.yml$)/);
 
+  // clear out existing files from model structure
+  models.forEach(
+    function(model) {
+      model.files = [];
+    }
+  );
+
   // correlate files with appropriate model
   files.forEach(
     function(file) {
@@ -331,10 +336,6 @@ function loadConfigFromFS(app, models, dir, uid, cb) {
         for(var i = 0; i < models.length; i++) {
           if(file.indexOf(models[i].prefix) > -1) {
             debug('%s file: %s', models[i].name, file);
-            if (i === 0) {
-              // clear out existing files from model structure
-              models[i].files = [];
-            }
             models[i].files.push(file);
             break;
           }
