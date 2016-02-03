@@ -69,7 +69,12 @@ function gatherPieces(app, ctx)
           }
         );
       }
-    ]
+    ],
+    function(err, results) {
+      if (err) {
+        console.error(err);
+      }
+    }
   );
 }
 
@@ -129,7 +134,7 @@ function grabAPIs(app, snapshot, plan, cb) {
         query,
         function(err, listOfApis) {
           if (err) {
-            cb(err);
+            done(err);
             return;
           }
           listOfApis.forEach(function(DBapi) {
@@ -240,30 +245,22 @@ function createOptimizedDataEntries(app, pieces, cb) {
             'snapshot-id' : pieces.snapshot
           };
 
-          app.dataSources.db.automigrate(
-            'optimizedData',
-            function(err) {
+
+          app.models.optimizedData.create(
+            newOptimizedDataEntry,
+            function(err, optimizedData) {
               if (err) {
-                cb(err);
+                apidone(err);
                 return;
               }
-              app.models.optimizedData.create(
-                newOptimizedDataEntry,
-                function(err, optimizedData) {
-                  if (err) {
-                    cb(err);
-                    return;
-                  }
-                  debug('optimizedData created: %j',
-                      optimizedData);
-                  apidone();
-                }
-              );
+              debug('optimizedData created: %j',
+                  optimizedData);
+              apidone();
             }
           );
         },
         function(err) {
-          creddone();
+          creddone(err);
         }
       );
     },

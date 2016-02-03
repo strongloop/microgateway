@@ -50,7 +50,8 @@ module.exports = function(app) {
   models.push(new ModelType('api', 'apis-'));
   models.push(new ModelType('subscription', 'subs-'));
   // add new models above this line
-  models.push(new ModelType('snapshot', 'snapshots-')); // hack, removed later
+  models.push(new ModelType('optimizedData', 'dummy'));
+  models.push(new ModelType('snapshot', 'dummy')); // hack, removed later
 
   var apimanager;
 
@@ -91,6 +92,7 @@ module.exports = function(app) {
       function(callback) {
         stageModels(app, models, function(err) {
             models.pop(); // remove snapshot model
+            models.pop(); // remove optimizedData model
             callback(err);
           }
        );
