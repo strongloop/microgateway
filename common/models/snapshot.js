@@ -4,7 +4,7 @@ module.exports = function(Snapshot) {
   Snapshot.observe('after delete', function(ctx, next) {
   	  if (typeof ctx.instance === 'object') {
         // delete relevant snapshots from other models
-        var models = ['catalog', 'product', 'api', 'subscription'];
+        var models = ['optimizedData', 'catalog', 'product', 'api', 'subscription'];
  
         var query = {
           'snapshot-id' : ctx.instance.id
