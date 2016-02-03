@@ -57,34 +57,35 @@ module.exports = function(app) {
   async.series(
     [
       function(callback) {
-      // get CONFIG_DIR.. two basic paths APIm load or local
-      // if no apim.config or ENV var, load default dir.. APIm 
-      // if apim.config or ENV var, 
-      //    if apimanager specified, dir = "last known config"..
-      //    if no apimanager specified, dir will be loaded.. 
-      environment.getVariable(CONFIGDIR, 
-                        function(value) 
-                          {
-                          // Load local files... 
-                          if (value) 
-                            {
-                            definitionsDir=value;
-                            }
-                          },
-                        callback);
+        // get CONFIG_DIR.. two basic paths APIm load or local
+        // if no apim.config or ENV var, load default dir.. APIm 
+        // if apim.config or ENV var, 
+        //    if apimanager specified, dir = "last known config"..
+        //    if no apimanager specified, dir will be loaded.. 
+        environment.getVariable(
+          CONFIGDIR,
+          function(value) {
+            // Load local files...
+            if (value) {
+              definitionsDir=value;
+            }
+          },
+          callback
+        );
       },
       function(callback) {
-      // get apimanager ip
-      // if no apim.config or ENV var, load what you have
-      // if apim.config or ENV var, grab fresh data if you can
-      environment.getVariable(APIMANAGER, 
-                      function(value) 
-                        {
-                          apimanager = value;
-                          if (apimanager)
-                            laptopexperience=false;
-                        },
-                      callback);
+        // get apimanager ip
+        // if no apim.config or ENV var, load what you have
+        // if apim.config or ENV var, grab fresh data if you can
+        environment.getVariable(
+          APIMANAGER,
+          function(value) {
+            apimanager = value;
+            if (apimanager)
+              laptopexperience=false;
+            },
+          callback
+        );
       },
       // stage the models
       function(callback) {
@@ -324,8 +325,7 @@ function loadConfigFromFS(app, models, dir, uid, cb) {
       debug('file match yamlFile: ', file.match(yamlFile));
       // apim pull scenario (only json, no yaml)
       if (!laptopexperience && 
-          file.match(jsonFile))
-        {
+          file.match(jsonFile)) {
         for(var i = 0; i < models.length; i++) {
           if(file.indexOf(models[i].prefix) > -1) {
             debug('%s file: %s', models[i].name, file);
@@ -337,25 +337,22 @@ function loadConfigFromFS(app, models, dir, uid, cb) {
             break;
           }
         }
-        }
+      }
       // laptop experience scenario (only yaml, no json)
       if (laptopexperience && 
-          file.match(yamlFile))
-          {
-          YAMLfiles.push(file);
-          }
-        }
+          file.match(yamlFile)) {
+        YAMLfiles.push(file);
+      }
+    }
   );
   
-  if (laptopexperience)
-    {
+  if (laptopexperience) {
     populateModelsWithLocalData(app, YAMLfiles, dir, cb);
-    }
-  else
-    {
+  }
+  else {
     // populate data-store models with the file contents
     populateModelsWithAPImData(app, models, dir, uid, cb);
-    }
+  }
   
 }
 
@@ -403,49 +400,42 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, cb) {
         debug('Swagger %s', readfile.swagger);
         var model = {};
         // looks like a product
-        if (readfile.product)
-          {
+        if (readfile.product) {
           model.name = 'product';
           // add the apis
           var apisInProduct = readfile['apis'];
-          if (apisInProduct)
-              {
-              var apis = [];
-              for(var i = 0; i < apisInProduct.length; i++) 
-                  {
-                  var apiFile = path.join(dir, 
-                    apisInProduct[i]['$ref']);
-                  var api;
-                  try 
-                    {api = YAML.load(apiFile);}
-                  catch(e)
-                    {
-                    debug('Load failed of: ', apiFile);
-                    api = YAML.load(apiFile+'.yaml');
-                    }
-                  apis.push(api);
-                  }
-              readfile['apis'] = apis;
+          if (apisInProduct) {
+            var apis = [];
+            for(var i = 0; i < apisInProduct.length; i++) {
+              var apiFile = path.join(dir, 
+                                      apisInProduct[i]['$ref']);
+              var api;
+              try {
+                api = YAML.load(apiFile);
+              } catch(e) {
+                debug('Load failed of: ', apiFile);
+                api = YAML.load(apiFile+'.yaml');
               }
+              apis.push(api);
+            }
+            readfile['apis'] = apis;
           }
+        }
         // looks like an API
-        if (readfile.swagger)
-          {
+        if (readfile.swagger) {
           model.name = 'api';
           // add the assembly
           if (readfile['x-ibm-configuration'] && 
               readfile['x-ibm-configuration'].assembly && 
-              readfile['x-ibm-configuration'].assembly['$ref'])
-              {
+              readfile['x-ibm-configuration'].assembly['$ref']) {
               var assemblyFile = path.join(dir, 
                 readfile['x-ibm-configuration'].assembly['$ref']);
               var assembly = YAML.load(assemblyFile);
               readfile['x-ibm-configuration'].assembly = assembly;
-              }
           }
+        }
         
-        if (model.name)
-          {
+        if (model.name) {
           // no catalog
           readfile.catalog = {};
           app.models[model.name].create(
@@ -462,17 +452,15 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, cb) {
               fileCallback();
             }
           );
-          }
-        else
-          {
+        }
+        else {
           fileCallback();
-          }
-        
-    },
-    function(err) {
-      debug('populateModelsWithLocalData exit');
-      cb(err);
-    }
+        }
+      },
+      function(err) {
+        debug('populateModelsWithLocalData exit');
+        cb(err);
+      }
   ); 
 }
 
