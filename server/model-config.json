@@ -52,5 +52,9 @@
   "snapshot": {
     "dataSource": "db",
     "public": true
+  },
+  "webhook": {
+    "dataSource": "db",
+    "public": true
   }
 }
