@@ -1,0 +1,38 @@
+{
+  "name": "micro-gw",
+  "version": "1.0.0",
+  "description": "API Mesh MicroGateway",
+  "main": "index.js",
+  "scripts": {
+    "pretest": "eslint ./ && jscs ./",
+    "lint": "eslint ./ && jscs ./",
+    "start": "node .",
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.ibm.com:apimesh/micro-gw.git"
+  },
+  "keywords": [
+    "ibm",
+    "api",
+    "mesh",
+    "gateway",
+    "microservices",
+    "enforce"
+  ],
+  "author": "IBM Gateway Team",
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "devDependencies": {
+    "eslint": "^1.10.3",
+    "eslint-config-strongloop": "^1.0.2",
+    "jscs": "^2.9.0",
+    "mocha": "^2.4.5",
+    "should": "^8.2.1",
+    "sinon": "^1.17.3"
+  },
+  "dependencies": {
+    "express": "^4.13.4",
+    "flow-engine": "git+ssh://git@github.ibm.com:apimesh/flow-engine.git#develop"
+  }
+}

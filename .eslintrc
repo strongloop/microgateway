@@ -1,0 +1,6 @@
+{
+  "extends": "strongloop",
+  "env": {
+    "mocha": true
+  }
+}

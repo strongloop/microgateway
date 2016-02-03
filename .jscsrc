@@ -1,0 +1,76 @@
+{
+  "excludeFiles": ["node_modules/**", "test/**", ".strong-pm"],
+  "disallowMixedSpacesAndTabs": true,
+  "disallowKeywordsOnNewLine": [],
+  "requireCurlyBraces": [
+     "try",
+     "catch"
+  ],
+  "disallowSpacesInsideObjectBrackets": null,
+  "maximumLineLength": {
+     "value": 80
+  },
+  "maximumLineLength": {
+	  "value": 80,
+	  "allowComments": true,
+	  "allowRegex": true
+  },
+  "validateIndentation": 2,
+  "validateQuoteMarks": "'",
+
+  "disallowMultipleLineStrings": true,
+  "disallowMixedSpacesAndTabs": true,
+  "disallowTrailingWhitespace": true,
+  "disallowSpaceAfterPrefixUnaryOperators": true,
+  "disallowMultipleVarDecl": true,
+  "disallowKeywordsOnNewLine": [],
+
+  "requireSpaceAfterKeywords": [
+	  "if",
+	  "else",
+	  "for",
+	  "while",
+	  "do",
+	  "switch",
+	  "return",
+	  "try",
+	  "catch"
+  ],
+  "requireSpaceBeforeBinaryOperators": [
+	  "=", "+=", "-=", "*=", "/=", "%=", "<<=", ">>=", ">>>=",
+    "&=", "|=", "^=", "+=",
+    "+", "-", "*", "/", "%", "<<", ">>", ">>>", "&",
+    "|", "^", "&&", "||", "===", "==", ">=",
+    "<=", "<", ">", "!=", "!=="
+	],
+  "requireSpaceAfterBinaryOperators": true,
+  "requireSpacesInConditionalExpression": true,
+  "requireSpaceBeforeBlockStatements": true,
+  "requireSpacesInForStatement": true,
+  "requireLineFeedAtFileEnd": true,
+  "requireSpacesInFunctionExpression": {
+	  "beforeOpeningCurlyBrace": true
+  },
+  "disallowSpacesInAnonymousFunctionExpression": {
+	  "beforeOpeningRoundBrace": true
+  },
+  "disallowSpacesInsideObjectBrackets": "all",
+  "disallowSpacesInsideArrayBrackets": "all",
+  "disallowSpacesInsideParentheses": true,
+
+  "disallowNewlineBeforeBlockStatements": true,
+
+  "jsDoc": {
+     "enforceExistence": false,
+     "checkAnnotations": "closurecompiler",
+     "checkParamNames": true,
+     "requireParamTypes": true,
+     "checkRedundantParams": true,
+     "checkReturnTypes": true,
+     "checkRedundantReturns": true,
+     "requireReturnTypes": true,
+     "checkTypes": "strictNativeCase",
+     "checkRedundantAccess": true,
+     "requireNewlineAfterDescription": true
+  }
+}
