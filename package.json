@@ -29,10 +29,16 @@
     "jscs": "^2.9.0",
     "mocha": "^2.4.5",
     "should": "^8.2.1",
-    "sinon": "^1.17.3"
+    "sinon": "^1.17.3",
+    "supertest": "^1.1.0"
   },
   "dependencies": {
+    "apim-noop": "git+ssh://git@github.ibm.com:apimesh/micro-gw-policy-sample.git",
+    "auth-header": "^0.2.2",
+    "body-parser": "^1.14.2",
     "express": "^4.13.4",
-    "flow-engine": "git+ssh://git@github.ibm.com:apimesh/flow-engine.git#develop"
+    "flow-engine": "git+ssh://git@github.ibm.com:apimesh/flow-engine.git#develop",
+    "moment": "^2.11.2",
+    "request": "^2.69.0"
   }
 }
