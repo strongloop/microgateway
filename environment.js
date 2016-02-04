@@ -6,8 +6,10 @@ var rootConfigPath = '/../config/';
 var configFile = __dirname + rootConfigPath + configFileName;
 var APIMANAGER='APIMANAGER';
 var CONFIGDIR='CONFIG_DIR';
-var DATASTOREPORT='DATASTORE_PORT';
-var GATEWAYPORT='GATEWAY_PORT';
+var DATASTORE_PORT='DATASTORE_PORT';
+var PORT='PORT';
+var HTTPS_PORT='HTTPS_PORT';
+var LOADED='LOADED';
 
 function setConfigFileVariable(variable, value)
 	{
@@ -78,8 +80,9 @@ function testVar(variable)
 	switch(variable) {
 		case APIMANAGER:
 		case CONFIGDIR:
-		case DATASTOREPORT:
-		case GATEWAYPORT:
+		case DATASTORE_PORT:
+		case PORT:
+		case HTTPS_PORT:
 			break;
 		default:
 			console.log('define your variable:' + variable + ' in environment.js');
@@ -91,5 +94,7 @@ exports.getVariable = getVariable;
 exports.setConfigFileVariable = setConfigFileVariable;
 exports.APIMANAGER = APIMANAGER;
 exports.CONFIGDIR = CONFIGDIR;
-exports.DATASTOREPORT = DATASTOREPORT;
-exports.GATEWAYPORT = GATEWAYPORT;
+exports.DATASTORE_PORT = DATASTORE_PORT;
+exports.PORT = PORT;
+exports.HTTPS_PORT = HTTPS_PORT;
+exports.LOADED = LOADED;
