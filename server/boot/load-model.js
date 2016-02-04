@@ -279,7 +279,7 @@ function loadConfig(app, models, currdir, snapdir, uid, initial, cb) {
               return;
             }
             if (initial) 
-              process.send('Load Complete');
+              process.send({LOADED: true});
             // only update pointer to latest configuration
             // when latest configuration successful loaded
             if (snapdir === dirToLoad) {

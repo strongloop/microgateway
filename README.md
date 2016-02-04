@@ -12,7 +12,7 @@ Currently, it grabs local files that are downloads from APIm, and populates the 
     From strong-gateway root:
     apim-export -o ./apim-datastore/server/boot sjsldev249.dev.ciondemand.com (or server you want to pull the data from)
     ```
-1. Introspect the models using the explorer: http://hostname:5000/explorer/
+1. Introspect the models using the explorer: http://hostname:<ephemeralport>/explorer/
 1. Test the lookup using the apim-getcontext cli (outputs contents that would be returned to the preflow)
   - examples:
     ```
