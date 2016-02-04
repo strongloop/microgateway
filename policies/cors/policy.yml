@@ -1,0 +1,53 @@
+policy: 2.0.0
+
+info:
+  title: CORS
+  name: cors
+  version: 1.0
+  description: |
+    The CORS policy controls the response headers returned by the gateway
+    when HEAD method is invoked on a path that does not have an explictly
+    defined HEAD operation.    
+  contact:
+  name: IBM API Mesh
+  url: https://www.ibm.com/apimesh
+  email: apimesh@ibm.com
+
+properties:
+  allow-credentials:
+    label: allow credentials
+    description: |
+      Configures the Access-Control-Allow-Credentials CORS header.
+      Set to true to pass the header, otherwise it is omitted.      
+    type: boolean
+    default: false
+  allow-headers:
+    label: allow headers
+    description: |
+      Configures the Access-Control-Allow-Headers CORS header.
+    type: string
+  allow-methods:
+    label: allow methods
+    description: |
+      Configures the Access-Control-Allow-Methods CORS header.
+      Expects a comma-delimited string. Example 'GET,PUT'
+    type: string
+  allow-origin:
+    label: allow origin
+    description: |
+      Configures the Access-Control-Allow-Origin CORS header. 
+    type: string
+    default: '*'
+  expose-headers:  
+    label: expose headers
+    description: |
+      Configures the Access-Control-Expose-Headers CORS header.
+      Expects a comma-delimited string. If not specified, no custom
+      headers are exposed.
+    type: string
+  max-age:
+    label: max age
+    description: |
+      Configures the Access-Control-Allow-Max-Age CORS header.
+      Set to an integer to pass the header, otherwise it is omitted.
+    type: integer
