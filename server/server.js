@@ -2,7 +2,7 @@ var loopback = require('loopback');
 var boot = require('loopback-boot');
 var async = require('async');
 var environment = require('../../utils/environment');
-var DATASTORE_PORT = require('../../utils/environment').DATASTORE_PORT;
+var DATASTORE_PORT = environment.DATASTORE_PORT;
 
 var app = module.exports = loopback();
 
@@ -25,9 +25,9 @@ app.start = function() {
       app.emit('started');
       var baseUrl = app.get('url').replace(/\/$/, '');
       var port = app.get('port');
-      process.env[DATASTORE_PORT] = app.get('port');
+      process.env['DATASTORE_PORT'] = port;
       console.log('Web server listening at: %s port: %s', baseUrl, port);
-      process.send({DATASTORE_PORT: app.get('port')});
+      process.send({'DATASTORE_PORT': port});
       
       if (app.get('loopback-component-explorer')) {
         var explorerPath = app.get('loopback-component-explorer').mountPath;
