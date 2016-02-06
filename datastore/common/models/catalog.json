@@ -1,0 +1,39 @@
+{
+  "name": "catalog",
+  "base": "PersistedModel",
+  "idInjection": false,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "dummyid": {
+      "type": "number",
+      "id": true
+    },
+    "default": "boolean",
+    "gateway-cluster": {
+      "host-name": "string",
+      "id": "string",
+      "title": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "name": "string",
+    "organization": {
+      "id": "string",
+      "name": "string",
+      "title": "string"
+    },
+    "sandbox": "boolean",
+    "title": "string",
+    "url": "string",
+    "snapshot-id": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

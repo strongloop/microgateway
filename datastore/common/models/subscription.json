@@ -1,0 +1,512 @@
+{
+  "name": "subscription",
+  "base": "PersistedModel",
+  "idInjection": false,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "dummyid": {
+      "type": "number",
+      "id": true
+    },
+    "active": "boolean",
+    "application": {
+      "app-credentials": [
+        {
+          "client-id": "string",
+          "client-secret": "string",
+          "id": "string"
+        }
+      ],
+      "description": "string",
+      "enabled": "boolean",
+      "id": "string",
+      "oauth-redirection-uri": "string",
+      "state": "string",
+      "test-app": "boolean",
+      "title": "string"
+    },
+    "catalog": {
+      "default": "boolean",
+      "id": "string",
+      "name": "string",
+      "sandbox": "boolean",
+      "title": "string",
+      "url": "string"
+    },
+    "developer-organization": {
+      "id": "string",
+      "name": "string",
+      "title": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "organization": {
+      "id": "string",
+      "name": "string",
+      "title": "string"
+    },
+    "plan-registration": {
+      "apis": [
+        {
+          "catalog": {
+            "default": "boolean",
+            "id": "string",
+            "name": "string",
+            "sandbox": "boolean",
+            "title": "string",
+            "url": "string"
+          },
+          "document": {
+            "basePath": "string",
+            "consumes": [
+              "string"
+            ],
+            "definitions": {
+              "Ascent": {
+                "additionalProperties": "boolean",
+                "properties": {
+                  "date": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "route": {
+                    "type": "string"
+                  }
+                },
+                "type": "string"
+              },
+              "AscentCreate": {
+                "additionalProperties": "boolean",
+                "properties": {
+                  "date": {
+                    "type": "string"
+                  },
+                  "route": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "string"
+                ],
+                "type": "string"
+              },
+              "AscentList": {
+                "additionalProperties": "boolean",
+                "properties": {
+                  "results": {
+                    "items": [
+                      {
+                        "additionalProperties": "boolean",
+                        "properties": {
+                          "date": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "route": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "string"
+                      }
+                    ],
+                    "type": "string"
+                  },
+                  "total_results": {
+                    "type": "string"
+                  }
+                },
+                "type": "string"
+              },
+              "AscentUpdate": {
+                "additionalProperties": "boolean",
+                "properties": {
+                  "date": {
+                    "type": "string"
+                  },
+                  "route": {
+                    "type": "string"
+                  }
+                },
+                "type": "string"
+              },
+              "Error": {
+                "additionalProperties": "boolean",
+                "properties": {
+                  "message": {
+                    "type": [
+                      "string"
+                    ]
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "type": "string"
+              }
+            },
+            "host": "string",
+            "info": {
+              "contact": {
+                "email": "string",
+                "name": "string",
+                "url": "string"
+              },
+              "description": "string",
+              "license": {
+                "name": "string",
+                "url": "string"
+              },
+              "termsOfService": "string",
+              "title": "string",
+              "version": "string",
+              "x-ibm-name": "string"
+            },
+            "paths": {
+              "/ascents": {
+                "get": {
+                  "deprecated": "boolean",
+                  "description": "string",
+                  "operationId": "string",
+                  "parameters": [
+                    {
+                      "description": "string",
+                      "in": "string",
+                      "name": "string",
+                      "required": "boolean",
+                      "type": "string"
+                    }
+                  ],
+                  "responses": {
+                    "200": {
+                      "description": "string",
+                      "schema": {
+                        "$ref": "string"
+                      }
+                    },
+                    "default": {
+                      "description": "string",
+                      "schema": {
+                        "$ref": "string"
+                      }
+                    }
+                  },
+                  "summary": "string",
+                  "tags": [
+                    "string"
+                  ]
+                },
+                "post": {
+                  "deprecated": "boolean",
+                  "description": "string",
+                  "parameters": [
+                    {
+                      "description": "string",
+                      "in": "string",
+                      "name": "string",
+                      "required": "boolean",
+                      "schema": {
+                        "$ref": "string"
+                      }
+                    }
+                  ],
+                  "responses": {
+                    "201": {
+                      "description": "string",
+                      "schema": {
+                        "$ref": "string"
+                      }
+                    },
+                    "default": {
+                      "description": "string",
+                      "schema": {
+                        "$ref": "string"
+                      }
+                    }
+                  },
+                  "summary": "string",
+                  "tags": [
+                    "string"
+                  ]
+                }
+              },
+              "/ascents/{ascent}": {
+                "delete": {
+                  "deprecated": "boolean",
+                  "description": "string",
+                  "operationId": "string",
+                  "parameters": [
+                    {
+                      "description": "string",
+                      "in": "string",
+                      "name": "string",
+                      "required": "boolean",
+                      "type": "string"
+                    }
+                  ],
+                  "responses": {
+                    "204": {
+                      "description": "string"
+                    },
+                    "default": {
+                      "description": "string",
+                      "schema": {
+                        "$ref": "string"
+                      }
+                    }
+                  },
+                  "summary": "string",
+                  "tags": [
+                    "string"
+                  ]
+                },
+                "get": {
+                  "deprecated": "boolean",
+                  "description": "string",
+                  "parameters": [
+                    {
+                      "description": "string",
+                      "in": "string",
+                      "name": "string",
+                      "required": "boolean",
+                      "type": "string"
+                    }
+                  ],
+                  "responses": {
+                    "200": {
+                      "description": "string",
+                      "schema": {
+                        "$ref": "string"
+                      }
+                    },
+                    "default": {
+                      "description": "string",
+                      "schema": {
+                        "$ref": "string"
+                      }
+                    }
+                  },
+                  "summary": "string",
+                  "tags": [
+                    "string"
+                  ]
+                },
+                "put": {
+                  "deprecated": "boolean",
+                  "description": "string",
+                  "parameters": [
+                    {
+                      "description": "string",
+                      "in": "string",
+                      "name": "string",
+                      "required": "boolean",
+                      "type": "string"
+                    }
+                  ],
+                  "responses": {
+                    "200": {
+                      "description": "string",
+                      "schema": {
+                        "$ref": "string"
+                      }
+                    },
+                    "default": {
+                      "description": "string",
+                      "schema": {
+                        "$ref": "string"
+                      }
+                    }
+                  },
+                  "summary": "string",
+                  "tags": [
+                    "string"
+                  ]
+                }
+              }
+            },
+            "produces": [
+              "string"
+            ],
+            "schemes": [
+              "string"
+            ],
+            "securityDefinitions": {
+              "oauthImplicit": {
+                "authorizationUrl": "string",
+                "flow": "string",
+                "scopes": {
+                  "scope1": "string",
+                  "scope2": "string"
+                },
+                "type": "string",
+                "x-ibm-oauth2": {
+                  "authentication": [
+                    "string"
+                  ],
+                  "authenticationForm": {
+                    "tlsClient": "string",
+                    "url": "string"
+                  },
+                  "authenticationRegistry": "string",
+                  "authenticationUrl": {
+                    "tlsClient": "string",
+                    "url": "string"
+                  },
+                  "authorization": "string",
+                  "authorizationForm": {
+                    "tlsClient": "string",
+                    "url": "string"
+                  },
+                  "refreshToken": "boolean",
+                  "revocationUrl": {
+                    "tlsClient": "string",
+                    "url": "string"
+                  }
+                }
+              }
+            },
+            "swagger": "string",
+            "x-ibm-configuration": {
+              "cors": {
+                "enabled": "boolean"
+              },
+              "enforced": "boolean",
+              "phase": "string",
+              "testable": "boolean"
+            }
+          },
+          "id": "string",
+          "organization": {
+            "id": "string",
+            "name": "string",
+            "title": "string"
+          },
+          "state": "string",
+          "url": "string"
+        }
+      ],
+      "id": "string",
+      "plan": {
+        "name": "string",
+        "title": "string"
+      },
+      "product": {
+        "document": {
+          "apis": [
+            {
+              "$ref": "string"
+            }
+          ],
+          "info": {
+            "contact": {
+              "email": "string",
+              "name": "string",
+              "url": "string"
+            },
+            "license": {
+              "name": "string",
+              "url": "string"
+            },
+            "name": "string",
+            "termsOfService": "string",
+            "title": "string",
+            "version": "string"
+          },
+          "plans": {
+            "gold": {
+              "apis": [
+                {
+                  "$ref": "string"
+                }
+              ],
+              "approval": "boolean",
+              "description": "string",
+              "rate-limit": {
+                "hard-limit": "boolean",
+                "value": "string"
+              },
+              "title": "string"
+            },
+            "silver": {
+              "apis": [
+                {
+                  "$ref": "string"
+                }
+              ],
+              "approval": "boolean",
+              "description": "string",
+              "rate-limit": {
+                "hard-limit": "boolean",
+                "value": "string"
+              },
+              "title": "string"
+            },
+            "trial": {
+              "apis": [
+                {
+                  "$ref": "string"
+                }
+              ],
+              "approval": "boolean",
+              "description": "string",
+              "rate-limit": {
+                "hard-limit": "boolean",
+                "value": "string"
+              },
+              "title": "string"
+            }
+          },
+          "product": "string",
+          "visibility": {
+            "subscribe": {
+              "enabled": "boolean",
+              "orgs": [
+                "string"
+              ],
+              "tags": [
+                "string"
+              ],
+              "type": "string"
+            },
+            "view": {
+              "enabled": "boolean",
+              "orgs": "array",
+              "tags": "array",
+              "type": "string"
+            }
+          }
+        },
+        "id": "string",
+        "state": "string",
+        "visibility": {
+          "subscribe": {
+            "enabled": "boolean",
+            "orgs": "array",
+            "tags": "array",
+            "type": "string"
+          },
+          "view": {
+            "enabled": "boolean",
+            "orgs": "array",
+            "tags": "array",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "url": "string",
+    "snapshot-id": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

@@ -1,0 +1,363 @@
+{
+  "name": "api",
+  "base": "PersistedModel",
+  "idInjection": false,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "dummyid": {
+      "type": "number",
+      "id": true
+    },
+    "catalog": {
+      "default": "boolean",
+      "id": "string",
+      "name": "string",
+      "sandbox": "boolean",
+      "title": "string",
+      "url": "string"
+    },
+    "document": {
+      "basePath": "string",
+      "definitions": {
+        "Activities": {
+          "properties": {
+            "count": {
+              "description": "string",
+              "format": "string",
+              "type": "string"
+            },
+            "history": {
+              "items": {
+                "$ref": "string"
+              },
+              "type": "string"
+            },
+            "limit": {
+              "description": "string",
+              "format": "string",
+              "type": "string"
+            },
+            "offset": {
+              "description": "string",
+              "format": "string",
+              "type": "string"
+            }
+          }
+        },
+        "Activity": {
+          "properties": {
+            "uuid": {
+              "description": "string",
+              "type": "string"
+            }
+          }
+        },
+        "Error": {
+          "properties": {
+            "code": {
+              "format": "string",
+              "type": "string"
+            },
+            "fields": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            }
+          }
+        },
+        "PriceEstimate": {
+          "properties": {
+            "currency_code": {
+              "description": "string",
+              "type": "string"
+            },
+            "display_name": {
+              "description": "string",
+              "type": "string"
+            },
+            "estimate": {
+              "description": "string",
+              "type": "string"
+            },
+            "high_estimate": {
+              "description": "string",
+              "type": "string"
+            },
+            "low_estimate": {
+              "description": "string",
+              "type": "string"
+            },
+            "product_id": {
+              "description": "string",
+              "type": "string"
+            },
+            "surge_multiplier": {
+              "description": "string",
+              "type": "string"
+            }
+          }
+        },
+        "Product": {
+          "properties": {
+            "capacity": {
+              "description": "string",
+              "type": "string"
+            },
+            "description": {
+              "description": "string",
+              "type": "string"
+            },
+            "display_name": {
+              "description": "string",
+              "type": "string"
+            },
+            "image": {
+              "description": "string",
+              "type": "string"
+            },
+            "product_id": {
+              "description": "string",
+              "type": "string"
+            }
+          }
+        },
+        "Profile": {
+          "properties": {
+            "email": {
+              "description": "string",
+              "type": "string"
+            },
+            "first_name": {
+              "description": "string",
+              "type": "string"
+            },
+            "last_name": {
+              "description": "string",
+              "type": "string"
+            },
+            "picture": {
+              "description": "string",
+              "type": "string"
+            },
+            "promo_code": {
+              "description": "string",
+              "type": "string"
+            }
+          }
+        }
+      },
+      "host": "string",
+      "info": {
+        "description": "string",
+        "title": "string",
+        "version": "string",
+        "x-ibm-name": "string"
+      },
+      "paths": {
+        "/estimates/price": {
+          "get": {
+            "deprecated": "boolean",
+            "description": "string",
+            "parameters": [
+              {
+                "description": "string",
+                "format": "string",
+                "in": "string",
+                "name": "string",
+                "required": "boolean",
+                "type": "string"
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "string",
+                "schema": {
+                  "items": {
+                    "$ref": "string"
+                  },
+                  "type": "string"
+                }
+              },
+              "default": {
+                "description": "string",
+                "schema": {
+                  "$ref": "string"
+                }
+              }
+            },
+            "summary": "string",
+            "tags": [
+              "string"
+            ]
+          }
+        },
+        "/estimates/time": {
+          "get": {
+            "deprecated": "boolean",
+            "description": "string",
+            "parameters": [
+              {
+                "description": "string",
+                "format": "string",
+                "in": "string",
+                "name": "string",
+                "required": "boolean",
+                "type": "string"
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "string",
+                "schema": {
+                  "items": {
+                    "$ref": "string"
+                  },
+                  "type": "string"
+                }
+              },
+              "default": {
+                "description": "string",
+                "schema": {
+                  "$ref": "string"
+                }
+              }
+            },
+            "summary": "string",
+            "tags": [
+              "string"
+            ]
+          }
+        },
+        "/history": {
+          "get": {
+            "deprecated": "boolean",
+            "description": "string",
+            "parameters": [
+              {
+                "description": "string",
+                "format": "string",
+                "in": "string",
+                "name": "string",
+                "type": "string"
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "string",
+                "schema": {
+                  "$ref": "string"
+                }
+              },
+              "default": {
+                "description": "string",
+                "schema": {
+                  "$ref": "string"
+                }
+              }
+            },
+            "summary": "string",
+            "tags": [
+              "string"
+            ]
+          }
+        },
+        "/me": {
+          "get": {
+            "deprecated": "boolean",
+            "description": "string",
+            "responses": {
+              "200": {
+                "description": "string",
+                "schema": {
+                  "$ref": "string"
+                }
+              },
+              "default": {
+                "description": "string",
+                "schema": {
+                  "$ref": "string"
+                }
+              }
+            },
+            "summary": "string",
+            "tags": [
+              "string"
+            ]
+          }
+        },
+        "/products": {
+          "get": {
+            "deprecated": "boolean",
+            "description": "string",
+            "parameters": [
+              {
+                "description": "string",
+                "format": "string",
+                "in": "string",
+                "name": "string",
+                "required": "boolean",
+                "type": "string"
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "string",
+                "schema": {
+                  "items": {
+                    "$ref": "string"
+                  },
+                  "type": "string"
+                }
+              },
+              "default": {
+                "description": "string",
+                "schema": {
+                  "$ref": "string"
+                }
+              }
+            },
+            "summary": "string",
+            "tags": [
+              "string"
+            ]
+          }
+        }
+      },
+      "produces": [
+        "string"
+      ],
+      "schemes": [
+        "string"
+      ],
+      "swagger": "string",
+      "x-ibm-configuration": {
+        "cors": {
+          "enabled": "boolean"
+        },
+        "enforced": "boolean",
+        "phase": "string",
+        "testable": "boolean"
+      }
+    },
+    "id": {
+      "type": "string"
+    },
+    "organization": {
+      "id": "string",
+      "name": "string",
+      "title": "string"
+    },
+    "state": "string",
+    "url": "string",
+    "snapshot-id": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

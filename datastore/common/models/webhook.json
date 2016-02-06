@@ -1,0 +1,20 @@
+{
+  "name": "webhook",
+  "base": "PersistedModel",
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "event": "string",
+    "event_id": "string",
+    "timestamp": "string",
+    "retry": "Number",
+    "webhook_id": "string",
+    "user": "string",
+    "payload": {}
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

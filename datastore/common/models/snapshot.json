@@ -1,0 +1,20 @@
+{
+  "name": "snapshot",
+  "base": "PersistedModel",
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "id": { 
+      "type": "string",
+      "generated": false,
+      "id": true
+    },
+    "refcount": "string",
+    "current" : "boolean"
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}
