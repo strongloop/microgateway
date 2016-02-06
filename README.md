@@ -10,3 +10,10 @@ works for folks.
 
 Ultimately either this repo or strong-gateway repo will disappear.
 
+#### Run
+
+Haven't cloned over the data-store, so you need to run this:
+```
+cd strong-gateway; node data-store/server/server.js
+npm test
+```

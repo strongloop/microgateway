@@ -4,7 +4,6 @@
   "description": "API Mesh MicroGateway",
   "main": "index.js",
   "scripts": {
-    "pretest": "eslint ./ && jscs ./",
     "lint": "eslint ./ && jscs ./",
     "start": "node .",
     "test": "mocha"
