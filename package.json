@@ -26,6 +26,7 @@
     "eslint": "^1.10.3",
     "eslint-config-strongloop": "^1.0.2",
     "jscs": "^2.9.0",
+    "lodash": "^4.2.1",
     "mocha": "^2.4.5",
     "should": "^8.2.1",
     "sinon": "^1.17.3",
