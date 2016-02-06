@@ -1,0 +1,27 @@
+product: 1.0.0
+info:
+    name: uber
+    title: 'Uber Product'
+    version: 1.0.0
+visibility:
+    view:
+        enabled: true
+        type: public
+        tags: []
+        orgs: []
+    subscribe:
+        enabled: true
+        type: authenticated
+        tags: []
+        orgs: []
+apis:
+    -
+        $ref: 'uber-api:1.0.0'
+plans:
+    gold:
+        title: 'Gold Plan'
+        rate-limit:
+            hard-limit: false
+            value: 1/sec
+        apis:
+            - {$ref: 'uber-api:1.0.0'}
