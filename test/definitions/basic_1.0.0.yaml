@@ -1,0 +1,28 @@
+info:
+  version: 1.0.0
+  title: basic
+  x-ibm-name: basic
+  description: Basic Auth Policy
+securityDefinitions:
+  basic-local-1:
+    type: basic
+    description: ''
+    x-ibm-authentication-url:
+      url: 'ldap://localhost:663'
+security:
+  - basic-local-1: []
+basePath: /basic
+swagger: '2.0'
+host: localhost
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /test:
+    get:
+      responses:
+        '200':
+          description: 200 OK
