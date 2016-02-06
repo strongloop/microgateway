@@ -35,8 +35,12 @@
     "apim-noop": "git+ssh://git@github.ibm.com:apimesh/micro-gw-policy-sample.git",
     "auth-header": "^0.2.2",
     "body-parser": "^1.14.2",
+    "compression": "^1.6.1",
     "express": "^4.13.4",
     "flow-engine": "git+ssh://git@github.ibm.com:apimesh/flow-engine.git#develop",
+    "loopback": "^2.26.2",
+    "loopback-boot": "^2.16.0",
+    "loopback-component-explorer": "^2.3.0",
     "moment": "^2.11.2",
     "request": "^2.69.0"
   }

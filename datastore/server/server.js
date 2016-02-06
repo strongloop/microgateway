@@ -27,8 +27,6 @@ app.start = function() {
       var port = app.get('port');
       process.env['DATASTORE_PORT'] = port;
       console.log('Web server listening at: %s port: %s', baseUrl, port);
-      process.send({'DATASTORE_PORT': port});
-      
       if (app.get('loopback-component-explorer')) {
         var explorerPath = app.get('loopback-component-explorer').mountPath;
         console.log('Browse your REST API at %s%s', baseUrl, explorerPath);

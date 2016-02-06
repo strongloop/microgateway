@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 var program = require('commander');
-var apimlookup = require('../../server/middleware/preflow/apim-lookup');
+var apimlookup = require('../../lib/preflow/apim-lookup');
 var contextget = apimlookup.contextget;
 
 var options = {};
