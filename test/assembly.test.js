@@ -17,7 +17,7 @@ function startEchoServer(done) {
 }
 
 function startMicroGateway(done) {
-  microgw.listen(3000, done);
+  microgw.start(3000, done);
 }
 
 describe('preflow and flow-engine integration', function() {

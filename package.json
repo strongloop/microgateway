@@ -38,6 +38,7 @@
     "compression": "^1.6.1",
     "express": "^4.13.4",
     "flow-engine": "git+ssh://git@github.ibm.com:apimesh/flow-engine.git#develop",
+    "forever-monitor": "^1.7.0",
     "loopback": "^2.26.2",
     "loopback-boot": "^2.16.0",
     "loopback-component-explorer": "^2.3.0",

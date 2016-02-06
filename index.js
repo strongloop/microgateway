@@ -1,1 +1,1 @@
-module.exports = require('./lib/microgw.js');
+require('./lib/microgw.js').start(5000);
