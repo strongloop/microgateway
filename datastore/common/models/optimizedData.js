@@ -177,16 +177,18 @@ function createOptimizedDataEntries(app, pieces, cb) {
                 Object.getOwnPropertyNames(
                   api.document.paths[propname]).forEach(
                   function(methodname) {
+		    var operation = api.document.paths[propname][methodname];
                     debug('propname method: %j',
                       methodname);
                     debug('propname operationId: %j',
-                      api.document.paths[propname]
-                      [methodname].operationId);
+                      operation.operationId);
                     method.push({
                       method: methodname.toUpperCase(),
-                      operationId:
-                        api.document.paths[propname]
-                        [methodname].operationId
+                      operationId: operation.operationId,
+                      securityDefs: api.document.securityDefinitions,
+                      // operational lvl Swagger security overrides the API lvl
+                      securityReqs: operation.security ? operation.security :
+                                                         api.document.security,
                     });
                   }
                 );
@@ -301,3 +303,4 @@ function calculateMatchingScore(apiPath) {
 }
 
 exports.gatherPieces = gatherPieces;
+
