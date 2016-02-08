@@ -762,13 +762,31 @@
             "schemes": [
                 "https"
             ],
+            "security": [
+                {
+                    "apikeyHeader": []
+                },
+                {
+                    "apikeyQueryParameter": []
+                }
+            ],
             "securityDefinitions": {
-                "basic-local": {
-                  "type": "basic",
-                  "description": "basic auth local ldap no tls",
-                  "x-ibm-authentication-url": {
-                    "url": "ldap://localhost:1389"
-                  }
+               "basic-local": {
+                    "type": "basic",
+                    "description": "basic auth local ldap no tls",
+                    "x-ibm-authentication-url": {
+                        "url": "ldap://localhost:1389"
+                    }
+                },
+                "apikeyHeader": {
+                    "in": "header",
+                    "name": "X-IBM-Client-Id",
+                    "type": "apiKey"
+                },
+                "apikeyQueryParameter": {
+                    "in": "query",
+                    "name": "client_id",
+                    "type": "apiKey"
                 },
                 "oauthImplicit": {
                     "authorizationUrl": "http://swagger.io/api/oauth/dialog",
@@ -1141,10 +1159,18 @@
             "schemes": [
                 "https"
             ],
+            "security": [
+                {
+                    "apikeyHeader": []
+                },
+                {
+                    "apikeyQueryParameter": []
+                }
+            ],
             "securityDefinitions": {
                 "apikeyHeader": {
                     "in": "header",
-                    "name": "client_id",
+                    "name": "X-IBM-Client-Id",
                     "type": "apiKey"
                 },
                 "apikeyQueryParameter": {
@@ -1263,6 +1289,134 @@
                 "x-ibm-name": "routes"
             },
             "paths": {
+                "/routes/test1": {
+                    "get": {
+                        "deprecated": false,
+                        "description": "",
+                        "operationId": "routes.test1",
+                        "parameters": [
+                            {
+                                "description": "Criteria to match model instances",
+                                "format": "JSON",
+                                "in": "query",
+                                "name": "where",
+                                "required": false,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Request was successful",
+                                "schema": {
+                                    "type": "object"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Test purposes.",
+                        "tags": [
+                            "routes"
+                        ],
+                        "security": [
+                            {
+                                "apikeyHeader": []
+                            }
+                        ]
+                    }
+                },
+                "/routes/test2": {
+                    "get": {
+                        "deprecated": false,
+                        "description": "",
+                        "operationId": "routes.test2",
+                        "parameters": [
+                            {
+                                "description": "Criteria to match model instances",
+                                "format": "JSON",
+                                "in": "query",
+                                "name": "where",
+                                "required": false,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Request was successful",
+                                "schema": {
+                                    "type": "object"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Test purposes.",
+                        "tags": [
+                            "routes"
+                        ],
+                        "security": [
+                        ]
+                    }
+                },
+                "/routes/test3": {
+                    "get": {
+                        "deprecated": false,
+                        "description": "",
+                        "operationId": "routes.test3",
+                        "parameters": [
+                            {
+                                "description": "Criteria to match model instances",
+                                "format": "JSON",
+                                "in": "query",
+                                "name": "where",
+                                "required": false,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Request was successful",
+                                "schema": {
+                                    "type": "object"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Test purposes.",
+                        "tags": [
+                            "routes"
+                        ],
+                        "security": [
+                            {
+                                "apiSecretHeader": []
+                            },
+                            {
+                                "apikeyHeader": [],
+                                "apikeyHeaderBogus": []
+                            },
+                            {
+                                "apikeyHeaderBogus": [],
+                                "apikeyHeader": []
+                            },
+                            {
+                                "apikeyQueryParameter": []
+                            }
+                        ]
+                    }
+                },
                 "/routes": {
                     "get": {
                         "deprecated": false,
@@ -1537,7 +1691,7 @@
                         ]
                     }
                 },
-                "/routes/{id}": {
+                "/routes/xyz{id}": {
                     "delete": {
                         "deprecated": false,
                         "description": "",
@@ -1734,19 +1888,37 @@
             "security": [
                 {
                     "apiSecretHeader": [],
-                    "apikeyHeader": [],
-                    "basicAuthentication": []
+                    "apikeyHeader": []
+                },
+                {
+                    "apikeyQueryParameter": [],
+                    "apiSecretQueryParameter": []
                 }
             ],
             "securityDefinitions": {
+                "apikeyQueryParameter": {
+                    "in": "query",
+                    "name": "client_id",
+                    "type": "apiKey"
+                },
+                "apiSecretQueryParameter": {
+                    "in": "query",
+                    "name": "client_secret",
+                    "type": "apiKey"
+                },
                 "apiSecretHeader": {
                     "in": "header",
-                    "name": "client_secret",
+                    "name": "X-IBM-Client-Secret",
                     "type": "apiKey"
                 },
                 "apikeyHeader": {
                     "in": "header",
-                    "name": "client_id",
+                    "name": "X-IBM-Client-Id",
+                    "type": "apiKey"
+                },
+                "apikeyHeaderBogus": {
+                    "in": "header",
+                    "name": "BogusId",
                     "type": "apiKey"
                 },
                 "basicAuthentication": {
