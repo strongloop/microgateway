@@ -23,7 +23,9 @@
       "path-regex": "string",
       "path-methods": [{
         "method": "string",
-        "operationId": "string"
+        "operationId": "string",
+        "securityDefs": {},
+        "securityReqs": []
       }]
     }],
     "snapshot-id": "string"
