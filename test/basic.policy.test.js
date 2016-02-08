@@ -5,6 +5,7 @@ let supertest = require('supertest');
 let echo = require('./support/echo-server');
 let ldap = require('./support/ldap-server');
 let mg = require('../lib/microgw');
+let should = require('should');
 
 describe('basic auth policy', function() {
 
@@ -36,8 +37,8 @@ describe('basic auth policy', function() {
      function(done) {
        console.log ('send request');
        request
-         .get('/apim/sb/v1/ascents_basic_auth?client_id=' +  clientId1)
-         .expect(200, '/api1', done);
+         .post('/apim/sb/v1/ascents?client_id=' +  clientId1)
+         .send({date: 'today', route: '66'})
+         .expect(200, '{"date":"today","route":"66"}', done);
      });
-
 });

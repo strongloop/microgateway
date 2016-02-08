@@ -528,50 +528,6 @@
                 "x-ibm-name": "ascents"
             },
              "paths": {
-                "/ascents_basic_auth": {
-                    "get": {
-                      "security": [
-                        { "basic-local": [] }
-                      ],
-                      "deprecated": false,
-                      "description": "List Ascent",
-                      "operationId": "list",
-                      "parameters": [
-                        {
-                          "description": "What element to start the list at, default is 0",
-                          "in": "query",
-                          "name": "offset",
-                          "required": false,
-                          "type": "string"
-                        },
-                        {
-                          "description": "Total number of items to return, default is 10",
-                          "in": "query",
-                          "name": "limit",
-                          "required": false,
-                          "type": "string"
-                        }
-                      ],
-                      "responses": {
-                        "200": {
-                          "description": "Success",
-                          "schema": {
-                            "$ref": "#/definitions/AscentList"
-                          }
-                        },
-                        "default": {
-                          "description": "Unexpected error",
-                          "schema": {
-                            "$ref": "#/definitions/Error"
-                          }
-                        }
-                      },
-                      "summary": "List Ascent",
-                      "tags": [
-                        "Ascent"
-                      ]
-                    }
-                },
                 "/ascents": {
                     "get": {
                         "deprecated": false,
@@ -613,6 +569,9 @@
                         ]
                     },
                     "post": {
+                        "security": [
+                          { "basic-local": [], "apikeyQueryParameter": [] }
+                        ],
                         "deprecated": false,
                         "description": "Create a Ascent",
                         "parameters": [
