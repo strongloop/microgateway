@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint ./ && jscs ./",
     "start": "node .",
-    "test": "mocha"
+    "test": "mocha -t 600000"
   },
   "repository": {
     "type": "git",
