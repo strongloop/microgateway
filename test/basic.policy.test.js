@@ -11,14 +11,15 @@ describe('basic auth policy', function() {
   let request;
   before((done) => {
     mg.start(3000)
-      .then(ldap.start(1389))
-      .then(echo.start(8889))
+      .then(() => ldap.start(1389))
+      .then(() => echo.start(8889))
       .then(() => {
         request = supertest('http://localhost:3000');
         console.log ('setup test1');
         done();
       }).catch((err) => {
         console.error(err);
+        done(err);
       });
   });
 
@@ -26,7 +27,8 @@ describe('basic auth policy', function() {
     echo.stop()
       .then(ldap.stop())
       .then(mg.stop())
-      .then(done, done);
+      .then(done, done)
+      .catch(done);
   });
 
   var clientId1 = 'fb82cb59-ba95-4c34-8612-e63697d7b845';

@@ -10,19 +10,20 @@ describe('preflow and flow-engine integration', function() {
   let request;
   before((done) => {
     mg.start(3000)
-      .then(echo.start(8889))
+      .then(() => echo.start(8889))
       .then(() => {
         request = supertest('http://localhost:3000');
         console.log ('setup test1');
         done();
       }).catch((err) => {
         console.error(err);
+        done(err);
       });
   });
 
   after((done) => {
     echo.stop()
-      .then(mg.stop())
+      .then(() => mg.stop())
       .then(done, done);
   });
 
