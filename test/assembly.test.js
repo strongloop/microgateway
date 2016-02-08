@@ -1,32 +1,34 @@
 'use strict';
 
-var express = require('express');
-var request = require('supertest')('http://localhost:3000');
-var microgw = require('../lib/microgw');
-
-var echoServer = express();
-echoServer.get('/*', function(req, resp) {
-  resp.send(req.url);
-});
-echoServer.post('/*', function(req, resp) {
-  req.pipe(resp);
-});
-
-function startEchoServer(done) {
-  echoServer.listen(8889, done);
-}
-
-function startMicroGateway(done) {
-  microgw.start(3000, done);
-}
+let express = require('express');
+let supertest = require('supertest');
+let echo = require('./support/echo-server');
+let mg = require('../lib/microgw');
 
 describe('preflow and flow-engine integration', function() {
-  before(startEchoServer);
-  before(startMicroGateway);
+
+  let request;
+  before((done) => {
+    mg.start(3000)
+      .then(echo.start(8889))
+      .then(() => {
+        request = supertest('http://localhost:3000');
+        console.log ('setup test1');
+        done();
+      }).catch((err) => {
+        console.error(err);
+      });
+  });
+
+  after((done) => {
+    echo.stop()
+      .then(mg.stop())
+      .then(done, done);
+  });
 
   var clientId1 = 'fb82cb59-ba95-4c34-8612-e63697d7b845';
   it('client_id=' + clientId1 + ' (query) should invoke API1 (apim-lookup)',
-    function(done) {
+     function(done) {
       request
         .get('/apim/sb/v1/ascents?client_id=' +  clientId1)
         .expect(200, '/api1', done);

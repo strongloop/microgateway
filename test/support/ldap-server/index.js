@@ -118,9 +118,9 @@ server.add('ou=users, o=myhost', pre, function(req, res, next) {
 
 });
 
-exports.start = function() {
+exports.start = function(port) {
   return new Promise((resolve, reject) => {
-    server.listen(1389, () => {
+    server.listen(port, () => {
       resolve();
     });
   });
@@ -131,3 +131,11 @@ exports.stop = function() {
     server.close();
   });
 };
+
+if (require.main === module) {
+  exports.start(1389).
+    then(() => {
+      console.log('ldap-server started on port 1389');
+    });
+}
+

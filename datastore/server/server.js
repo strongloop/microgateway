@@ -1,3 +1,5 @@
+'use strict'
+
 var loopback = require('loopback');
 var boot = require('loopback-boot');
 var async = require('async');
@@ -21,7 +23,7 @@ app.start = function() {
   },
   function(callback) {
     // start the web server
-    return app.listen(function() {
+    var server = app.listen(function() {
       app.emit('started');
       var baseUrl = app.get('url').replace(/\/$/, '');
       var port = app.get('port');
@@ -34,6 +36,9 @@ app.start = function() {
         console.log('Browse your REST API at %s%s', baseUrl, explorerPath);
       }
     });
+    app.close = function(cb) {
+      server.close(cb);
+    };
   }]);
 };
 

@@ -527,7 +527,51 @@
                 "version": "1.0.0",
                 "x-ibm-name": "ascents"
             },
-            "paths": {
+             "paths": {
+                "/ascents_basic_auth": {
+                    "get": {
+                      "security": [
+                        { "basic-local": [] }
+                      ],
+                      "deprecated": false,
+                      "description": "List Ascent",
+                      "operationId": "list",
+                      "parameters": [
+                        {
+                          "description": "What element to start the list at, default is 0",
+                          "in": "query",
+                          "name": "offset",
+                          "required": false,
+                          "type": "string"
+                        },
+                        {
+                          "description": "Total number of items to return, default is 10",
+                          "in": "query",
+                          "name": "limit",
+                          "required": false,
+                          "type": "string"
+                        }
+                      ],
+                      "responses": {
+                        "200": {
+                          "description": "Success",
+                          "schema": {
+                            "$ref": "#/definitions/AscentList"
+                          }
+                        },
+                        "default": {
+                          "description": "Unexpected error",
+                          "schema": {
+                            "$ref": "#/definitions/Error"
+                          }
+                        }
+                      },
+                      "summary": "List Ascent",
+                      "tags": [
+                        "Ascent"
+                      ]
+                    }
+                },
                 "/ascents": {
                     "get": {
                         "deprecated": false,
@@ -719,6 +763,13 @@
                 "https"
             ],
             "securityDefinitions": {
+                "basic-local": {
+                  "type": "basic",
+                  "description": "basic auth local ldap no tls",
+                  "x-ibm-authentication-url": {
+                    "url": "ldap://localhost:1389"
+                  }
+                },
                 "oauthImplicit": {
                     "authorizationUrl": "http://swagger.io/api/oauth/dialog",
                     "flow": "implicit",

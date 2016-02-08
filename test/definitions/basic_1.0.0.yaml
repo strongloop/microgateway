@@ -8,7 +8,7 @@ securityDefinitions:
     type: basic
     description: ''
     x-ibm-authentication-url:
-      url: 'ldap://localhost:663'
+      url: 'ldap://localhost:1389'
 security:
   - basic-local-1: []
 basePath: /basic
