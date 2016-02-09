@@ -28,6 +28,7 @@
     "jscs": "^2.9.0",
     "lodash": "^4.2.1",
     "mocha": "^2.4.5",
+    "node-static": "^0.7.7",
     "should": "^8.2.1",
     "sinon": "^1.17.3",
     "supertest": "^1.1.0"
