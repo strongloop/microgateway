@@ -6,8 +6,9 @@ var debug = require('debug')('strong-gateway:data-store');
 var sgwapimpull = require('../../apim-pull');
 var apimpull = sgwapimpull.pull;
 var environment = require('../../../utils/environment');
-var APIMANAGER = require('../../../utils/environment').APIMANAGER;
-var CONFIGDIR = require('../../../utils/environment').CONFIGDIR;
+var APIMANAGER = environment.APIMANAGER;
+var APIMANAGER_PORT = environment.APIMANAGER_PORT;
+var CONFIGDIR = environment.CONFIGDIR;
 
 var rootConfigPath = '/../../../config/';
 var defaultDefinitionsDir = __dirname + rootConfigPath + 'default';
@@ -53,7 +54,7 @@ module.exports = function(app) {
   models.push(new ModelType('optimizedData', 'dummy'));
   models.push(new ModelType('snapshot', 'dummy')); // hack, removed later
 
-  var apimanager;
+  var apimanager = {};
 
   async.series(
     [
@@ -81,10 +82,20 @@ module.exports = function(app) {
         environment.getVariable(
           APIMANAGER,
           function(value) {
-            apimanager = value;
-            if (apimanager)
+            apimanager.ip = value;
+            if (apimanager.ip)
               laptopexperience=false;
-            },
+          },
+          callback
+        );
+      },
+      function(callback) {
+        // get apimanager port
+        environment.getVariable(
+          APIMANAGER_PORT,
+          function(value) {
+            apimanager.port = value;
+          },
           callback
         );
       },
@@ -102,10 +113,10 @@ module.exports = function(app) {
     function(err, results) {
       if (!err) {
         loadData(app,
-                    apimanager,
-                    models,
-                    definitionsDir,
-                    true); // first call to loadData()
+                 apimanager,
+                 models,
+                 definitionsDir,
+                 true); // first call to loadData()
       }
     }
   );
@@ -216,7 +227,8 @@ function pullFromAPIm(apimanager, uid, cb) {
         }
 
         var options = {};
-        options['host'] = apimanager;
+        options['host'] = apimanager.ip;
+        options['port'] = apimanager.port;
         options['outdir'] = snapdir;
         debug('apimpull start');
         apimpull(options,function(err, response) {
