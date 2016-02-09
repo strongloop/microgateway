@@ -49,11 +49,13 @@ describe('basic auth policy', function() {
       .expect(200, '{"date":"today","route":"66"}', done);
   });
 
-  let clientId2 = '612caa59-9649-491f-99b7-d9a941c4bd2e';
-  it(`client_id=${clientId2} should fail`, function(done) {
+  it(`client_id=${clientId1} should fail`, function(done) {
+    console.log ('send request');
     request
-      .get('/apim/sb/v1/forecasts?client_id=' + clientId2)
-      .auth('root', 'wrongpassword')
-      .expect(401, '', done);
+    .post('/apim/sb/v1/ascents?client_id=' +  clientId1)
+    .auth('root', 'badpass')
+    .send({date: 'today', route: '66'})
+    .expect(401, done);
   });
+
 });

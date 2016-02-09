@@ -36,6 +36,7 @@
   "dependencies": {
     "apim-noop": "git+ssh://git@github.ibm.com:apimesh/micro-gw-policy-sample.git",
     "auth-header": "^0.2.2",
+    "basic-ldap": "git+ssh://git@github.ibm.com:jcbelles/basic-ldap.git",
     "body-parser": "^1.14.2",
     "compression": "^1.6.1",
     "express": "^4.13.4",
