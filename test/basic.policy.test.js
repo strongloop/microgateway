@@ -55,5 +55,5 @@ describe('basic auth policy', function() {
       .get('/apim/sb/v1/forecasts?client_id=' + clientId2)
       .auth('root', 'wrongpassword')
       .expect(401, '', done);
-    });
+  });
 });
