@@ -25,6 +25,8 @@ function startAPImServer(done) {
 
 function startMicroGateway(done) {
   process.env['DATASTORE_PORT'] = 5000;
+  process.env['APIMANAGER'] = '127.0.0.1';
+  process.env['APIMANAGER_PORT'] = 8080;
   microgw.start(3000, done);
 }
 
