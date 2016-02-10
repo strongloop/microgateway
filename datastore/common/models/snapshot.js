@@ -1,4 +1,5 @@
 var app = require('../../server/server');
+var fs = require('fs.extra');
 
 module.exports = function(Snapshot) {
   Snapshot.observe('after delete', function(ctx, next) {
@@ -17,6 +18,11 @@ module.exports = function(Snapshot) {
             app.models[model].destroyAll(query, function(err, info) {
               }
             );
+          }
+        );
+        fs.rmrf(
+          process.env['ROOTCONFIGDIR'] + ctx.instance.id,
+          function (err) {
           }
         );
       }

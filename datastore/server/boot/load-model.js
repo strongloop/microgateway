@@ -10,12 +10,12 @@ var APIMANAGER = environment.APIMANAGER;
 var APIMANAGER_PORT = environment.APIMANAGER_PORT;
 var CONFIGDIR = environment.CONFIGDIR;
 
-var rootConfigPath = '/../../../config/';
-var defaultDefinitionsDir = __dirname + rootConfigPath + 'default';
+var rootConfigPath = __dirname + '/../../../config/';
+var defaultDefinitionsDir = rootConfigPath + 'default';
 var definitionsDir = defaultDefinitionsDir;
 
 var subscriptionsFilename = 'subscriptions.json';
-var subscriptionsConfig = __dirname + rootConfigPath + subscriptionsFilename;
+var subscriptionsConfig = rootConfigPath + subscriptionsFilename;
 
 var laptopexperience = true;
 
@@ -86,8 +86,10 @@ module.exports = function(app) {
           APIMANAGER,
           function(value) {
             apimanager.ip = value;
-            if (apimanager.ip)
+            if (apimanager.ip) {
               laptopexperience=false;
+              process.env['ROOTCONFIGDIR'] = rootConfigPath;
+            }
           },
           callback
         );
@@ -219,8 +221,7 @@ function pullFromAPIm(apimanager, uid, cb) {
   debug('pullFromAPIm entry');
   if (apimanager) {
     // Have an APIm, grab latest if we can..
-    var snapdir =  __dirname +
-                   rootConfigPath +
+    var snapdir =  rootConfigPath +
                    uid +
                    '/';
     fs.mkdir(snapdir, function(err) {

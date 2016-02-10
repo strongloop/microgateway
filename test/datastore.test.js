@@ -3,12 +3,10 @@
 var _ = require('lodash');
 var assert = require('assert');
 var fs = require('fs');
-var remove = require('remove');
 var express = require('express');
 var request = require('supertest')('http://localhost:5000');
 var microgw = require('../lib/microgw');
 var apimServer = require('./mock-apim-server/apim-server');
-var snapshotID;
 
 var echoServer = express();
 echoServer.get('/*', function(req, resp) {
@@ -38,22 +36,11 @@ function startMicroGateway(done) {
   microgw.start(3000, done);
 }
 
-function cleanupDir(done) {
-  var snapshotdir = __dirname + '/../config/' + snapshotID;
-  try {
-    remove.removeSync(snapshotdir);
-  } catch(e) {
-    console.error(e);
-  }
-  
-  done();
-}
-
 describe('data-store', function() {
   before(startEchoServer);
   before(startAPImServer);
   before(startMicroGateway);
-  after(cleanupDir);
+  var snapshotID;
 
   function verifyResponseArray(res, expected) {
     assert.strictEqual(res.length, expected.length);
@@ -116,15 +103,31 @@ describe('data-store', function() {
         ).end(done);
     }
   );
-  it('release should remove current snapshot and decrement ref count',
+  it('release should remove current snapshot and decrement ref count and cleanup dir',
     function(done) {
       var expect = {snapshot : {}};
       request
         .get('/api/snapshots/release?id=' + snapshotID)
         .expect(function(res) {
             assert(_.isEqual(expect, res.body));
+            
           }
-        ).end(done);
+        ).end(function (err, res) {
+            if (err) return done(err);
+            setTimeout(
+              function () {
+                // check for non existence of directory
+                try {
+                  var stats = fs.statSync(process.env['ROOTCONFIGDIR'] + snapshotID);
+                } catch (e) {
+                  if(e.code === 'ENOENT') return done(); // expected
+                }
+                done(new Error('Snapshot directory still exists'));
+              },
+              1500 // 1.5 seconds to cleanup
+            );
+          }
+        );
     }
   );
 
