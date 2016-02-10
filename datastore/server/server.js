@@ -21,7 +21,7 @@ app.start = function() {
   },
   function(callback) {
     // start the web server
-    return app.listen(function() {
+    return app.listen(process.env.DATASTORE_PORT || 0, function() {
       app.emit('started');
       var baseUrl = app.get('url').replace(/\/$/, '');
       var port = app.get('port');
