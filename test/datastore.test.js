@@ -33,12 +33,12 @@ describe('data-store', function() {
   before(startAPImServer);
   before(startMicroGateway);
 
-  function verifyResponse(res, expected) {
-    assert.strictEqual(res.body.length, expected.length);
+  function verifyResponseArray(res, expected) {
+    assert.strictEqual(res.length, expected.length);
 
     for(var i = 0; i < expected.length; i++) {
       var expect = expected[i];
-      var actual = res.body[i];
+      var actual = res[i];
       for (var prop in expect) {
         if (expect.hasOwnProperty(prop)) {
           assert.strictEqual(actual[prop], expect[prop]);
@@ -47,15 +47,41 @@ describe('data-store', function() {
     }
   }
 
+  function verifyResponseSingle(res, expected) {
+    for (var prop in expected) {
+      if (expected.hasOwnProperty(prop)) {
+         assert.strictEqual(res[prop], expected[prop]);
+      }
+    }
+  }
+
+  var snapshotID;
   it('snapshots should have single current entry with ref count of 1',
     function(done) {
       var expect = [{refcount : '1', current: true}];
       request
         .get('/api/snapshots')
         .expect(function(res) {
-            verifyResponse(res, expect);
+            verifyResponseArray(res.body, expect);
+            snapshotID = res.body[0].id;
+            assert(snapshotID.length === 5); // ID's are strings of 5 characters
+            assert(parseInt(snapshotID) >= 0); // ID's are >= 0
+            assert(parseInt(snapshotID) < 65536); // ID's are < 65536
           }
         ).end(done);
-  });
+    }
+  );
+  it('current should return current snapshotID and increment ref count',
+    function(done) {
+      var expect = {refcount : '2', current: true};
+      request
+        .get('/api/snapshots/current')
+        .expect(function(res) {
+            verifyResponseSingle(res.body.snapshot, expect);
+            assert(res.body.snapshot.id === snapshotID); // ID should be same as previous
+          }
+        ).end(done);
+    }
+  );
 
 });
