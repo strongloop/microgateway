@@ -93,7 +93,20 @@ produces:
     - application/json
 schemes:
     - https
+security:
+    -
+        apikeyHeader: []
+    -
+        apikeyQueryParameter: []
 securityDefinitions:
+    apikeyHeader:
+        in: header
+        name: X-IBM-Client-Id
+        type: apiKey
+    apikeyQueryParameter:
+        in: query
+        name: client_id
+        type: apiKey
     oauthImplicit:
         authorizationUrl: 'http://swagger.io/api/oauth/dialog'
         flow: implicit

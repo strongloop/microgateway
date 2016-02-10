@@ -17,6 +17,7 @@ var subscriptionsFilename = 'subscriptions.json';
 var subscriptionsConfig = __dirname + rootConfigPath + subscriptionsFilename;
 
 var laptopexperience = true;
+process.env['laptopexperience']=laptopexperience;
 
 /**
  * Creates a model type 
@@ -86,7 +87,10 @@ module.exports = function(app) {
           function(value) {
             apimanager = value;
             if (apimanager)
+              {
               laptopexperience=false;
+              process.env['laptopexperience']=laptopexperience;
+              }
             },
           callback
         );
@@ -346,7 +350,7 @@ function loadConfigFromFS(app, models, dir, uid, cb) {
   );
   
   if (laptopexperience) {
-    populateModelsWithLocalData(app, YAMLfiles, dir, cb);
+    populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb);
   }
   else {
     // populate data-store models with the file contents
@@ -372,8 +376,9 @@ function createAPIID(api)
  * @param {string} dir - path to directory containing persisted data to load
  * @param {callback} cb - callback that handles error or successful completion
  */
-function populateModelsWithLocalData(app, YAMLfiles, dir, cb) {
+function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
   debug('populateModelsWithLocalData entry');
+  var apis = {};
   async.series([
     function(seriesCallback) {
       async.forEach(YAMLfiles,
@@ -413,21 +418,20 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, cb) {
             var entry = {};
             // looks like a product
             if (readfile.product) {
-              model.name = 'product';
-              entry.id = createProductID(readfile)
-              entry.document = readfile;
-              entry.document = expandProductData(readfile, dir);
+              console.log('product found: skipping')
             }
             // looks like an API
             if (readfile.swagger) {
               model.name = 'api';
               entry.id = createAPIID(readfile);
               entry.document = expandAPIData(readfile, dir);
+              apis[entry.document.info['x-ibm-name']] = entry.document;
             }
             
             if (model.name) {
               // no catalog
               entry.catalog = {};
+              entry['snapshot-id'] = uid;
               app.models[model.name].create(
                 entry,
                 function(err, mymodel) {
@@ -447,12 +451,56 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, cb) {
               fileCallback();
             }
           },
-          function(err) {
-            debug('populateModelsWithLocalData exit');
-            seriesCallback();
-          }
+          function(err) {  }
       ); 
+      seriesCallback();
     },
+    // create product with all the apis defined
+    function(seriesCallback) {
+        var entry = {};
+        // no catalog
+        entry.catalog = {};
+        entry['snapshot-id'] = uid;
+        entry.document = 
+          {
+          "product": "1.0.0",
+          "info": {
+            "name": "static product",
+            "version": "1.0.0",
+            "title": "static-product"
+          },
+          "visibility": {
+            "view": {
+              "type": "public"
+            },
+            "subscribe": {
+              "type": "authenticated"
+            }
+          },
+          "apis": apis,
+          "plans": {
+            "default": {
+              "apis": apis
+            }
+          }
+        }
+        debug('creating static product and attaching apis: ' + JSON.stringify(entry, null, 4))
+
+        app.models['product'].create(
+          entry,
+          function(err, mymodel) {
+            if (err) {
+              console.error(err);
+              seriesCallback(err);
+              return;
+            }
+            debug('%s created: %j',
+                  'product',
+                  mymodel);
+          seriesCallback();
+          }
+        );
+      },
     // Try to read a static subscriptions..
     function(seriesCallback) {
           var file = subscriptionsConfig;
@@ -468,6 +516,7 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, cb) {
               function(subscription, subsCallback) 
                 {
                 var modelname = 'subscription';
+                subscription['snapshot-id'] = uid;
                 app.models[modelname].create(
                   subscription,
                   function(err, mymodel) {
@@ -497,23 +546,53 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, cb) {
     );
 }
 
+function findAndReplace(object, value, replacevalue){
+  for(var x in object){
+    if(typeof object[x] == 'object'){
+      findAndReplace(object[x], value, replacevalue);
+    }
+   //console.log('object[x]: ' + object[x]);
+    if(object[x] == value){ 
+      console.log('found one');
+      object[x] = replacevalue;
+    }
+  }
+  return object;
+}
+
 function expandAPIData(apidoc, dir)
   {
   // add the assembly
-  if (apidoc['x-ibm-configuration'] && 
-      apidoc['x-ibm-configuration'].assembly && 
+  if (apidoc['x-ibm-configuration'])
+    {
+    if (apidoc['x-ibm-configuration'].assembly && 
       apidoc['x-ibm-configuration'].assembly['$ref']) {
       var assemblyFile = path.join(dir, 
         apidoc['x-ibm-configuration'].assembly['$ref']);
       var assembly = YAML.load(assemblyFile);
       apidoc['x-ibm-configuration'].assembly = assembly;
-  }
+      }
+    if (apidoc['x-ibm-configuration'].properties)
+      {
+      Object.getOwnPropertyNames(apidoc['x-ibm-configuration'].properties).forEach(
+        function (property) 
+          {
+          console.log('property: ' + property)
+          console.log('apidoc[x-ibm-configuration][properties][property][value]: ' + JSON.stringify(apidoc['x-ibm-configuration']['properties'][property]['value']))
+          console.log('before apidoc: ' + JSON.stringify(apidoc))
+          var propertyvalue = '$(' + property + ')';
+          console.log('property: ' + propertyvalue);
+          apidoc = findAndReplace(apidoc, propertyvalue, apidoc['x-ibm-configuration']['properties'][property]['value'])
+          console.log('after apidoc: ' + JSON.stringify(apidoc))
+          });
+      }
+    }
   return apidoc;
   }
 function loadAPIsFromYAML(listOfAPIs, dir)
   {
-  //var apis = [];
-  var summaryAPIs = [];
+  var apis = [];
+  //var summaryAPIs = [];
   for(var i = 0; i < listOfAPIs.length; i++) {
     var apiFile = path.join(dir, 
                             listOfAPIs[i]['$ref']);
@@ -525,33 +604,14 @@ function loadAPIsFromYAML(listOfAPIs, dir)
       api = YAML.load(apiFile+'.yaml');
     }
     //scope data down
-    var summary = {id: createAPIID(api),info: api.info};
-    summaryAPIs.push(summary);
-    //apis.push(api);
+    //var summary = {id: createAPIID(api),info: api.info};
+    //summaryAPIs.push(summary);
+    apis.push(api);
     }
-  return summaryAPIs;
+  //return summaryAPIs;
+  return apis;
   }
   
-function expandProductData(productdoc, dir)
-  {
-    // add the apis
-    var apisInProduct = productdoc['apis'];
-    if (apisInProduct) {
-      var apis = loadAPIsFromYAML(apisInProduct, dir)
-      productdoc['apis'] = apis;
-    }
-    // add the plans.apis
-    var plans = JSON.parse(JSON.stringify(productdoc.plans));
-    debug('plans: ' + JSON.stringify(plans));
-    debug('plans props: ' + Object.getOwnPropertyNames(plans).length);
-    Object.getOwnPropertyNames(plans).forEach(
-      function(propname) 
-      {
-      var apisInProductPlan = productdoc.plans[propname]['apis'];
-      productdoc.plans[propname]['apis'] = loadAPIsFromYAML(apisInProductPlan, dir)
-      });      
-    return productdoc;
-  }
 
 /**
  * Populates data-store models with persisted content

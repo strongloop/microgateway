@@ -37,11 +37,12 @@ describe('preflow and flow-engine integration', function() {
       .then(done, done);
   });
 
-  var clientId1 = 'fb82cb59-ba95-4c34-8612-e63697d7b845';
+function tests(env) {
+    var clientId1 = 'fb82cb59-ba95-4c34-8612-e63697d7b845';
   it('client_id=' + clientId1 + ' (query) should invoke API1 (apim-lookup)',
      function(done) {
       request
-        .get('/apim/sb/v1/ascents?client_id=' + clientId1)
+        .get('/v1/ascents?client_id=' + clientId1)
         .expect(200, '/api1', done);
   });
 
@@ -49,7 +50,7 @@ describe('preflow and flow-engine integration', function() {
   it('client_id=' + clientId2 + ' (query) should invoke API2 (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/forecasts?client_id=' + clientId2)
+        .get('/v1/forecasts?client_id=' + clientId2)
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         // .set('x-ibm-plan-version', '2.0')
         .expect(200, '/api2', done);
@@ -59,7 +60,7 @@ describe('preflow and flow-engine integration', function() {
      ' (query) should invoke API2 (apim-lookup-defaultcat)',
     function(done) {
       request
-        .get('/apim/v1/forecasts?client_id=' + clientId2)
+        .get('/v1/forecasts?client_id=' + clientId2)
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         // .set('x-ibm-plan-version', '2.0')
         .expect(200, '/api2', done);
@@ -77,7 +78,7 @@ describe('preflow and flow-engine integration', function() {
      ' (query) should not find api - bad catalog (apim-lookup)',
     function(done) {
       request
-        .get('/apim/xyz/v1/ascents?client_id=' + clientId1)
+        .get('/xyz/v1/ascents?client_id=' + clientId1)
         .expect(404, done);
   });
 
@@ -85,7 +86,7 @@ describe('preflow and flow-engine integration', function() {
      ' (query) should not find api - bad base path (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/xyz/ascents?client_id=' + clientId1)
+        .get('/xyz/ascents?client_id=' + clientId1)
         .expect(404, done);
   });
 
@@ -93,7 +94,7 @@ describe('preflow and flow-engine integration', function() {
      ' (query) should not find api - bad path (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/xyz?client_id=' + clientId1)
+        .get('/v1/xyz?client_id=' + clientId1)
         .expect(404, done);
   });
 
@@ -102,7 +103,7 @@ describe('preflow and flow-engine integration', function() {
      ' (query) should not find api - bad clientId (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/ascents?client_id=' + clientIdBad)
+        .get('/v1/ascents?client_id=' + clientIdBad)
         .expect(404, done);
   });
 
@@ -110,7 +111,7 @@ describe('preflow and flow-engine integration', function() {
      ' (query) should not find api - bad clientId name (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/ascents?client-id=' + clientIdBad)
+        .get('/v1/ascents?client-id=' + clientIdBad)
         .expect(404, done);
   });
 
@@ -119,7 +120,7 @@ describe('preflow and flow-engine integration', function() {
      ' secret=' + clientSecret3a + ' (query) should invoke API3 (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes?client_id=' + clientId2 +
+        .get('/v1/routes?client_id=' + clientId2 +
              '&client_secret=' + clientSecret3a)
         .expect(200, '/api3', done);
   });
@@ -130,7 +131,7 @@ describe('preflow and flow-engine integration', function() {
      ' bad secret (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes?client_id=' + clientId2 +
+        .get('/v1/routes?client_id=' + clientId2 +
              '&client_secret=' + clientSecret3Bad)
         .expect(404, done);
   });
@@ -139,7 +140,7 @@ describe('preflow and flow-engine integration', function() {
      ' (query) should not find api - missing secret (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes?client_id=' + clientId2)
+        .get('/v1/routes?client_id=' + clientId2)
         .expect(404, done);
   });
 
@@ -148,7 +149,7 @@ describe('preflow and flow-engine integration', function() {
      ' bad clientID valid secret (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes?client_id=' + clientIdBad +
+        .get('/v1/routes?client_id=' + clientIdBad +
              '&client_secret=' + clientSecret3a)
         .expect(404, done);
   });
@@ -158,7 +159,7 @@ describe('preflow and flow-engine integration', function() {
      ' bad secret name (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes?client_id=' + clientId2 +
+        .get('/v1/routes?client_id=' + clientId2 +
              '&client_secret_bad=' + clientSecret3a)
         .expect(404, done);
   });
@@ -167,7 +168,7 @@ describe('preflow and flow-engine integration', function() {
      ' (query) should invoke API3 with extra parm (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes?client_id=' + clientId2 +
+        .get('/v1/routes?client_id=' + clientId2 +
              '&client_secret=' + clientSecret3a +
              '&extra_parm=someValue')
         .expect(200, '/api3', done);
@@ -176,7 +177,7 @@ describe('preflow and flow-engine integration', function() {
   it('client_id=' + clientId1 + ' (header) should invoke API1 (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/ascents')
+        .get('/v1/ascents')
         .set('X-IBM-Client-Id', clientId1)
         .expect(200, '/api1', done);
   });
@@ -184,7 +185,7 @@ describe('preflow and flow-engine integration', function() {
   it('client_id=' + clientId2 + ' (header) should invoke API2 (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/forecasts')
+        .get('/v1/forecasts')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
         // .set('x-ibm-plan-version', '2.0')
@@ -195,7 +196,7 @@ describe('preflow and flow-engine integration', function() {
      ' (header) should invoke API2 (apim-lookup-defaultcat)',
     function(done) {
       request
-        .get('/apim/v1/forecasts')
+        .get('/v1/forecasts')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
         // .set('x-ibm-plan-version', '2.0')
@@ -224,7 +225,7 @@ describe('preflow and flow-engine integration', function() {
      ' (header) should not find api - bad clientId (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/ascents')
+        .get('/v1/ascents')
         .set('X-IBM-Client-Id', clientIdBad)
         .expect(404, done);
   });
@@ -233,7 +234,7 @@ describe('preflow and flow-engine integration', function() {
      ' (header) should not find api - bad base path (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/xyz/ascents')
+        .get('/xyz/ascents')
         .set('X-IBM-Client-Id', clientId1)
         .expect(404, done);
   });
@@ -242,7 +243,7 @@ describe('preflow and flow-engine integration', function() {
      ' (header) should not find api - bad path (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/xyz')
+        .get('/v1/xyz')
         .set('X-IBM-Client-Id', clientId1)
         .expect(404, done);
   });
@@ -251,7 +252,7 @@ describe('preflow and flow-engine integration', function() {
      ' (header) should not find api - bad clientID name (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/ascents')
+        .get('/v1/ascents')
         .set('X-IBM-Client-Id-bad', clientId1)
         .expect(404, done);
   });
@@ -260,7 +261,7 @@ describe('preflow and flow-engine integration', function() {
      ' secret=' + clientSecret3a + ' (header) should invoke API3 (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes')
+        .get('/v1/routes')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
         .set('X-IBM-Client-Secret', clientSecret3a)
@@ -272,7 +273,7 @@ describe('preflow and flow-engine integration', function() {
      ' bad secret (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes')
+        .get('/v1/routes')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
         .set('X-IBM-Client-Secret', clientSecret3Bad)
@@ -283,7 +284,7 @@ describe('preflow and flow-engine integration', function() {
      ' (header) should not find api - missing secret (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes')
+        .get('/v1/routes')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
         .expect(404, done);
@@ -294,7 +295,7 @@ describe('preflow and flow-engine integration', function() {
      ' bad clientID valid secret (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes?')
+        .get('/v1/routes?')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientIdBad)
         .set('X-IBM-Client-Secret', clientSecret3a)
@@ -306,7 +307,7 @@ describe('preflow and flow-engine integration', function() {
      ' bad secret name (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes')
+        .get('/v1/routes')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
         .set('X-IBM-Client-Secret-Bad', clientSecret3a)
@@ -317,7 +318,7 @@ describe('preflow and flow-engine integration', function() {
      ' (header) should invoke API3 with extra parm (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes')
+        .get('/v1/routes')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
         .set('X-IBM-Client-Secret', clientSecret3a)
@@ -330,7 +331,7 @@ describe('preflow and flow-engine integration', function() {
      ' key only (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes/test1')
+        .get('/v1/routes/test1')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
         .expect(200, '/api3', done);
@@ -341,7 +342,7 @@ describe('preflow and flow-engine integration', function() {
      ' no query at operation (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes/test1?client_id=' + clientId2 +
+        .get('/v1/routes/test1?client_id=' + clientId2 +
              '&client_secret=' + clientSecret3a)
         .expect(404, done);
   });
@@ -351,7 +352,7 @@ describe('preflow and flow-engine integration', function() {
      ' no requirements (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes/test2')
+        .get('/v1/routes/test2')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientIdBad)
         .set('X-IBM-Client-Secret', clientSecret3Bad)
@@ -363,7 +364,7 @@ describe('preflow and flow-engine integration', function() {
      ' bad names/values no requirements (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes/test2')
+        .get('/v1/routes/test2')
         .set('x-ibm-plan-id-bad', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id-bad', clientId2)
         .expect(200, '/api3', done);
@@ -373,7 +374,7 @@ describe('preflow and flow-engine integration', function() {
      ' (query) should invoke API3 - last req (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes/test3?client_id=' + clientId2)
+        .get('/v1/routes/test3?client_id=' + clientId2)
         .expect(200, '/api3', done);
   });
 
@@ -381,7 +382,7 @@ describe('preflow and flow-engine integration', function() {
      ' (header) should invoke API3 - first req (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes/test3')
+        .get('/v1/routes/test3')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Secret', clientSecret3a)
         .expect(200, '/api3', done);
@@ -391,7 +392,7 @@ describe('preflow and flow-engine integration', function() {
      ' (header) should not find api - missing req (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes/test3')
+        .get('/v1/routes/test3')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
         .expect(404, done);
@@ -401,7 +402,7 @@ describe('preflow and flow-engine integration', function() {
      ' (header) should invoke API3 - first scheme (apim-lookup)',
     function(done) {
       request
-        .get('/apim/sb/v1/routes/test3')
+        .get('/v1/routes/test3')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
         .expect(404, done);
@@ -416,4 +417,17 @@ describe('preflow and flow-engine integration', function() {
         .expect(200, 'hello', done);
   });
   */
+}
+
+describe('preflow and flow-engine integration', function() {
+  
+  // APIm tests
+  //before(setupApimTest);
+  before(startEchoServer);
+  before(startMicroGateway);
+  tests('apim');
+  
+
 });
+
+

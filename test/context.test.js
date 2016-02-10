@@ -10,17 +10,7 @@ var path = require('path');
 
 var context = require('../lib/context');
 
-function setupApimTest(done) {
-  fs.writeFileSync(
-    path.resolve(__dirname, '../config/apim.config'),
-    '{"APIMANAGER": "127.0.0.1"}',
-    'utf8'
-  );
-  done();
-}
-
 describe('Context middleware', function() {
-  before(setupApimTest);
 
   describe('Request category variables', function() {
     var app = loopback();

@@ -19,11 +19,8 @@
       "url": "string"
     },
     "document": {
-      "apis": [
-        {
-          "$ref": "string"
-        }
-      ],
+      "apis": 
+        {},
       "info": {
         "name": "string",
         "title": "string",
@@ -31,11 +28,7 @@
       },
       "plans": {
         "gold": {
-          "apis": [
-            {
-              "$ref": "string"
-            }
-          ],
+          "apis": {},
           "rate-limit": {
             "hard-limit": "boolean",
             "value": "string"
