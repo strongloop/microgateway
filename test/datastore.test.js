@@ -2,10 +2,13 @@
 
 var _ = require('lodash');
 var assert = require('assert');
+var fs = require('fs');
+var remove = require('remove');
 var express = require('express');
 var request = require('supertest')('http://localhost:5000');
 var microgw = require('../lib/microgw');
 var apimServer = require('./mock-apim-server/apim-server');
+var snapshotID;
 
 var echoServer = express();
 echoServer.get('/*', function(req, resp) {
@@ -20,6 +23,11 @@ function startEchoServer(done) {
 }
 
 function startAPImServer(done) {
+  try {
+    fs.unlinkSync(__dirname + '/../config/apim.config');
+  } catch(e) {
+    //console.error(e);
+  }
   apimServer.start('127.0.0.1', 8080, done);
 }
 
@@ -30,10 +38,22 @@ function startMicroGateway(done) {
   microgw.start(3000, done);
 }
 
+function cleanupDir(done) {
+  var snapshotdir = __dirname + '/../config/' + snapshotID;
+  try {
+    remove.removeSync(snapshotdir);
+  } catch(e) {
+    console.error(e);
+  }
+  
+  done();
+}
+
 describe('data-store', function() {
   before(startEchoServer);
   before(startAPImServer);
   before(startMicroGateway);
+  after(cleanupDir);
 
   function verifyResponseArray(res, expected) {
     assert.strictEqual(res.length, expected.length);
@@ -57,7 +77,6 @@ describe('data-store', function() {
     }
   }
 
-  var snapshotID;
   it('snapshots should have single current entry with ref count of 1',
     function(done) {
       var expect = [{refcount : '1', current: true}];
@@ -73,7 +92,7 @@ describe('data-store', function() {
         ).end(done);
     }
   );
-  it('current should return current snapshotID and increment ref count',
+  it('current should return current snapshot and increment ref count',
     function(done) {
       var expect = {refcount : '2', current: true};
       request
@@ -81,6 +100,29 @@ describe('data-store', function() {
         .expect(function(res) {
             verifyResponseSingle(res.body.snapshot, expect);
             assert(res.body.snapshot.id === snapshotID); // ID should be same as previous
+          }
+        ).end(done);
+    }
+  );
+  it('release should return current snapshot and decrement ref count',
+    function(done) {
+      var expect = {refcount : '1', current: true};
+      request
+        .get('/api/snapshots/release?id=' + snapshotID)
+        .expect(function(res) {
+            verifyResponseSingle(res.body.snapshot, expect);
+            assert(res.body.snapshot.id === snapshotID); // ID should be same as previous
+          }
+        ).end(done);
+    }
+  );
+  it('release should remove current snapshot and decrement ref count',
+    function(done) {
+      var expect = {snapshot : {}};
+      request
+        .get('/api/snapshots/release?id=' + snapshotID)
+        .expect(function(res) {
+            assert(_.isEqual(expect, res.body));
           }
         ).end(done);
     }
