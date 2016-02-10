@@ -3,6 +3,8 @@
 var express = require('express');
 var request = require('supertest')('http://localhost:3000');
 var microgw = require('../lib/microgw');
+var path = require('path');
+var fs = require('fs');
 
 var echoServer = express();
 echoServer.get('/*', function(req, resp) {
@@ -20,7 +22,17 @@ function startMicroGateway(done) {
   microgw.start(3000, done);
 }
 
+function setupApimTest(done) {
+  fs.writeFileSync(
+    path.resolve(__dirname, '../config/apim.config'),
+    '{"APIMANAGER": "127.0.0.1"}',
+    'utf8'
+  );
+  done();
+}
+
 describe('preflow and flow-engine integration', function() {
+  before(setupApimTest);
   before(startEchoServer);
   before(startMicroGateway);
 
@@ -113,7 +125,7 @@ describe('preflow and flow-engine integration', function() {
 
   var clientSecret3Bad = 'bad_secret';
   it('client_id=' + clientId2 +
-     ' secret=' + clientSecret3Bad + '(query) should not find api -' + 
+     ' secret=' + clientSecret3Bad + '(query) should not find api -' +
      ' bad secret (apim-lookup)',
     function(done) {
       request
@@ -131,7 +143,7 @@ describe('preflow and flow-engine integration', function() {
   });
 
   it('client_id=' + clientIdBad +
-     ' secret=' + clientSecret3a + '(query) should not find api -' + 
+     ' secret=' + clientSecret3a + '(query) should not find api -' +
      ' bad clientID valid secret (apim-lookup)',
     function(done) {
       request
@@ -141,7 +153,7 @@ describe('preflow and flow-engine integration', function() {
   });
 
   it('client_id=' + clientId2 +
-     ' secret=' + clientSecret3a + '(query) should not find api -' + 
+     ' secret=' + clientSecret3a + '(query) should not find api -' +
      ' bad secret name (apim-lookup)',
     function(done) {
       request
@@ -150,7 +162,7 @@ describe('preflow and flow-engine integration', function() {
         .expect(404, done);
   });
 
-  it('client_id=' + clientId2 + ' secret=' + clientSecret3a + 
+  it('client_id=' + clientId2 + ' secret=' + clientSecret3a +
      ' (query) should invoke API3 with extra parm (apim-lookup)',
     function(done) {
       request
@@ -255,7 +267,7 @@ describe('preflow and flow-engine integration', function() {
   });
 
   it('client_id=' + clientId2 +
-     ' secret=' + clientSecret3Bad + '(header) should not find api -' + 
+     ' secret=' + clientSecret3Bad + '(header) should not find api -' +
      ' bad secret (apim-lookup)',
     function(done) {
       request
@@ -277,7 +289,7 @@ describe('preflow and flow-engine integration', function() {
   });
 
   it('client_id=' + clientIdBad +
-     ' secret=' + clientSecret3a + '(header) should not find api -' + 
+     ' secret=' + clientSecret3a + '(header) should not find api -' +
      ' bad clientID valid secret (apim-lookup)',
     function(done) {
       request
@@ -289,7 +301,7 @@ describe('preflow and flow-engine integration', function() {
   });
 
   it('client_id=' + clientId2 +
-     ' secret=' + clientSecret3a + '(header) should not find api -' + 
+     ' secret=' + clientSecret3a + '(header) should not find api -' +
      ' bad secret name (apim-lookup)',
     function(done) {
       request
@@ -300,7 +312,7 @@ describe('preflow and flow-engine integration', function() {
         .expect(404, done);
   });
 
-  it('client_id=' + clientId2 + ' secret=' + clientSecret3a + 
+  it('client_id=' + clientId2 + ' secret=' + clientSecret3a +
      ' (header) should invoke API3 with extra parm (apim-lookup)',
     function(done) {
       request

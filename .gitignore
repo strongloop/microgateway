@@ -1,4 +1,5 @@
 npm-global/
+config/apim.config
 .idea/
 coverage/
 *.iml
