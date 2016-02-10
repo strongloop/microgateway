@@ -120,7 +120,12 @@ module.exports = function(app) {
         loadData(app,
                  apimanager,
                  models,
+<<<<<<< HEAD
+                 definitionsDir,
+                 true); // first call to loadData()
+=======
                  definitionsDir);
+>>>>>>> master
       }
     }
   );
