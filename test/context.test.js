@@ -5,10 +5,22 @@ var assert = require('assert');
 var debug = require('debug')('context-test');
 var loopback = require('loopback');
 var request = require('supertest');
+var fs = require('fs');
+var path = require('path');
 
 var context = require('../lib/context');
 
+function setupApimTest(done) {
+  fs.writeFileSync(
+    path.resolve(__dirname, '../config/apim.config'),
+    '{"APIMANAGER": "127.0.0.1"}',
+    'utf8'
+  );
+  done();
+}
+
 describe('Context middleware', function() {
+  before(setupApimTest);
 
   describe('Request category variables', function() {
     var app = loopback();

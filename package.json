@@ -23,6 +23,7 @@
   "author": "IBM Gateway Team",
   "license": "SEE LICENSE IN LICENSE.txt",
   "devDependencies": {
+    "debug": "^2.2.0",
     "eslint": "^1.10.3",
     "eslint-config-strongloop": "^1.0.2",
     "jscs": "^2.9.0",
@@ -34,18 +35,22 @@
     "supertest": "^1.1.0"
   },
   "dependencies": {
-    "apim-noop": "git+ssh://git@github.ibm.com:apimesh/micro-gw-policy-sample.git",
+    "async": "^1.5.2",
     "auth-header": "^0.2.2",
     "basic-ldap": "git+ssh://git@github.ibm.com:jcbelles/basic-ldap.git",
     "body-parser": "^1.14.2",
     "compression": "^1.6.1",
+    "cors": "^2.7.1",
     "express": "^4.13.4",
-    "flow-engine": "git+ssh://git@github.ibm.com:apimesh/flow-engine.git#develop",
+    "flow-engine": "^1.x",
     "forever-monitor": "^1.7.0",
+    "js-yaml": "^3.5.2",
     "loopback": "^2.26.2",
     "loopback-boot": "^2.16.0",
     "loopback-component-explorer": "^2.3.0",
     "moment": "^2.11.2",
-    "request": "^2.69.0"
+    "request": "^2.69.0",
+    "type-is": "^1.6.11",
+    "yamljs": "^0.2.4"
   }
 }

@@ -1,17 +1,85 @@
 var async = require('async');
 var debug = require('debug')('strong-gateway:data-store');
-//module.exports = function(Dummy) {};
 
+var ALLPLANS = 'ALLPLANS';
+function createProductOptimizedEntry(app, ctx)
+  {
+  }
+  
+function determineNeededSubscriptionOptimizedEntries(app, ctx)
+  {
+  var locals;
+  if (ctx.instance['plan-registration'].id === ALLPLANS)
+    {
+    var query = {};
+    var entries = [];
+    async.series([
+      function(callback) {
+        // find optimized entries to create
+        app.models.product.find(query, function(err, products) {
+          products.forEach(function (product, index, array) 
+            {
+            var plans = JSON.parse(JSON.stringify(product.document.plans));
+            Object.getOwnPropertyNames(plans).forEach(
+              function(propname) 
+                {
+                locals = ripCTX(ctx)
+                //overwrite with specific entry
+                locals.catalog = {};
+                locals.plan = product.document.plans[propname];
+                locals.product = product;
+                locals.plan.id = getPlanID(locals.product, propname);
+                locals.plan.name = propname;
+                entries.push({locals: locals, app: app})
+                });      
+            });
+            callback();
+          });
+          
+      },
+      function(callback) {
+        debug('optimized entries count: ' + entries.length);
+        // create optimized entries
+        entries.forEach(function (entry, index, array)
+          {
+          gatherDataCreateOptimizedEntry(entry.app, entry.locals); 
+          }
+        );
+        callback();
+      }]);
+    }
+  else 
+    {
+    locals = ripCTX(ctx);
+    gatherDataCreateOptimizedEntry(app, locals);  
+    }
+  }
 
-function gatherPieces(app, ctx)
+function ripCTX(ctx)
   {
   var locals = {};
-  locals.ctx = ctx;
+  locals.subscription = {};
+  locals.subscription.id = ctx.instance.id;
   locals.credentials =
-  ctx.instance.application['app-credentials'];
+    ctx.instance.application['app-credentials'];
   locals.plan = ctx.instance['plan-registration'];
   locals.product = ctx.instance['plan-registration'].product;
+  if (locals.plan.plan)
+    {locals.plan.id = getPlanID(locals.product, locals.plan.plan.name);
+     locals.plan.name = locals.plan.plan.name;}
   locals.snapshot = ctx.instance['snapshot-id'];
+  return locals;
+  }
+  
+function getPlanID(product, planname)
+  {
+  debug('product.document.info.name + ":" + product.document.info.version + ":" + planname: ' + 
+    JSON.stringify(product.document.info.name + ":" + product.document.info.version + ":" + planname, null, 4));
+  return product.document.info.name + ":" + product.document.info.version + ":" + planname;
+  }
+
+function gatherDataCreateOptimizedEntry(app, locals)
+  {
   async.series(
     [
       function(callback) {
@@ -57,7 +125,7 @@ function gatherPieces(app, ctx)
         );
       },
       function(callback) {
-        createOptimizedDataEntries(
+        createOptimizedDataEntry(
           app,
           locals,
           function(err) {
@@ -92,7 +160,6 @@ function grabCatalog(app, snapshot, product, cb) {
         return;
       }
       catalog = myproduct.catalog;
-      //console.log('snapshot ' + snapshot + ' id ' + product.id);
       cb(null, catalog);
     }
   );
@@ -112,7 +179,9 @@ function grabOrg(app, snapshot, catalog, cb) {
         cb(err);
         return;
       }
-      org = mycatalog.organization;
+      if (mycatalog)
+        org = mycatalog.organization;
+      else {org={};}
       cb(null, org);
     }
   );
@@ -138,16 +207,28 @@ function grabAPIs(app, snapshot, plan, cb) {
             return;
           }
           listOfApis.forEach(function(DBapi) {
+            if (api.document)
+              {
               if (DBapi.document.info['version'] ===
                 api.document.info['version'] &&
                 DBapi.document.info['x-ibm-name'] ===
                 api.document.info['x-ibm-name']) {
-
-                debug('found api in db: %j', DBapi);
-                apis.push(DBapi);
+                  debug('found api in db: %j', DBapi);
+                  apis.push(DBapi);
+                  }
               }
-            }
-          );
+            else // standard (not in document)
+              {
+              debug('found api: %j', api);
+              if (DBapi.document.info['version'] ===
+                api.info['version'] &&
+                DBapi.document.info['x-ibm-name'] ===
+                api.info['x-ibm-name']) {
+                  debug('found api in db: %j', DBapi);
+                  apis.push(DBapi);
+                  }       
+              }
+          });
           done();
         }
       );
@@ -159,7 +240,7 @@ function grabAPIs(app, snapshot, plan, cb) {
 }
 
 
-function createOptimizedDataEntries(app, pieces, cb) {
+function createOptimizedDataEntry(app, pieces, cb) {
   async.each(
     pieces.credentials,
     function(credential, creddone) { //each clientid
@@ -167,17 +248,19 @@ function createOptimizedDataEntries(app, pieces, cb) {
         pieces.apis,
         function(api, apidone) {  // each api
           var apiPaths = [];
+          var pathsProp = JSON.parse(JSON.stringify(api.document['paths']));
           debug('pathsProp ' +
-                Object.getOwnPropertyNames(api.document['paths']));
-          Object.getOwnPropertyNames(api.document['paths']).forEach(
+                Object.getOwnPropertyNames(pathsProp));
+          Object.getOwnPropertyNames(pathsProp).forEach(
             function(propname) {
               var method = [];
               if (propname.indexOf('/') > -1) {
                 debug('propname: ' + propname);
+                var propnames = JSON.parse(JSON.stringify(api.document.paths[propname]));
                 Object.getOwnPropertyNames(
-                  api.document.paths[propname]).forEach(
+                  propnames).forEach(
                   function(methodname) {
-		    var operation = api.document.paths[propname][methodname];
+		                var operation = propnames[methodname];
                     debug('propname method: %j',
                       methodname);
                     debug('propname operationId: %j',
@@ -230,11 +313,11 @@ function createOptimizedDataEntries(app, pieces, cb) {
         */
           debug('pieces: ' + JSON.stringify(pieces,null,4));
           var newOptimizedDataEntry = {
-            'subscription-id': pieces.ctx.instance.id,
+            'subscription-id': pieces.subscription.id,
             'client-id': credential['client-id'],
             'client-secret': credential['client-secret'],
             'plan-id': pieces.plan.id,
-            'plan-name': pieces.plan.plan.name,
+            'plan-name': pieces.plan.name,
             'product-id': pieces.product.id,
             'product-name': pieces.product.document.info.name,
             'catalog-id': pieces.catalog.id,
@@ -302,5 +385,5 @@ function calculateMatchingScore(apiPath) {
   return pathScore;
 }
 
-exports.gatherPieces = gatherPieces;
-
+exports.determineNeededSubscriptionOptimizedEntries = determineNeededSubscriptionOptimizedEntries;
+exports.createProductOptimizedEntry = createProductOptimizedEntry;
