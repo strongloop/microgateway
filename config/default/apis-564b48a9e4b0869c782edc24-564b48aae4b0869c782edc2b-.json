@@ -527,7 +527,7 @@
                 "version": "1.0.0",
                 "x-ibm-name": "ascents"
             },
-            "paths": {
+             "paths": {
                 "/ascents": {
                     "get": {
                         "deprecated": false,
@@ -569,6 +569,9 @@
                         ]
                     },
                     "post": {
+                        "security": [
+                          { "basic-local": [], "apikeyQueryParameter": [] }
+                        ],
                         "deprecated": false,
                         "description": "Create a Ascent",
                         "parameters": [
@@ -727,6 +730,13 @@
                 }
             ],
             "securityDefinitions": {
+               "basic-local": {
+                    "type": "basic",
+                    "description": "basic auth local ldap no tls",
+                    "x-ibm-authentication-url": {
+                        "url": "ldap://localhost:1389"
+                    }
+                },
                 "apikeyHeader": {
                     "in": "header",
                     "name": "X-IBM-Client-Id",

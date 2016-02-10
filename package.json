@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint ./ && jscs ./",
     "start": "node .",
-    "test": "mocha"
+    "test": "mocha -t 600000"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
     "eslint": "^1.10.3",
     "eslint-config-strongloop": "^1.0.2",
     "jscs": "^2.9.0",
+    "ldapjs": "^1.0.0",
     "lodash": "^4.2.1",
     "mocha": "^2.4.5",
     "should": "^8.2.1",
@@ -36,6 +37,7 @@
   "dependencies": {
     "async": "^1.5.2",
     "auth-header": "^0.2.2",
+    "basic-ldap": "git+ssh://git@github.ibm.com:jcbelles/basic-ldap.git",
     "body-parser": "^1.14.2",
     "compression": "^1.6.1",
     "cors": "^2.7.1",

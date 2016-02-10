@@ -105,10 +105,9 @@ module.exports = function(app) {
     function(err, results) {
       if (!err) {
         loadData(app,
-                    apimanager,
-                    models,
-                    definitionsDir,
-                    true); // first call to loadData()
+                 apimanager,
+                 models,
+                 definitionsDir);
       }
     }
   );
@@ -120,10 +119,8 @@ module.exports = function(app) {
  * @param {Object} config - configuration pointing to APIm server
  * @param {Array} models - instances of ModelType to populate with data
  * @param {string} currdir - current snapshot symbolic link path 
- * @param {boolean} initial - whether or not this is the first call to
- *                            loadData()
  */
-function loadData(app, apimanager, models, currdir, initial) {
+function loadData(app, apimanager, models, currdir) {
   var snapshotID, snapdir;
   async.series(
     [
@@ -146,7 +143,6 @@ function loadData(app, apimanager, models, currdir, initial) {
                    currdir,
                    snapdir,
                    snapshotID,
-                   initial,
                    callback);
       }
     ],
@@ -167,8 +163,7 @@ function scheduleLoadData(app, apimanager, models, dir) {
              app,
              apimanager,
              models,
-             dir,
-             false); // not first call to loadData()
+             dir);
 }
 
 /**
@@ -257,11 +252,9 @@ function pullFromAPIm(apimanager, uid, cb) {
  * @param {string} currdir - current snapshot symbolic link path
  * @param {string} snapdir - path to directory containing persisted data to load
  * @param {string} uid - snapshot identifier
- * @param {boolean} initial - whether or not this is the first call to
- *                            loadConfig()
  * @param {callback} cb - callback that handles error or successful completion
  */
-function loadConfig(app, models, currdir, snapdir, uid, initial, cb) {
+function loadConfig(app, models, currdir, snapdir, uid, cb) {
   debug('loadConfig entry');
 
   var dirToLoad = (snapdir === '') ?
@@ -282,8 +275,7 @@ function loadConfig(app, models, currdir, snapdir, uid, initial, cb) {
               cb(err);
               return;
             }
-            if (initial) 
-              process.send({LOADED: true});
+            process.send({LOADED: true});
             // only update pointer to latest configuration
             // when latest configuration successful loaded
             if (snapdir === dirToLoad) {
