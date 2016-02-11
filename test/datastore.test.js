@@ -1,24 +1,13 @@
 'use strict';
 
-var _ = require('lodash');
-var assert = require('assert');
-var fs = require('fs');
-var express = require('express');
-var request = require('supertest')('http://localhost:5000');
-var microgw = require('../lib/microgw');
-var apimServer = require('./mock-apim-server/apim-server');
-
-var echoServer = express();
-echoServer.get('/*', function(req, resp) {
-  resp.send(req.url);
-});
-echoServer.post('/*', function(req, resp) {
-  req.pipe(resp);
-});
-
-function startEchoServer(done) {
-  echoServer.listen(8889, done);
-}
+let _ = require('lodash');
+let assert = require('assert');
+let fs = require('fs');
+let path = require('path');
+let echo = require('./support/echo-server');
+let supertest = require('supertest');
+let microgw = require('../lib/microgw');
+let apimServer = require('./support/mock-apim-server/apim-server');
 
 function startAPImServer(done) {
   try {
@@ -37,10 +26,45 @@ function startMicroGateway(done) {
 }
 
 describe('data-store', function() {
-  before(startEchoServer);
-  before(startAPImServer);
-  before(startMicroGateway);
-  var snapshotID;
+//  before(startAPImServer);
+//  before(startMicroGateway);
+  let request;
+  let snapshotID;
+  before((done) => {
+    const writeconf = () => (new Promise((resolve, reject) => {
+        const confpath = path.resolve(__dirname, '../config/apim.config');
+        process.env['DATASTORE_PORT'] = 5000;
+        fs.writeFile(confpath, 
+          '{' +
+          '"APIMANAGER": "127.0.0.1",' +
+          '"APIMANAGER_PORT": 8080' +
+          '}',
+          'utf8', (err) => {
+            if (err) reject(err);
+            else resolve();
+          }
+        );
+      })
+    );
+    writeconf()
+      .then(() => microgw.start(3000))
+      .then(() => echo.start(8889))
+      .then(() => apimServer.start('127.0.0.1', 8080))
+      .then(() => {
+        request = supertest('http://localhost:5000');
+      })
+      .then(done)
+      .catch((err) => {
+        console.error(err);
+        done(err);
+      });
+  });
+
+  after((done) => {
+    echo.stop()
+      .then(() => microgw.stop())
+      .then(done, done);
+  });
 
   function verifyResponseArray(res, expected) {
     assert.strictEqual(res.length, expected.length);
