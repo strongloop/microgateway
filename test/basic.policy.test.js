@@ -1,5 +1,7 @@
 'use strict';
 
+let fs = require('fs');
+let path = require('path');
 let express = require('express');
 let supertest = require('supertest');
 let echo = require('./support/echo-server');
@@ -12,7 +14,15 @@ describe('basic auth policy', function() {
   let request;
   before((done) => {
     console.log('Starting micro-gateway');
-    mg.start(3000)
+    const writeconf = () => (new Promise((resolve, reject) => {
+      const confpath = path.resolve(__dirname, '../config/apim.config');
+      fs.writeFile(confpath, '{"APIMANAGER": "127.0.0.1"}', 'utf8', (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    }));
+    writeconf()
+      .then(() => mg.start(3000))
       .then(() => {
         console.log('Starting LDAP server');
         return ldap.start(1389);
@@ -24,8 +34,9 @@ describe('basic auth policy', function() {
       .then(() => {
         request = supertest('http://localhost:3000');
         console.log ('setup test1');
-        done();
-      }).catch((err) => {
+      })
+      .then(done)
+      .catch((err) => {
         console.error(err);
         done(err);
       });
