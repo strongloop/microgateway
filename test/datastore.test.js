@@ -34,11 +34,9 @@ describe('data-store', function() {
     const writeconf = () => (new Promise((resolve, reject) => {
         const confpath = path.resolve(__dirname, '../config/apim.config');
         process.env['DATASTORE_PORT'] = 5000;
+        process.env['APIMANAGER_PORT'] = 8080;
         fs.writeFile(confpath, 
-          '{' +
-          '"APIMANAGER": "127.0.0.1",' +
-          '"APIMANAGER_PORT": 8080' +
-          '}',
+          '{"APIMANAGER": "127.0.0.1"}',
           'utf8', (err) => {
             if (err) reject(err);
             else resolve();
@@ -47,9 +45,9 @@ describe('data-store', function() {
       })
     );
     writeconf()
+      .then(() => apimServer.start('127.0.0.1', 8080))
       .then(() => microgw.start(3000))
       .then(() => echo.start(8889))
-      .then(() => apimServer.start('127.0.0.1', 8080))
       .then(() => {
         request = supertest('http://localhost:5000');
       })
