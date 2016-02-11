@@ -64,9 +64,12 @@ function ripCTX(ctx)
     ctx.instance.application['app-credentials'];
   locals.plan = ctx.instance['plan-registration'];
   locals.product = ctx.instance['plan-registration'].product;
-  if (locals.plan.plan)
-    {locals.plan.id = getPlanID(locals.product, locals.plan.plan.name);
-     locals.plan.name = locals.plan.plan.name;}
+  if (locals.plan.plan) {
+    locals.plan.id = getPlanID(locals.product, locals.plan.plan.name);
+    locals.plan.name = locals.plan.plan.name;
+    locals.plan.rateLimit =
+      locals.product.document.plans[locals.plan.name]['rate-limit'];
+  }
   locals.snapshot = ctx.instance['snapshot-id'];
   return locals;
   }
@@ -301,6 +304,7 @@ function createOptimizedDataEntry(app, pieces, cb) {
         "product-name": "string",
         "plan-id": "string",
         "plan-name": "string",
+        "plan-rate-limit": {},
         "api-id": "string",
         "api-base-path": "string",
         "api-paths": [{
@@ -318,6 +322,7 @@ function createOptimizedDataEntry(app, pieces, cb) {
             'client-secret': credential['client-secret'],
             'plan-id': pieces.plan.id,
             'plan-name': pieces.plan.name,
+            'plan-rate-limit': pieces.plan.rateLimit,
             'product-id': pieces.product.id,
             'product-name': pieces.product.document.info.name,
             'catalog-id': pieces.catalog.id,
