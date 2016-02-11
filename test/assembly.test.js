@@ -11,20 +11,21 @@ describe('preflow and flow-engine integration', function() {
 
   let request;
   before((done) => {
-    mg.start(3000)
+    const writeconf = () => (new Promise((resolve, reject) => {
+      const confpath = path.resolve(__dirname, '../config/apim.config');
+      fs.writeFile(confpath, '{"APIMANAGER": "127.0.0.1"}', 'utf8', (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    }));
+    writeconf()
+      .then(() => mg.start(3000))
       .then(() => echo.start(8889))
       .then(() => {
         request = supertest('http://localhost:3000');
         console.log ('setup test1');
       })
-      .then(() => {
-        fs.writeFileSync(
-          path.resolve(__dirname, '../config/apim.config'),
-          '{"APIMANAGER": "127.0.0.1"}',
-          'utf8'
-        );
-        done();
-      })
+      .then(done)
       .catch((err) => {
         console.error(err);
         done(err);
