@@ -53,6 +53,7 @@ module.exports = function(app) {
   models.push(new ModelType('product', 'products-'));
   models.push(new ModelType('api', 'apis-'));
   models.push(new ModelType('subscription', 'subs-'));
+  models.push(new ModelType('tlsprofile', 'tlsprofs-'));
   // add new models above this line
   models.push(new ModelType('optimizedData', 'dummy'));
   models.push(new ModelType('snapshot', 'dummy')); // hack, removed later

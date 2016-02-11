@@ -9,7 +9,8 @@ module.exports = function(Snapshot) {
                       'catalog',
                       'product',
                       'api',
-                      'subscription'];
+                      'subscription',
+                      'tlsprofile'];
  
         var query = {
           'snapshot-id' : ctx.instance.id
