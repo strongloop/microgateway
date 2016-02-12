@@ -141,3 +141,32 @@ exports.getTlsProfile = function(snapshot, tlsProfleName) {
     });
   });
 }
+
+exports.getRegistry = function(snapshot, registryName) {
+  debug('getRegistry entry snapshot:' + snapshot +
+                              '\n registryName:' + registryName );
+  // build request to send to data-store
+  let snapshotFilter = `{"snapshot-id": "${snapshot }"}`;
+  let registryNameFilter = `{"name": "${registryName }"}`;
+  let queryfilter = `{"where": { "and":[${snapshotFilter}, ${registryNameFilter}]}}`;
+  const port = process.env['DATASTORE_PORT'];
+
+  let queryurl = `http://${host}:${port}/api/registries?filter=${encodeURIComponent(queryfilter)}`;
+
+  // send request to data-store to get the requested Registry Profile
+  // for matching API(s)
+  return new Promise((resolve, reject) => {
+    request({url: queryurl}, function (error, response, body) {
+      debug('error: ', error);
+      debug('body: %j', body);
+      debug('response: %j', response);
+      // exit early on error
+      if (error) {
+        reject(new Error(error));
+        return;
+      }
+      resolve(JSON.parse(body));
+
+    });
+  });
+}
