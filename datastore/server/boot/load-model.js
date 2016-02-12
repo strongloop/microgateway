@@ -13,9 +13,6 @@ var rootConfigPath = '/../../../config/';
 var defaultDefinitionsDir = __dirname + rootConfigPath + 'default';
 var definitionsDir = defaultDefinitionsDir;
 
-var subscriptionsFilename = 'subscriptions.json';
-var subscriptionsConfig = __dirname + rootConfigPath + subscriptionsFilename;
-
 /**
  * Creates a model type 
  * @class
@@ -474,43 +471,46 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
           }
         );
       },
-    // Try to read a static subscriptions..
+    // Hardcode default subscription for all plans
     function(seriesCallback) {
-          var file = subscriptionsConfig;
-          var subscriptions;
-          try {
-            // read the content of the files into memory
-            // and parse as JSON
-            subscriptions = JSON.parse(fs.readFileSync(file));
-            debug('subscriptions filename: ' + file);
-            debug('subscriptions file: ' + 
-              JSON.stringify(subscriptions, null, 4));
-            async.forEach(subscriptions,
-              function(subscription, subsCallback) 
-                {
-                var modelname = 'subscription';
-                subscription['snapshot-id'] = uid;
-                app.models[modelname].create(
-                  subscription,
-                  function(err, mymodel) {
-                    if (err) {
-                      console.error(err);
-                      subsCallback(err);
-                      return;
-                    }
-                    debug('%s created: %j',
-                          modelname,
-                          mymodel);
-                    subsCallback();
-                  }
-              );
-                });
-            
-          } catch(e) {
-            seriesCallback(e);
-            return;
-          }
-          seriesCallback();
+      var subscriptions = [
+            {
+            "catalog": {},
+            "id": "test subscription",
+            "application": {
+              "id": "app name",
+              "app-credentials": [{
+                "client-id": "default",
+                "client-secret": "SECRET"
+              }]
+            },
+            "plan-registration": {
+              "id": "ALLPLANS"
+                }
+            }
+            ];
+
+        async.forEach(subscriptions,
+          function(subscription, subsCallback) 
+            {
+            var modelname = 'subscription';
+            subscription['snapshot-id'] = uid;
+            app.models[modelname].create(
+              subscription,
+              function(err, mymodel) {
+                if (err) {
+                  console.error(err);
+                  subsCallback(err);
+                  return;
+                }
+                debug('%s created: %j',
+                      modelname,
+                      mymodel);
+                subsCallback();
+              }
+            );
+          });
+        seriesCallback();
     }],
     function (err)
       {
