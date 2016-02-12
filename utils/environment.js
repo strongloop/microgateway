@@ -5,6 +5,7 @@ var configFileName = 'apim.config';
 var rootConfigPath = '/../config/';
 var configFile = __dirname + rootConfigPath + configFileName;
 var APIMANAGER='APIMANAGER';
+var APIMANAGER_PORT='APIMANAGER_PORT';
 var CONFIGDIR='CONFIG_DIR';
 var DATASTORE_PORT='DATASTORE_PORT';
 var PORT='PORT';
@@ -30,6 +31,7 @@ function getVariable(variable, fncallback, endcallback)
 	{
 	var value=null;
 	testVar(variable);
+	debug('Looking for variable: ', variable);
 	async.series([
         function(callback) {
 				// check env vars... 
@@ -79,6 +81,7 @@ function testVar(variable)
 	{
 	switch(variable) {
 		case APIMANAGER:
+		case APIMANAGER_PORT:
 		case CONFIGDIR:
 		case DATASTORE_PORT:
 		case PORT:
@@ -93,6 +96,7 @@ function testVar(variable)
 exports.getVariable = getVariable;
 exports.setConfigFileVariable = setConfigFileVariable;
 exports.APIMANAGER = APIMANAGER;
+exports.APIMANAGER_PORT = APIMANAGER_PORT;
 exports.CONFIGDIR = CONFIGDIR;
 exports.DATASTORE_PORT = DATASTORE_PORT;
 exports.PORT = PORT;

@@ -45,6 +45,10 @@
     "dataSource": "db",
     "public": true
   },
+  "tlsprofile": {
+    "dataSource": "db",
+    "public": true
+  },
   "optimizedData": {
     "dataSource": "db",
     "public": true

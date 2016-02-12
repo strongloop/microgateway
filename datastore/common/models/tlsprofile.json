@@ -1,0 +1,45 @@
+{
+  "name": "tlsprofile",
+  "base": "PersistedModel",
+  "idInjection": false,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "dummyid": {
+      "type": "number",
+      "id": true
+    },
+    "id": {
+      "type": "string"
+    },
+    "snapshot-id": {
+      "type": "string"
+    },
+    "url": "string",
+    "name": "string",
+    "title": "string",
+    "description": "string",
+    "public": "boolean",
+    "ciphers": [
+      "string"
+    ],
+    "protocols": [
+      "string"
+    ],
+    "certs": [
+      {
+        "name": "string",
+        "cert": "string",
+        "cert-type": "string",
+        "cert-id": "string"
+      }
+    ],
+    "mutual-auth": "boolean",
+    "private-key": "string"
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}
