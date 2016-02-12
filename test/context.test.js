@@ -10,17 +10,7 @@ var path = require('path');
 
 var context = require('../lib/context');
 
-function setupApimTest(done) {
-  fs.writeFileSync(
-    path.resolve(__dirname, '../config/apim.config'),
-    '{"APIMANAGER": "127.0.0.1"}',
-    'utf8'
-  );
-  done();
-}
-
 describe('Context middleware', function() {
-  before(setupApimTest);
 
   describe('Request category variables', function() {
     var app = loopback();
@@ -279,17 +269,17 @@ describe('Context middleware', function() {
 
       it('should work with URL w/o query params', function(done) {
         apiBasePath = '/foo';
-        expectOpPath = '/bar';
+        expectOpPath = '/foo/bar';
         request(myapp)
-          .get(apiBasePath + expectOpPath)
+          .get(expectOpPath)
           .expect(200, 'done', done);
       });
 
       it('should work with URL w/ query params', function(done) {
         apiBasePath = '/foo';
-        expectOpPath = '/bar';
+        expectOpPath = '/foo/bar';
         request(myapp)
-          .get(apiBasePath + expectOpPath + '?name=hello')
+          .get(expectOpPath + '?name=hello')
           .expect(200, 'done', done);
       });
 

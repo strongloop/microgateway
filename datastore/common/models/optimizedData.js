@@ -4,55 +4,57 @@ var debug = require('debug')('strong-gateway:data-store');
 var ALLPLANS = 'ALLPLANS';
 function createProductOptimizedEntry(app, ctx)
   {
+  //console.log('ctx: ' + JSON.stringify(ctx, null, 4));
   }
   
 function determineNeededSubscriptionOptimizedEntries(app, ctx)
   {
   var locals;
-  if (ctx.instance['plan-registration'].id === ALLPLANS)
+  locals = ripCTX(ctx);
+  if (!process.env.APIMANAGER)
     {
-    var query = {};
-    var entries = [];
-    async.series([
-      function(callback) {
-        // find optimized entries to create
-        app.models.product.find(query, function(err, products) {
-          products.forEach(function (product, index, array) 
-            {
-            var plans = JSON.parse(JSON.stringify(product.document.plans));
-            Object.getOwnPropertyNames(plans).forEach(
-              function(propname) 
-                {
-                locals = ripCTX(ctx)
-                //overwrite with specific entry
-                locals.catalog = {};
-                locals.plan = product.document.plans[propname];
-                locals.product = product;
-                locals.plan.id = getPlanID(locals.product, propname);
-                locals.plan.name = propname;
-                entries.push({locals: locals, app: app})
-                });      
-            });
-            callback();
-          });
-          
-      },
-      function(callback) {
-        debug('optimized entries count: ' + entries.length);
-        // create optimized entries
-        entries.forEach(function (entry, index, array)
-          {
-          gatherDataCreateOptimizedEntry(entry.app, entry.locals); 
-          }
-        );
-        callback();
-      }]);
+    var planid = ctx.instance['plan-registration'].id;
+    findPlansToAddSubscriptions(app, locals, planid)
     }
   else 
     {
-    locals = ripCTX(ctx);
+    //specific subscription from APIm
     gatherDataCreateOptimizedEntry(app, locals);  
     }
+  }
+  
+function findPlansToAddSubscriptions(app, passed, planid)
+  {
+  var locals = passed;
+  var productquery = {}; // look at all products
+  // find optimized entries to create
+  app.models.product.find(productquery, function(err, products) {
+    async.forEach(products,
+      function (product, productCallback) 
+      {
+      var plans = JSON.parse(JSON.stringify(product.document.plans));
+      async.forEach(Object.getOwnPropertyNames(plans),
+        function(propname, propCallback) 
+          {
+          //overwrite with specific entry
+          locals.catalog = {};
+          locals.product = product;
+          locals.plan = {};
+          locals.plan.apis = product.document.plans[propname].apis;
+          locals.plan.name = propname;
+          locals.plan.id = getPlanID(locals.product, propname);
+          if (planid === ALLPLANS || locals.plan.id === planid)
+            {
+            gatherDataCreateOptimizedEntry(app, locals, propCallback); 
+            }
+          else
+            {
+            propCallback();
+            }
+          });
+      productCallback();
+      });
+    });
   }
 
 function ripCTX(ctx)
@@ -62,11 +64,15 @@ function ripCTX(ctx)
   locals.subscription.id = ctx.instance.id;
   locals.credentials =
     ctx.instance.application['app-credentials'];
-  locals.plan = ctx.instance['plan-registration'];
   locals.product = ctx.instance['plan-registration'].product;
-  if (locals.plan.plan)
-    {locals.plan.id = getPlanID(locals.product, locals.plan.plan.name);
-     locals.plan.name = locals.plan.plan.name;}
+  locals.plan = {};
+  if (ctx.instance['plan-registration'].apis && ctx.instance['plan-registration'].plan)
+    {
+    locals.plan.apis = ctx.instance['plan-registration'].apis;
+    locals.plan.plan = ctx.instance['plan-registration'].plan;
+    locals.plan.id = getPlanID(locals.product, locals.plan.plan.name);
+    locals.plan.name = locals.plan.plan.name;
+    }
   locals.snapshot = ctx.instance['snapshot-id'];
   return locals;
   }
@@ -78,7 +84,7 @@ function getPlanID(product, planname)
   return product.document.info.name + ":" + product.document.info.version + ":" + planname;
   }
 
-function gatherDataCreateOptimizedEntry(app, locals)
+function gatherDataCreateOptimizedEntry(app, locals, gatherCallback)
   {
   async.series(
     [
@@ -142,6 +148,8 @@ function gatherDataCreateOptimizedEntry(app, locals)
       if (err) {
         console.error(err);
       }
+      if (gatherCallback)
+        gatherCallback();
     }
   );
 }

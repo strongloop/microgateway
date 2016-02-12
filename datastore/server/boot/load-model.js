@@ -14,11 +14,6 @@ var rootConfigPath = __dirname + '/../../../config/';
 var defaultDefinitionsDir = rootConfigPath + 'default';
 var definitionsDir = defaultDefinitionsDir;
 
-var subscriptionsFilename = 'subscriptions.json';
-var subscriptionsConfig = rootConfigPath + subscriptionsFilename;
-
-var laptopexperience = true;
-
 /**
  * Creates a model type 
  * @class
@@ -67,43 +62,14 @@ module.exports = function(app) {
         // if no apim.config or ENV var, load default dir.. APIm 
         // if apim.config or ENV var, 
         //    if apimanager specified, dir = "last known config"..
-        //    if no apimanager specified, dir will be loaded.. 
-        environment.getVariable(
-          CONFIGDIR,
-          function(value) {
-            // Load local files...
-            if (value) {
-              definitionsDir=value;
-            }
-          },
-          callback
-        );
-      },
-      function(callback) {
-        // get apimanager ip
-        // if no apim.config or ENV var, load what you have
-        // if apim.config or ENV var, grab fresh data if you can
-        environment.getVariable(
-          APIMANAGER,
-          function(value) {
-            apimanager.ip = value;
-            if (apimanager.ip) {
-              laptopexperience=false;
-              process.env['ROOTCONFIGDIR'] = rootConfigPath;
-            }
-          },
-          callback
-        );
-      },
-      function(callback) {
-        // get apimanager port
-        environment.getVariable(
-          APIMANAGER_PORT,
-          function(value) {
-            apimanager.port = value;
-          },
-          callback
-        );
+        //    if no apimanager specified, dir will be loaded..
+        if (process.env[CONFIGDIR])
+          definitionsDir = process.env[CONFIGDIR];
+        else {
+          process.env['ROOTCONFIGDIR'] = rootConfigPath;
+          definitionsDir = defaultDefinitionsDir;
+        }
+        callback();
       },
       // stage the models
       function(callback) {
@@ -171,7 +137,7 @@ function loadData(app, apimanager, models, currdir) {
 }
 
 function scheduleLoadData(app, apimanager, models, dir) {
-  if (!laptopexperience)
+  if (process.env[APIMANAGER])
     setTimeout(loadData,
              15 * 1000, // 15 seconds TODO: make configurable
              app,
@@ -228,8 +194,8 @@ function pullFromAPIm(apimanager, uid, cb) {
         }
 
         var options = {};
-        options['host'] = apimanager.ip;
-        options['port'] = apimanager.port;
+        options['host'] = process.env[APIMANAGER];
+        options['port'] = process.env[APIMANAGER_PORT];
         options['outdir'] = snapdir;
         debug('apimpull start');
         apimpull(options,function(err, response) {
@@ -341,8 +307,7 @@ function loadConfigFromFS(app, models, dir, uid, cb) {
       debug('file match jsonFile: ', file.match(jsonFile));
       debug('file match yamlFile: ', file.match(yamlFile));
       // apim pull scenario (only json, no yaml)
-      if (!laptopexperience && 
-          file.match(jsonFile)) {
+      if (process.env[APIMANAGER] && file.match(jsonFile)) {
         for(var i = 0; i < models.length; i++) {
           if(file.indexOf(models[i].prefix) > -1) {
             debug('%s file: %s', models[i].name, file);
@@ -352,21 +317,20 @@ function loadConfigFromFS(app, models, dir, uid, cb) {
         }
       }
       // laptop experience scenario (only yaml, no json)
-      if (laptopexperience && 
-          file.match(yamlFile)) {
+      // might want to support json for laptop as well
+      else if (file.match(yamlFile)) {
         YAMLfiles.push(file);
       }
     }
   );
   
-  if (laptopexperience) {
-    populateModelsWithLocalData(app, YAMLfiles, dir, cb);
-  }
-  else {
+  if (process.env[APIMANAGER]) {
     // populate data-store models with the file contents
     populateModelsWithAPImData(app, models, dir, uid, cb);
   }
-  
+  else {
+    populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb);
+  }
 }
 
 function createProductID(product)
@@ -386,8 +350,9 @@ function createAPIID(api)
  * @param {string} dir - path to directory containing persisted data to load
  * @param {callback} cb - callback that handles error or successful completion
  */
-function populateModelsWithLocalData(app, YAMLfiles, dir, cb) {
+function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
   debug('populateModelsWithLocalData entry');
+  var apis = {};
   async.series([
     function(seriesCallback) {
       async.forEach(YAMLfiles,
@@ -427,21 +392,20 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, cb) {
             var entry = {};
             // looks like a product
             if (readfile.product) {
-              model.name = 'product';
-              entry.id = createProductID(readfile)
-              entry.document = readfile;
-              entry.document = expandProductData(readfile, dir);
+              console.log('product found: skipping')
             }
             // looks like an API
             if (readfile.swagger) {
               model.name = 'api';
               entry.id = createAPIID(readfile);
               entry.document = expandAPIData(readfile, dir);
+              apis[entry.document.info['x-ibm-name']] = entry.document;
             }
             
             if (model.name) {
               // no catalog
               entry.catalog = {};
+              entry['snapshot-id'] = uid;
               app.models[model.name].create(
                 entry,
                 function(err, mymodel) {
@@ -461,48 +425,96 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, cb) {
               fileCallback();
             }
           },
-          function(err) {
-            debug('populateModelsWithLocalData exit');
-            seriesCallback();
-          }
+          function(err) {  }
       ); 
+      seriesCallback();
     },
-    // Try to read a static subscriptions..
+    // create product with all the apis defined
     function(seriesCallback) {
-          var file = subscriptionsConfig;
-          var subscriptions;
-          try {
-            // read the content of the files into memory
-            // and parse as JSON
-            subscriptions = JSON.parse(fs.readFileSync(file));
-            debug('subscriptions filename: ' + file);
-            debug('subscriptions file: ' + 
-              JSON.stringify(subscriptions, null, 4));
-            async.forEach(subscriptions,
-              function(subscription, subsCallback) 
-                {
-                var modelname = 'subscription';
-                app.models[modelname].create(
-                  subscription,
-                  function(err, mymodel) {
-                    if (err) {
-                      console.error(err);
-                      subsCallback(err);
-                      return;
-                    }
-                    debug('%s created: %j',
-                          modelname,
-                          mymodel);
-                    subsCallback();
-                  }
-              );
-                });
-            
-          } catch(e) {
-            seriesCallback(e);
-            return;
+        var entry = {};
+        // no catalog
+        entry.catalog = {};
+        entry['snapshot-id'] = uid;
+        entry.document = 
+          {
+          "product": "1.0.0",
+          "info": {
+            "name": "static product",
+            "version": "1.0.0",
+            "title": "static-product"
+          },
+          "visibility": {
+            "view": {
+              "type": "public"
+            },
+            "subscribe": {
+              "type": "authenticated"
+            }
+          },
+          "apis": apis,
+          "plans": {
+            "default": {
+              "apis": apis
+            }
           }
+        }
+        debug('creating static product and attaching apis: ' + JSON.stringify(entry, null, 4))
+
+        app.models['product'].create(
+          entry,
+          function(err, mymodel) {
+            if (err) {
+              console.error(err);
+              seriesCallback(err);
+              return;
+            }
+            debug('%s created: %j',
+                  'product',
+                  mymodel);
           seriesCallback();
+          }
+        );
+      },
+    // Hardcode default subscription for all plans
+    function(seriesCallback) {
+      var subscriptions = [
+            {
+            "catalog": {},
+            "id": "test subscription",
+            "application": {
+              "id": "app name",
+              "app-credentials": [{
+                "client-id": "default",
+                "client-secret": "SECRET"
+              }]
+            },
+            "plan-registration": {
+              "id": "ALLPLANS"
+                }
+            }
+            ];
+
+        async.forEach(subscriptions,
+          function(subscription, subsCallback) 
+            {
+            var modelname = 'subscription';
+            subscription['snapshot-id'] = uid;
+            app.models[modelname].create(
+              subscription,
+              function(err, mymodel) {
+                if (err) {
+                  console.error(err);
+                  subsCallback(err);
+                  return;
+                }
+                debug('%s created: %j',
+                      modelname,
+                      mymodel);
+                subsCallback();
+              }
+            );
+          });
+        seriesCallback();
     }],
     function (err)
       {
@@ -511,23 +523,52 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, cb) {
     );
 }
 
+function findAndReplace(object, value, replacevalue){
+  for(var x in object){
+    if(typeof object[x] == 'object'){
+      findAndReplace(object[x], value, replacevalue);
+    }
+    if(typeof object[x] === 'string' && object[x].indexOf(value) > -1){ 
+      debug('found variable to replace: ' + value + ' with ' + replacevalue);
+      object[x] = object[x].replace(value, replacevalue);
+    }
+  }
+  return object;
+}
+
 function expandAPIData(apidoc, dir)
   {
   // add the assembly
-  if (apidoc['x-ibm-configuration'] && 
-      apidoc['x-ibm-configuration'].assembly && 
+  if (apidoc['x-ibm-configuration'])
+    {
+    if (apidoc['x-ibm-configuration'].assembly && 
       apidoc['x-ibm-configuration'].assembly['$ref']) {
       var assemblyFile = path.join(dir, 
         apidoc['x-ibm-configuration'].assembly['$ref']);
       var assembly = YAML.load(assemblyFile);
       apidoc['x-ibm-configuration'].assembly = assembly;
-  }
+      }
+    if (apidoc['x-ibm-configuration'].properties)
+      {
+      Object.getOwnPropertyNames(apidoc['x-ibm-configuration'].properties).forEach(
+        function (property) 
+          {
+          debug('property: ' + property)
+          debug('apidoc[x-ibm-configuration][properties][property][value]: ' + JSON.stringify(apidoc['x-ibm-configuration']['properties'][property]['value']))
+          debug('before apidoc: ' + JSON.stringify(apidoc))
+          var propertyvalue = '$(' + property + ')';
+          debug('property: ' + propertyvalue);
+          apidoc = findAndReplace(apidoc, propertyvalue, apidoc['x-ibm-configuration']['properties'][property]['value'])
+          debug('after apidoc: ' + JSON.stringify(apidoc))
+          });
+      }
+    }
   return apidoc;
   }
 function loadAPIsFromYAML(listOfAPIs, dir)
   {
-  //var apis = [];
-  var summaryAPIs = [];
+  var apis = [];
+  //var summaryAPIs = [];
   for(var i = 0; i < listOfAPIs.length; i++) {
     var apiFile = path.join(dir, 
                             listOfAPIs[i]['$ref']);
@@ -539,33 +580,14 @@ function loadAPIsFromYAML(listOfAPIs, dir)
       api = YAML.load(apiFile+'.yaml');
     }
     //scope data down
-    var summary = {id: createAPIID(api),info: api.info};
-    summaryAPIs.push(summary);
-    //apis.push(api);
+    //var summary = {id: createAPIID(api),info: api.info};
+    //summaryAPIs.push(summary);
+    apis.push(api);
     }
-  return summaryAPIs;
+  //return summaryAPIs;
+  return apis;
   }
   
-function expandProductData(productdoc, dir)
-  {
-    // add the apis
-    var apisInProduct = productdoc['apis'];
-    if (apisInProduct) {
-      var apis = loadAPIsFromYAML(apisInProduct, dir)
-      productdoc['apis'] = apis;
-    }
-    // add the plans.apis
-    var plans = JSON.parse(JSON.stringify(productdoc.plans));
-    debug('plans: ' + JSON.stringify(plans));
-    debug('plans props: ' + Object.getOwnPropertyNames(plans).length);
-    Object.getOwnPropertyNames(plans).forEach(
-      function(propname) 
-      {
-      var apisInProductPlan = productdoc.plans[propname]['apis'];
-      productdoc.plans[propname]['apis'] = loadAPIsFromYAML(apisInProductPlan, dir)
-      });      
-    return productdoc;
-  }
 
 /**
  * Populates data-store models with persisted content

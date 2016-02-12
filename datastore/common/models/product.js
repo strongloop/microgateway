@@ -11,7 +11,7 @@ module.exports = function(Products) {
       if (ctx.isNewInstance) {
         debug('new product received: ',
             JSON.stringify(ctx.instance,null,4));
-        //OptimizedData.createProductOptimizedEntry(app, ctx);
+        OptimizedData.createProductOptimizedEntry(app, ctx);
       }
       next();
     }
