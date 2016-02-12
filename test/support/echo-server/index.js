@@ -2,12 +2,33 @@
 
 let express = require('express');
 let app = express();
+let ah = require('auth-header');
+
+app.get('/auth', function(req, resp) {
+  var results = ah.parse(req.get('authorization')).values;
+  var auth = results.length === 1 ? results[0] : null;
+  if (auth && auth.scheme == 'Basic') {
+    const t = (new Buffer(auth.token, 'base64')).toString('utf-8');
+    const user = t.split(':');
+    if (user[0] === 'root' && user[1] === 'Hunter2') {
+      resp.sendStatus(200);
+    } else {
+      resp.sendStatus(401);
+    }
+  } else {
+    resp.sendStatus(401);
+  }
+});
 
 app.get('/*', function(req, resp) {
   resp.send(req.url);
 });
 
 app.post('/*', function(req, resp) {
+  req.pipe(resp);
+});
+
+app.put('/*', function(req, resp) {
   req.pipe(resp);
 });
 
