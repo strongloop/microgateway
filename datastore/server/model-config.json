@@ -49,6 +49,10 @@
     "dataSource": "db",
     "public": true
   },
+  "registry": {
+    "dataSource": "db",
+    "public": true
+  },
   "optimizedData": {
     "dataSource": "db",
     "public": true
