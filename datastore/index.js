@@ -31,6 +31,14 @@ exports.start = function(fork) {
         }
       });
 
+      child.on('stderr', function(data) {
+        process.stderr.write(data);
+      });
+
+      child.on('stdout', function(data) {
+        process.stdout.write(data);
+      });
+
       child.start();
     } else {
       process.send = function(msg) {
