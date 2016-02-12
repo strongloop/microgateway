@@ -93,10 +93,15 @@ produces:
     - application/json
 schemes:
     - https
+security:
+    -
+        apikeyHeader: []
+    -
+        apikeyQueryParameter: []
 securityDefinitions:
     apikeyHeader:
         in: header
-        name: client_id
+        name: X-IBM-Client-Id
         type: apiKey
     apikeyQueryParameter:
         in: query

@@ -4,7 +4,7 @@
 var fs = require('fs'),
     request = require('request'),
     async = require('async'),
-    jsyaml = require('js-yaml');
+    extend = require('util')._extend;
 
 /**
  * Module exports
@@ -20,6 +20,7 @@ var APIM_CATALOG_ENDP = '/v1/catalogs',
     APIM_APIS_ENDP = '/apis',
     APIM_PRODUCTS_ENDP= '/products',
     APIM_SUBS_ENDP= '/subscriptions',
+    APIM_TLS_ENDP= '/tls-profiles',
     APIM_TYPE_FILTER= 'strong-gateway',
     APIM_CLIENT_ID_EQ= 'client_id=',
     APIM_TYPE_EQ='type=';
@@ -29,6 +30,18 @@ var APIM_CATALOG_ENDP = '/v1/catalogs',
  */
 var response = {};
 var result; 
+
+/**
+ * Creates a model type 
+ * @class
+ * @param {string} name - name of the model
+ * @param {string} prefix - file name prefix associated with the model
+ */ 
+function ModelType(name, prefix, endp) {
+  this.name = name;
+  this.prefix = prefix;
+  this.endp = endp;
+}
 
 /**
  * Pulls latest configuration 
@@ -54,12 +67,12 @@ function apimpull (opts, cb) {
     clientid : opts.clientid || '1111-1111'
   };
   /* First, start w/ catalogs */
-  pullcatalog(options, function(err, catalogs) {
+  pullcatalog(options, function(err, catalogs, models) {
       if (err) {
         cb(err, response);
       }
       else if (typeof catalogs !== 'undefined') {
-        getapisproductsandsubs(options, catalogs, cb);
+        getDataBasedOnCatalog(options, catalogs, models, cb);
       }
       else {
         cb(null, response);
@@ -69,74 +82,26 @@ function apimpull (opts, cb) {
 }
 
 /**
- * Fetches APIm APIs, products and subscriptions for each catalog
+ * Fetches data from APIm for each catalog
+ * such as APIs, products and subscriptions
  */
-function getapisproductsandsubs(options, catalogs, cb) {
-  var catalogsWithAPIs = [];
+function getDataBasedOnCatalog(options, catalogs, models, cb) {
+
   async.each(catalogs,
-    function(catalog, callback) {
+    function(catalog, catcallback) {
       /* Next, go to APIs for each catalog */
-      pullapis(options, catalog, function(err) {
-          if (err) {
-            console.error(err);
-          }
-          else {
-            catalogsWithAPIs.push(catalog);
-          }
-          callback();
-        }
-      );
-    },
-    function(err) {
-      if(err) {
-        cb(err, response);
-      }
-      else {
-        getproductsandsubs(options, catalogsWithAPIs, cb);
-      }
-    }
-  );
-}
-
-/**
- * Fetches APIm products and subscriptions for each catalog that contains APIs
- */
-function getproductsandsubs(options, catalogsWithAPIs, cb) {
-  async.each(catalogsWithAPIs,
-    function(catalog, callback) {
-      /* Next, go to products for each catalog */
-      pullproducts(options, catalog, function(err) {
-          if (err) {
-            console.error(err);
-          }
-          callback();
-        }
-      );
-    },
-    function(err) {
-      if(err) {
-        cb(err, response);
-      }
-      else {
-        getsubs(options, catalogsWithAPIs, cb);
-      }
-    }
-  );
-}
-
-/**
- * Fetches APIm subscriptions for each catalog that contains APIs
- */
-function getsubs(options, catalogsWithAPIs, cb) {
-
-  async.each(catalogsWithAPIs,
-    function(catalog, callback) {
-      /* Finally, go to subscriptions for each catalog */
-      pullsubs(options, catalog, function(err) {
-          if (err) {
-            console.error(err);
-          }
-          callback();
+      async.each(models,
+        function(model, modelcallback) {
+          pullDataFromEndp(options, catalog, model, function(err) {
+              if (err) {
+                console.error(err);
+              }
+              modelcallback(err);
+            }
+          );
+        },
+        function(err) {
+          catcallback(err);
         }
       );
     },
@@ -163,10 +128,16 @@ function pullcatalog (opts, cb) {
       }
       else if ('object' === typeof result) {
         response.catalogs = result.file;
-        response.products = [];
-        response.apis = [];
-        response.api = [];
-        response.subs = [];
+        var models = [];
+        models.push(new ModelType('products', 'products-', APIM_PRODUCTS_ENDP));
+        models.push(new ModelType('apis', 'apis-', APIM_APIS_ENDP));
+        models.push(new ModelType('subscriptions', 'subs-', APIM_SUBS_ENDP));
+        models.push(new ModelType('tlsprofiles', 'tlsprofs-', APIM_TLS_ENDP));
+        models.forEach(
+          function(model) {
+            response[model.name] = [];
+          }
+        );
         var catalogsJSON;
         try {
           catalogsJSON = JSON.parse(result.contents);
@@ -182,7 +153,7 @@ function pullcatalog (opts, cb) {
             }); 
           }
         );
-        cb(null, catalogs);
+        cb(null, catalogs, models);
       }
       else {
         var error = 
@@ -194,112 +165,28 @@ function pullcatalog (opts, cb) {
 }
 
 /**
- * Fetches response from  APIm apis endpoint, persists the response to the
- * filesystem '<outdir>/apis-<org>-<catalog>-<etag>.json' and 
- * create YAML version of Swagger document to persist to filesystem: 
- * '<outdir>/api-<org>-<catalog>-<apiname>-<apiver>-<etag>.yml'
+ * Fetches response from APIm endpoint, persists the 
+ * response to the filesystem '<outdir>/<model.prefix><org>-<catalog>-<etag>.json'
  */
-function pullapis (opts, catalog, cb) {
-  opts.path = APIM_CATALOG_ENDP + '/' + catalog.cat + APIM_APIS_ENDP +
-              '?' + // filter parms
-              APIM_CLIENT_ID_EQ + opts.clientid + '&' +
-              APIM_TYPE_EQ + APIM_TYPE_FILTER;
-
-  opts.prefix = '/apis-' + catalog.org + '-' + catalog.cat + '-';
-  opts.suffix = '.json';
-  fetch(opts, function (err, result) {
+function pullDataFromEndp (opts, catalog, model, cb) {
+  var myopts = extend({}, opts);
+  myopts.path = APIM_CATALOG_ENDP + '/' + catalog.cat + model.endp + 
+                '?' + // filter parms
+                APIM_CLIENT_ID_EQ + opts.clientid + '&' +
+                APIM_TYPE_EQ + APIM_TYPE_FILTER;
+  myopts.prefix = '/' + model.prefix + catalog.org + '-' + catalog.cat + '-';
+  myopts.suffix = '.json';
+  fetch(myopts, function (err, result) {
       if (err) {
         cb(err);
       }
       else if ('object' === typeof result) {
-        response.apis.push(result.file);
-        var apisJSON;
-        try {
-          apisJSON = JSON.parse(result.contents);
-        } catch (e) {
-          cb(e);
-          return;
-        }
-        var fileParts = result.file.split('-');
-        var etag = fileParts[fileParts.length - 1].split('.')[0];
-        async.each(apisJSON,
-          function(obj, callback) {
-            var filename = opts.outdir + '/api-' + catalog.org + '-' +
-              catalog.cat + '-' + obj.document.info['x-ibm-name'] +
-              '-' + obj.document.info.version + '-' + etag +
-              '.yml';
-            var outstream = fs.createWriteStream(filename);
-            response.api.push(filename);
-            outstream.write(jsyaml.safeDump(obj.document));
-            outstream.end();
-            outstream.on('finish', function() {
-                callback();
-              }
-            );
-          },
-          function(err) {
-            cb(err);
-          }
-        );
-      }
-      else {
-        var error = new Error('Unexpected type returned from api fetch');
-        cb(error);
-      }
-    }
-  );
-}
-
-/**
- * Fetches response from APIm products endpoint, persists the response to the
- * filesystem '<outdir>/products-<org>-<catalog>-<etag>.json'
- */
-function pullproducts (opts, catalog, cb) {
-  opts.path = APIM_CATALOG_ENDP + '/' + catalog.cat + APIM_PRODUCTS_ENDP + 
-              '?' + // filter parms
-              APIM_CLIENT_ID_EQ + opts.clientid + '&' +
-              APIM_TYPE_EQ + APIM_TYPE_FILTER;
-  opts.prefix = '/products-' + catalog.org + '-' + catalog.cat + '-';
-  opts.suffix = '.json';
-  fetch(opts, function (err, result) {
-      if (err) {
-        cb(err);
-      }
-      else if ('object' === typeof result) {
-        response.products.push(result.file);
+        response[model.name].push(result.file);
         cb();
       }
       else {
         var error = 
-          new Error('Unexpected type returned from product fetch');
-        cb(error);
-      }
-    }
-  );
-}
-
-/**
- * Fetches response from APIm subscriptions endpoint, persists the 
- * response to the filesystem '<outdir>/subs-<org>-<catalog>-<etag>.json'
- */
-function pullsubs (opts, catalog, cb) {
-  opts.path = APIM_CATALOG_ENDP + '/' + catalog.cat + APIM_SUBS_ENDP + 
-              '?' + // filter parms
-              APIM_CLIENT_ID_EQ + opts.clientid + '&' +
-              APIM_TYPE_EQ + APIM_TYPE_FILTER;
-  opts.prefix = '/subs-' + catalog.org + '-' + catalog.cat + '-';
-  opts.suffix = '.json';
-  fetch(opts, function (err, result) {
-      if (err) {
-        cb(err);
-      }
-      else if ('object' === typeof result) {
-        response.subs.push(result.file);
-        cb();
-      }
-      else {
-        var error = 
-		  new Error('Unexpected type returned from subscription fetch');
+          new Error('Unexpected type returned from ' + model.name + ' fetch');
         cb(error);
       }
     }
