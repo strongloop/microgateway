@@ -269,17 +269,17 @@ describe('Context middleware', function() {
 
       it('should work with URL w/o query params', function(done) {
         apiBasePath = '/foo';
-        expectOpPath = '/bar';
+        expectOpPath = '/foo/bar';
         request(myapp)
-          .get(apiBasePath + expectOpPath)
+          .get(expectOpPath)
           .expect(200, 'done', done);
       });
 
       it('should work with URL w/ query params', function(done) {
         apiBasePath = '/foo';
-        expectOpPath = '/bar';
+        expectOpPath = '/foo/bar';
         request(myapp)
-          .get(apiBasePath + expectOpPath + '?name=hello')
+          .get(expectOpPath + '?name=hello')
           .expect(200, 'done', done);
       });
 

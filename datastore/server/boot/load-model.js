@@ -525,7 +525,7 @@ function findAndReplace(object, value, replacevalue){
       findAndReplace(object[x], value, replacevalue);
     }
     if(typeof object[x] === 'string' && object[x].indexOf(value) > -1){ 
-      console.log('found one');
+      debug('found variable to replace: ' + value + ' with ' + replacevalue);
       object[x] = object[x].replace(value, replacevalue);
     }
   }
