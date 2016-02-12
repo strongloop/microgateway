@@ -9,25 +9,7 @@ let supertest = require('supertest');
 let microgw = require('../lib/microgw');
 let apimServer = require('./support/mock-apim-server/apim-server');
 
-function startAPImServer(done) {
-  try {
-    fs.unlinkSync(__dirname + '/../config/apim.config');
-  } catch(e) {
-    //console.error(e);
-  }
-  apimServer.start('127.0.0.1', 8080, done);
-}
-
-function startMicroGateway(done) {
-  process.env['DATASTORE_PORT'] = 5000;
-  process.env['APIMANAGER'] = '127.0.0.1';
-  process.env['APIMANAGER_PORT'] = 8080;
-  microgw.start(3000, done);
-}
-
 describe('data-store', function() {
-//  before(startAPImServer);
-//  before(startMicroGateway);
   let request;
   let snapshotID;
   before((done) => {
@@ -60,8 +42,8 @@ describe('data-store', function() {
 
   after((done) => {
     echo.stop()
-      .then(() => microgw.stop())
-      .then(done, done);
+      .then(done, done)
+      .catch(done);
   });
 
   function verifyResponseArray(res, expected) {
