@@ -603,6 +603,42 @@
                         "tags": [
                             "Ascent"
                         ]
+                    },
+                    "put": {
+                        "security": [
+                          { "basic-local-http": [], "apikeyQueryParameter": [] }
+                        ],
+                        "deprecated": false,
+                        "description": "Create a Ascent",
+                        "parameters": [
+                            {
+                                "description": "Ascent to create",
+                                "in": "body",
+                                "name": "payload",
+                                "required": true,
+                                "schema": {
+                                    "$ref": "#/definitions/AscentCreate"
+                                }
+                            }
+                        ],
+                        "responses": {
+                            "201": {
+                                "description": "Successful create",
+                                "schema": {
+                                    "$ref": "#/definitions/Ascent"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Create a Ascent",
+                        "tags": [
+                            "Ascent"
+                        ]
                     }
                 },
                 "/ascents/{ascent}": {
@@ -735,6 +771,13 @@
                     "description": "basic auth local ldap no tls",
                     "x-ibm-authentication-url": {
                         "url": "ldap://localhost:1389"
+                    }
+                },
+                "basic-local-http": {
+                    "type": "basic",
+                    "description": "basic auth local http no tls",
+                    "x-ibm-authentication-url": {
+                        "url": "http://localhost:8889/auth"
                     }
                 },
                 "apikeyHeader": {
