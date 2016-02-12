@@ -112,3 +112,32 @@ exports.getCurrentSnapshot = function() {
     });
   });
 }
+
+exports.getTlsProfile = function(snapshot, tlsProfleName) {
+  debug('getTlsProfile entry snapshot:' + snapshot +
+                              '\n tlsProfleName:' + tlsProfleName );
+  // build request to send to data-store
+  let snapshotFilter = `{"snapshot-id": "${snapshot }"}`;
+  let tlsNameFilter = `{"name": "${tlsProfleName }"}`;
+  let queryfilter = `{"where": { "and":[${snapshotFilter}, ${tlsNameFilter}]}}`;
+  const port = process.env['DATASTORE_PORT'];
+
+  let queryurl = `http://${host}:${port}/api/tlsprofiles?filter=${encodeURIComponent(queryfilter)}`;
+
+  // send request to data-store to get the reqiested TLS Profile
+  // for matching API(s)
+  return new Promise((resolve, reject) => {
+    request({url: queryurl}, function (error, response, body) {
+      debug('error: ', error);
+      debug('body: %j', body);
+      debug('response: %j', response);
+      // exit early on error
+      if (error) {
+        reject(new Error(error));
+        return;
+      }
+      resolve(JSON.parse(body));
+
+    });
+  });
+}
