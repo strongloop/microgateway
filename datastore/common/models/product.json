@@ -26,16 +26,7 @@
         "title": "string",
         "version": "string"
       },
-      "plans": {
-        "gold": {
-          "apis": {},
-          "rate-limit": {
-            "hard-limit": "boolean",
-            "value": "string"
-          },
-          "title": "string"
-        }
-      },
+      "plans": {},
       "product": "string",
       "visibility": {
         "subscribe": {
