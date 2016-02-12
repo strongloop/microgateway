@@ -11,7 +11,7 @@ function determineNeededSubscriptionOptimizedEntries(app, ctx)
   {
   var locals;
   locals = ripCTX(ctx);
-  if (process.env['laptopexperience'] === 'true')
+  if (!process.env.APIMANAGER)
     {
     var planid = ctx.instance['plan-registration'].id;
     findPlansToAddSubscriptions(app, locals, planid)

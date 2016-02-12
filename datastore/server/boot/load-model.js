@@ -16,9 +16,6 @@ var definitionsDir = defaultDefinitionsDir;
 var subscriptionsFilename = 'subscriptions.json';
 var subscriptionsConfig = __dirname + rootConfigPath + subscriptionsFilename;
 
-var laptopexperience = true;
-process.env['laptopexperience']=laptopexperience;
-
 /**
  * Creates a model type 
  * @class
@@ -66,34 +63,12 @@ module.exports = function(app) {
         // if no apim.config or ENV var, load default dir.. APIm 
         // if apim.config or ENV var, 
         //    if apimanager specified, dir = "last known config"..
-        //    if no apimanager specified, dir will be loaded.. 
-        environment.getVariable(
-          CONFIGDIR,
-          function(value) {
-            // Load local files...
-            if (value) {
-              definitionsDir=value;
-            }
-          },
-          callback
-        );
-      },
-      function(callback) {
-        // get apimanager ip
-        // if no apim.config or ENV var, load what you have
-        // if apim.config or ENV var, grab fresh data if you can
-        environment.getVariable(
-          APIMANAGER,
-          function(value) {
-            apimanager = value;
-            if (apimanager)
-              {
-              laptopexperience=false;
-              process.env['laptopexperience']=laptopexperience;
-              }
-            },
-          callback
-        );
+        //    if no apimanager specified, dir will be loaded..
+        if (process.env[CONFIGDIR])
+          definitionsDir = process.env[CONFIGDIR];
+        else
+          definitionsDir = defaultDefinitionsDir;
+        callback();
       },
       // stage the models
       function(callback) {
@@ -161,7 +136,7 @@ function loadData(app, apimanager, models, currdir) {
 }
 
 function scheduleLoadData(app, apimanager, models, dir) {
-  if (!laptopexperience)
+  if (process.env[APIMANAGER])
     setTimeout(loadData,
              15 * 1000, // 15 seconds TODO: make configurable
              app,
@@ -331,8 +306,7 @@ function loadConfigFromFS(app, models, dir, uid, cb) {
       debug('file match jsonFile: ', file.match(jsonFile));
       debug('file match yamlFile: ', file.match(yamlFile));
       // apim pull scenario (only json, no yaml)
-      if (!laptopexperience && 
-          file.match(jsonFile)) {
+      if (process.env[APIMANAGER] && file.match(jsonFile)) {
         for(var i = 0; i < models.length; i++) {
           if(file.indexOf(models[i].prefix) > -1) {
             debug('%s file: %s', models[i].name, file);
@@ -342,21 +316,20 @@ function loadConfigFromFS(app, models, dir, uid, cb) {
         }
       }
       // laptop experience scenario (only yaml, no json)
-      if (laptopexperience && 
-          file.match(yamlFile)) {
+      // might want to support json for laptop as well
+      else if (file.match(yamlFile)) {
         YAMLfiles.push(file);
       }
     }
   );
   
-  if (laptopexperience) {
-    populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb);
-  }
-  else {
+  if (process.env[APIMANAGER]) {
     // populate data-store models with the file contents
     populateModelsWithAPImData(app, models, dir, uid, cb);
   }
-  
+  else {
+    populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb);
+  }
 }
 
 function createProductID(product)

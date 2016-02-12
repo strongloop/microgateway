@@ -11,15 +11,9 @@ describe('preflow and flow-engine integration', function() {
 
   let request;
   before((done) => {
-    const writeconf = () => (new Promise((resolve, reject) => {
-      const confpath = path.resolve(__dirname, '../config/apim.config');
-      fs.writeFile(confpath, '{"APIMANAGER": "127.0.0.1"}', 'utf8', (err) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    }));
-    writeconf()
-      .then(() => mg.start(3000))
+    process.env.APIMANAGER = '127.0.0.1';
+    process.env.NODE_ENV = 'production';
+    mg.start(3000)
       .then(() => echo.start(8889))
       .then(() => {
         request = supertest('http://localhost:3000');
@@ -33,9 +27,11 @@ describe('preflow and flow-engine integration', function() {
   });
 
   after((done) => {
+    delete process.env.APIMANAGER;
+    delete process.env.NODE_ENV;
     echo.stop()
-    .then(() => mg.stop())
-    .then(done, done);
+      .then(() => mg.stop())
+      .then(done, done);
   });
 
 

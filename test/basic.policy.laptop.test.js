@@ -14,15 +14,8 @@ describe('basic auth policy', function() {
   let request;
   before((done) => {
     process.env.CONFIG_DIR = __dirname + '/definitions';
-    const writeconf = () => (new Promise((resolve, reject) => {
-      const confpath = path.resolve(__dirname, '../config/apim.config');
-      fs.writeFile(confpath, '{"APIMANAGER": "127.0.0.1"}', 'utf8', (err) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    }));
-    writeconf()
-      .then(() => mg.start(3000))
+    process.env.NODE_ENV = 'production';
+    mg.start(3000)
       .then(() => {
         return ldap.start(1389);
       })
@@ -40,6 +33,8 @@ describe('basic auth policy', function() {
   });
 
   after((done) => {
+    delete process.env.CONFIG_DIR;
+    delete process.env.NODE_ENV;
     mg.stop()
       .then(() => ldap.stop())
       .then(() => echo.stop())
