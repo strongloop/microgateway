@@ -551,10 +551,9 @@ function findAndReplace(object, value, replacevalue){
     if(typeof object[x] == 'object'){
       findAndReplace(object[x], value, replacevalue);
     }
-   //console.log('object[x]: ' + object[x]);
-    if(object[x] == value){ 
+    if(typeof object[x] === 'string' && object[x].indexOf(value) > -1){ 
       console.log('found one');
-      object[x] = replacevalue;
+      object[x] = object[x].replace(value, replacevalue);
     }
   }
   return object;
@@ -577,13 +576,13 @@ function expandAPIData(apidoc, dir)
       Object.getOwnPropertyNames(apidoc['x-ibm-configuration'].properties).forEach(
         function (property) 
           {
-          console.log('property: ' + property)
-          console.log('apidoc[x-ibm-configuration][properties][property][value]: ' + JSON.stringify(apidoc['x-ibm-configuration']['properties'][property]['value']))
-          console.log('before apidoc: ' + JSON.stringify(apidoc))
+          debug('property: ' + property)
+          debug('apidoc[x-ibm-configuration][properties][property][value]: ' + JSON.stringify(apidoc['x-ibm-configuration']['properties'][property]['value']))
+          debug('before apidoc: ' + JSON.stringify(apidoc))
           var propertyvalue = '$(' + property + ')';
-          console.log('property: ' + propertyvalue);
+          debug('property: ' + propertyvalue);
           apidoc = findAndReplace(apidoc, propertyvalue, apidoc['x-ibm-configuration']['properties'][property]['value'])
-          console.log('after apidoc: ' + JSON.stringify(apidoc))
+          debug('after apidoc: ' + JSON.stringify(apidoc))
           });
       }
     }
