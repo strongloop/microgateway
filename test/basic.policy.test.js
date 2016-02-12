@@ -49,7 +49,7 @@ describe('basic auth policy', function() {
   let clientId1 = 'fb82cb59-ba95-4c34-8612-e63697d7b845';
   it(`client_id=${clientId1} should pass with "root"/"Hunter2"`, function(done) {
     request
-      .post('/apim/sb/v1/ascents?client_id=' +  clientId1)
+      .post('/v1/ascents?client_id=' +  clientId1)
       .auth('root', 'Hunter2')
       .send({date: 'today', route: '66'})
       .expect(200, '{"date":"today","route":"66"}', done);
@@ -57,7 +57,7 @@ describe('basic auth policy', function() {
 
   it(`client_id=${clientId1} should fail`, function(done) {
     request
-    .post('/apim/sb/v1/ascents?client_id=' +  clientId1)
+    .post('/v1/ascents?client_id=' +  clientId1)
     .auth('root', 'badpass')
     .send({date: 'today', route: '66'})
     .expect(401, done);
@@ -65,7 +65,7 @@ describe('basic auth policy', function() {
 
   it(`client_id=${clientId1} should fail with http and "root"/"Hunter3"`, function(done) {
     request
-      .put('/apim/sb/v1/ascents?client_id=' +  clientId1)
+      .put('/v1/ascents?client_id=' +  clientId1)
       .auth('root', 'Hunter3')
       .send({date: 'today', route: '66'})
       .expect(401, done);
@@ -73,7 +73,7 @@ describe('basic auth policy', function() {
 
   it(`client_id=${clientId1} should pass with http and "root"/"Hunter2"`, function(done) {
     request
-      .put('/apim/sb/v1/ascents?client_id=' +  clientId1)
+      .put('/v1/ascents?client_id=' +  clientId1)
       .auth('root', 'Hunter2')
       .send({date: 'today', route: '66'})
       .expect(200, '{"date":"today","route":"66"}', done);

@@ -148,7 +148,8 @@ function gatherDataCreateOptimizedEntry(app, locals, gatherCallback)
       if (err) {
         console.error(err);
       }
-      gatherCallback();
+      if (gatherCallback)
+        gatherCallback();
     }
   );
 }
