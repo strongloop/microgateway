@@ -6,11 +6,12 @@ var debug = require('debug')('strong-gateway:data-store');
 var sgwapimpull = require('../../apim-pull');
 var apimpull = sgwapimpull.pull;
 var environment = require('../../../utils/environment');
-var APIMANAGER = require('../../../utils/environment').APIMANAGER;
-var CONFIGDIR = require('../../../utils/environment').CONFIGDIR;
+var APIMANAGER = environment.APIMANAGER;
+var APIMANAGER_PORT = environment.APIMANAGER_PORT;
+var CONFIGDIR = environment.CONFIGDIR;
 
-var rootConfigPath = '/../../../config/';
-var defaultDefinitionsDir = __dirname + rootConfigPath + 'default';
+var rootConfigPath = __dirname + '/../../../config/';
+var defaultDefinitionsDir = rootConfigPath + 'default';
 var definitionsDir = defaultDefinitionsDir;
 
 /**
@@ -47,11 +48,12 @@ module.exports = function(app) {
   models.push(new ModelType('product', 'products-'));
   models.push(new ModelType('api', 'apis-'));
   models.push(new ModelType('subscription', 'subs-'));
+  models.push(new ModelType('tlsprofile', 'tlsprofs-'));
   // add new models above this line
   models.push(new ModelType('optimizedData', 'dummy'));
   models.push(new ModelType('snapshot', 'dummy')); // hack, removed later
 
-  var apimanager;
+  var apimanager = {};
 
   async.series(
     [
@@ -63,8 +65,10 @@ module.exports = function(app) {
         //    if no apimanager specified, dir will be loaded..
         if (process.env[CONFIGDIR])
           definitionsDir = process.env[CONFIGDIR];
-        else
+        else {
+          process.env['ROOTCONFIGDIR'] = rootConfigPath;
           definitionsDir = defaultDefinitionsDir;
+        }
         callback();
       },
       // stage the models
@@ -179,8 +183,7 @@ function pullFromAPIm(apimanager, uid, cb) {
   debug('pullFromAPIm entry');
   if (apimanager) {
     // Have an APIm, grab latest if we can..
-    var snapdir =  __dirname +
-                   rootConfigPath +
+    var snapdir =  rootConfigPath +
                    uid +
                    '/';
     fs.mkdir(snapdir, function(err) {
@@ -191,7 +194,8 @@ function pullFromAPIm(apimanager, uid, cb) {
         }
 
         var options = {};
-        options['host'] = apimanager;
+        options['host'] = process.env[APIMANAGER];
+        options['port'] = process.env[APIMANAGER_PORT];
         options['outdir'] = snapdir;
         debug('apimpull start');
         apimpull(options,function(err, response) {
