@@ -113,6 +113,31 @@ exports.getCurrentSnapshot = function() {
   });
 }
 
+exports.releaseCurrentSnapshot = function(id) {
+  debug('releaseCurrentSnapshot entry');
+  // build request to send to data-store
+  const port = process.env['DATASTORE_PORT'];
+  const queryurl = `http://${host}:${port}/api/snapshots/release?id=${id}`;
+
+  // send request to optimizedData model from data-store
+  // for matching API(s)
+  return new Promise((resolve, reject) => {
+    request({url: queryurl}, (error, response, body) => {
+      debug('error: ', error);
+      debug('body: %j', body);
+      debug('response: %j', response);
+      // exit early on error
+      if (error) {
+        debug('releaseCurrentSnapshot error');
+        reject(new Error(error));
+        return;
+      }
+      debug('releaseCurrentSnapshot exit');
+      resolve(id);
+    });
+  });
+}
+
 exports.getTlsProfile = function(snapshot, tlsProfleName) {
   debug('getTlsProfile entry snapshot:' + snapshot +
                               '\n tlsProfleName:' + tlsProfleName );
