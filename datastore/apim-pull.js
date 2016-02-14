@@ -21,6 +21,7 @@ var APIM_CATALOG_ENDP = '/v1/catalogs',
     APIM_PRODUCTS_ENDP= '/products',
     APIM_SUBS_ENDP= '/subscriptions',
     APIM_TLS_ENDP= '/tls-profiles',
+    APIM_REGISTRIES_ENDP= '/registries',
     APIM_TYPE_FILTER= 'strong-gateway',
     APIM_CLIENT_ID_EQ= 'client_id=',
     APIM_TYPE_EQ='type=';
@@ -133,6 +134,7 @@ function pullcatalog (opts, cb) {
         models.push(new ModelType('apis', 'apis-', APIM_APIS_ENDP));
         models.push(new ModelType('subscriptions', 'subs-', APIM_SUBS_ENDP));
         models.push(new ModelType('tlsprofiles', 'tlsprofs-', APIM_TLS_ENDP));
+        models.push(new ModelType('registries', 'registries-', APIM_REGISTRIES_ENDP));
         models.forEach(
           function(model) {
             response[model.name] = [];

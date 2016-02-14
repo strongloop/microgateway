@@ -1,0 +1,50 @@
+{
+  "name": "registry",
+  "base": "PersistedModel",
+  "idInjection": false,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "dummyid": {
+      "type": "number",
+      "id": true
+    },
+    "id": {
+      "type": "string"
+    },
+    "snapshot-id": {
+      "type": "string"
+    },
+    "url": "string",
+    "name": "string",
+    "type": "string",
+    "title": "string",
+    "description": "string",
+    "ldap-config": {
+      "host": "string",
+      "port": "number",
+      "ssl": "boolean",
+      "protocol-version": "string",
+      "authenticated-bind": "boolean",
+      "search-dn-base": "string",
+      "search-dn-filter-prefix": "string",
+      "search-dn-filter-suffix": "string",
+      "auth-method": "string",
+      "bind-prefix": "string",
+      "bind-suffix": "string",
+      "search-dn-scope": "string",
+      "group-auth-method": "string",
+      "static-group-dn": "string",
+      "static-group-filter-prefix": "string",
+      "static-group-filter-suffix": "string",
+      "static-group-scope": "string",
+      "dynamic-group-filter": "string",
+      "tls-profile": "string"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}
