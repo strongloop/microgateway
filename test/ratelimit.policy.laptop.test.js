@@ -40,6 +40,8 @@ describe('ratelimit basic policy', function() {
   it('should expect ratelimit header', function(done) {
     request
       .get('/ratelimit/ratelimit')
+      .expect('x-ratelimit-limit', '100')
+      .expect('x-ratelimit-remaining', '99')
       .expect(200, done);
   });
 });

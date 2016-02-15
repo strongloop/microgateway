@@ -1,0 +1,16 @@
+{
+  "name": "apiconnect-policy-rate-limiting",
+  "version": "1.0.0",
+  "description": "Rate Limiting Policy for API Connect",
+  "main": "index.js",
+  "scripts": {
+  },
+  "keywords": [
+    "apiconnect",
+    "policy",
+    "rate",
+    "limiting"
+  ],
+  "author": "",
+  "license": "SEE LICENSE IN LICENSE"
+}

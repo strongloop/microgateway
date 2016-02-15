@@ -1,0 +1,55 @@
+policy: 1.0.0
+
+info:
+  title: Rate Limiting
+  name: rate-limiting
+  description: Limit the number of API requests
+  contact:
+    name: IBM API Connect
+    url: https://www.ibm.com/apiconnect
+    email: steve-product-manager@ibm.com
+properties:
+  type: "object"
+    properties:
+      requests:
+        label: ${messages:property.requests.label}
+        description: ${messages:property.requests.description}
+        type: integer
+        minimum: 1
+        #default: 1000
+      unit: #scale:
+        label: ${messages:property.scale.label}
+        description: ${messages:property.scale.description}
+        enum:
+          - second
+          - minute
+          - hour
+          - day
+          - week
+        #default: day
+      period:
+        label: ${messages:property.period.label}
+        description: ${messages:property.period.description}
+        type: integer
+        minimum: 1
+        default: 1
+      reject:
+        label: ${messages:property.reject.label}
+        description: ${messages:property.reject.description}
+        type: boolean
+        default: true
+      shared:
+        label: ${messages:property.sharedCounter.label}
+        description: ${messages:property.sharedCounter.description}
+        type: boolean
+        default: true
+      #unlimited:
+      #  label: ${messages:property.unlimited.label}
+      #  description: ${messages:property.unlimited.description}
+      #  type: boolean
+      #  default: false
+    required:
+      - requests
+      - unit
+      - period
+      - reject
