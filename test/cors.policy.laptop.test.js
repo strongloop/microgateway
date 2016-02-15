@@ -48,7 +48,7 @@ describe('cross origin resource sharing policy', function() {
     request
       .get('/cors-disabled/path-cors')
       .expect(200, done)
-      .end(function(err, res){
+      .end(function(err, res) {
         if (err) return done(err);
         var cors = res.header['Access-Control-Allow-Origin'] !== undefined;
         cors.should.be.False();
