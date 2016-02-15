@@ -102,7 +102,7 @@ describe('preflow and flow-engine integration', function() {
       function (done) {
         request
         .get('/v1/ascents?client_id=' + clientIdBad)
-        .expect(404, done);
+        .expect(401, done);
       });
 
     it('client_id=' + clientId1 +
@@ -110,7 +110,7 @@ describe('preflow and flow-engine integration', function() {
       function (done) {
         request
         .get('/v1/ascents?client-id=' + clientIdBad)
-        .expect(404, done);
+        .expect(401, done);
       });
 
     var clientSecret3a = 'api-level_secret';
@@ -131,7 +131,7 @@ describe('preflow and flow-engine integration', function() {
         request
         .get('/v1/routes?client_id=' + clientId2 +
           '&client_secret=' + clientSecret3Bad)
-        .expect(404, done);
+        .expect(401, done);
       });
 
     it('client_id=' + clientId2 +
@@ -139,7 +139,7 @@ describe('preflow and flow-engine integration', function() {
       function (done) {
         request
         .get('/v1/routes?client_id=' + clientId2)
-        .expect(404, done);
+        .expect(401, done);
       });
 
     it('client_id=' + clientIdBad +
@@ -149,7 +149,7 @@ describe('preflow and flow-engine integration', function() {
         request
         .get('/v1/routes?client_id=' + clientIdBad +
           '&client_secret=' + clientSecret3a)
-        .expect(404, done);
+        .expect(401, done);
       });
 
     it('client_id=' + clientId2 +
@@ -159,7 +159,7 @@ describe('preflow and flow-engine integration', function() {
         request
         .get('/v1/routes?client_id=' + clientId2 +
           '&client_secret_bad=' + clientSecret3a)
-        .expect(404, done);
+        .expect(401, done);
       });
 
     it('client_id=' + clientId2 + ' secret=' + clientSecret3a +
@@ -225,7 +225,7 @@ describe('preflow and flow-engine integration', function() {
         request
         .get('/v1/ascents')
         .set('X-IBM-Client-Id', clientIdBad)
-        .expect(404, done);
+        .expect(401, done);
       });
 
     it('client_id=' + clientId1 +
@@ -252,7 +252,7 @@ describe('preflow and flow-engine integration', function() {
         request
         .get('/v1/ascents')
         .set('X-IBM-Client-Id-bad', clientId1)
-        .expect(404, done);
+        .expect(401, done);
       });
 
     it('client_id=' + clientId2 +
@@ -275,7 +275,7 @@ describe('preflow and flow-engine integration', function() {
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
         .set('X-IBM-Client-Secret', clientSecret3Bad)
-        .expect(404, done);
+        .expect(401, done);
       });
 
     it('client_id=' + clientId2 +
@@ -285,7 +285,7 @@ describe('preflow and flow-engine integration', function() {
         .get('/v1/routes')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
-        .expect(404, done);
+        .expect(401, done);
       });
 
     it('client_id=' + clientIdBad +
@@ -297,7 +297,7 @@ describe('preflow and flow-engine integration', function() {
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientIdBad)
         .set('X-IBM-Client-Secret', clientSecret3a)
-        .expect(404, done);
+        .expect(401, done);
       });
 
     it('client_id=' + clientId2 +
@@ -309,7 +309,7 @@ describe('preflow and flow-engine integration', function() {
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
         .set('X-IBM-Client-Secret-Bad', clientSecret3a)
-        .expect(404, done);
+        .expect(401, done);
       });
 
     it('client_id=' + clientId2 + ' secret=' + clientSecret3a +
@@ -342,7 +342,7 @@ describe('preflow and flow-engine integration', function() {
         request
         .get('/v1/routes/test1?client_id=' + clientId2 +
           '&client_secret=' + clientSecret3a)
-        .expect(404, done);
+        .expect(401, done);
       });
 
     it('client_id=' + clientIdBad +
@@ -393,7 +393,7 @@ describe('preflow and flow-engine integration', function() {
         .get('/v1/routes/test3')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
-        .expect(404, done);
+        .expect(401, done);
       });
 
     it('client_secret=' + clientSecret3a +
@@ -403,7 +403,7 @@ describe('preflow and flow-engine integration', function() {
         .get('/v1/routes/test3')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
-        .expect(404, done);
+        .expect(401, done);
       });
 
     /*
