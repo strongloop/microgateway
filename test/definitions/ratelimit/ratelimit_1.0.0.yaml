@@ -1,0 +1,19 @@
+info:
+  version: 1.0.0
+  title: ratelimit
+  x-ibm-name: ratelimit
+  description: ratelimit test suite
+basePath: /ratelimit
+swagger: '2.0'
+paths:
+  /ratelimit:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+x-ibm-configuration:
+  assembly:
+    execute:
+      - invoke:
+          title: invoke
+          target-url: 'http://localhost:8889/'

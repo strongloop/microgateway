@@ -113,6 +113,31 @@ exports.getCurrentSnapshot = function() {
   });
 }
 
+exports.releaseCurrentSnapshot = function(id) {
+  debug('releaseCurrentSnapshot entry');
+  // build request to send to data-store
+  const port = process.env['DATASTORE_PORT'];
+  const queryurl = `http://${host}:${port}/api/snapshots/release?id=${id}`;
+
+  // send request to optimizedData model from data-store
+  // for matching API(s)
+  return new Promise((resolve, reject) => {
+    request({url: queryurl}, (error, response, body) => {
+      debug('error: ', error);
+      debug('body: %j', body);
+      debug('response: %j', response);
+      // exit early on error
+      if (error) {
+        debug('releaseCurrentSnapshot error');
+        reject(new Error(error));
+        return;
+      }
+      debug('releaseCurrentSnapshot exit');
+      resolve(id);
+    });
+  });
+}
+
 exports.getTlsProfile = function(snapshot, tlsProfleName) {
   debug('getTlsProfile entry snapshot:' + snapshot +
                               '\n tlsProfleName:' + tlsProfleName );
@@ -125,6 +150,35 @@ exports.getTlsProfile = function(snapshot, tlsProfleName) {
   let queryurl = `http://${host}:${port}/api/tlsprofiles?filter=${encodeURIComponent(queryfilter)}`;
 
   // send request to data-store to get the reqiested TLS Profile
+  // for matching API(s)
+  return new Promise((resolve, reject) => {
+    request({url: queryurl}, function (error, response, body) {
+      debug('error: ', error);
+      debug('body: %j', body);
+      debug('response: %j', response);
+      // exit early on error
+      if (error) {
+        reject(new Error(error));
+        return;
+      }
+      resolve(JSON.parse(body));
+
+    });
+  });
+}
+
+exports.getRegistry = function(snapshot, registryName) {
+  debug('getRegistry entry snapshot:' + snapshot +
+                              '\n registryName:' + registryName );
+  // build request to send to data-store
+  let snapshotFilter = `{"snapshot-id": "${snapshot }"}`;
+  let registryNameFilter = `{"name": "${registryName }"}`;
+  let queryfilter = `{"where": { "and":[${snapshotFilter}, ${registryNameFilter}]}}`;
+  const port = process.env['DATASTORE_PORT'];
+
+  let queryurl = `http://${host}:${port}/api/registries?filter=${encodeURIComponent(queryfilter)}`;
+
+  // send request to data-store to get the requested Registry Profile
   // for matching API(s)
   return new Promise((resolve, reject) => {
     request({url: queryurl}, function (error, response, body) {

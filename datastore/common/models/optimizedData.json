@@ -16,6 +16,7 @@
     "product-name": "string",
     "plan-id": "string",
     "plan-name": "string",
+    "plan-rate-limit": {},
     "api-id": "string",
     "api-base-path": "string",
     "api-paths": [{
