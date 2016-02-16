@@ -17,3 +17,4 @@ test/sandbox
 coverage
 .vscode
 .DS_Store
+.npmrc

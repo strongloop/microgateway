@@ -1,7 +1,7 @@
 'use strict';
 var debug = require('debug')('policy:invoke');
 var url = require('url');
-var dsc = require('../datastore/client');
+//var dsc = require('../datastore/client');
 
 // TODO: handle self signed certificates
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -21,11 +21,11 @@ module.exports = function (config) {
 // information, but this instance is hardcoded to get one from the mock
 // datastore. This code can't be tested until Tony adds code to flow-engine to
 // resolve policy at this location (micro-gw/policy)
-console.log("NEWPOLICY LOCATION- SnapshotID: " + context.get('config-snapshot-id'));
-        dsc.getTlsProfile( context.get('config-snapshot-id'), 'new-tls-profile-1')
-        .then(
-          function(result) { console.log('TLS: ' + JSON.stringify(result));},
-          function(error)  { console.log('TLS ERR: ' + error);});
+//console.log("NEWPOLICY LOCATION- SnapshotID: " + context.get('config-snapshot-id'));
+//        dsc.getTlsProfile( context.get('config-snapshot-id'), 'new-tls-profile-1')
+//        .then(
+//          function(result) { console.log('TLS: ' + JSON.stringify(result));},
+//          function(error)  { console.log('TLS ERR: ' + error);});
 
         //the authentication
         if (props.username && props.password)
