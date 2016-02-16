@@ -44,7 +44,7 @@ function loadPasswdFile (req, res, next) {
         return;
 
       var user = {
-        dn: 'cn=' + record[0] + ', ou=users, o=myhost',
+        dn: 'cn=' + record[0] + ', ou=myorg, o=com',
         attributes: {
           cn: record[0],
           pass: record[1],
@@ -79,7 +79,7 @@ server.bind('cn=root', function(req, res, next) {
 });
 
 
-server.search('o=myhost', pre, function(req, res, next) {
+server.search('ou=myorg', pre, function(req, res, next) {
   Object.keys(req.users).forEach(k => {
     if (req.filter.matches(req.users[k].attributes)) {
       res.send(req.users[k]);
@@ -89,7 +89,17 @@ server.search('o=myhost', pre, function(req, res, next) {
   return next();
 });
 
-server.add('ou=users, o=myhost', pre, function(req, res, next) {
+server.search('ou=myorg,ou=com', pre, function(req, res, next) {
+  Object.keys(req.users).forEach(k => {
+    if (req.filter.matches(req.users[k].attributes)) {
+      res.send(req.users[k]);
+    }
+  });
+  res.end();
+  return next();
+});
+
+server.add('ou=myorg, ou=com', pre, function(req, res, next) {
   if (!req.dn.rdns[0].attrs.cn)
     return next(new ldap.ConstraintViolationError('cn required'));
 
