@@ -5,8 +5,6 @@ var assert = require('assert');
 var debug = require('debug')('context-test');
 var loopback = require('loopback');
 var request = require('supertest');
-var fs = require('fs');
-var path = require('path');
 
 var context = require('../lib/context');
 
@@ -335,6 +333,49 @@ describe('Context middleware', function() {
       });
     }); // end of should parse HTTP authorization header test
 
+    describe('should reject/ignore non-empty payload when needed', function() {
+      var app = loopback();
+      app.use(function(req, resp, next) {
+        // Because unable to find a node module that can send payload with
+        // GET, HEAD, and DELETE methods, use this middleware to override
+        // the HTTP method name
+        req.method = req.get('X-METHOD-NAME') || req.method;
+        next();
+      });
+      app.use(context());
+      app.use(function(req, resp) {
+        debug('get context content');
+        var ctx = req.ctx;
+        resp.send({
+          type: typeof ctx.get('request.body'),
+          body: ctx.get('request.body')
+        });
+      });
+      app.use(function(error, req, resp, next) {
+        debug('receive error: ', error);
+        resp.status(500).json(error);
+      });
+
+      it('should ignore OPTIONS method w/ payload', function(done) {
+        request(app)
+          .options('/foo')
+          .type('text')
+          .send('hello world')
+          .expect(200, {type: 'string', body: ''}, done);
+      });
+
+      ['GET', 'HEAD', 'DELETE'].forEach(function(method) {
+        it('should reject ' + method + ' method w/ payload', function(done) {
+          request(app)
+            .post('/foo')
+            .set('X-METHOD-NAME', method)
+            .type('text')
+            .send('hello world')
+            .expect(500, done);
+        });
+      });
+    }); // end of 'should reject/ignore non-empty payload when needed' test
+
   }); // end of 'Request category variables test
 
   describe('Message category variables', function() {
@@ -414,49 +455,6 @@ describe('Context middleware', function() {
       });
     }); // end of 'should contain headers and body properties' test
 
-    describe('should reject/ignore non-empty payload when needed', function() {
-      var app = loopback();
-      app.use(function(req, resp, next) {
-        // Because unable to find a node module that can send payload with
-        // GET, HEAD, and DELETE methods, use this middleware to override
-        // the HTTP method name
-        req.method = req.get('X-METHOD-NAME') || req.method;
-        next();
-      });
-      app.use(context());
-      app.use(function(req, resp) {
-        debug('get context content');
-        var ctx = req.ctx;
-        resp.send({
-          type: typeof ctx.get('message.body'),
-          body: ctx.get('message.body')
-        });
-      });
-      app.use(function(error, req, resp, next) {
-        debug('receive error: ', error);
-        resp.status(500).json(error);
-      });
-
-      it('should ignore OPTIONS method w/ payload', function(done) {
-        request(app)
-          .options('/foo')
-          .type('text')
-          .send('hello world')
-          .expect(200, {type: 'string', body: ''}, done);
-      });
-
-      ['GET', 'HEAD', 'DELETE'].forEach(function(method) {
-        it('should reject ' + method + ' method w/ payload', function(done) {
-          request(app)
-            .post('/foo')
-            .set('X-METHOD-NAME', method)
-            .type('text')
-            .send('hello world')
-            .expect(500, done);
-        });
-      });
-    }); // end of 'should reject/ignore non-empty payload when needed' test
-
   }); // end of Message category variables test
 
   describe('Read-only variables', function() {
@@ -470,6 +468,7 @@ describe('Context middleware', function() {
                      'request.content-type',
                      'request.date',
                      'request.authorization',
+                     'request.body',
                      'system.datetime',
                      'system.time.hour',
                      'system.time.minute',
@@ -598,8 +597,8 @@ describe('Context middleware', function() {
 
         var result = {};
         result['content-type'] = ctx.get('request.content-type');
-        result['payload-type'] = typeof ctx.get('message.body');
-        result['payload'] = ctx.get('message.body');
+        result['payload-type'] = typeof ctx.get('request.body');
+        result['payload'] = ctx.get('request.body');
 
         resp.send(result);
       });
@@ -613,7 +612,7 @@ describe('Context middleware', function() {
         .expect(200, {
           'content-type': contentType,
           'payload-type': 'string',
-          'payload': payload
+          payload: payload
         }, done);
     });
 
@@ -644,9 +643,9 @@ describe('Context middleware', function() {
         .expect(200, 'done', done);
     });
 
-    it('should be able to override message.body parsing', function(done) {
+    it('should be able to override request.body parsing', function(done) {
       var contextOptions = {
-        message: {
+        request: {
           bodyParser: [
             {text: ['json', '+json']},
             {raw: ['*/*']}
@@ -661,8 +660,8 @@ describe('Context middleware', function() {
 
         var result = {};
         result['content-type'] = ctx.get('request.content-type');
-        result['payload-type'] = typeof ctx.get('message.body');
-        result['payload'] = ctx.get('message.body');
+        result['payload-type'] = typeof ctx.get('request.body');
+        result['payload'] = ctx.get('request.body');
 
         resp.send(result);
       });
@@ -678,13 +677,13 @@ describe('Context middleware', function() {
         .expect(200, {
           'content-type': contentType,
           'payload-type': 'string',
-          'payload': JSON.stringify(payload)
+          payload: JSON.stringify(payload)
         }, done);
     });
 
-    describe('should be able to override message.body filtering', function() {
+    describe('should be able to override request.body filtering', function() {
       var contextOptions = {
-        message: {
+        request: {
           bodyFilter: {}
         }
       };
@@ -703,7 +702,7 @@ describe('Context middleware', function() {
         debug('get context content');
         var ctx = req.ctx;
         try {
-          assert.strictEqual(ctx.get('message.body'), payload);
+          assert.strictEqual(ctx.get('request.body'), payload);
           resp.status(200).send('done');
         } catch (error) {
           resp.status(500).send(error);
