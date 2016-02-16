@@ -39,6 +39,7 @@
     "auth-header": "^0.2.2",
     "basic-auth": "^1.0.3",
     "body-parser": "^1.14.2",
+    "chokidar": "^1.4.2",
     "compression": "^1.6.1",
     "cors": "^2.7.1",
     "express": "^4.13.4",
