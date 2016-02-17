@@ -4,7 +4,46 @@ var debug = require('debug')('strong-gateway:data-store');
 var ALLPLANS = 'ALLPLANS';
 function createProductOptimizedEntry(app, ctx)
   {
-  //console.log('ctx: ' + JSON.stringify(ctx, null, 4));
+  var locals = {};
+  var product = ctx.instance
+  locals.subscription = {};  /// no subscription
+  // assume we are going to create a wildcard entry...
+  //     We will not if there's security configured at api level..
+  locals.credentials = {'client-id' : '', 'client-secret': ''};
+  var isWildcard = true;
+  cycleThroughPlansInProduct(app, locals, isWildcard, product, ALLPLANS);
+  }
+  
+function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, productCallback)
+  {
+  var plans = JSON.parse(JSON.stringify(product.document.plans));
+  async.forEach(Object.getOwnPropertyNames(plans),
+    function(propname, propCallback) 
+      {
+      //overwrite with specific entry
+      locals.catalog = {};
+      locals.product = product;
+      locals.plan = {};
+      locals.plan.apis = product.document.plans[propname].apis;
+      locals.plan.name = propname;
+      locals.plan.id = getPlanID(locals.product, propname);
+      locals.plan.rateLimit =
+        locals.product.document.plans[locals.plan.name]['rate-limit'];
+      // 1. trying to add to a particular plan
+      // 2. trying to add to all plans
+      //    a. all subscription
+      //    b. product that possibly doesn't have subs or security
+      if (planid === ALLPLANS || locals.plan.id === planid)
+        {
+        gatherDataCreateOptimizedEntry(app, locals, isWildcard, propCallback); 
+        }
+      else
+        {
+        propCallback();
+        }
+      });
+  if (productCallback)
+    productCallback();
   }
   
 function determineNeededSubscriptionOptimizedEntries(app, ctx)
@@ -19,12 +58,14 @@ function determineNeededSubscriptionOptimizedEntries(app, ctx)
   else 
     {
     //specific subscription from APIm
-    gatherDataCreateOptimizedEntry(app, locals);  
+    var isWildcard = false
+    gatherDataCreateOptimizedEntry(app, locals, isWildcard);  
     }
   }
   
 function findPlansToAddSubscriptions(app, passed, planid)
   {
+  var isWildcard = false;
   var locals = passed;
   var productquery = {}; // look at all products
   // find optimized entries to create
@@ -32,29 +73,7 @@ function findPlansToAddSubscriptions(app, passed, planid)
     async.forEach(products,
       function (product, productCallback) 
       {
-      var plans = JSON.parse(JSON.stringify(product.document.plans));
-      async.forEach(Object.getOwnPropertyNames(plans),
-        function(propname, propCallback) 
-          {
-          //overwrite with specific entry
-          locals.catalog = {};
-          locals.product = product;
-          locals.plan = {};
-          locals.plan.apis = product.document.plans[propname].apis;
-          locals.plan.name = propname;
-          locals.plan.id = getPlanID(locals.product, propname);
-          locals.plan.rateLimit =
-            locals.product.document.plans[locals.plan.name]['rate-limit'];
-          if (planid === ALLPLANS || locals.plan.id === planid)
-            {
-            gatherDataCreateOptimizedEntry(app, locals, propCallback); 
-            }
-          else
-            {
-            propCallback();
-            }
-          });
-      productCallback();
+      cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, productCallback);
       });
     });
   }
@@ -88,7 +107,7 @@ function getPlanID(product, planname)
   return product.document.info.name + ":" + product.document.info.version + ":" + planname;
   }
 
-function gatherDataCreateOptimizedEntry(app, locals, gatherCallback)
+function gatherDataCreateOptimizedEntry(app, locals, isWildcard, gatherCallback)
   {
   async.series(
     [
@@ -138,6 +157,7 @@ function gatherDataCreateOptimizedEntry(app, locals, gatherCallback)
         createOptimizedDataEntry(
           app,
           locals,
+          isWildcard,
           function(err) {
             if (err) {
               callback(err);
@@ -219,27 +239,27 @@ function grabAPIs(app, snapshot, plan, cb) {
             return;
           }
           listOfApis.forEach(function(DBapi) {
+            var info = {};
             if (api.document)
-              {
-              if (DBapi.document.info['version'] ===
-                api.document.info['version'] &&
-                DBapi.document.info['x-ibm-name'] ===
-                api.document.info['x-ibm-name']) {
-                  debug('found api in db: %j', DBapi);
-                  apis.push(DBapi);
-                  }
-              }
-            else // standard (not in document)
-              {
-              debug('found api: %j', api);
-              if (DBapi.document.info['version'] ===
-                api.info['version'] &&
-                DBapi.document.info['x-ibm-name'] ===
-                api.info['x-ibm-name']) {
-                  debug('found api in db: %j', DBapi);
-                  apis.push(DBapi);
-                  }       
-              }
+              {info = api.document.info;}
+            else
+              if (api.info) // standard (not in document)
+                {info = api.info;}
+              else
+                { // not resolved try to spit the name
+                var apiName = api['$ref'].split(':');
+                debug('apiName: %j', apiName);
+                info = {'x-ibm-name': apiName[0], 'version': apiName[1]}
+                }
+
+            if (DBapi.document.info['version'] ===
+              info['version'] &&
+              DBapi.document.info['x-ibm-name'] ===
+              info['x-ibm-name']) {
+                debug('found api in db: %j', DBapi);
+                apis.push(DBapi);
+                }
+            
           });
           done();
         }
@@ -252,7 +272,7 @@ function grabAPIs(app, snapshot, plan, cb) {
 }
 
 
-function createOptimizedDataEntry(app, pieces, cb) {
+function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
   async.each(
     pieces.credentials,
     function(credential, creddone) { //each clientid
@@ -277,27 +297,37 @@ function createOptimizedDataEntry(app, pieces, cb) {
                       methodname);
                     debug('propname operationId: %j',
                       operation.operationId);
-                    method.push({
-                      method: methodname.toUpperCase(),
-                      operationId: operation.operationId,
-                      securityDefs: api.document.securityDefinitions,
-                      // operational lvl Swagger security overrides the API lvl
-                      securityReqs: operation.security ? operation.security :
-                                                         api.document.security,
-                    });
+                    var securityEnabledForMethod = 
+                      operation.security ? operation.security : api.document.security;
+                    if ((securityEnabledForMethod && !isWildcard) || 
+                        // add only security for subscriptions
+                        (!securityEnabledForMethod && isWildcard)) 
+                        // add only non-security for products (wildcard)
+                      {
+                      method.push({
+                        method: methodname.toUpperCase(),
+                        operationId: operation.operationId,
+                        securityDefs: api.document.securityDefinitions,
+                        // operational lvl Swagger security overrides the API lvl
+                        securityReqs: securityEnabledForMethod,
+                        });
+                      }
                   }
                 );
-                var regexPath = makePathRegex(
-                          api.document.basePath,
-                          propname);
-                var apiPath = {
-                  path: propname,
-                  'matching-score':
-                    calculateMatchingScore(propname),
-                  'path-regex': regexPath,
-                  'path-methods': method
-                };
-                apiPaths.push(apiPath);
+                if (method.length !== 0) // no methods, no apiPaths
+                  {
+                  var regexPath = makePathRegex(
+                            api.document.basePath,
+                            propname);
+                  var apiPath = {
+                    path: propname,
+                    'matching-score':
+                      calculateMatchingScore(propname),
+                    'path-regex': regexPath,
+                    'path-methods': method
+                    };
+                  apiPaths.push(apiPath);
+                  }
               }
             }
           );
@@ -344,7 +374,8 @@ function createOptimizedDataEntry(app, pieces, cb) {
             'snapshot-id' : pieces.snapshot
           };
 
-
+        if (apiPaths.length !== 0) // no paths, no entry..
+          {
           app.models.optimizedData.create(
             newOptimizedDataEntry,
             function(err, optimizedData) {
@@ -357,6 +388,11 @@ function createOptimizedDataEntry(app, pieces, cb) {
               apidone();
             }
           );
+          }
+        else 
+          {
+          apidone();
+          }
         },
         function(err) {
           creddone(err);
