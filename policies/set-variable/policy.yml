@@ -1,0 +1,53 @@
+policy: 1.0.0
+
+info:
+  title: Set Variable
+  name: apim.setvariable
+  version: "1"
+  description: Sets Variables in the runtime
+  appliesTo:
+    - API
+  contact:
+    name: Steve Product Manager
+    url: http://developer.acme.com/contacturl
+    email: steve-product-manager@someemailservice.com
+
+attach:
+  - rest
+  - soap
+
+properties: 
+  $schema: "http://json-schema.org/draft-04/schema#"
+  title: "Set, Add or Clear a runtime variable"
+  description: "Set, Add or Clear a runtime variable"
+  type: object
+  properties: 
+    setVariable:
+      label: "Set Variable"
+      description: "Set, Add or Clear a runtime variable"
+      type: array
+      items: 
+        type: object
+        properties: 
+          action: 
+            default: Set
+            description: Action
+            enum: 
+              - Add
+              - Set
+              - Clear
+            label: Action
+            type: string
+          name: 
+            description: "Variable Name"
+            label: Name
+            type: string
+          value: 
+            description: "Variable Value"
+            label: Value
+            type: string
+        required: 
+          - action
+          - name
+  required: 
+    - message

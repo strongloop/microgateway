@@ -1,0 +1,14 @@
+{
+  "name": "set-variable",
+  "version": "0.0.1",
+  "description": "An API Connect policy that set variables in the runtime",
+  "main": "index.js",
+  "keywords": [
+    "policy",
+    "api",
+    "apiconnect",
+    "set-variable"
+  ],
+  "author": "IBM",
+  "license": "ISC"
+}

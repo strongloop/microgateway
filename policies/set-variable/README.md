@@ -1,7 +1,7 @@
-## Invoke
+## Set Variable
 
 #### Overview
-The invoke policy is capable of calling to a backend or acting as a proxy
+The set-variable policy manipulates context variables in the runtime
 
 #### Properties
 See the `policy.yml`
