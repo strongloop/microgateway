@@ -43,6 +43,8 @@ function findPlansToAddSubscriptions(app, passed, planid)
           locals.plan.apis = product.document.plans[propname].apis;
           locals.plan.name = propname;
           locals.plan.id = getPlanID(locals.product, propname);
+          locals.plan.rateLimit =
+            locals.product.document.plans[locals.plan.name]['rate-limit'];
           if (planid === ALLPLANS || locals.plan.id === planid)
             {
             gatherDataCreateOptimizedEntry(app, locals, propCallback); 
