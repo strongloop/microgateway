@@ -376,6 +376,21 @@ describe('Context middleware', function() {
       });
     }); // end of 'should reject/ignore non-empty payload when needed' test
 
+    describe('should produce request.parameters', function() {
+      var app = loopback();
+      app.use(context());
+      app.use(function(req, resp) {
+        var ctx = req.ctx;
+        resp.send(ctx.request.parameters);
+      });
+
+      it('should parse query parameters', function(done) {
+        request(app)
+          .get('/search-tool?preference=yahoo')
+          .expect(200, { preference: 'yahoo'}, done);
+      });
+    }); // end of 'should produce request.parameters' test
+
   }); // end of 'Request category variables test
 
   describe('Message category variables', function() {
