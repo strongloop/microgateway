@@ -1,0 +1,26 @@
+policy: 1.0.0
+
+info:
+  title: JavaScript
+  name: javascript
+  version: 1.0
+  description: JavaScript Policy
+  contact:
+    name: IBM API Management
+    email: ibmapi@us.ibm.com
+    url: http://www.ibm.com/apimanagement
+
+attach:
+  - rest
+  - soap
+
+properties:
+  type: object
+  properties:
+    source:
+      label: Source
+      description: The JavaScript source to execute
+      default: console.log ('hello apim')
+      type: string
+  required:
+    - source

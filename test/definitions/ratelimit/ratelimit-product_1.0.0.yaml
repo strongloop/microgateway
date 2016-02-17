@@ -1,0 +1,19 @@
+product: 1.0.0
+info:
+  name: ratelimit-product
+  title: ratelimit-product
+  version: 1.0.0
+apis:
+  - $ref: 'ratelimit:1.0.0'
+plans:
+  Default:
+    title: Default
+    apis:
+      - $ref: 'ratelimit:1.0.0'
+    rate-limit:
+      value: 2/1second
+visibility:
+  view:
+    type: public
+  subscribe:
+    type: authenticated

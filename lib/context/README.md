@@ -4,7 +4,7 @@ and attach the context object to Express `req.ctx`.
 ## API
 ```js
 var express = require('express');
-var contextMiddlewareFactory = require('./context');
+var contextMiddlewareFactory = require('./lib/context');
 
 var app = express();
 app.use(contextMiddlewareFactory(options));
@@ -54,6 +54,54 @@ app.use(contextMiddlewareFactory(options));
 
 ```
 
+#### request.bodyParser
+an array describing which parser should be used for which content-type.
+For content-type not defined in this option, the default parsing method is
+`raw`, i.e. Buffer.
+
+Currently, the underlying implementation uses parsers from 
+`body-parser` https://github.com/expressjs/body-parser to parse payload.
+
+See https://github.ibm.com/apimesh/collab/blob/master/design/gateway/context.md
+for detailed usage.
+
+```js
+var options = {
+  request: {
+    bodyParser: [
+      { json: [ '*/json', '*/+json' ] },  // JSON content-type using json parser
+      { text: [ 'text/*'] },          // text content-type using text parser
+      { urlencoded: [ '*/x-www-form-urlencoded'] }
+    ];
+  }
+};
+
+var app = express();
+app.use(contextMiddlewareFactory(options));
+```
+
+
+#### request.bodyFilter
+an object defines when to reject or ignore payload of specific HTTP methods.
+
+See https://github.ibm.com/apimesh/collab/blob/master/design/gateway/context.md
+for detailed usage.
+
+```js
+var options = {
+  request: {
+    bodyFilter: {
+      DELETE: 'reject',
+      GET: 'reject',
+      HEAD: 'reject',
+      OPTIONS: 'ignore'
+    }
+  }
+};
+
+var app = express();
+app.use(contextMiddlewareFactory(options));
+```
 
 
 #### system.datetimeFormat
@@ -91,53 +139,4 @@ var app = express();
 app.use(contextMiddlewareFactory(options));
 ```
 
-
-#### message.bodyParser
-an array describing which parser should be used for which content-type.
-For content-type not defined in this option, the default parsing method is
-`raw`, i.e. Buffer.
-
-Currently, the underlying implementation uses parsers from 
-`body-parser` https://github.com/expressjs/body-parser to parse payload.
-
-See https://github.ibm.com/apimesh/collab/blob/master/design/gateway/context.md
-for detailed usage.
-
-```js
-var options = {
-  message: {
-    bodyParser: [
-      { json: [ '*/json', '*/+json' ] },  // JSON content-type using json parser
-      { text: [ 'text/*'] },          // text content-type using text parser
-      { urlencoded: [ '*/x-www-form-urlencoded'] }
-    ];
-  }
-};
-
-var app = express();
-app.use(contextMiddlewareFactory(options));
-```
-
-
-#### message.methodPayloadFilter
-an object defines when to reject or ignore payload of specific HTTP methods.
-
-See https://github.ibm.com/apimesh/collab/blob/master/design/gateway/context.md
-for detailed usage.
-
-```js
-var options = {
-  message: {
-    methodPayloadFilter: {
-      DELETE: 'reject',
-      GET: 'reject',
-      HEAD: 'reject',
-      OPTIONS: 'ignore'
-    }
-  }
-};
-
-var app = express();
-app.use(contextMiddlewareFactory(options));
-```
 
