@@ -1,0 +1,25 @@
+info:
+  version: 1.0.0
+  title: set-variable
+  x-ibm-name: set-variable
+  description: set-variable test suite
+basePath: /set-variable
+swagger: '2.0'
+paths:
+  /set-variable:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+x-ibm-configuration:
+  assembly:
+    execute:
+      - set-variable:
+          title: set-variable
+          actions:
+            - set: target-url
+              value: http://localhost:8889
+      - invoke:
+          title: invoke
+          target-url: $(target-url)
+
