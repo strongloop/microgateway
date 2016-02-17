@@ -456,10 +456,10 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
           "plans": {
             "default": {
               "apis": apis,
-              "rate-limit": {
-              "value": "100/hour",
-              "hard-limit": true
-              }
+         //     "rate-limit": {
+         //     "value": "5/hour",
+         //     "hard-limit": true
+         //     }
             }
           }
         }
