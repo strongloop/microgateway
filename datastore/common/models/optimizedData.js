@@ -6,10 +6,11 @@ function createProductOptimizedEntry(app, ctx)
   {
   var locals = {};
   var product = ctx.instance
+  locals.snapshot = ctx.instance['snapshot-id'];
   locals.subscription = {};  /// no subscription
   // assume we are going to create a wildcard entry...
   //     We will not if there's security configured at api level..
-  locals.credentials = {'client-id' : '', 'client-secret': ''};
+  locals.credentials = [{'client-id' : '', 'client-secret': ''}];
   var isWildcard = true;
   cycleThroughPlansInProduct(app, locals, isWildcard, product, ALLPLANS);
   }
