@@ -67,7 +67,7 @@ describe('Context middleware', function() {
       var expect = {
         verb: 'GET',
         uri: '/',
-        path: '/',
+        path: '',
         'content-type': undefined,
         authorization: undefined,
         headers: {}
@@ -84,7 +84,7 @@ describe('Context middleware', function() {
       var expect = {
         verb: 'GET',
         uri: '/x/y/z',
-        path: '/x/y/z',
+        path: 'x/y/z',
         'content-type': undefined,
         authorization: undefined,
         headers: {}
@@ -101,7 +101,7 @@ describe('Context middleware', function() {
       var expect = {
         verb: 'GET',
         uri: '/foo/bar?param1=1&param2=2',
-        path: '/foo/bar',
+        path: 'foo/bar',
         'content-type': undefined,
         authorization: undefined,
         headers: {}
@@ -118,7 +118,7 @@ describe('Context middleware', function() {
       var expect = {
         verb: 'GET',
         uri: '/foo/bar?param1=1&param2=2',
-        path: '/foo/bar',
+        path: 'foo/bar',
         'content-type': undefined,
         authorization: undefined,
         headers: {
@@ -138,7 +138,7 @@ describe('Context middleware', function() {
       var expect = {
         verb: 'POST',
         uri: '/foo',
-        path: '/foo',
+        path: 'foo',
         'content-type': 'application/json',
         authorization: undefined,
         headers: {}
@@ -258,7 +258,7 @@ describe('Context middleware', function() {
         // set the API basepath
         ctx.set('api.basepath', apiBasePath);
         try {
-          assert.strictEqual(ctx.get('request.path'), expectOpPath);
+          assert.strictEqual(ctx.get('request.path'), expectOpPath.substr(1));
           resp.send('done');
         } catch (error) {
           resp.send(error);
