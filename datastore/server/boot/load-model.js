@@ -182,7 +182,7 @@ function stageModels(app, models, cb) {
  */
 function pullFromAPIm(apimanager, uid, cb) {
   debug('pullFromAPIm entry');
-  if (apimanager) {
+  if (process.env[APIMANAGER]) {
     // Have an APIm, grab latest if we can..
     var snapdir =  rootConfigPath +
                    uid +
