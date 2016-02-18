@@ -1,0 +1,21 @@
+{
+  "name": "invoke",
+  "version": "1.0.0",
+  "description": "Invoke Policy",
+  "main": "index.js",
+  "keywords": [
+    "policy",
+    "api",
+    "apiconnect",
+    "mesh",
+    "invoke"
+  ],
+  "author": "IBM",
+  "license": "ISC",
+  "dependencies": {
+    "debug": "^2.x"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
