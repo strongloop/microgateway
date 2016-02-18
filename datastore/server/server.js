@@ -6,6 +6,11 @@ var async = require('async');
 var environment = require('../../utils/environment');
 var DATASTORE_PORT = environment.DATASTORE_PORT;
 
+// if the parent get killed we need to bite the bullet
+process.on('disconnect', function() {
+  process.exit(0);
+});
+
 var app = module.exports = loopback();
 
 app.start = function() {

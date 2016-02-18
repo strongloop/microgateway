@@ -1,14 +1,14 @@
 {
   "name": "invoke",
   "version": "1.0.0",
-  "description": "Invoke policy for the IBM API Connect flow-engine",
+  "description": "Invoke Policy",
   "main": "index.js",
   "keywords": [
     "policy",
     "api",
     "apiconnect",
-    "invoke",
-    "connect"
+    "mesh",
+    "invoke"
   ],
   "author": "IBM",
   "license": "ISC",
@@ -16,6 +16,6 @@
     "debug": "^2.x"
   },
   "scripts": {
-    "test": "true"
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

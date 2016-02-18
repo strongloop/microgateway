@@ -2,8 +2,8 @@ policy: 1.1.0
 
 info:
   title: Invoke
-  name: apim-setheader
-  description: Set an HTTP header for a message
+  name: apim-invoke
+  description: Invoke policy for the IBM API Connect
   contact:
     name: IBM API Mesh Samples
     url: https://www.ibm.com/apimesh
@@ -18,12 +18,12 @@ properties:
       enum:
         - GET
         - POST
-        - PATCH
         - PUT
         - DELETE
         - OPTIONS
-        - proxy
-      default: proxy
+        - HEAD
+        - PATCH
+      default: $(request.verb)
     target-url:
       label: "Target URL"
       description: "Full URL, may contain parameters"
@@ -31,7 +31,6 @@ properties:
       oneOf:
         -
           $ref: $/definitions/url
-
     http-version:
       label: HTTP Version
       type: string
