@@ -25,6 +25,7 @@
       "path-methods": [{
         "method": "string",
         "operationId": "string",
+        "consumes": [],
         "securityDefs": {},
         "securityReqs": []
       }]
