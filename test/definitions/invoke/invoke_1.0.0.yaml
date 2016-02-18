@@ -1,0 +1,32 @@
+info:
+  version: 1.0.0
+  title: invoke
+  x-ibm-name: invoke
+securityDefinitions:
+basePath: /invoke
+swagger: '2.0'
+paths:
+  /path-1:
+    post:
+      responses:
+        '200':
+          description: 200 OK
+    get:
+      responses:
+        '200':
+          description: 200 OK
+  /path-2:
+    post:
+      responses:
+        '200':
+          description: 200 OK
+    get:
+      responses:
+        '200':
+          description: 200 OK
+x-ibm-configuration:
+  assembly:
+    execute:
+      - invoke:
+          title: invoke
+          target-url: 'http://localhost:8889/'
