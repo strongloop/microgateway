@@ -490,7 +490,7 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
               "id": "app name",
               "app-credentials": [{
                 "client-id": "default",
-                "client-secret": "SECRET"
+                "client-secret": "CRexOpCRkV1UtjNvRZCVOczkUrNmGyHzhkGKJXiDswo="
               }]
             },
             "plan-registration": {
