@@ -30,7 +30,7 @@ where:
    - `<protocol>` is one of *http* or *https*
    - `<hostname>` is either DNS resolvable hostname or IPv4 literal
    - `<port>` is integer (1 - 65535) representing TCP port to listen on; defaults to 80 for http and 443 for https
-   - `<provider organization>` is the provider organization
+   - `<provider organization>` is the provider organization  (This field is TBD)
    - `<catalog>` is the environment; when not provided use the default catalog
    - `<basepath>` is the base path as defined by the Swagger 2.0 definition of the API
    - `<path>` is the operation as defined by the Swagger 2.0 definition of the API
