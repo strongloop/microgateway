@@ -249,7 +249,8 @@ describe('Context middleware', function() {
 
     describe('should produce req.path according to api.basepath', function() {
       var apiBasePath;
-      var expectOpPath;
+      var requestedPath;
+      var expectedPath;
       var myapp = loopback();
       myapp.use(context());
       myapp.use(function(req, resp) {
@@ -258,7 +259,9 @@ describe('Context middleware', function() {
         // set the API basepath
         ctx.set('api.basepath', apiBasePath);
         try {
-          assert.strictEqual(ctx.get('request.path'), expectOpPath.substr(1));
+          // the expected path should not include the preceding `/`
+          expectedPath = requestedPath.substr(1);
+          assert.strictEqual(ctx.get('request.path'), expectedPath);
           resp.send('done');
         } catch (error) {
           resp.send(error);
@@ -267,33 +270,33 @@ describe('Context middleware', function() {
 
       it('should work with URL w/o query params', function(done) {
         apiBasePath = '/foo';
-        expectOpPath = '/foo/bar';
+        requestedPath = '/foo/bar';
         request(myapp)
-          .get(expectOpPath)
+          .get(requestedPath)
           .expect(200, 'done', done);
       });
 
       it('should work with URL w/ query params', function(done) {
         apiBasePath = '/foo';
-        expectOpPath = '/foo/bar';
+        requestedPath = '/foo/bar';
         request(myapp)
-          .get(expectOpPath + '?name=hello')
+          .get(requestedPath + '?name=hello')
           .expect(200, 'done', done);
       });
 
       it('should work when api.basepath not exist', function(done) {
         apiBasePath = undefined;
-        expectOpPath = '/foo/bar';
+        requestedPath = '/foo/bar';
         request(myapp)
-          .get(expectOpPath)
+          .get(requestedPath)
           .expect(200, 'done', done);
       });
 
       it('should work when api.basepath mismatch originalUrl', function(done) {
         apiBasePath = 'foot';
-        expectOpPath = '/foo/bar';
+        requestedPath = '/foo/bar';
         request(myapp)
-          .get(expectOpPath)
+          .get(requestedPath)
           .expect(200, 'done', done);
       });
     });
