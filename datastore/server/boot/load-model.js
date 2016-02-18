@@ -182,7 +182,7 @@ function stageModels(app, models, cb) {
  */
 function pullFromAPIm(apimanager, uid, cb) {
   debug('pullFromAPIm entry');
-  if (apimanager) {
+  if (process.env[APIMANAGER]) {
     // Have an APIm, grab latest if we can..
     var snapdir =  rootConfigPath +
                    uid +
@@ -490,7 +490,7 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
               "id": "app name",
               "app-credentials": [{
                 "client-id": "default",
-                "client-secret": "SECRET"
+                "client-secret": "CRexOpCRkV1UtjNvRZCVOczkUrNmGyHzhkGKJXiDswo="
               }]
             },
             "plan-registration": {
