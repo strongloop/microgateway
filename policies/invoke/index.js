@@ -144,34 +144,22 @@ function invoke(props, context, next) {
     var request = http.request(options, function(response) {
         //read the response
         var target = context.message;
-        target.headers = {};
 
         target.statusCode = response.statusCode;
         target.statusMessage = response.statusMessage;
+        logger.info('invoke response: %d, %s', target.statusCode, target.statusMessage);
 
+        target.headers = {};
         for (var i in response.headers)
             target.headers[i] = response.headers[i];
 
         target.body = '';
-
-        logger.info('invoke response: %d, %s', target.statusCode, target.statusMessage);
-        logger.info('invoke response headers: %j', target.headers, {});
         response.on('data', function(chunk) {
-            logger.debug('invoke is reading: %s', chunk);
             target.body += chunk;
         });
 
+        //TODO: check the mime type and convert the target.body to JSON?
         response.on('end', function() {
-            if (typeof target.write === 'function') {
-                target.write(target.body);
-            }
-
-            if (typeof target.end === 'function') {
-                target.end();
-            }
-
-            logger.debug('invoke target.body: %s', target.body);
-            logger.debug('invoke context.message: %j', context.message, {});
             logger.info('invoke done');
             next();
         });

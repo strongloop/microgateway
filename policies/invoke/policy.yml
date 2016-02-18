@@ -21,7 +21,9 @@ properties:
         - PUT
         - DELETE
         - OPTIONS
-      default: GET
+        - HEAD
+        - PATCH
+      default: $(request.verb)
     target-url:
       label: "Target URL"
       description: "Full URL, may contain parameters"
