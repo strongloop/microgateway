@@ -1,5 +1,5 @@
 {
-  "name": "micro-gw",
+  "name": "apiconnect-microgateway",
   "version": "1.0.0",
   "description": "API Mesh MicroGateway",
   "main": "index.js",

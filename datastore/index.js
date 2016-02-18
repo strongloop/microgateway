@@ -10,7 +10,8 @@ exports.start = function(fork) {
       child = new (forever.Monitor)('./datastore/server/server.js', {
         max: 10,
         args: [],
-        fork: true
+        fork: true,
+        killTree: true,
       });
 
       child.on('restart', function() {
@@ -18,7 +19,7 @@ exports.start = function(fork) {
       });
 
       child.on('exit', function() {
-        console.error('datastore failed to start');
+        console.error('datastore exited');
       });
 
       child.on('message', function(msg) {
@@ -40,6 +41,12 @@ exports.start = function(fork) {
       });
 
       child.start();
+
+      process.on('SIGTERM', function() {
+        child.kill(true);
+        process.exit(0);
+      });
+
     } else {
       process.send = function(msg) {
         if (msg.LOADED) {
