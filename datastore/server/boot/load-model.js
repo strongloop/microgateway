@@ -45,8 +45,8 @@ module.exports = function(app) {
   // to the data-store
   var models = [];
   models.push(new ModelType('catalog', 'catalogs-'));
-  models.push(new ModelType('product', 'products-'));
   models.push(new ModelType('api', 'apis-'));
+  models.push(new ModelType('product', 'products-'));
   models.push(new ModelType('subscription', 'subs-'));
   models.push(new ModelType('tlsprofile', 'tlsprofs-'));
   models.push(new ModelType('registry', 'registries-'));
