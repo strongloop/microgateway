@@ -560,28 +560,25 @@ function expandAPIData(apidoc, dir)
       Object.getOwnPropertyNames(apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties).forEach(
         function (property) 
           {
-          debug('property: ' + property)
-          debug('apidoc[x-ibm-configuration].catalogs[apic-dev].properties[property]: ' + JSON.stringify(apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties[property]))
-          debug('before apidoc: ' + JSON.stringify(apidoc))
+          debug('property: ' + property);
           var propertyvalue = '$(' + property + ')';
           debug('propertyvalue: ' + propertyvalue);
           var replacementvalue;
           // is it an environment var?? $(envVar)
           var regEx = /\$\((.*)\)/;
-          if (regEx.test(apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties[property]))
-            {
-            var matches = apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties[property].match(regEx)
-            debug('matches: ' + matches)
-            var envvar = matches[1];
+          var matches = apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties[property].match(regEx)
+          var envvar = matches[1];
+          if (envvar) {
+            if (!process.env[envvar]) {
+              debug('Environment Variable not set for :' + envvar);
+              }
             replacementvalue = process.env[envvar];
             }
           // just replace all the values straight up
-          else 
-            {
+          else {
             replacementvalue = apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties[property];
             }
             apidoc = findAndReplace(apidoc, propertyvalue, replacementvalue)
-            debug('after apidoc: ' + JSON.stringify(apidoc))
             });
       }
     }
