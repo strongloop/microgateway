@@ -239,19 +239,17 @@ function grabAPIs(app, snapshot, product, plan, cb) {
         }
       };
       var info = {};
-      if (product.document.apis[api].document)
-        {
+      if (product.document.apis[api].document) {
         debug('info: product.document.apis[api].document');
         info = product.document.apis[api].document.info;
         }
       else
-        if (product.document.apis[api].info) // standard (not in document)
-          {
+        if (product.document.apis[api].info) {// standard (not in document)
           debug('info: product.document.apis[api].info');
           info = product.document.apis[api].info;
           }
-        else
-          { // not resolved try to spit the name
+        else {
+          // not resolved try to spit the name
           debug('api: %j', api);
           var apiName = product.document.apis[api]['name'].split(':');
           debug('apiName: %j', apiName);
