@@ -143,6 +143,7 @@ function gatherDataCreateOptimizedEntry(app, locals, isWildcard, gatherCallback)
       function(callback) {
         grabAPIs(app,
           locals.snapshot,
+          locals.product,
           locals.plan,
           function(err, apis) {
             if (err) {
@@ -221,17 +222,43 @@ function grabOrg(app, snapshot, catalog, cb) {
 }
 
 
-function grabAPIs(app, snapshot, plan, cb) {
+function grabAPIs(app, snapshot, product, plan, cb) {
   var apis = [];
-  debug('found plan: %j', plan);
+  debug('got product: %j', product);
+  debug('got plan: %j', plan);
+  var planApis = JSON.parse(JSON.stringify(plan.apis));
+  debug('planApis: %j', planApis);
+  debug('planApiProps: %j', Object.getOwnPropertyNames(planApis));
+      
   async.each(
-    plan.apis,
+    Object.getOwnPropertyNames(planApis),
     function(api, done) {
       var query = {
         'where' : {
           'snapshot-id' : snapshot
         }
       };
+      var info = {};
+      if (product.document.apis[api].document)
+        {
+        debug('info: product.document.apis[api].document');
+        info = product.document.apis[api].document.info;
+        }
+      else
+        if (product.document.apis[api].info) // standard (not in document)
+          {
+          debug('info: product.document.apis[api].info');
+          info = product.document.apis[api].info;
+          }
+        else
+          { // not resolved try to spit the name
+          debug('api: %j', api);
+          var apiName = product.document.apis[api]['name'].split(':');
+          debug('apiName: %j', apiName);
+          debug('info: product.document.apis[api][name]');
+          info = {'x-ibm-name': apiName[0], 'version': apiName[1]}
+          }
+      debug('info: %j', info);
       app.models.api.find(
         query,
         function(err, listOfApis) {
@@ -240,19 +267,7 @@ function grabAPIs(app, snapshot, plan, cb) {
             return;
           }
           listOfApis.forEach(function(DBapi) {
-            var info = {};
-            if (api.document)
-              {info = api.document.info;}
-            else
-              if (api.info) // standard (not in document)
-                {info = api.info;}
-              else
-                { // not resolved try to spit the name
-                var apiName = api['$ref'].split(':');
-                debug('apiName: %j', apiName);
-                info = {'x-ibm-name': apiName[0], 'version': apiName[1]}
-                }
-
+            debug('DBapi.document.info: %j', DBapi.document.info);
             if (DBapi.document.info['version'] ===
               info['version'] &&
               DBapi.document.info['x-ibm-name'] ===
