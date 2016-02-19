@@ -14,11 +14,11 @@ describe('data-store', function() {
   let snapshotID;
   before((done) => {
     process.env.DATASTORE_PORT = 5000;
-    process.env.APIMANAGER_PORT = 8080;
+    process.env.APIMANAGER_PORT = 8081;
     process.env.APIMANAGER = '127.0.0.1';
     process.env.NODE_ENV = 'production';
     echo.start(8889)
-      .then(() => apimServer.start('127.0.0.1', 8080))
+      .then(() => apimServer.start('127.0.0.1', 8081))
       .then(() => microgw.start(3000))
       .then(() => {
         request = supertest('http://localhost:5000');
