@@ -1,0 +1,45 @@
+info:
+  version: 1.0.0
+  title: cors-policy
+  x-ibm-name: cors-policy
+basePath: /cors-policy
+swagger: '2.0'
+paths:
+  /cors1:
+    get:
+      operationId: cors1
+      responses:
+        '200':
+          description: 200 OK
+  /cors2:
+    get:
+      operationId: cors2
+      responses:
+        '200':
+          description: 200 OK
+x-ibm-configuration:
+  assembly:
+    execute:
+      - operation-switch:
+          title: operation-switch
+          case:
+            - operations:
+                - cors1
+              execute:
+                - cors:
+                    allow-credentials: true
+                    allow-headers: FOO, BAR
+                    allow-methods: GET, POST
+                    allow-origin: http://foo.example.com
+                    expose-headers: X-Foo-Header, X-Bar-Header
+                    max-age: 3600
+
+            - operations:
+                - cors2
+              execute:
+                - cors:
+                    allow-credentials: false
+
+      - invoke:
+          title: invoke
+          target-url: 'http://localhost:8889/'
