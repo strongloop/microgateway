@@ -150,8 +150,10 @@ function invoke(props, context, next) {
         logger.info('invoke response: %d, %s', target.statusCode, target.statusMessage);
 
         target.headers = {};
-        for (var i in response.headers)
-            target.headers[i] = response.headers[i];
+        let rhrs = response.rawHeaders;
+        for(var i = 0; i < rhrs.length; i+=2) {
+            target.headers[rhrs[i]] = rhrs[i+1];
+        }
 
         target.body = '';
         response.on('data', function(chunk) {
