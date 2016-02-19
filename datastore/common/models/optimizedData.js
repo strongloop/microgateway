@@ -86,14 +86,14 @@ function ripCTX(ctx)
   locals.subscription.id = ctx.instance.id;
   locals.credentials =
     ctx.instance.application['app-credentials'];
+  ctx.instance['plan-registration'].apis = {}; // old list, wipe it
   locals.product = ctx.instance['plan-registration'].product;
   locals.plan = {};
-  if (ctx.instance['plan-registration'].apis && ctx.instance['plan-registration'].plan)
+  locals.plan = ctx.instance['plan-registration'].plan;
+  if (locals.product)
     {
-    locals.plan.apis = ctx.instance['plan-registration'].apis;
-    locals.plan.plan = ctx.instance['plan-registration'].plan;
-    locals.plan.id = getPlanID(locals.product, locals.plan.plan.name);
-    locals.plan.name = locals.plan.plan.name;
+    locals.plan.apis = locals.product.document.plans[locals.plan.name].apis;
+    locals.plan.id = getPlanID(locals.product, locals.plan.name);
     locals.plan.rateLimit =
       locals.product.document.plans[locals.plan.name]['rate-limit'];
     }
@@ -239,23 +239,20 @@ function grabAPIs(app, snapshot, product, plan, cb) {
         }
       };
       var info = {};
-      if (product.document.apis[api].document) {
-        debug('info: product.document.apis[api].document');
-        info = product.document.apis[api].document.info;
+      if (product.document.apis[api].info) {// standard (not in document)
+        debug('info: product.document.apis[api].info');
+        info = product.document.apis[api].info;
         }
       else
-        if (product.document.apis[api].info) {// standard (not in document)
-          debug('info: product.document.apis[api].info');
-          info = product.document.apis[api].info;
-          }
-        else {
-          // not resolved try to spit the name
-          debug('api: %j', api);
-          var apiName = product.document.apis[api]['name'].split(':');
-          debug('apiName: %j', apiName);
-          debug('info: product.document.apis[api][name]');
-          info = {'x-ibm-name': apiName[0], 'version': apiName[1]}
-          }
+        {
+        // not resolved try to spit the name
+        debug('api: %j', api);
+        var apiName = product.document.apis[api]['name'].split(':');
+        debug('apiName: %j', apiName);
+        debug('info: product.document.apis[api][name]');
+        info = {'x-ibm-name': apiName[0], 'version': apiName[1]} 
+        }
+      
       debug('info: %j', info);
       app.models.api.find(
         query,
