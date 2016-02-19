@@ -543,9 +543,9 @@ function findAndReplace(object, value, replacevalue){
 
 function expandAPIData(apidoc, dir)
   {
-  // add the assembly
   if (apidoc['x-ibm-configuration'])
     {
+    // add the assembly
     if (apidoc['x-ibm-configuration'].assembly && 
       apidoc['x-ibm-configuration'].assembly['$ref']) {
       var assemblyFile = path.join(dir, 
@@ -553,19 +553,36 @@ function expandAPIData(apidoc, dir)
       var assembly = YAML.load(assemblyFile);
       apidoc['x-ibm-configuration'].assembly = assembly;
       }
-    if (apidoc['x-ibm-configuration'].properties)
+    // fill in apid-dev properties
+    if (apidoc['x-ibm-configuration'].catalogs)
       {
-      Object.getOwnPropertyNames(apidoc['x-ibm-configuration'].properties).forEach(
+      if (apidoc['x-ibm-configuration'].catalogs['apic-dev'])
+      Object.getOwnPropertyNames(apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties).forEach(
         function (property) 
           {
           debug('property: ' + property)
-          debug('apidoc[x-ibm-configuration][properties][property][value]: ' + JSON.stringify(apidoc['x-ibm-configuration']['properties'][property]['value']))
+          debug('apidoc[x-ibm-configuration].catalogs[apic-dev].properties[property]: ' + JSON.stringify(apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties[property]))
           debug('before apidoc: ' + JSON.stringify(apidoc))
           var propertyvalue = '$(' + property + ')';
-          debug('property: ' + propertyvalue);
-          apidoc = findAndReplace(apidoc, propertyvalue, apidoc['x-ibm-configuration']['properties'][property]['value'])
-          debug('after apidoc: ' + JSON.stringify(apidoc))
-          });
+          debug('propertyvalue: ' + propertyvalue);
+          var replacementvalue;
+          // is it an environment var?? $(envVar)
+          var regEx = /\$\((.*)\)/;
+          if (regEx.test(apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties[property]))
+            {
+            var matches = apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties[property].match(regEx)
+            debug('matches: ' + matches)
+            var envvar = matches[1];
+            replacementvalue = process.env[envvar];
+            }
+          // just replace all the values straight up
+          else 
+            {
+            replacementvalue = apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties[property];
+            }
+            apidoc = findAndReplace(apidoc, propertyvalue, replacementvalue)
+            debug('after apidoc: ' + JSON.stringify(apidoc))
+            });
       }
     }
   return apidoc;
