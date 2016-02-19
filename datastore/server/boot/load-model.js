@@ -2,7 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var async = require('async');
 var YAML = require('yamljs');
-var debug = require('debug')('strong-gateway:data-store');
+var debug = require('debug')('micro-gateway:data-store');
 var sgwapimpull = require('../../apim-pull');
 var apimpull = sgwapimpull.pull;
 var environment = require('../../../utils/environment');
@@ -45,8 +45,8 @@ module.exports = function(app) {
   // to the data-store
   var models = [];
   models.push(new ModelType('catalog', 'catalogs-'));
-  models.push(new ModelType('product', 'products-'));
   models.push(new ModelType('api', 'apis-'));
+  models.push(new ModelType('product', 'products-'));
   models.push(new ModelType('subscription', 'subs-'));
   models.push(new ModelType('tlsprofile', 'tlsprofs-'));
   models.push(new ModelType('registry', 'registries-'));
@@ -543,9 +543,9 @@ function findAndReplace(object, value, replacevalue){
 
 function expandAPIData(apidoc, dir)
   {
-  // add the assembly
   if (apidoc['x-ibm-configuration'])
     {
+    // add the assembly
     if (apidoc['x-ibm-configuration'].assembly && 
       apidoc['x-ibm-configuration'].assembly['$ref']) {
       var assemblyFile = path.join(dir, 
@@ -553,19 +553,33 @@ function expandAPIData(apidoc, dir)
       var assembly = YAML.load(assemblyFile);
       apidoc['x-ibm-configuration'].assembly = assembly;
       }
-    if (apidoc['x-ibm-configuration'].properties)
+    // fill in apid-dev properties
+    if (apidoc['x-ibm-configuration'].catalogs)
       {
-      Object.getOwnPropertyNames(apidoc['x-ibm-configuration'].properties).forEach(
+      if (apidoc['x-ibm-configuration'].catalogs['apic-dev'])
+      Object.getOwnPropertyNames(apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties).forEach(
         function (property) 
           {
-          debug('property: ' + property)
-          debug('apidoc[x-ibm-configuration][properties][property][value]: ' + JSON.stringify(apidoc['x-ibm-configuration']['properties'][property]['value']))
-          debug('before apidoc: ' + JSON.stringify(apidoc))
+          debug('property: ' + property);
           var propertyvalue = '$(' + property + ')';
-          debug('property: ' + propertyvalue);
-          apidoc = findAndReplace(apidoc, propertyvalue, apidoc['x-ibm-configuration']['properties'][property]['value'])
-          debug('after apidoc: ' + JSON.stringify(apidoc))
-          });
+          debug('propertyvalue: ' + propertyvalue);
+          var replacementvalue;
+          // is it an environment var?? $(envVar)
+          var regEx = /\$\((.*)\)/;
+          var matches = apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties[property].match(regEx)
+          var envvar = matches[1];
+          if (envvar) {
+            if (!process.env[envvar]) {
+              debug('Environment Variable not set for :' + envvar);
+              }
+            replacementvalue = process.env[envvar];
+            }
+          // just replace all the values straight up
+          else {
+            replacementvalue = apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties[property];
+            }
+            apidoc = findAndReplace(apidoc, propertyvalue, replacementvalue)
+            });
       }
     }
   return apidoc;

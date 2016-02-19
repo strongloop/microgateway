@@ -1,5 +1,5 @@
 var app = require('../../server/server');
-var debug = require('debug')('strong-gateway:data-store');
+var debug = require('debug')('micro-gateway:data-store');
 var OptimizedData = require('./optimizedData.js');
 
 module.exports = function(Products) {
