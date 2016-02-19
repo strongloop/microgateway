@@ -1,6 +1,6 @@
 var fs = require('fs');
 var async = require('async');
-var debug = require('debug')('strong-gateway:utils');
+var debug = require('debug')('micro-gateway:utils');
 var configFileName = 'apim.config';
 var rootConfigPath = '/../config/';
 var configFile = __dirname + rootConfigPath + configFileName;
