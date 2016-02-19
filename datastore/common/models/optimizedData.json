@@ -26,6 +26,7 @@
         "method": "string",
         "operationId": "string",
         "consumes": [],
+        "parameters": {},
         "securityDefs": {},
         "securityReqs": []
       }]

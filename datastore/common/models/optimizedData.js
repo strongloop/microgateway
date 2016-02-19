@@ -281,6 +281,7 @@ function createOptimizedDataEntry(app, pieces, cb) {
                       method: methodname.toUpperCase(),
                       operationId: operation.operationId,
                       consumes: operation.consumes || api.document.consumes,
+                      parameters: operation.parameters,
                       securityDefs: api.document.securityDefinitions,
                       // operational lvl Swagger security overrides the API lvl
                       securityReqs: operation.security ? operation.security :
