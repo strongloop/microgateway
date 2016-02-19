@@ -27,12 +27,12 @@ visibility:
             - Consumer-Org-1
             - Consumer-Org-2
 apis:
-    -
-        $ref: 'ascents:1.0.0'
-    -
-        $ref: 'forecasts:1.0.0'
-    -
-        $ref: 'routes:1.0.0'
+  ascents: 
+    name: "ascents:1.0.0"
+  forecasts: 
+    name: "forecasts:1.0.0"
+  routes: 
+    name: "routes:1.0.0"
 plans:
     trial:
         title: 'Trial Climb On'
@@ -42,7 +42,7 @@ plans:
             hard-limit: true
             value: 60/hour
         apis:
-            - {$ref: 'ascents:1.0.0'}
+          ascents: {}
     silver:
         title: 'Silver Climb On'
         description: 'blah blah'
@@ -51,8 +51,8 @@ plans:
             hard-limit: false
             value: 100/min
         apis:
-            - {$ref: 'ascents:1.0.0'}
-            - {$ref: 'forecasts:1.0.0'}
+          ascents: {}
+          forecasts: {}
     gold:
         title: 'Gold Climb On'
         description: 'blah blah'
@@ -61,6 +61,6 @@ plans:
             hard-limit: false
             value: 1000/min
         apis:
-            - {$ref: 'ascents:1.0.0'}
-            - {$ref: 'forecasts:1.0.0'}
-            - {$ref: 'routes:1.0.0'}
+          ascents: {}
+          forecasts: {}
+          routes: {}

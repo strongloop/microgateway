@@ -49,101 +49,7 @@
       "title": "string"
     },
     "plan-registration": {
-      "apis": [
-        {
-          "catalog": {
-            "default": "boolean",
-            "id": "string",
-            "name": "string",
-            "sandbox": "boolean",
-            "title": "string",
-            "url": "string"
-          },
-          "document": {
-            "basePath": "string",
-            "consumes": [
-              "string"
-            ],
-            "definitions": {},
-            "host": "string",
-            "info": {
-              "contact": {
-                "email": "string",
-                "name": "string",
-                "url": "string"
-              },
-              "description": "string",
-              "license": {
-                "name": "string",
-                "url": "string"
-              },
-              "termsOfService": "string",
-              "title": "string",
-              "version": "string",
-              "x-ibm-name": "string"
-            },
-            "paths": {},
-            "produces": [
-              "string"
-            ],
-            "schemes": [
-              "string"
-            ],
-            "securityDefinitions": {
-              "oauthImplicit": {
-                "authorizationUrl": "string",
-                "flow": "string",
-                "scopes": {
-                  "scope1": "string",
-                  "scope2": "string"
-                },
-                "type": "string",
-                "x-ibm-oauth2": {
-                  "authentication": [
-                    "string"
-                  ],
-                  "authenticationForm": {
-                    "tlsClient": "string",
-                    "url": "string"
-                  },
-                  "authenticationRegistry": "string",
-                  "authenticationUrl": {
-                    "tlsClient": "string",
-                    "url": "string"
-                  },
-                  "authorization": "string",
-                  "authorizationForm": {
-                    "tlsClient": "string",
-                    "url": "string"
-                  },
-                  "refreshToken": "boolean",
-                  "revocationUrl": {
-                    "tlsClient": "string",
-                    "url": "string"
-                  }
-                }
-              }
-            },
-            "swagger": "string",
-            "x-ibm-configuration": {
-              "cors": {
-                "enabled": "boolean"
-              },
-              "enforced": "boolean",
-              "phase": "string",
-              "testable": "boolean"
-            }
-          },
-          "id": "string",
-          "organization": {
-            "id": "string",
-            "name": "string",
-            "title": "string"
-          },
-          "state": "string",
-          "url": "string"
-        }
-      ],
+      "apis": {},
       "id": "string",
       "plan": {
         "name": "string",
@@ -151,11 +57,7 @@
       },
       "product": {
         "document": {
-          "apis": [
-            {
-              "$ref": "string"
-            }
-          ],
+          "apis": {},
           "info": {
             "contact": {
               "email": "string",
