@@ -1,5 +1,5 @@
 var async = require('async');
-var debug = require('debug')('strong-gateway:data-store');
+var debug = require('debug')('micro-gateway:data-store');
 
 var ALLPLANS = 'ALLPLANS';
 function createProductOptimizedEntry(app, ctx)
