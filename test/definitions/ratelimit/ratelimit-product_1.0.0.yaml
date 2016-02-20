@@ -4,12 +4,13 @@ info:
   title: ratelimit-product
   version: 1.0.0
 apis:
-  - $ref: 'ratelimit:1.0.0'
+  ratelimit: 
+    name: 'ratelimit:1.0.0'
 plans:
   Default:
     title: Default
     apis:
-      - $ref: 'ratelimit:1.0.0'
+      ratelimit: {}
     rate-limit:
       value: 2/1second
 visibility:

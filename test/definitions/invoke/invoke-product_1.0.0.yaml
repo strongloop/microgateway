@@ -4,9 +4,10 @@ info:
   title: invoke-product
   version: 1.0.0
 apis:
-  - $ref: 'invoke:1.0.0'
+  invoke:
+    name: 'invoke:1.0.0'
 plans:
   Default:
     title: Default
     apis:
-      - $ref: 'invoke:1.0.0'
+      invoke: {}
