@@ -2,12 +2,12 @@
 
 ## Environment Variables
 
-APIMANAGER : Host of the APIm when you need to connect to. (online only)
-APIMANAGER_PORT : Port to connect to APIm on. (online only)
-DATASTORE_PORT : 
+- APIMANAGER : Host of the APIm when you need to connect to. (online only)
+- APIMANAGER_PORT : Port to connect to APIm on. (online only)
+- DATASTORE_PORT : 
   By default, the datastore binds to port 0, causing an ephemeral port listen
   If set before startup, the datastore will listen on that port
-CONFIGDIR : 
+- CONFIGDIR : 
   Directory of swagger to load. (online & laptop, this will be used for initial load. online will load into ./config for subsequent loads)
   
 ## What does it do?
