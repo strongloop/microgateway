@@ -1,6 +1,6 @@
 # micro-gw
 
-[![Build Status](https://apim-jenkins3.hursley.ibm.com/buildStatus/icon?job=micro-gw)](https://apim-jenkins3.hursley.ibm.com/view/API%20Connect/job/micro-gw/)
+[![Build Status](https://apim-jenkins3.hursley.ibm.com/buildStatus/icon?job=apiconnect-microgateway)](https://apim-jenkins3.hursley.ibm.com/job/apiconnect-microgateway)
 
 API Mesh MicroGateway
 

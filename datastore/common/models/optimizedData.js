@@ -1,10 +1,50 @@
 var async = require('async');
-var debug = require('debug')('strong-gateway:data-store');
+var debug = require('debug')('micro-gateway:data-store');
 
 var ALLPLANS = 'ALLPLANS';
 function createProductOptimizedEntry(app, ctx)
   {
-  //console.log('ctx: ' + JSON.stringify(ctx, null, 4));
+  var locals = {};
+  var product = ctx.instance
+  locals.snapshot = ctx.instance['snapshot-id'];
+  locals.subscription = {};  /// no subscription
+  // assume we are going to create a wildcard entry...
+  //     We will not if there's security configured at api level..
+  locals.credentials = [{'client-id' : '', 'client-secret': ''}];
+  var isWildcard = true;
+  cycleThroughPlansInProduct(app, locals, isWildcard, product, ALLPLANS);
+  }
+  
+function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, productCallback)
+  {
+  var plans = JSON.parse(JSON.stringify(product.document.plans));
+  async.forEach(Object.getOwnPropertyNames(plans),
+    function(propname, propCallback) 
+      {
+      //overwrite with specific entry
+      locals.catalog = {};
+      locals.product = product;
+      locals.plan = {};
+      locals.plan.apis = product.document.plans[propname].apis;
+      locals.plan.name = propname;
+      locals.plan.id = getPlanID(locals.product, propname);
+      locals.plan.rateLimit =
+        locals.product.document.plans[locals.plan.name]['rate-limit'];
+      // 1. trying to add to a particular plan
+      // 2. trying to add to all plans
+      //    a. all subscription
+      //    b. product that possibly doesn't have subs or security
+      if (planid === ALLPLANS || locals.plan.id === planid)
+        {
+        gatherDataCreateOptimizedEntry(app, locals, isWildcard, propCallback); 
+        }
+      else
+        {
+        propCallback();
+        }
+      });
+  if (productCallback)
+    productCallback();
   }
   
 function determineNeededSubscriptionOptimizedEntries(app, ctx)
@@ -19,12 +59,14 @@ function determineNeededSubscriptionOptimizedEntries(app, ctx)
   else 
     {
     //specific subscription from APIm
-    gatherDataCreateOptimizedEntry(app, locals);  
+    var isWildcard = false
+    gatherDataCreateOptimizedEntry(app, locals, isWildcard);  
     }
   }
   
 function findPlansToAddSubscriptions(app, passed, planid)
   {
+  var isWildcard = false;
   var locals = passed;
   var productquery = {}; // look at all products
   // find optimized entries to create
@@ -32,29 +74,7 @@ function findPlansToAddSubscriptions(app, passed, planid)
     async.forEach(products,
       function (product, productCallback) 
       {
-      var plans = JSON.parse(JSON.stringify(product.document.plans));
-      async.forEach(Object.getOwnPropertyNames(plans),
-        function(propname, propCallback) 
-          {
-          //overwrite with specific entry
-          locals.catalog = {};
-          locals.product = product;
-          locals.plan = {};
-          locals.plan.apis = product.document.plans[propname].apis;
-          locals.plan.name = propname;
-          locals.plan.id = getPlanID(locals.product, propname);
-          locals.plan.rateLimit =
-            locals.product.document.plans[locals.plan.name]['rate-limit'];
-          if (planid === ALLPLANS || locals.plan.id === planid)
-            {
-            gatherDataCreateOptimizedEntry(app, locals, propCallback); 
-            }
-          else
-            {
-            propCallback();
-            }
-          });
-      productCallback();
+      cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, productCallback);
       });
     });
   }
@@ -66,14 +86,14 @@ function ripCTX(ctx)
   locals.subscription.id = ctx.instance.id;
   locals.credentials =
     ctx.instance.application['app-credentials'];
+  ctx.instance['plan-registration'].apis = {}; // old list, wipe it
   locals.product = ctx.instance['plan-registration'].product;
   locals.plan = {};
-  if (ctx.instance['plan-registration'].apis && ctx.instance['plan-registration'].plan)
+  locals.plan = ctx.instance['plan-registration'].plan;
+  if (locals.product)
     {
-    locals.plan.apis = ctx.instance['plan-registration'].apis;
-    locals.plan.plan = ctx.instance['plan-registration'].plan;
-    locals.plan.id = getPlanID(locals.product, locals.plan.plan.name);
-    locals.plan.name = locals.plan.plan.name;
+    locals.plan.apis = locals.product.document.plans[locals.plan.name].apis;
+    locals.plan.id = getPlanID(locals.product, locals.plan.name);
     locals.plan.rateLimit =
       locals.product.document.plans[locals.plan.name]['rate-limit'];
     }
@@ -88,7 +108,7 @@ function getPlanID(product, planname)
   return product.document.info.name + ":" + product.document.info.version + ":" + planname;
   }
 
-function gatherDataCreateOptimizedEntry(app, locals, gatherCallback)
+function gatherDataCreateOptimizedEntry(app, locals, isWildcard, gatherCallback)
   {
   async.series(
     [
@@ -123,6 +143,7 @@ function gatherDataCreateOptimizedEntry(app, locals, gatherCallback)
       function(callback) {
         grabAPIs(app,
           locals.snapshot,
+          locals.product,
           locals.plan,
           function(err, apis) {
             if (err) {
@@ -138,6 +159,7 @@ function gatherDataCreateOptimizedEntry(app, locals, gatherCallback)
         createOptimizedDataEntry(
           app,
           locals,
+          isWildcard,
           function(err) {
             if (err) {
               callback(err);
@@ -200,17 +222,38 @@ function grabOrg(app, snapshot, catalog, cb) {
 }
 
 
-function grabAPIs(app, snapshot, plan, cb) {
+function grabAPIs(app, snapshot, product, plan, cb) {
   var apis = [];
-  debug('found plan: %j', plan);
+  debug('got product: %j', product);
+  debug('got plan: %j', plan);
+  var planApis = JSON.parse(JSON.stringify(plan.apis));
+  debug('planApis: %j', planApis);
+  debug('planApiProps: %j', Object.getOwnPropertyNames(planApis));
+      
   async.each(
-    plan.apis,
+    Object.getOwnPropertyNames(planApis),
     function(api, done) {
       var query = {
         'where' : {
           'snapshot-id' : snapshot
         }
       };
+      var info = {};
+      if (product.document.apis[api].info) {// standard (not in document)
+        debug('info: product.document.apis[api].info');
+        info = product.document.apis[api].info;
+        }
+      else
+        {
+        // not resolved try to spit the name
+        debug('api: %j', api);
+        var apiName = product.document.apis[api]['name'].split(':');
+        debug('apiName: %j', apiName);
+        debug('info: product.document.apis[api][name]');
+        info = {'x-ibm-name': apiName[0], 'version': apiName[1]} 
+        }
+      
+      debug('info: %j', info);
       app.models.api.find(
         query,
         function(err, listOfApis) {
@@ -219,27 +262,15 @@ function grabAPIs(app, snapshot, plan, cb) {
             return;
           }
           listOfApis.forEach(function(DBapi) {
-            if (api.document)
-              {
-              if (DBapi.document.info['version'] ===
-                api.document.info['version'] &&
-                DBapi.document.info['x-ibm-name'] ===
-                api.document.info['x-ibm-name']) {
-                  debug('found api in db: %j', DBapi);
-                  apis.push(DBapi);
-                  }
-              }
-            else // standard (not in document)
-              {
-              debug('found api: %j', api);
-              if (DBapi.document.info['version'] ===
-                api.info['version'] &&
-                DBapi.document.info['x-ibm-name'] ===
-                api.info['x-ibm-name']) {
-                  debug('found api in db: %j', DBapi);
-                  apis.push(DBapi);
-                  }       
-              }
+            debug('DBapi.document.info: %j', DBapi.document.info);
+            if (DBapi.document.info['version'] ===
+              info['version'] &&
+              DBapi.document.info['x-ibm-name'] ===
+              info['x-ibm-name']) {
+                debug('found api in db: %j', DBapi);
+                apis.push(DBapi);
+                }
+            
           });
           done();
         }
@@ -252,7 +283,7 @@ function grabAPIs(app, snapshot, plan, cb) {
 }
 
 
-function createOptimizedDataEntry(app, pieces, cb) {
+function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
   async.each(
     pieces.credentials,
     function(credential, creddone) { //each clientid
@@ -289,17 +320,20 @@ function createOptimizedDataEntry(app, pieces, cb) {
                     });
                   }
                 );
-                var regexPath = makePathRegex(
-                          api.document.basePath,
-                          propname);
-                var apiPath = {
-                  path: propname,
-                  'matching-score':
-                    calculateMatchingScore(propname),
-                  'path-regex': regexPath,
-                  'path-methods': method
-                };
-                apiPaths.push(apiPath);
+                if (method.length !== 0) // no methods, no apiPaths
+                  {
+                  var regexPath = makePathRegex(
+                            api.document.basePath,
+                            propname);
+                  var apiPath = {
+                    path: propname,
+                    'matching-score':
+                      calculateMatchingScore(propname),
+                    'path-regex': regexPath,
+                    'path-methods': method
+                    };
+                  apiPaths.push(apiPath);
+                  }
               }
             }
           );
@@ -346,7 +380,8 @@ function createOptimizedDataEntry(app, pieces, cb) {
             'snapshot-id' : pieces.snapshot
           };
 
-
+        if (apiPaths.length !== 0) // no paths, no entry..
+          {
           app.models.optimizedData.create(
             newOptimizedDataEntry,
             function(err, optimizedData) {
@@ -359,6 +394,11 @@ function createOptimizedDataEntry(app, pieces, cb) {
               apidone();
             }
           );
+          }
+        else 
+          {
+          apidone();
+          }
         },
         function(err) {
           creddone(err);
