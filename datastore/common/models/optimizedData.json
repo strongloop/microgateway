@@ -28,10 +28,12 @@
       "path": "string",
       "path-regex": "string",
       "path-methods": [{
+        "consumes": [],
         "method": "string",
         "operationId": "string",
-        "consumes": [],
-        "parameters": {},
+        "parameters": [],
+        "produces": [],
+        "responses": {},
         "securityDefs": {},
         "securityReqs": []
       }]

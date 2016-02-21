@@ -317,15 +317,19 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                         (!securityEnabledForMethod && isWildcard)) 
                         // add only non-security for products (wildcard)
                       {
-                      method.push({
-                        method: methodname.toUpperCase(),
-                        operationId: operation.operationId,
-                        consumes: operation.consumes || api.document.consumes,
-                        parameters: operation.parameters,
-                        securityDefs: api.document.securityDefinitions,
-                        // operational lvl Swagger security overrides the API lvl
-                        securityReqs: securityEnabledForMethod,
-                        });
+                        method.push({
+                          consumes: operation.consumes || api.document.consumes,
+                          method: methodname.toUpperCase(),
+                          operationId: operation.operationId,
+                          parameters: getOpParams(api.document.parameters,
+                                                  api.document.paths[propname].parameters,
+                                                  operation.parameters),
+                          produces: operation.produces || api.document.produces,
+                          responses: operation.responses,
+                          securityDefs: api.document.securityDefinitions,
+                          // operational lvl Swagger security overrides the API lvl
+                          securityReqs: securityEnabledForMethod,
+                          });
                       }
                   }
                 );
@@ -474,6 +478,19 @@ function calculateMatchingScore(apiPath) {
   }
 
   return pathScore;
+}
+
+/**
+ * Returns a Object that denotes the parameters associated with the operation
+ *
+ * @param {Object} apiParams api-level parameters in the swagger
+ * @param {Array} pathParams path-level parameters in the swagger
+ * @param {Array} opParams op-level perameters in the swagger
+ *
+ */
+function getOpParams(apiParams, pathParams, opParams) {
+  // TODO need to join the 3 params
+  return opParams;
 }
 
 exports.determineNeededSubscriptionOptimizedEntries = determineNeededSubscriptionOptimizedEntries;

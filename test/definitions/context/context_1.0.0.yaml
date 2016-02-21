@@ -17,10 +17,10 @@ produces:
   - application/json
 
 paths:
-  /context/api:
+  /context/internal:
     get:
-      summary: get API context variable value
-      operationId: getAPI
+      summary: get interal context variable value
+      operationId: getInternal
       parameters:
         - name: param1
           in: query
@@ -30,6 +30,13 @@ paths:
           in: header
           description: parameter 2
           type: integer
+      responses:
+        '200':
+          description: 200 OK
+  /context/api:
+    get:
+      summary: get API context variable value
+      operationId: getAPI
       responses:
         '200':
           description: 200 OK
@@ -43,8 +50,22 @@ x-ibm-configuration:
         foo: local_foo
   assembly:
     execute:
-      - set-variable:
-          title: set-variable
-          actions:
-            - set: message.body
-              value: $(api)
+      - operation-switch:
+          title: operation-switch
+          case:
+            - operations:
+                - getInternal
+              execute:
+                - set-variable:
+                    title: set-variable
+                    actions:
+                      - set: message.body
+                        value: $(_.api)
+            - operations:
+                - getAPI
+              execute:
+                - set-variable:
+                    title: set-variable
+                    actions:
+                      - set: message.body
+                        value: $(api)
