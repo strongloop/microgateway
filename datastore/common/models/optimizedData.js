@@ -28,6 +28,7 @@ function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, pr
       locals.plan.apis = product.document.plans[propname].apis;
       locals.plan.name = propname;
       locals.plan.id = getPlanID(locals.product, propname);
+      locals.plan.version = locals.product.document.info.version;
       locals.plan.rateLimit =
         locals.product.document.plans[locals.plan.name]['rate-limit'];
       // 1. trying to add to a particular plan
@@ -94,6 +95,7 @@ function ripCTX(ctx)
     {
     locals.plan.apis = locals.product.document.plans[locals.plan.name].apis;
     locals.plan.id = getPlanID(locals.product, locals.plan.name);
+    locals.plan.version = locals.product.document.info.version;
     locals.plan.rateLimit =
       locals.product.document.plans[locals.plan.name]['rate-limit'];
     }
@@ -345,6 +347,20 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             }
           );
 
+          // get API properties that user can define
+          var ibmSwaggerExtension = api.document['x-ibm-configuration'];
+          var defaultApiProperties = ibmSwaggerExtension.properties;
+          var apiProperties = {};
+          if (defaultApiProperties) {
+            Object.getOwnPropertyNames(defaultApiProperties).forEach(
+              function(propertyName){
+                apiProperties[propertyName] = 
+                  ibmSwaggerExtension.catalogs[pieces.catalog.name].properties[propertyName] || 
+                  defaultApiProperties[propertyName];
+              }
+            );
+          }
+
     /*
         "subscription-id": "string",
         "client-id": "string",
@@ -359,6 +375,9 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
         "plan-rate-limit": {},
         "api-id": "string",
         "api-base-path": "string",
+        "api-name": "string",
+        "api-version": "string",
+        "api-properties": {},
         "api-paths": [{
            "path": "string",
            "path-base": "string",
@@ -374,6 +393,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'client-secret': credential['client-secret'],
             'plan-id': pieces.plan.id,
             'plan-name': pieces.plan.name,
+            'plan-version': pieces.plan.version,
             'plan-rate-limit': pieces.plan.rateLimit,
             'product-id': pieces.product.id,
             'product-name': pieces.product.document.info.name,
@@ -383,6 +403,10 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'organization-name': pieces.org.name,
             'api-id': api.id,
             'api-base-path': api.document.basePath,
+            'api-name': api.document.info.title,
+            'api-type': api.document['x-ibm-configuration']['api-type'] || 'REST',
+            'api-version': api.document.info.version,
+            'api-properties': apiProperties,
             'api-paths': apiPaths,
             'snapshot-id' : pieces.snapshot
           };
