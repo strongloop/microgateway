@@ -354,9 +354,13 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
           if (defaultApiProperties) {
             Object.getOwnPropertyNames(defaultApiProperties).forEach(
               function(propertyName){
-                apiProperties[propertyName] = 
-                  ibmSwaggerExtension.catalogs[pieces.catalog.name].properties[propertyName] || 
-                  defaultApiProperties[propertyName];
+                if (pieces.catalog.name &&
+                    ibmSwaggerExtension.catalogs[pieces.catalog.name] &&
+                    ibmSwaggerExtension.catalogs[pieces.catalog.name].properties[propertyName]) {
+                  apiProperties[propertyName] = ibmSwaggerExtension.catalogs[pieces.catalog.name].properties[propertyName];
+                } else {
+                  apiProperties[propertyName] = defaultApiProperties[propertyName];
+                }
               }
             );
           }

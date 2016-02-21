@@ -1,0 +1,50 @@
+info:
+  version: 1.0.0
+  title: context
+  x-ibm-name: context
+  description: context test suite
+
+basePath: /
+
+swagger: '2.0'
+
+consumes:
+  - application/xml
+  - application/json
+
+produces:
+  - application/xml
+  - application/json
+
+paths:
+  /context/api:
+    get:
+      summary: get API context variable value
+      operationId: getAPI
+      parameters:
+        - name: param1
+          in: query
+          description: parameter 1
+          type: string
+        - name: param2
+          in: header
+          description: parameter 2
+          type: integer
+      responses:
+        '200':
+          description: 200 OK
+x-ibm-configuration:
+  properties:
+    foo:
+      value: default_foo
+  catalogs:
+    local:
+      properties:
+        foo: local_foo
+  assembly:
+    execute:
+      - set-variable:
+          title: set-variable
+          actions:
+            - set: message.body
+              value: $(api)
