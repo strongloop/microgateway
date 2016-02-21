@@ -308,16 +308,23 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                       methodname);
                     debug('propname operationId: %j',
                       operation.operationId);
-                    method.push({
-                      method: methodname.toUpperCase(),
-                      operationId: operation.operationId,
-                      consumes: operation.consumes || api.document.consumes,
-                      parameters: operation.parameters,
-                      securityDefs: api.document.securityDefinitions,
-                      // operational lvl Swagger security overrides the API lvl
-                      securityReqs: operation.security ? operation.security :
-                                                         api.document.security,
-                    });
+                    var securityEnabledForMethod = 
+                      operation.security ? operation.security : api.document.security;
+                    if ((securityEnabledForMethod && !isWildcard) || 
+                        // add only security for subscriptions
+                        (!securityEnabledForMethod && isWildcard)) 
+                        // add only non-security for products (wildcard)
+                      {
+                      method.push({
+                        method: methodname.toUpperCase(),
+                        operationId: operation.operationId,
+                        consumes: operation.consumes || api.document.consumes,
+                        parameters: operation.parameters,
+                        securityDefs: api.document.securityDefinitions,
+                        // operational lvl Swagger security overrides the API lvl
+                        securityReqs: securityEnabledForMethod,
+                        });
+                      }
                   }
                 );
                 if (method.length !== 0) // no methods, no apiPaths
