@@ -42,8 +42,7 @@ paths:
           description: 200 OK
 x-ibm-configuration:
   properties:
-    foo:
-      value: default_foo
+    foo: default_foo
   catalogs:
     local:
       properties:
@@ -61,6 +60,11 @@ x-ibm-configuration:
                     actions:
                       - set: message.body
                         value: $(_.api)
+                - set-variable:
+                    title: set-content-type
+                    actions:
+                      - set: message.headers.content-type
+                        value: application/json
             - operations:
                 - getAPI
               execute:
@@ -69,3 +73,8 @@ x-ibm-configuration:
                     actions:
                       - set: message.body
                         value: $(api)
+                - set-variable:
+                    title: set-content-type
+                    actions:
+                      - set: message.headers.content-type
+                        value: application/json
