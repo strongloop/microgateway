@@ -7,11 +7,9 @@ info:
   description: |
     The CORS policy controls the response headers returned by the gateway
     when HEAD method is invoked on a path that does not have an explictly
-    defined HEAD operation.    
-  contact:
-  name: IBM API Mesh
-  url: https://www.ibm.com/apimesh
-  email: apimesh@ibm.com
+    defined HEAD operation.
+  name: IBM API Connect
+  url: ibm.biz/apiconnect
 
 properties:
   allow-credentials:

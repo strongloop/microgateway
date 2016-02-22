@@ -14,14 +14,14 @@ visibility:
         type: authenticated
         tags: []
         orgs: []
-apis:
-    -
-        $ref: 'uber-api:1.0.0'
+apis: 
+  uber-api: 
+    name: "uber-api:1.0.0"
 plans:
     gold:
         title: 'Gold Plan'
         rate-limit:
             hard-limit: false
             value: 1/sec
-        apis:
-            - {$ref: 'uber-api:1.0.0'}
+        apis: 
+          uber-api: {}

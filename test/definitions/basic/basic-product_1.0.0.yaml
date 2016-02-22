@@ -4,9 +4,10 @@ info:
   title: basic-product
   version: 1.0.0
 apis:
-  - $ref: 'basic:1.0.0'
+  basic:
+    name: 'basic:1.0.0'
 plans:
   Default:
     title: Default
     apis:
-      - $ref: 'basic:1.0.0'
+      basic: {}

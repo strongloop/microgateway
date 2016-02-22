@@ -1,5 +1,15 @@
 # APIm Optimized datastore builder
 
+## Environment Variables
+
+- APIMANAGER : Host of the APIm when you need to connect to. (online only)
+- APIMANAGER_PORT : Port to connect to APIm on. (online only)
+- DATASTORE_PORT : 
+  By default, the datastore binds to port 0, causing an ephemeral port listen
+  If set before startup, the datastore will listen on that port
+- CONFIGDIR : 
+  Directory of swagger to load. (online & laptop, this will be used for initial load. online will load into ./config for subsequent loads)
+  
 ## What does it do?
 Currently, it periodically uses apim-pull.js to download files from APIm, uses these locally persisted files to populate the data models with them, and builds another model which is optimized for preflow lookup.
 
