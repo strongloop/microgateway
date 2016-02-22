@@ -66,7 +66,7 @@
       }
     }
   }
-}, {
+},{
   "id": "564b7b44e4b0869c782ede0b",
   "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b44e4b0869c782ede0b",
   "state": "published",
@@ -177,6 +177,60 @@
         }, {
           "$ref": "routes:1.0.0"
         }]
+      }
+    }
+  }
+},{
+  "id": "564b7b44e4b0869c782ede12",
+  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b44e4b0869c782ede12",
+  "state": "published",
+  "visibility": {
+    "view": {
+      "enabled": true,
+      "type": "public",
+      "tags": [],
+      "orgs": []
+    },
+    "subscribe": {
+      "enabled": true,
+      "type": "authenticated",
+      "tags": [],
+      "orgs": []
+    }
+  },
+  "organization": {
+    "id": "564b48a9e4b0869c782edc24",
+    "name": "apim",
+    "title": "Climb On"
+  },
+  "catalog": {
+    "id": "564b48aae4b0869c782edc2b",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+    "name": "sb",
+    "title": "Sandbox",
+    "sandbox": true,
+    "default": false
+  },
+  "document": {
+    "product": "1.0.0",
+    "info": {
+      "name": "basic-product",
+      "title": "basic-product",
+      "version": "1.0.0"
+    },
+    "apis": [
+      {
+        "$ref": "basic:1.0.0"
+      }
+    ],
+    "plans": {
+      "Default": {
+        "title": "Default",
+        "apis": [
+          {
+            "$ref": "basic:1.0.0"
+          }
+        ]
       }
     }
   }
