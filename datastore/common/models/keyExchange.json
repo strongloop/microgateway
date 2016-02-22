@@ -1,0 +1,15 @@
+{
+  "name": "keyExchange",
+  "base": "PersistedModel",
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "publicKey": "string",
+    "privateKey": "string"
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}
