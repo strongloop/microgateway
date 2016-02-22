@@ -54,7 +54,10 @@ module.exports = function(app) {
   models.push(new ModelType('optimizedData', 'dummy'));
   models.push(new ModelType('snapshot', 'dummy')); // hack, removed later
 
-  var apimanager = {};
+  var apimanager = {
+    host: process.env[APIMANAGER],
+    port: process.env[APIMANAGER_PORT]
+    };
 
   async.series(
     [
@@ -102,16 +105,29 @@ module.exports = function(app) {
  * @param {string} currdir - current snapshot symbolic link path 
  */
 function loadData(app, apimanager, models, currdir) {
-  var snapshotID, snapdir;
+  var snapshotID = getSnapshotID()
+  var snapdir;
+  var handshakeOk = false;
   async.series(
     [
       function(callback) {
-        snapshotID = getSnapshotID();
-        pullFromAPIm(apimanager, snapshotID, function(err, dir) {
+        if (apimanager.host) {
+        // we have an APIm, so try to handshake with it.. 
+          handshakeOk = true;
+          }
+        callback();
+      },
+      function(callback) {
+        if (apimanager.host && handshakeOk) {
+        // we have an APIm, so try to handshake with it.. 
+          pullFromAPIm(apimanager, snapshotID, function(err, dir) {
             snapdir = dir;
             callback();
-          }
-        );
+          });
+        }
+        else {
+          snapdir = '';
+          callback();}
       },
       // populate snapshot model
       function(callback) {
@@ -120,6 +136,7 @@ function loadData(app, apimanager, models, currdir) {
       // load current config
       function(callback) {
         loadConfig(app,
+                   apimanager,
                    models,
                    currdir,
                    snapdir,
@@ -138,7 +155,7 @@ function loadData(app, apimanager, models, currdir) {
 }
 
 function scheduleLoadData(app, apimanager, models, dir) {
-  if (process.env[APIMANAGER])
+  if (apimanager.host)
     setTimeout(loadData,
              15 * 1000, // 15 seconds TODO: make configurable
              app,
@@ -182,47 +199,55 @@ function stageModels(app, models, cb) {
  */
 function pullFromAPIm(apimanager, uid, cb) {
   debug('pullFromAPIm entry');
-  if (process.env[APIMANAGER]) {
-    // Have an APIm, grab latest if we can..
-    var snapdir =  rootConfigPath +
-                   uid +
-                   '/';
-    fs.mkdir(snapdir, function(err) {
-        if (err) {
-          debug('pullFromAPIm exit(1)');
-          cb(null, '');
-          return;
-        }
-
-        var options = {};
-        options['host'] = process.env[APIMANAGER];
-        options['port'] = process.env[APIMANAGER_PORT];
-        options['outdir'] = snapdir;
-        debug('apimpull start');
-        apimpull(options,function(err, response) {
-            if (err) {
-              console.error(err);
-              try {
-                fs.rmdirSync(snapdir);
-              } catch(e) {
-                console.error(e);
-                //continue
-              }
-              snapdir = '';
-              // falling through
-              // try loading from local files
-            }
-            debug(response);
-            debug('pullFromAPIm exit(2)');
-            cb(null, snapdir);
-          }
-        );
+  // Have an APIm, grab latest if we can..
+  var snapdir =  rootConfigPath +
+                  uid +
+                  '/';
+  fs.mkdir(snapdir, function(err) {
+      if (err) {
+        debug('pullFromAPIm exit(1)');
+        cb(null, '');
+        return;
       }
-    );
-  } else {
-    debug('pullFromAPIm exit(3)');
-    cb(null, '');
-  }
+      /*
+      var options = {
+        host : host of APIm
+        port : port of APIm
+        timeout : opts.timeout * 1000 || 30 * 1000,
+        clikey : opts.clikey ? fs.readFileSync(key) : null,
+        clicert : opts.clicert ? fs.readFileSync(cert)  : null,
+        clientid : opts.clientid || '1111-1111',
+        outdir : opts.outdir || 'apim'
+      };*/
+
+      var options = {};
+      options['host'] = apimanager.host;
+      options['port'] = apimanager.port;
+      options['clikey'] = apimanager.clikey;
+      options['clicert'] = apimanager.clicert;
+      options['clientid'] = apimanager.clientid;
+      options['outdir'] = snapdir;
+      debug('apimpull start');
+      apimpull(options,function(err, response) {
+          if (err) {
+            console.error(err);
+            try {
+              fs.rmdirSync(snapdir);
+            } catch(e) {
+              console.error(e);
+              //continue
+            }
+            snapdir = '';
+            // falling through
+            // try loading from local files
+          }
+          debug(response);
+          debug('pullFromAPIm exit(2)');
+          cb(null, snapdir);
+        }
+      );
+    }
+  );
 }
 
 /**
@@ -235,13 +260,13 @@ function pullFromAPIm(apimanager, uid, cb) {
  * @param {string} uid - snapshot identifier
  * @param {callback} cb - callback that handles error or successful completion
  */
-function loadConfig(app, models, currdir, snapdir, uid, cb) {
+function loadConfig(app, apimanager, models, currdir, snapdir, uid, cb) {
   debug('loadConfig entry');
 
   var dirToLoad = (snapdir === '') ?
                     (currdir + '/') :
                     snapdir;
-  loadConfigFromFS(app, models, dirToLoad, uid, function(err) {
+  loadConfigFromFS(app, apimanager, models, dirToLoad, uid, function(err) {
       if (err) {
         console.error(err);
         debug('loadConfig error(1)');
@@ -280,7 +305,7 @@ function loadConfig(app, models, currdir, snapdir, uid, cb) {
  * @param {string} uid - snapshot identifier
  * @param {callback} cb - callback that handles error or successful completion
  */
-function loadConfigFromFS(app, models, dir, uid, cb) {
+function loadConfigFromFS(app, apimanager, models, dir, uid, cb) {
   var files;
   debug('loadConfigFromFS entry');
   try {
@@ -308,7 +333,7 @@ function loadConfigFromFS(app, models, dir, uid, cb) {
       debug('file match jsonFile: ', file.match(jsonFile));
       debug('file match yamlFile: ', file.match(yamlFile));
       // apim pull scenario (only json, no yaml)
-      if (process.env[APIMANAGER] && file.match(jsonFile)) {
+      if (apimanager.host && file.match(jsonFile)) {
         for(var i = 0; i < models.length; i++) {
           if(file.indexOf(models[i].prefix) > -1) {
             debug('%s file: %s', models[i].name, file);
@@ -325,7 +350,7 @@ function loadConfigFromFS(app, models, dir, uid, cb) {
     }
   );
   
-  if (process.env[APIMANAGER]) {
+  if (apimanager.host) {
     // populate data-store models with the file contents
     populateModelsWithAPImData(app, models, dir, uid, cb);
   }
