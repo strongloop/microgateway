@@ -1,5 +1,6 @@
 'use strict';
 
+let _ = require('lodash');
 let fs = require('fs');
 let path = require('path');
 let express = require('express');
@@ -7,8 +8,56 @@ let supertest = require('supertest');
 let echo = require('./support/echo-server');
 let ldap = require('./support/ldap-server');
 let mg = require('../lib/microgw');
+let dsc = require('../datastore/client');
 let should = require('should');
 let apimServer = require('./support/mock-apim-server/apim-server');
+
+function cleanup () {
+  const rmfile = fpath => new Promise((resolve, reject) => {
+    console.log(`Removing file ${fpath}`);
+    fs.unlink(fpath, err => {
+      if (err) {
+        console.error(`Error removing ${fpath}`);
+        reject(err);
+      }
+      else
+        resolve();
+    })
+  });
+
+  const readdir = dir => new Promise((resolve, reject) => {
+    fs.readdir(ssdir, (err, files) => {
+      if (err) {
+        console.error(`Error while reading ${ssdir}`);
+        reject(err);
+      }
+      else
+        resolve(files);
+    });
+  });
+
+  let ssdir;
+
+  return dsc.getCurrentSnapshot()
+    .then(id => {
+      ssdir = path.resolve(__dirname, '../config', id);
+      return readdir(ssdir);
+    })
+    .then(files => new Promise((resolve) => {
+      console.log(`Removing ${ssdir}`);
+      let p = Promise.all(_.map(files, f => rmfile(path.resolve(ssdir, f))));
+      p = p.then(() => {
+        fs.rmdir(ssdir, err => {
+          if (err)
+            console.error(`Error removing ${fpath}`);
+          resolve(p);
+        });
+      })
+    }))
+    .catch(err => {
+      console.error('cleanup() failed due to error', err);
+    });
+}
 
 describe('basic auth policy', function() {
 
@@ -47,14 +96,17 @@ describe('basic auth policy', function() {
   });
 
   after((done) => {
-    delete process.env.CONFIG_DIR;
-    delete process.env.DATASTORE_PORT;
-    delete process.env.APIMANAGER_PORT;
-    delete process.env.APIMANAGER;
-    delete process.env.NODE_ENV;
-    mg.stop()
+    cleanup()
+      .then(() => mg.stop())
       .then(() => ldap.stop())
       .then(() => echo.stop())
+      .then(() => {
+        delete process.env.CONFIG_DIR;
+        delete process.env.DATASTORE_PORT;
+        delete process.env.APIMANAGER_PORT;
+        delete process.env.APIMANAGER;
+        delete process.env.NODE_ENV;
+      })
       .then(done, done)
       .catch(done);
   });
