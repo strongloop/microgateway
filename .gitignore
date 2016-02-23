@@ -1,7 +1,8 @@
 npm-global/
-config/apim.config
 .idea/
 coverage/
+id_rsa
+id_rsa.pub
 *.iml
 *.dat
 *.gz
