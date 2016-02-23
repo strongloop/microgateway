@@ -12,8 +12,6 @@ var environment = require('../../../utils/environment');
 var APIMANAGER = environment.APIMANAGER;
 var APIMANAGER_PORT = environment.APIMANAGER_PORT;
 var APIMANAGER_CATALOG = environment.APIMANAGER_CATALOG;
-var GW_PUBLIC_KEY = environment.GW_PUBLIC_KEY;
-var GW_PRIVATE_KEY = environment.GW_PRIVATE_KEY;
 var CONFIGDIR = environment.CONFIGDIR;
 
 var LAPTOP_RATELIMIT = environment.LAPTOP_RATELIMIT;
@@ -66,8 +64,6 @@ module.exports = function(app) {
     host: process.env[APIMANAGER],
     port: process.env[APIMANAGER_PORT],
     catalog: process.env[APIMANAGER_CATALOG],
-    publicKey: process.env[GW_PUBLIC_KEY],
-    privateKey: process.env[GW_PRIVATE_KEY],
     handshakeOk: true
     };
 
@@ -114,9 +110,6 @@ module.exports = function(app) {
                  apimanager,
                  models,
                  definitionsDir);
-      }
-      else {
-        
       }
     }
   );
@@ -210,6 +203,7 @@ function stageModels(app, models, cb) {
 }
 /**
  * Attempt to handshake from APIm server
+ * @param {???} app - loopback application
  * @param {Object} config - configuration pointing to APIm server
  * @param {callback} cb - callback that handles error or path to
  *                        snapshot directory
