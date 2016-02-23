@@ -22,11 +22,17 @@ describe('javascript policy', function() {
     // update properties in context
     it('should be able to update a property in the context', function(done) {
       var context = {request:
-                          {uri: 'http://localhost/foo'}
+                          {uri: 'http://localhost/foo'},
+                      myval: 1
                      };
-      var code = `request.uri = 'http://localhost/bar';`;
+      var code = `request.uri = 'http://localhost/bar';
+                  myval = 'myvalue';
+        `;
+      console.error('context.myval:', context.myval);
       javascriptPolicy({source: code}, context, error => {
+        should(error).be.a.Undefined();
         context.request.uri.should.exactly('http://localhost/bar');
+        context.myval.should.exactly('myvalue');
         done();
       });
     });
@@ -38,17 +44,20 @@ describe('javascript policy', function() {
                      };
       var code = `delete request.uri;`;
       javascriptPolicy({source: code}, context, error => {
+        should(error).be.a.Undefined();
         should(context.request.uri).be.a.Undefined();
         done();
       });
     });
 
+    // local variable won't be added into context
     it('should not pollute context with local variable', function(done) {
       var context = {request:
                           {uri: 'http://localhost/foo'}
                      };
       var code = `var a = 'localvar'; a = request.uri;`;
       javascriptPolicy({source: code}, context, error => {
+        should(error).be.a.Undefined();
         should(context.a).be.a.Undefined();
         done();
       });
@@ -69,36 +78,76 @@ describe('javascript policy', function() {
         `;
 
       javascriptPolicy({source: code}, context, error => {
+        should(error).be.a.Undefined();
         context.request.uri.should.exactly('http://localhost/xxx');
         done();
       });
     });
 
     // use global functions
-    it('should be able to use ECMA function: parseInt()', function(done) {
+    it('should be able to use parseInt()', function(done) {
       var context = {request:
                           {uri: 'http://localhost/foo'},
-                     myval : "1"
+                     myval : '1'
                      };
       var code = `myval = parseInt(myval);`;
 
       javascriptPolicy({source: code}, context, error => {
+        should(error).be.a.Undefined();
         should(context.myval).exactly(1).and.be.a.Number();
         done();
       });
     });
 
     // use JSON.stringify functions
-    it('should be able to use ECMA function: parseInt()', function(done) {
+    it('should be able to use JSON.stringify()', function(done) {
       var context = {request:
                           {uri: 'http://localhost/foo'},
-                     myval : "1"
+                     myval: '1'
                      };
       var code = `myval = JSON.stringify({ 'a': 'a', 'b':'b'});`;
 
       javascriptPolicy({source: code}, context, error => {
-        should(context.myval).exactly(JSON.stringify({ 'a': 'a', 'b':'b'})).
+        should(error).be.a.Undefined();
+        should(context['myval']).exactly(JSON.stringify({ 'a': 'a', 'b':'b'})).
           and.be.a.String();
+        done();
+      });
+    });
+
+    // try catch
+    it('should be able to use try/catch', function(done) {
+      var context = {request:
+                          {uri: 'http://localhost/foo'}
+                     };
+      var code = `try {
+          var vm = require('vm');
+        } catch (e) {
+          request.uri = 'http://localhost/bar'
+        }`;
+
+      javascriptPolicy({source: code}, context, error => {
+        should(error).be.a.Undefined();
+        context.request.uri.should.exactly('http://localhost/bar');
+        done();
+      });
+    });
+
+    // using arrow function
+    it('should be able to use arrow function', function(done) {
+      var context = {request:
+                          {uri: 'http://localhost/foo'},
+                     myval: '1'
+                     };
+      var code = `var total = 0;
+        [1, 2, 3].forEach( (val) => {
+          total += val;
+        });
+        myval = total;`;
+
+      javascriptPolicy({source: code}, context, error => {
+        should(error).be.a.Undefined();
+        should(context.myval).exactly(6).and.be.a.Number();
         done();
       });
     });
