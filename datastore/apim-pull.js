@@ -236,7 +236,7 @@ function fetch (opts, cb) {
         );
       }
       else {
-        var error = new Error(opts.url +
+        var error = new Error(options.url +
                     ' failed with: ' +
                     res.statusCode);
         cb(error);

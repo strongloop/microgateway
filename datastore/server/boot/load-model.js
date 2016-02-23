@@ -2,13 +2,21 @@ var fs = require('fs');
 var path = require('path');
 var async = require('async');
 var YAML = require('yamljs');
+var constants = require('constants');
+var Crypto = require('crypto');
+var Request = require('request');
 var debug = require('debug')('micro-gateway:data-store');
 var sgwapimpull = require('../../apim-pull');
 var apimpull = sgwapimpull.pull;
 var environment = require('../../../utils/environment');
 var APIMANAGER = environment.APIMANAGER;
 var APIMANAGER_PORT = environment.APIMANAGER_PORT;
+var APIMANAGER_CATALOG = environment.APIMANAGER_CATALOG;
+var GW_PUBLIC_KEY = environment.GW_PUBLIC_KEY;
+var GW_PRIVATE_KEY = environment.GW_PRIVATE_KEY;
 var CONFIGDIR = environment.CONFIGDIR;
+
+var LAPTOP_RATELIMIT = environment.LAPTOP_RATELIMIT;
 
 var rootConfigPath = __dirname + '/../../../config/';
 var defaultDefinitionsDir = rootConfigPath + 'default';
@@ -56,16 +64,20 @@ module.exports = function(app) {
 
   var apimanager = {
     host: process.env[APIMANAGER],
-    port: process.env[APIMANAGER_PORT]
+    port: process.env[APIMANAGER_PORT],
+    catalog: process.env[APIMANAGER_CATALOG],
+    publicKey: process.env[GW_PUBLIC_KEY],
+    privateKey: process.env[GW_PRIVATE_KEY],
+    handshakeOk: true
     };
 
   async.series(
     [
       function(callback) {
         // get CONFIG_DIR.. two basic paths APIm load or local
-        // if no apim.config or ENV var, load default dir.. APIm 
-        // if apim.config or ENV var, 
-        //    if apimanager specified, dir = "last known config"..
+        // if no ENV var, load default dir.. APIm 
+        // if ENV var, 
+        //    if apimanager specified, dir = 'last known config'..
         //    if no apimanager specified, dir will be loaded..
         if (process.env[CONFIGDIR])
           definitionsDir = process.env[CONFIGDIR];
@@ -83,15 +95,28 @@ module.exports = function(app) {
             callback(err);
           }
        );
+      },
+      function(callback) {
+        if (apimanager.host && apimanager.handshakeOk === false) {
+        // we have an APIm, so try to handshake with it.. 
+          handshakeWithAPIm(app, apimanager, function(err, handshakeApimanager) {
+            apimanager = handshakeApimanager;
+            callback(err);
+            })
+          }
+        else { callback();}       
       }
     ],
     // load the data into the models
-    function(err, results) {
+    function(err) {
       if (!err) {
         loadData(app,
                  apimanager,
                  models,
                  definitionsDir);
+      }
+      else {
+        
       }
     }
   );
@@ -105,21 +130,15 @@ module.exports = function(app) {
  * @param {string} currdir - current snapshot symbolic link path 
  */
 function loadData(app, apimanager, models, currdir) {
-  var snapshotID = getSnapshotID()
   var snapdir;
-  var handshakeOk = false;
+  var snapshotID = getSnapshotID();
+  
   async.series(
     [
       function(callback) {
-        if (apimanager.host) {
-        // we have an APIm, so try to handshake with it.. 
-          handshakeOk = true;
-          }
-        callback();
-      },
-      function(callback) {
-        if (apimanager.host && handshakeOk) {
-        // we have an APIm, so try to handshake with it.. 
+        debug("apimanager before pullFromAPIm: " + JSON.stringify(apimanager))
+        if (apimanager.host && apimanager.handshakeOk) {
+        // we have an APIm, handshake succeeded, so try to pull data.. 
           pullFromAPIm(apimanager, snapshotID, function(err, dir) {
             snapdir = dir;
             callback();
@@ -189,6 +208,96 @@ function stageModels(app, models, cb) {
     }
   );
 }
+/**
+ * Attempt to handshake from APIm server
+ * @param {Object} config - configuration pointing to APIm server
+ * @param {callback} cb - callback that handles error or path to
+ *                        snapshot directory
+ */
+function handshakeWithAPIm(app, apimanager, cb) {
+  debug('handshakeWithAPIm entry');
+  
+  async.series([
+    function(callback) {
+      //configure route to API
+      callback();
+      },
+    function(callback) {
+      // send version encrypted using public key
+      var keyDir = __dirname + '/../../../';
+      var version ='1.0.0';
+      var private_key = fs.readFileSync(keyDir + 'id_rsa','utf8');
+      var encryptedVersion = Crypto.privateEncrypt(private_key, new Buffer(version,'ascii'));
+      var body = {
+        gatewayVersion: encryptedVersion
+      }
+      debug('EncryptedBody:' + JSON.stringify(body));
+          
+      var apimHandshakeUrl = 'https://' + apimanager.host + ':' + apimanager.port + '/v1/catalogs/' + apimanager.catalog + '/handshake/';
+      
+      Request({
+        url: apimHandshakeUrl,
+        method: "POST",
+        json: body,
+        headers: {
+          "content-type": "application/json",
+          }
+        },       
+      function(err, res, body) {
+        if (err) {
+          debug('Failed to communicate with %s: %s ', apimHandshakeUrl, err);
+          callback(err);
+        }
+        else {
+          debug('statusCode: ' + res.statusCode);          
+          if (res.statusCode === 200) {
+            var algorithm = 'AES-256-CBC';
+            var IV = '0000000000000000';
+            debug('body: ' + JSON.stringify(res.body));
+            var password = Crypto.privateDecrypt(private_key, new Buffer(res.body.Key));
+            debug("password: " + password);
+            var decipher = Crypto.createDecipheriv(algorithm, password, IV);
+            var decrypted = decipher.update(res.body.cipher, 'base64', 'utf8');
+            decrypted += decipher.final('utf8');
+            debug('decrypted: ' + decrypted);
+            var jsonDecrypted = JSON.parse(decrypted);
+            
+            debug('jsonDecrypted: ' + JSON.stringify(jsonDecrypted));
+            
+            apimanager.clicert = jsonDecrypted.managerCert;
+            apimanager.clikey = jsonDecrypted.managerKey;
+            apimanager.clientid = jsonDecrypted.clientID;
+            
+            debug('apimanager.clicert: ' + apimanager.clicert);
+            debug('apimanager.clikey: ' + apimanager.clikey);
+            debug('apimanager.clientid: ' + apimanager.clientid);
+
+            debug('apimanager: ' + JSON.stringify(apimanager));          
+            callback(null, apimanager);
+            }
+          else {
+            debug('failed https')
+            var error = new Error(apimHandshakeUrl +
+                            ' failed with: ' +
+                            res.statusCode);
+            callback(error);
+            }
+          }
+        });
+      },
+    function(callback) {
+      //remove route to API
+      callback();
+      }],
+    function(err) {
+      debug('handshakeWithAPIm exit');
+      if (err)
+        apimanager.handshakeOk = false;
+      else
+        apimanager.handshakeOk = true;
+      cb(err, apimanager);
+    });
+  }
 
 /**
  * Attempt to request data from APIm server and persist to disk
@@ -285,8 +394,7 @@ function loadConfig(app, apimanager, models, currdir, snapdir, uid, cb) {
             // only update pointer to latest configuration
             // when latest configuration successful loaded
             if (snapdir === dirToLoad) {
-                environment.setConfigFileVariable(CONFIGDIR, 
-                            snapdir);
+                process.env[CONFIGDIR] = snapdir;
             }
             debug('loadConfig exit');
             cb();
@@ -461,30 +569,33 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
         // no catalog
         entry.catalog = {};
         entry['snapshot-id'] = uid;
+        var rateLimit = '100/hour';
+        if (process.env[LAPTOP_RATELIMIT])
+          {rateLimit=process.env[LAPTOP_RATELIMIT];}
         entry.document = 
           {
-          "product": "1.0.0",
-          "info": {
-            "name": "static product",
-            "version": "1.0.0",
-            "title": "static-product"
+          'product': '1.0.0',
+          'info': {
+            'name': 'static product',
+            'version': '1.0.0',
+            'title': 'static-product'
           },
-          "visibility": {
-            "view": {
-              "type": "public"
+          'visibility': {
+            'view': {
+              'type': 'public'
             },
-            "subscribe": {
-              "type": "authenticated"
+            'subscribe': {
+              'type': 'authenticated'
             }
           },
-          "apis": apis,
-          "plans": {
-            "default": {
-              "apis": apis
-         //     "rate-limit": {
-         //     "value": "5/hour",
-         //     "hard-limit": true
-         //     }
+          'apis': apis,
+          'plans': {
+            'default': {
+              'apis': apis,
+              'rate-limit': {
+              'value': rateLimit,
+              'hard-limit': true
+              }
             }
           }
         }
@@ -509,17 +620,17 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
     function(seriesCallback) {
       var subscriptions = [
             {
-            "catalog": {},
-            "id": "test subscription",
-            "application": {
-              "id": "app name",
-              "app-credentials": [{
-                "client-id": "default",
-                "client-secret": "CRexOpCRkV1UtjNvRZCVOczkUrNmGyHzhkGKJXiDswo="
+            'catalog': {},
+            'id': 'test subscription',
+            'application': {
+              'id': 'app name',
+              'app-credentials': [{
+                'client-id': 'default',
+                'client-secret': 'CRexOpCRkV1UtjNvRZCVOczkUrNmGyHzhkGKJXiDswo='
               }]
             },
-            "plan-registration": {
-              "id": "ALLPLANS"
+            'plan-registration': {
+              'id': 'ALLPLANS'
                 }
             }
             ];
