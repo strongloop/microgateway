@@ -18,7 +18,7 @@ function createProductOptimizedEntry(app, ctx)
 function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, productCallback)
   {
   var plans = JSON.parse(JSON.stringify(product.document.plans));
-  async.forEach(Object.getOwnPropertyNames(plans),
+  async.forEachLimit(Object.getOwnPropertyNames(plans),1, 
     function(propname, propCallback) 
       {
       //overwrite with specific entry
@@ -310,11 +310,28 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                       operation.operationId);
                     var securityEnabledForMethod = 
                       operation.security ? operation.security : api.document.security;
-                    if ((securityEnabledForMethod && !isWildcard) || 
-                        // add only security for subscriptions
-                        (!securityEnabledForMethod && isWildcard)) 
-                        // add only non-security for products (wildcard)
+                    debug('securityEnabledForMethod: ' + JSON.stringify(securityEnabledForMethod));
+                    var clientidSecurity = false;
+                    if (securityEnabledForMethod)
                       {
+                      securityEnabledForMethod.forEach(
+                        function(securityReq) {
+                            var securityProps = Object.getOwnPropertyNames(securityReq)
+                            var clientidProps = ['apiSecretHeader','apikeyHeader',
+                                                'apikeyQueryParameter', 'apiSecretQueryParameter'];
+                            clientidProps.forEach(
+                              function(clientidProp) {
+                                if (securityProps.indexOf(clientidProp) > -1)  {                                
+                                  clientidSecurity = true;
+                                  debug('clientidSecurity: ' + clientidSecurity);
+                                  }
+                                });
+                        });
+                      }
+                    if ((securityEnabledForMethod && clientidSecurity && !isWildcard) || 
+                        // add only security for subscriptions
+                        ((!securityEnabledForMethod || !clientidSecurity) && isWildcard)) {
+                        // add only non-clientid security for products (wildcard)
                       method.push({
                         method: methodname.toUpperCase(),
                         operationId: operation.operationId,
@@ -325,8 +342,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                       }
                   }
                 );
-                if (method.length !== 0) // no methods, no apiPaths
-                  {
+                if (method.length !== 0) { // no methods, no apiPaths
                   var regexPath = makePathRegex(
                             api.document.basePath,
                             propname);
@@ -385,8 +401,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'snapshot-id' : pieces.snapshot
           };
 
-        if (apiPaths.length !== 0) // no paths, no entry..
-          {
+        if (apiPaths.length !== 0) { // no paths, no entry..
           app.models.optimizedData.create(
             newOptimizedDataEntry,
             function(err, optimizedData) {
@@ -400,8 +415,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             }
           );
           }
-        else 
-          {
+        else {
           apidone();
           }
         },
