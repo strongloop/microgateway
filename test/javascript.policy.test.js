@@ -115,6 +115,20 @@ describe('javascript policy', function() {
       });
     });
 
+//    // using let
+//    it('should be able to use let', function(done) {
+//      var context = {request:
+//                          {uri: 'http://localhost/foo'}
+//                     };
+//      var code = `let a = 'bar'; request.uri = 'http://localhost/' + a;`;
+//
+//      javascriptPolicy({source: code}, context, error => {
+//        should(error).be.a.Undefined();
+//        context.request.uri.should.exactly('http://localhost/bar');
+//        done();
+//      });
+//    });
+
     // try catch
     it('should be able to use try/catch', function(done) {
       var context = {request:
