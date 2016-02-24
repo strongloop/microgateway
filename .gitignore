@@ -1,8 +1,6 @@
 npm-global/
 .idea/
 coverage/
-id_rsa
-id_rsa.pub
 *.iml
 *.dat
 *.gz
