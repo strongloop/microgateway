@@ -19,6 +19,8 @@
     "plan-version": "string",
     "plan-rate-limit": {},
     "api-id": "string",
+    "api-document": {},
+    "api-assembly": {},
     "api-base-path": "string",
     "api-name": "string",
     "api-type": "string",

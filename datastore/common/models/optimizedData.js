@@ -351,7 +351,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             }
           );
 
-          // get API properties that user can define
+          // get API properties that user defined in the swagger
           var ibmSwaggerExtension = api.document['x-ibm-configuration'];
           var defaultApiProperties = ibmSwaggerExtension.properties;
           var apiProperties = {};
@@ -368,6 +368,18 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
               }
             );
           }
+
+          // Some customers add their own extension to the swagger,
+          // so we will make the swagger available in context to customers.
+          // As the information is needed for every incoming transaction on
+          // gateway, store the data in the optimized data model.
+          var swaggerWithoutAssembly = JSON.parse(JSON.stringify(api.document));
+          delete swaggerWithoutAssembly['x-ibm-configuration'].assembly;
+
+          var assemblyFlow = {
+            assembly: api.document['x-ibm-configuration'].assembly
+          };
+
 
     /*
         "subscription-id": "string",
@@ -410,6 +422,8 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'organization-id': pieces.org.id,
             'organization-name': pieces.org.name,
             'api-id': api.id,
+            'api-document': swaggerWithoutAssembly,
+            'api-assembly': assemblyFlow,
             'api-base-path': api.document.basePath,
             'api-name': api.document.info.title,
             'api-type': api.document['x-ibm-configuration']['api-type'] || 'REST',

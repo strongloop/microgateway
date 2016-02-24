@@ -3,6 +3,7 @@
 let _ = require('lodash');
 let assert = require('assert');
 let supertest = require('supertest');
+let yaml = require('yamljs');
 
 let mg = require('../lib/microgw');
 
@@ -43,8 +44,14 @@ describe('Context variables', function() {
 
         result.endpoint.address = '*';
 
+        let swagger =
+          yaml.load(process.env.CONFIG_DIR + '/context_1.0.0.yaml');
+
+        delete swagger['x-ibm-configuration'].assembly;
+
         assert.deepStrictEqual(result, {
           basepath: '/',
+          document: swagger,
           endpoint: {
             address: '*',
             hostname: 'localhost'
@@ -75,7 +82,13 @@ describe('Context variables', function() {
           result = JSON.parse(result);
         }
 
+        let swagger =
+          yaml.load(process.env.CONFIG_DIR + '/context_1.0.0.yaml');
+
         assert.deepStrictEqual(result, {
+          assembly: {
+            assembly: swagger['x-ibm-configuration'].assembly
+          },
           consumes: [
             'application/xml',
             'application/json'
