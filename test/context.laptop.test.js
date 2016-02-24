@@ -42,7 +42,6 @@ describe('Context variables', function() {
         }
 
         result.endpoint.address = '*';
-        result.document = {}; // no need to verify the swagger content
 
         assert.deepStrictEqual(result, {
           basepath: '/',
@@ -59,29 +58,53 @@ describe('Context variables', function() {
             foo: 'default_foo'
           },
           type: 'REST',
-          version: '1.0.0',
-          document: {},
-          operation: {
-            path: '/context/api',
-            consumes: [
-              'application/xml',
-              'application/json'
-            ],
-            parameters: [
-              {
-                  description: 'parameter 1',
-                  in: 'query',
-                  name: 'param1',
-                  type: 'string'
-              },
-              {
-                  description: 'parameter 2',
-                  in: 'header',
-                  name: 'param2',
-                  type: 'integer'
-              }
-            ]
+          version: '1.0.0'
+        });
+        done();
+      });
+  });
+
+  it('should produce all $(_.api) context variables', function(done) {
+    request
+      .get('/context/internal')
+      .expect(200)
+      .end(function(err, res) {
+        var result = res.body;
+        if (_.isString(result)) {
+          console.log('parsing JSON');
+          result = JSON.parse(result);
+        }
+
+        assert.deepStrictEqual(result, {
+          consumes: [
+            'application/xml',
+            'application/json'
+          ],
+          operation: 'GET',
+          parameters: [
+            {
+                description: 'parameter 1',
+                in: 'query',
+                name: 'param1',
+                type: 'string'
+            },
+            {
+                description: 'parameter 2',
+                in: 'header',
+                name: 'param2',
+                type: 'integer'
             }
+          ],
+          path: '/context/internal',
+          produces: [
+            'application/xml',
+            'application/json'
+          ],
+          responses: {
+            '200': {
+              description: "200 OK"
+            }
+          }
         });
         done();
       });

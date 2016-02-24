@@ -490,7 +490,7 @@ function calculateMatchingScore(apiPath) {
  */
 function getOpParams(apiParams, pathParams, opParams) {
   // TODO need to join the 3 params
-  return opParams || [];
+  return opParams;
 }
 
 exports.determineNeededSubscriptionOptimizedEntries = determineNeededSubscriptionOptimizedEntries;
