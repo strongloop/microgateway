@@ -64,9 +64,5 @@
   "webhook": {
     "dataSource": "db",
     "public": true
-  },
-  "keyExchange": {
-     "dataSource": "db",
-     "public": true
-  }  
+  }
 }
