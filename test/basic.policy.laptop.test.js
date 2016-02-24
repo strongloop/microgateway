@@ -125,6 +125,13 @@ describe('basic auth policy', function() {
       .expect(401, done);
   });
 
+  it('should fail due to missing LDAP registry', function(done) {
+    request
+    .post('/basic/path-1')
+    .auth('root', 'Hunter2')
+    .expect(401, done);
+  });
+
   it('should pass using http with root:Hunter2', function(done) {
     request
       .get('/basic/path-2')

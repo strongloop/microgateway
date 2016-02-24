@@ -1763,6 +1763,14 @@
                 "basic-ldap": {
                     "type": "basic",
                     "description": "",
+                    "x-ibm-authentication-registry": "ldap1",
+                    "x-ibm-authentication-url": {
+                        "url": "ldap://localhost:1389"
+                    }
+                },
+                "basic-ldap-no-registry": {
+                    "type": "basic",
+                    "description": "",
                     "x-ibm-authentication-url": {
                         "url": "ldap://localhost:1389"
                     }
@@ -1802,6 +1810,18 @@
                         "security": [
                             {
                                 "basic-ldap": []
+                            }
+                        ]
+                    },
+                    "post": {
+                        "responses": {
+                            "200": {
+                                "description": "200 OK"
+                            }
+                        },
+                        "security": [
+                            {
+                                "basic-ldap-no-registry": []
                             }
                         ]
                     }
