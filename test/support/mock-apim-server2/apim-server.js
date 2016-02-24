@@ -1,3 +1,6 @@
+'use strict'
+
+var debug = require('debug')('micro-gateway:apim-server2');
 var fs = require('fs');
 var express = require('express');
 var https = require('https');
@@ -16,22 +19,60 @@ var PORT = 5555;
 var HOST = 'localhost';
 var app = express();
 
-exports.start = function (HOST, PORT, cb) {
-    var server = https.createServer(https_options, app).listen(PORT, HOST);
-    console.log('HTTPS Server listening on %s:%s', HOST, PORT);
-    return server;
+var test1 = false;
+var test2 = false;
+
+
+let server;
+exports.start = function() {
+  return new Promise((resolve, reject) => {
+    server = https.createServer(https_options, app).listen(PORT, HOST, () => {
+      console.log('HTTPS Server listening on %s:%s', HOST, PORT);
+      resolve();
+    });
+  });
 };
 
 
+exports.stop = function() {
+  return new Promise((resolve, reject) => {
+    if (server) {
+      server.close(() => {
+        resolve();
+      });
+    } else {
+      resolve();
+    }
+  });
+}
+
+exports.app = app;
+
+if (require.main === module) {
+  exports.start().
+    then(() => {
+    });
+}
 
 app.use(bodyParser.json()); 
+
+app.get('/results/test1', function(req, res) {
+    res.status(200).json(test1)
+    });
+    
+app.get('/results/test2', function(req, res) {
+    res.status(200).json(test2)
+    });
 
 app.post('/v1/*', upload.array(), function(req, res) {
     var version = req.body.gatewayVersion;
     var clientID = '1111-1111'
     // decrypt the version
     var decryptedVersion = Crypto.publicDecrypt(public_key, new Buffer(version, 'ascii')).toString();
-    console.log('DecryptedBody:' + JSON.stringify(decryptedVersion));
+    debug('DecryptedBody:' + JSON.stringify(decryptedVersion));
+    
+    if (decryptedVersion === "1.0.0")
+      {test1 = true;}
     
     // create payload and send it
     var password = Crypto.createHash('sha256').update('Nixnogen').digest();
@@ -46,7 +87,7 @@ app.post('/v1/*', upload.array(), function(req, res) {
                 clientID: clientID
                 }
     
-    console.log('payload: ' + JSON.stringify(payload));
+    debug('payload: ' + JSON.stringify(payload));
     
     var encryptedPayload = cipher.update(JSON.stringify(payload), 'utf8', 'base64');
     encryptedPayload += cipher.final('base64');
@@ -57,4 +98,5 @@ app.post('/v1/*', upload.array(), function(req, res) {
                 };
                 
     res.status(200).json(body)
+    test2 = true;
 });
