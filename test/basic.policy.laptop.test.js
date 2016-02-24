@@ -53,7 +53,7 @@ describe('basic auth policy', function() {
     request
       .get('/basic/path-1')
       .auth('root', 'badpass')
-      .expect(401, done);
+      .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
   });
 
   it('should pass using http with root:Hunter2', function(done) {
@@ -67,7 +67,7 @@ describe('basic auth policy', function() {
     request
       .get('/basic/path-2')
       .auth('root', 'badpass')
-      .expect(401, done);
+      .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
   });
 
 });
