@@ -64,7 +64,7 @@ module.exports = function(app) {
     host: process.env[APIMANAGER],
     port: process.env[APIMANAGER_PORT],
     catalog: process.env[APIMANAGER_CATALOG],
-    handshakeOk: true
+    handshakeOk: false
     };
 
   async.series(
@@ -97,7 +97,7 @@ module.exports = function(app) {
         // we have an APIm, so try to handshake with it.. 
           handshakeWithAPIm(app, apimanager, function(err, handshakeApimanager) {
             apimanager = handshakeApimanager;
-            callback(err);
+            callback(); // should return the error.. not ready #TODO
             })
           }
         else { callback();}       
@@ -130,7 +130,8 @@ function loadData(app, apimanager, models, currdir) {
     [
       function(callback) {
         debug("apimanager before pullFromAPIm: " + JSON.stringify(apimanager))
-        if (apimanager.host && apimanager.handshakeOk) {
+        if (apimanager.host) { 
+            // && apimanager.handshakeOk << shouldn't call if handshake failed.. not ready #TODO
         // we have an APIm, handshake succeeded, so try to pull data.. 
           pullFromAPIm(apimanager, snapshotID, function(err, dir) {
             snapdir = dir;
@@ -213,10 +214,6 @@ function handshakeWithAPIm(app, apimanager, cb) {
   
   async.series([
     function(callback) {
-      //configure route to API
-      callback();
-      },
-    function(callback) {
       // send version encrypted using public key
       var keyDir = __dirname + '/../../../';
       var version ='1.0.0';
@@ -270,7 +267,6 @@ function handshakeWithAPIm(app, apimanager, cb) {
             callback(null, apimanager);
             }
           else {
-            debug('failed https')
             var error = new Error(apimHandshakeUrl +
                             ' failed with: ' +
                             res.statusCode);
@@ -278,17 +274,13 @@ function handshakeWithAPIm(app, apimanager, cb) {
             }
           }
         });
-      },
-    function(callback) {
-      //remove route to API
-      callback();
       }],
     function(err) {
-      debug('handshakeWithAPIm exit');
       if (err)
         apimanager.handshakeOk = false;
       else
         apimanager.handshakeOk = true;
+      debug('handshakeWithAPIm exit');
       cb(err, apimanager);
     });
   }
