@@ -28,6 +28,7 @@ function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, pr
       locals.plan.apis = product.document.plans[propname].apis;
       locals.plan.name = propname;
       locals.plan.id = getPlanID(locals.product, propname);
+      locals.plan.version = locals.product.document.info.version;
       locals.plan.rateLimit =
         locals.product.document.plans[locals.plan.name]['rate-limit'];
       // 1. trying to add to a particular plan
@@ -94,6 +95,7 @@ function ripCTX(ctx)
     {
     locals.plan.apis = locals.product.document.plans[locals.plan.name].apis;
     locals.plan.id = getPlanID(locals.product, locals.plan.name);
+    locals.plan.version = locals.product.document.info.version;
     locals.plan.rateLimit =
       locals.product.document.plans[locals.plan.name]['rate-limit'];
     }
@@ -333,8 +335,14 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                         ((!securityEnabledForMethod || !clientidSecurity) && isWildcard)) {
                         // add only non-clientid security for products (wildcard)
                       method.push({
+                        consumes: operation.consumes || api.document.consumes,
                         method: methodname.toUpperCase(),
                         operationId: operation.operationId,
+                        parameters: getOpParams(api.document.parameters,
+                                                api.document.paths[propname].parameters,
+                                                operation.parameters),
+                        produces: operation.produces || api.document.produces,
+                        responses: operation.responses,
                         securityDefs: api.document.securityDefinitions,
                         // operational lvl Swagger security overrides the API lvl
                         securityReqs: securityEnabledForMethod,
@@ -359,6 +367,36 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             }
           );
 
+          // get API properties that user defined in the swagger
+          var ibmSwaggerExtension = api.document['x-ibm-configuration'];
+          var defaultApiProperties = ibmSwaggerExtension.properties;
+          var apiProperties = {};
+          if (defaultApiProperties) {
+            Object.getOwnPropertyNames(defaultApiProperties).forEach(
+              function(propertyName){
+                if (pieces.catalog.name &&
+                    ibmSwaggerExtension.catalogs[pieces.catalog.name] &&
+                    ibmSwaggerExtension.catalogs[pieces.catalog.name].properties[propertyName]) {
+                  apiProperties[propertyName] = ibmSwaggerExtension.catalogs[pieces.catalog.name].properties[propertyName];
+                } else {
+                  apiProperties[propertyName] = defaultApiProperties[propertyName];
+                }
+              }
+            );
+          }
+
+          // Some customers add their own extension to the swagger,
+          // so we will make the swagger available in context to customers.
+          // As the information is needed for every incoming transaction on
+          // gateway, store the data in the optimized data model.
+          var swaggerWithoutAssembly = JSON.parse(JSON.stringify(api.document));
+          delete swaggerWithoutAssembly['x-ibm-configuration'].assembly;
+
+          var assemblyFlow = {
+            assembly: api.document['x-ibm-configuration'].assembly
+          };
+
+
     /*
         "subscription-id": "string",
         "client-id": "string",
@@ -373,6 +411,9 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
         "plan-rate-limit": {},
         "api-id": "string",
         "api-base-path": "string",
+        "api-name": "string",
+        "api-version": "string",
+        "api-properties": {},
         "api-paths": [{
            "path": "string",
            "path-base": "string",
@@ -388,6 +429,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'client-secret': credential['client-secret'],
             'plan-id': pieces.plan.id,
             'plan-name': pieces.plan.name,
+            'plan-version': pieces.plan.version,
             'plan-rate-limit': pieces.plan.rateLimit,
             'product-id': pieces.product.id,
             'product-name': pieces.product.document.info.name,
@@ -396,7 +438,13 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'organization-id': pieces.org.id,
             'organization-name': pieces.org.name,
             'api-id': api.id,
+            'api-document': swaggerWithoutAssembly,
+            'api-assembly': assemblyFlow,
             'api-base-path': api.document.basePath,
+            'api-name': api.document.info.title,
+            'api-type': api.document['x-ibm-configuration']['api-type'] || 'REST',
+            'api-version': api.document.info.version,
+            'api-properties': apiProperties,
             'api-paths': apiPaths,
             'snapshot-id' : pieces.snapshot
           };
@@ -458,6 +506,19 @@ function calculateMatchingScore(apiPath) {
   }
 
   return pathScore;
+}
+
+/**
+ * Returns a Object that denotes the parameters associated with the operation
+ *
+ * @param {Object} apiParams api-level parameters in the swagger
+ * @param {Array} pathParams path-level parameters in the swagger
+ * @param {Array} opParams op-level perameters in the swagger
+ *
+ */
+function getOpParams(apiParams, pathParams, opParams) {
+  // TODO need to join the 3 params
+  return opParams || [];
 }
 
 exports.determineNeededSubscriptionOptimizedEntries = determineNeededSubscriptionOptimizedEntries;

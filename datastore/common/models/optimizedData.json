@@ -16,15 +16,26 @@
     "product-name": "string",
     "plan-id": "string",
     "plan-name": "string",
+    "plan-version": "string",
     "plan-rate-limit": {},
     "api-id": "string",
+    "api-document": {},
+    "api-assembly": {},
     "api-base-path": "string",
+    "api-name": "string",
+    "api-type": "string",
+    "api-version": "string",
+    "api-properties": {},
     "api-paths": [{
       "path": "string",
       "path-regex": "string",
       "path-methods": [{
+        "consumes": [],
         "method": "string",
         "operationId": "string",
+        "parameters": [],
+        "produces": [],
+        "responses": {},
         "securityDefs": {},
         "securityReqs": []
       }]
