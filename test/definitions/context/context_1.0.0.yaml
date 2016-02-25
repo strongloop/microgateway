@@ -4,7 +4,7 @@ info:
   x-ibm-name: context
   description: context test suite
 
-basePath: /
+basePath: /v1
 
 swagger: '2.0'
 
@@ -36,7 +36,6 @@ paths:
   /context/api:
     get:
       summary: get API context variable value
-      operationId: getAPI
       responses:
         '200':
           description: 200 OK
@@ -66,7 +65,8 @@ x-ibm-configuration:
                       - set: message.headers.content-type
                         value: application/json
             - operations:
-                - getAPI
+                - path: /context/api
+                  verb: get
               execute:
                 - set-variable:
                     title: set-variable

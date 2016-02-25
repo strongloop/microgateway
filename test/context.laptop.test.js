@@ -34,7 +34,7 @@ describe('Context variables', function() {
 
   it('should produce all $(api) context variables', function(done) {
     request
-      .get('/context/api')
+      .get('/v1/context/api')
       .expect(200)
       .end(function(err, res) {
         var result = res.body;
@@ -50,7 +50,6 @@ describe('Context variables', function() {
         delete swagger['x-ibm-configuration'].assembly;
 
         assert.deepStrictEqual(result, {
-          basepath: '/',
           document: swagger,
           endpoint: {
             address: '*',
@@ -59,7 +58,6 @@ describe('Context variables', function() {
           id: 'context:1.0.0',
           method: 'GET',
           name: 'context',
-          operationId: 'getAPI',
           path: '/context/api',
           properties: {
             foo: 'default_foo'
@@ -73,7 +71,7 @@ describe('Context variables', function() {
 
   it('should produce all $(_.api) context variables', function(done) {
     request
-      .get('/context/internal')
+      .get('/v1/context/internal')
       .expect(200)
       .end(function(err, res) {
         var result = res.body;
