@@ -15,7 +15,9 @@ var app = module.exports = loopback();
 
 app.start = function() {
     // start the web server
-    var server = app.listen(process.env.DATASTORE_PORT || 0, function() {
+    var server = app.listen(process.env.DATASTORE_PORT || 0, 
+                            "localhost", 
+    function() {
       app.emit('started');
       var baseUrl = app.get('url').replace(/\/$/, '');
       var port = app.get('port');
