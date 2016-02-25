@@ -1775,6 +1775,14 @@
                         "url": "ldap://localhost:1389"
                     }
                 },
+                "basic-ldap-tls": {
+                    "type": "basic",
+                    "description": "",
+                    "x-ibm-authentication-registry": "ldap-tls",
+                    "x-ibm-authentication-url": {
+                        "url": "ldap://localhost:1636"
+                    }
+                },
                 "basic-http": {
                     "type": "basic",
                     "description": "",
@@ -1822,6 +1830,18 @@
                         "security": [
                             {
                                 "basic-ldap-no-registry": []
+                            }
+                        ]
+                    },
+                    "put": {
+                        "responses": {
+                            "200": {
+                                "description": "200 OK"
+                            }
+                        },
+                        "security": [
+                            {
+                                "basic-ldap-tls": []
                             }
                         ]
                     }

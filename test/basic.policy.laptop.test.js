@@ -80,7 +80,7 @@ describe('basic auth policy', function() {
       }))
       .then(() => mg.start(3000))
       .then(() => {
-        return ldap.start(1389);
+        return ldap.start(1389, 1636);
       })
       .then(() => {
         return echo.start(8889);
@@ -127,9 +127,16 @@ describe('basic auth policy', function() {
 
   it('should fail due to missing LDAP registry', function(done) {
     request
-    .post('/basic/path-1')
+      .post('/basic/path-1')
+      .auth('root', 'Hunter2')
+      .expect(401, done);
+  });
+
+  it('should pass with root:Hunter2 (tls)', function (done) {
+    request
+    .put('/basic/path-1')
     .auth('root', 'Hunter2')
-    .expect(401, done);
+    .expect(200, done);
   });
 
   it('should pass using http with root:Hunter2', function(done) {
