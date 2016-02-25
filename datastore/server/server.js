@@ -65,11 +65,9 @@ boot(app, __dirname, function(err) {
 function storeDatastorePort(port)
   {
   var path = 'datastore.config'
-  console.log('path: ' + path);
   if (process.env[CONFIGDIR])
     {
     path = process.env[CONFIGDIR] + '/' + path;
-    console.log('path: ' + path);
     }
   fs.writeFile(path, JSON.stringify({port: port}), 'utf8', function (err) {
     if (err) throw err;
