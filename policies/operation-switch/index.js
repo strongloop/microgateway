@@ -11,17 +11,6 @@ var debug = require('debug')('policy:operation-switch');
  *    - path: the context var name for retriving the API operation path
  */
 module.exports = function (config) {
-    if (config) {
-      config = JSON.parse(JSON.stringify(config));
-    } else {
-      config = {};
-    }
-
-    // assign default configurations
-    config.operationId = config.operationId || 'api.operationId';
-    config.verb = config.verb || '_.api.operation';
-    config.path = config.path || '_.api.path';
-
     return function (props, context, next) {
         var logger  = context.get('logger');
 
@@ -30,9 +19,9 @@ module.exports = function (config) {
             next();
         }
 
-        var actualOpId = context.get(config.operationId);
-        var actualVerb = context.get(config.verb).toLowerCase();
-        var actualPath = context.get(config.path);
+        var actualOpId = context.get('api.operationId');
+        var actualVerb = context.get('_.api.operation').toLowerCase();
+        var actualPath = context.get('_.api.path');
         logger.info('[operation-switch] Matching %s %s (%s)',
                 actualVerb, actualPath, actualOpId);
 
