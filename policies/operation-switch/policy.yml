@@ -1,0 +1,49 @@
+policy: 1.1.0
+
+info:
+  title: Operation-Switch
+  name: apim-operation-switch
+  description: Operation-Switch policy for the IBM API Connect
+  contact:
+    name: IBM API Mesh Samples
+    url: https://www.ibm.com/apimesh
+    email: steve-product-manager@ibm.com
+properties:
+  type: "object"
+  required:
+    - case
+  properties:
+    title:
+      type: string
+    case:
+      type: array
+      minItems: 1
+      items:
+        type: object
+        required:
+          - operations
+          - execute
+        properties:
+          operations:
+            type: array
+            minItems: 1
+            items:
+              oneOf:
+                - operationId:
+                    type: string
+                - operationVerbPath:
+                    type: object
+                    required:
+                      - verb
+                      - path
+                    properties:
+                      verb:
+                        type: string
+                      path:
+                        type: string
+          execute:
+            type: array
+            minItems: 1
+            items:
+              $ref: '#/definitions/assembly-policy'
+
