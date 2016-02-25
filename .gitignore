@@ -18,3 +18,4 @@ coverage
 .vscode
 .DS_Store
 .npmrc
+datastore.config
