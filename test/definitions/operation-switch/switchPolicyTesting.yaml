@@ -1,0 +1,115 @@
+# This file contains testcases for the 'operation-switch' policy. The
+# 'operation-switch' policy is used to test the operation and generate different
+# reponses accordingly.
+
+info:
+  version: 1.0.0
+  title: operation-switch
+  x-ibm-name: operation-switch
+  description: operation switch test suite
+
+basePath: /
+
+swagger: '2.0'
+
+paths:
+  /customer:
+    post:
+      responses:
+        '200':
+          description: 200 OK
+  /order:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+    post:
+      operationId: createOrder
+      responses:
+        '200':
+          description: 200 OK
+    put:
+      operationId: updateOrder
+      responses:
+        '200':
+          description: 200 OK
+    delete:
+      operationId: deleteOrder
+      responses:
+        '200':
+          description: 200 OK
+
+x-ibm-configuration:
+  assembly:
+    execute:
+      - set-variable:
+          actions:
+            - set: message.body
+              value: Initial value
+      - set-variable:
+          actions:
+            - set: message.statusCode
+              value: 500
+      - operation-switch:
+          case:
+            - operations:
+                - verb: POST
+                  path: /customer
+              execute:
+                - set-variable:
+                    actions:
+                      - set: message.statusCode
+                        value: 200
+                - set-variable:
+                    actions:
+                      - set: message.body
+                        value: A new customer is created
+
+            - operations:
+                - getOrders
+              execute:
+                - set-variable:
+                    actions:
+                      - set: message.statusCode
+                        value: 200
+                - set-variable:
+                    actions:
+                      - set: message.body
+                        value: A new order is created
+
+            - operations:
+                - createOrder
+              execute:
+                - set-variable:
+                    actions:
+                      - set: message.statusCode
+                        value: 200
+                - set-variable:
+                    actions:
+                      - set: message.body
+                        value: A new order is created
+
+            - operations:
+                - updateOrder
+              execute:
+                - set-variable:
+                    actions:
+                      - set: message.statusCode
+                        value: 200
+                - set-variable:
+                    actions:
+                      - set: message.body
+                        value: The given order is updated
+
+            - operations:
+                - deleteOrder
+              execute:
+                - set-variable:
+                    actions:
+                      - set: message.body
+                        value: Deleting orders is not allowed
+                - set-variable:
+                    actions:
+                      - set: message.statusCode
+                        value: 500
+

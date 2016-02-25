@@ -319,14 +319,13 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                       securityEnabledForMethod.forEach(
                         function(securityReq) {
                             var securityProps = Object.getOwnPropertyNames(securityReq)
-                            var clientidProps = ['apiSecretHeader','apikeyHeader',
-                                                'apikeyQueryParameter', 'apiSecretQueryParameter'];
-                            clientidProps.forEach(
-                              function(clientidProp) {
-                                if (securityProps.indexOf(clientidProp) > -1)  {                                
+                            securityProps.forEach(
+                              function(securityProp) {
+                                if (api.document.securityDefinitions && 
+                                    api.document.securityDefinitions[securityProp] &&
+                                    api.document.securityDefinitions[securityProp].type === 'apiKey')
                                   clientidSecurity = true;
                                   debug('clientidSecurity: ' + clientidSecurity);
-                                  }
                                 });
                         });
                       }
