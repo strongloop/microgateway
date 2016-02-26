@@ -29,6 +29,7 @@
     "api-paths": [{
       "path": "string",
       "path-regex": "string",
+      "matching-score": "number",
       "path-methods": [{
         "consumes": [],
         "method": "string",

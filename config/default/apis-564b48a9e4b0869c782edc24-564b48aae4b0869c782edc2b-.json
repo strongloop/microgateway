@@ -1694,7 +1694,7 @@
                         ]
                     }
                 },
-                "/routes/xyz{id}": {
+                "/routes/{id}": {
                     "delete": {
                         "deprecated": false,
                         "description": "",
@@ -1842,7 +1842,7 @@
                         ]
                     }
                 },
-                "/routes/{id}/exists": {
+                "/test4/{id}/exists": {
                     "get": {
                         "deprecated": false,
                         "description": "",
@@ -1876,6 +1876,46 @@
                             "routes"
                         ]
                     }
+                },
+                "/test4/id/{exists}": {
+                    "get": {
+                        "deprecated": false,
+                        "description": "",
+                        "operationId": "routes.exists",
+                        "parameters": [
+                            {
+                                "description": "Model id",
+                                "format": "JSON",
+                                "in": "path",
+                                "name": "id",
+                                "required": true,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Request was successful",
+                                "schema": {
+                                    "type": "object"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Check whether a model instance exists in the data source.",
+                        "tags": [
+                            "routes"
+                        ]
+                    },
+                    "security": [
+                        {
+                            "apikeyHeader": []
+                        }
+                    ]
                 }
             },
             "produces": [

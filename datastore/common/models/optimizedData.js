@@ -14,12 +14,12 @@ function createProductOptimizedEntry(app, ctx)
   var isWildcard = true;
   cycleThroughPlansInProduct(app, locals, isWildcard, product, ALLPLANS);
   }
-  
+
 function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, productCallback)
   {
   var plans = JSON.parse(JSON.stringify(product.document.plans));
-  async.forEachLimit(Object.getOwnPropertyNames(plans),1, 
-    function(propname, propCallback) 
+  async.forEachLimit(Object.getOwnPropertyNames(plans),1,
+    function(propname, propCallback)
       {
       //overwrite with specific entry
       locals.catalog = {};
@@ -37,7 +37,7 @@ function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, pr
       //    b. product that possibly doesn't have subs or security
       if (planid === ALLPLANS || locals.plan.id === planid)
         {
-        gatherDataCreateOptimizedEntry(app, locals, isWildcard, propCallback); 
+        gatherDataCreateOptimizedEntry(app, locals, isWildcard, propCallback);
         }
       else
         {
@@ -47,7 +47,7 @@ function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, pr
   if (productCallback)
     productCallback();
   }
-  
+
 function determineNeededSubscriptionOptimizedEntries(app, ctx)
   {
   var locals;
@@ -57,14 +57,14 @@ function determineNeededSubscriptionOptimizedEntries(app, ctx)
     var planid = ctx.instance['plan-registration'].id;
     findPlansToAddSubscriptions(app, locals, planid)
     }
-  else 
+  else
     {
     //specific subscription from APIm
     var isWildcard = false
-    gatherDataCreateOptimizedEntry(app, locals, isWildcard);  
+    gatherDataCreateOptimizedEntry(app, locals, isWildcard);
     }
   }
-  
+
 function findPlansToAddSubscriptions(app, passed, planid)
   {
   var isWildcard = false;
@@ -73,7 +73,7 @@ function findPlansToAddSubscriptions(app, passed, planid)
   // find optimized entries to create
   app.models.product.find(productquery, function(err, products) {
     async.forEach(products,
-      function (product, productCallback) 
+      function (product, productCallback)
       {
       cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, productCallback);
       });
@@ -102,10 +102,10 @@ function ripCTX(ctx)
   locals.snapshot = ctx.instance['snapshot-id'];
   return locals;
   }
-  
+
 function getPlanID(product, planname)
   {
-  debug('product.document.info.name + ":" + product.document.info.version + ":" + planname: ' + 
+  debug('product.document.info.name + ":" + product.document.info.version + ":" + planname: ' +
     JSON.stringify(product.document.info.name + ":" + product.document.info.version + ":" + planname, null, 4));
   return product.document.info.name + ":" + product.document.info.version + ":" + planname;
   }
@@ -231,7 +231,7 @@ function grabAPIs(app, snapshot, product, plan, cb) {
   var planApis = JSON.parse(JSON.stringify(plan.apis));
   debug('planApis: %j', planApis);
   debug('planApiProps: %j', Object.getOwnPropertyNames(planApis));
-      
+
   async.each(
     Object.getOwnPropertyNames(planApis),
     function(api, done) {
@@ -252,9 +252,9 @@ function grabAPIs(app, snapshot, product, plan, cb) {
         var apiName = product.document.apis[api]['name'].split(':');
         debug('apiName: %j', apiName);
         debug('info: product.document.apis[api][name]');
-        info = {'x-ibm-name': apiName[0], 'version': apiName[1]} 
+        info = {'x-ibm-name': apiName[0], 'version': apiName[1]}
         }
-      
+
       debug('info: %j', info);
       app.models.api.find(
         query,
@@ -272,7 +272,7 @@ function grabAPIs(app, snapshot, product, plan, cb) {
                 debug('found api in db: %j', DBapi);
                 apis.push(DBapi);
                 }
-            
+
           });
           done();
         }
@@ -310,7 +310,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                       methodname);
                     debug('propname operationId: %j',
                       operation.operationId);
-                    var securityEnabledForMethod = 
+                    var securityEnabledForMethod =
                       operation.security ? operation.security : api.document.security;
                     debug('securityEnabledForMethod: ' + JSON.stringify(securityEnabledForMethod));
                     var clientidSecurity = false;
@@ -321,7 +321,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                             var securityProps = Object.getOwnPropertyNames(securityReq)
                             securityProps.forEach(
                               function(securityProp) {
-                                if (api.document.securityDefinitions && 
+                                if (api.document.securityDefinitions &&
                                     api.document.securityDefinitions[securityProp] &&
                                     api.document.securityDefinitions[securityProp].type === 'apiKey')
                                   clientidSecurity = true;
@@ -329,7 +329,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                                 });
                         });
                       }
-                    if ((securityEnabledForMethod && clientidSecurity && !isWildcard) || 
+                    if ((securityEnabledForMethod && clientidSecurity && !isWildcard) ||
                         // add only security for subscriptions
                         ((!securityEnabledForMethod || !clientidSecurity) && isWildcard)) {
                         // add only non-clientid security for products (wildcard)
@@ -487,7 +487,7 @@ function makePathRegex(basePath, apiPath) {
     if (braceBegin >= 0) {
       braceEnd = path.indexOf('}') + 1;
       var variablePath = path.substring(braceBegin, braceEnd);
-      path = path.replace(variablePath, '.*');
+      path = path.replace(variablePath, ".+");
     }
   } while (braceBegin >= 0);
   path = '^' + basePath + path + '$';
@@ -498,9 +498,9 @@ function makePathRegex(basePath, apiPath) {
 function calculateMatchingScore(apiPath) {
   var pathArray = apiPath.split('/');
   var pathScore = 0;
-  for (var i=1; i < pathArray.length; i++) {
+  for (var i=0; i < pathArray.length; i++) {
     if (pathArray[i].indexOf('{') >= 0) {
-      pathScore += i;
+      pathScore += Math.pow((pathArray.length - i), 2);
     }
   }
 
