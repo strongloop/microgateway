@@ -488,6 +488,7 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
             "id": "test subscription",
             "application": {
               "id": "app name",
+              "oauth-redirection-uri": "https://localhost",
               "app-credentials": [{
                 "client-id": "default",
                 "client-secret": "CRexOpCRkV1UtjNvRZCVOczkUrNmGyHzhkGKJXiDswo="
