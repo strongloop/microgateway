@@ -39,8 +39,8 @@ describe('matching score test', function() {
     var clientId2 = '612caa59-9649-491f-99b7-d9a941c4bd2e';
     var clientSecret3a = 'api-level_secret';
     it('client_id=' + clientId2 +
-      ' secret=' + clientSecret3a + ' (query) should fail -' +
-      ' no query at operation (apim-lookup)',
+      ' secret=' + clientSecret3a + ' "/routes/foo/bar" should not -' +
+      ' match "/routes/{id}"',
       function (done) {
         request
         .get('/v1/routes/foo/bar?client_id=' + clientId2 +
