@@ -487,7 +487,7 @@ function makePathRegex(basePath, apiPath) {
     if (braceBegin >= 0) {
       braceEnd = path.indexOf('}') + 1;
       var variablePath = path.substring(braceBegin, braceEnd);
-      path = path.replace(variablePath, '[^// ]+');
+      path = path.replace(variablePath, '[^\/ ]+');
     }
   } while (braceBegin >= 0);
   path = '^' + basePath + path + '$';
