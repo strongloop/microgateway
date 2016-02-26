@@ -36,17 +36,28 @@ describe('matching score test', function() {
 
 
   function tests(env) {
-    var clientId2 = '612caa59-9649-491f-99b7-d9a941c4bd2e';
-    var clientSecret3a = 'api-level_secret';
-    it('client_id=' + clientId2 +
-      ' secret=' + clientSecret3a + ' "/routes/foo/bar" should not -' +
+    var clientId1 = '612caa59-9649-491f-99b7-d9a941c4bd2e';
+    var clientSecret1 = 'api-level_secret';
+    var clientSecret2 = 'bad_secret';
+    it('client_id=' + clientId1 +
+      ' secret=' + clientSecret1 + ' "/routes/foo/bar" should not -' +
       ' match "/routes/{id}"',
       function (done) {
         request
-        .get('/v1/routes/foo/bar?client_id=' + clientId2 +
-          '&client_secret=' + clientSecret3a)
+        .get('/v1/routes/foo/bar?client_id=' + clientId1 +
+          '&client_secret=' + clientSecret1)
         .expect(404, done);
       });
+
+      it('client_id=' + clientId1 +
+        ' secret=' + clientSecret2 + ' "/routes/id/exists" not authorized -' +
+        ' for "/routes/id/{exists}"',
+        function (done) {
+          request
+          .get('/v1/routes/id/exists?client_id=' + clientId1 +
+            '&client_secret=' + clientSecret2)
+          .expect(401, done);
+        });
   }
 
   tests('apim');
