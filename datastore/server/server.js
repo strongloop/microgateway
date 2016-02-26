@@ -14,19 +14,6 @@ process.on('disconnect', function() {
 var app = module.exports = loopback();
 
 app.start = function() {
-  async.series([
-  function(callback) {
-    environment.getVariable(
-      DATASTORE_PORT,
-      function(value) {
-        if (value) {
-          app.set('port', value);
-        }
-      },
-      callback
-    );
-  },
-  function(callback) {
     // start the web server
     var server = app.listen(process.env.DATASTORE_PORT || 0, 
                             "localhost", 
@@ -46,7 +33,6 @@ app.start = function() {
     app.close = function(cb) {
       server.close(cb);
     };
-  }]);
 };
 
 // Bootstrap the application, configure models, datasources and middleware.

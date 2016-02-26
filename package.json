@@ -53,6 +53,7 @@
     "loopback-boot": "^2.16.0",
     "loopback-component-explorer": "^2.3.0",
     "moment": "^2.11.2",
+    "multer": "^1.1.0",
     "request": "^2.69.0",
     "type-is": "^1.6.11",
     "yamljs": "^0.2.4"
