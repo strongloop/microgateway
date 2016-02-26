@@ -1,0 +1,13 @@
+{
+  "locations": [
+    "./location1",
+    "./location2"
+  ],
+  "config" : {
+      "mypolicy1": {
+          "settings": {
+              "foo": "bar2"
+          }
+      }
+  }
+}
