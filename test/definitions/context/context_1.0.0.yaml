@@ -17,6 +17,17 @@ produces:
   - application/json
 
 paths:
+  /context:
+    get:
+      summary: get a context variable value
+      parameters:
+        - name: name
+          in: query
+          description: the context name
+          type: string
+      responses:
+        '200':
+          description: 200 OK
   /context/internal:
     get:
       summary: get interal context variable value
@@ -77,6 +88,7 @@ paths:
       responses:
         '200':
           description: 200 OK
+
 x-ibm-configuration:
   properties:
     foo: default_foo
@@ -89,6 +101,18 @@ x-ibm-configuration:
       - operation-switch:
           title: operation-switch
           case:
+            - operations:
+                - path: /context
+                  verb: get
+              execute:
+                - javascript:
+                    title: write context variable to message.body
+                    source: |
+                      var name = request.parameters.name;
+                      message.body = {
+                        name: name,
+                        value: get(name)
+                      };
             - operations:
                 - getInternal
               execute:

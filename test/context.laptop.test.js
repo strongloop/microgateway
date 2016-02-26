@@ -146,4 +146,17 @@ describe('Context variables', function() {
       });
   });
 
+  it('should copy $(api.properties.*) to context root level', function(done) {
+    request
+      .get('/v1/context?name=foo')
+      .expect(200)
+      .end(function(err, res) {
+        assert.deepStrictEqual(res.body, {
+          name: 'foo',
+          value: 'default_foo'
+        });
+        done();
+      });
+  });
+
 });
