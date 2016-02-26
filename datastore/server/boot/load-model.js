@@ -129,7 +129,7 @@ function loadData(app, apimanager, models, currdir) {
   async.series(
     [
       function(callback) {
-        debug("apimanager before pullFromAPIm: " + JSON.stringify(apimanager))
+        debug('apimanager before pullFromAPIm: ' + JSON.stringify(apimanager))
         if (apimanager.host) { 
             // && apimanager.handshakeOk << shouldn't call if handshake failed.. not ready #TODO
         // we have an APIm, handshake succeeded, so try to pull data.. 
@@ -228,10 +228,10 @@ function handshakeWithAPIm(app, apimanager, cb) {
       
       Request({
         url: apimHandshakeUrl,
-        method: "POST",
+        method: 'POST',
         json: body,
         headers: {
-          "content-type": "application/json",
+          'content-type': 'application/json'
           }
         },       
       function(err, res, body) {
@@ -246,7 +246,7 @@ function handshakeWithAPIm(app, apimanager, cb) {
             var IV = '0000000000000000';
             debug('body: ' + JSON.stringify(res.body));
             var password = Crypto.privateDecrypt(private_key, new Buffer(res.body.Key));
-            debug("password: " + password);
+            debug('password: ' + password);
             var decipher = Crypto.createDecipheriv(algorithm, password, IV);
             var decrypted = decipher.update(res.body.cipher, 'base64', 'utf8');
             decrypted += decipher.final('utf8');
@@ -610,6 +610,7 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
             'id': 'test subscription',
             'application': {
               'id': 'app name',
+              'oauth-redirection-uri': 'https://localhost',
               'app-credentials': [{
                 'client-id': 'default',
                 'client-secret': 'CRexOpCRkV1UtjNvRZCVOczkUrNmGyHzhkGKJXiDswo='
