@@ -487,7 +487,7 @@ function makePathRegex(basePath, apiPath) {
     if (braceBegin >= 0) {
       braceEnd = path.indexOf('}') + 1;
       var variablePath = path.substring(braceBegin, braceEnd);
-      path = path.replace(variablePath, '.*');
+      path = path.replace(variablePath, '[^// ]+');
     }
   } while (braceBegin >= 0);
   path = '^' + basePath + path + '$';
@@ -498,9 +498,9 @@ function makePathRegex(basePath, apiPath) {
 function calculateMatchingScore(apiPath) {
   var pathArray = apiPath.split('/');
   var pathScore = 0;
-  for (var i=1; i < pathArray.length; i++) {
+  for (var i=0; i < pathArray.length; i++) {
     if (pathArray[i].indexOf('{') >= 0) {
-      pathScore += pathArray.length - i;
+      pathScore += Math.pow((pathArray.length - i), 2);
     }
   }
 
