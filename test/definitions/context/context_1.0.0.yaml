@@ -39,6 +39,44 @@ paths:
       responses:
         '200':
           description: 200 OK
+  /context/request/parameters/{param4}/{param3}:
+    get:
+      summary: get request parameter value
+      operationId: getParameters
+      parameters:
+        - name: param1
+          in: query
+          description: parameter 1
+          type: string
+          required: true
+        - name: param2
+          in: query
+          description: parameter 2
+          type: integer
+          required: true
+        - name: param3
+          in: path
+          description: parameter 3
+          type: integer
+          required: true
+        - name: param4
+          in: path
+          description: parameter 4
+          type: string
+          required: true
+        - name: X-foo
+          in: header
+          description: X-foo
+          type: string
+          required: true
+        - name: paramBoolean
+          in: query
+          description: parameter Bool
+          type: boolean
+          required: true
+      responses:
+        '200':
+          description: 200 OK
 x-ibm-configuration:
   properties:
     foo: default_foo
@@ -73,6 +111,19 @@ x-ibm-configuration:
                     actions:
                       - set: message.body
                         value: $(api)
+                - set-variable:
+                    title: set-content-type
+                    actions:
+                      - set: message.headers.content-type
+                        value: application/json
+            - operations:
+                - getParameters
+              execute:
+                - set-variable:
+                    title: set-variable
+                    actions:
+                      - set: message.body
+                        value: $(request.parameters)
                 - set-variable:
                     title: set-content-type
                     actions:

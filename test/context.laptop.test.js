@@ -121,4 +121,29 @@ describe('Context variables', function() {
       });
   });
 
+  it('should produce all request.parameters', function(done) {
+    request
+      .get('/v1/context/request/parameters/abc/9999?param1=value1&param2=8888&param5=1111&paramBoolean=false')
+      .set('X-foo', 'bar')
+      .expect(200)
+      .end(function(err, res) {
+        var result = res.body;
+        if (_.isString(result)) {
+          result = JSON.parse(result);
+        }
+
+        console.log(result);
+        assert.deepStrictEqual(result,
+            {"param1":"value1",
+             "param2":8888,
+             "param3":9999,
+             "param4":"abc",
+             "X-foo":"bar",
+             "paramBoolean":false}
+        );
+        assert.equal(result.param5, undefined);
+        done();
+      });
+  });
+
 });
