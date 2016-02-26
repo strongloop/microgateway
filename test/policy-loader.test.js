@@ -27,12 +27,17 @@ describe('policy-loader', function() {
     describe('multiple locations', function() {
         it('should load policies in location1 and location2', function() {
             let paths = [
-                path.resolve(__dirname, 'definitions', 
+                path.resolve(__dirname, 'definitions',
                         'policy-loader', 'location1'),
                 path.resolve(__dirname, 'definitions',
                         'policy-loader', 'location2')
             ];
-            let pl = policyLoader.create(paths);
+            let pl = policyLoader.create(paths, {
+                'mypolicy1': {
+                    'settings': {
+                        'foo': 'bar2'
+                    }
+                }});
             pl.should.be.a.Object();
             let policies = pl.getPolicies();
             policies.should.have.property('mypolicy1');
