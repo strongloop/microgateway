@@ -46,18 +46,48 @@ describe('matching score test', function() {
         request
         .get('/v1/routes/foo/bar?client_id=' + clientId1 +
           '&client_secret=' + clientSecret1)
+        .expect(200, done);
+      });
+
+    it('client_id=' + clientId1 +
+      ' secret=' + clientSecret1 + ' "/test4/id/exists" not authorized -' +
+      ' for "/test4/id/{exists}"',
+      function (done) {
+        request
+        .get('/v1/test4/id/exists?client_id=' + clientId1 +
+          '&client_secret=' + clientSecret1)
+        .expect(200, done);
+      });
+
+    it('client_id=' + clientId1 +
+      ' secret=' + clientSecret2 + ' "/test4/id/exists" not authorized -' +
+      ' for "/test4/id/{exists}"',
+      function (done) {
+        request
+        .get('/v1/test4/id/exists?client_id=' + clientId1 +
+          '&client_secret=' + clientSecret2)
+        .expect(401, done);
+      });
+
+    it('client_id=' + clientId1 +
+      ' secret=' + clientSecret2 + ' "/test4//exists" does not match -' +
+      ' for "/test4/id/{exists}"',
+      function (done) {
+        request
+        .get('/v1/test4//exists?client_id=' + clientId1 +
+          '&client_secret=' + clientSecret2)
         .expect(404, done);
       });
 
-      it('client_id=' + clientId1 +
-        ' secret=' + clientSecret2 + ' "/routes/id/exists" not authorized -' +
-        ' for "/routes/id/{exists}"',
-        function (done) {
-          request
-          .get('/v1/routes/id/exists?client_id=' + clientId1 +
-            '&client_secret=' + clientSecret2)
-          .expect(401, done);
-        });
+    it('client_id=' + clientId1 +
+      ' secret=' + clientSecret1 + ' "/test4/id/foo" does not match -' +
+      ' for "/test4/id/{exists}"',
+      function (done) {
+        request
+        .get('/v1/test4/foo/exists?client_id=' + clientId1 +
+          '&client_secret=' + clientSecret1)
+        .expect(200, done);
+      });
   }
 
   tests('apim');

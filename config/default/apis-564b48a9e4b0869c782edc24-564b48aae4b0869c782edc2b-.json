@@ -1841,7 +1841,7 @@
                         ]
                     }
                 },
-                "/routes/{id}/exists": {
+                "/test4/{id}/exists": {
                     "get": {
                         "deprecated": false,
                         "description": "",
@@ -1876,7 +1876,7 @@
                         ]
                     }
                 },
-                "/routes/id/{exists}": {
+                "/test4/id/{exists}": {
                     "get": {
                         "deprecated": false,
                         "description": "",
