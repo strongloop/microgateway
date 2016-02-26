@@ -10,7 +10,7 @@ var Crypto = require('crypto');
 var upload = multer();
 var key = fs.readFileSync(__dirname + '/key.pem');
 var cert = fs.readFileSync(__dirname + '/cert.pem')
-var public_key = fs.readFileSync('./id_rsa.pub','utf8');
+var public_key = fs.readFileSync(__dirname + '/id_rsa.pub','utf8');
 var https_options = {
     key: key,
     cert: cert

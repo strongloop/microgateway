@@ -20,6 +20,10 @@ var rootConfigPath = __dirname + '/../../../config/';
 var defaultDefinitionsDir = rootConfigPath + 'default';
 var definitionsDir = defaultDefinitionsDir;
 
+var keyDir = __dirname + '/../../../';
+var keyFile = keyDir + 'id_rsa';
+var version ='1.0.0';
+
 /**
  * Creates a model type 
  * @class
@@ -93,8 +97,16 @@ module.exports = function(app) {
        );
       },
       function(callback) {
-        if (apimanager.host && apimanager.handshakeOk === false) {
-        // we have an APIm, so try to handshake with it.. 
+        // load key..
+        var private_key = '';
+        try {
+          private_key = fs.readFileSync(keyFile,'utf8');
+        } catch(e) {
+          console.log('Can not load key: %s Error: %s', keyFile, e);
+        }
+
+        if (apimanager.host && apimanager.handshakeOk === false && private_key) {
+        // we have an APIm, and a key so try to handshake with it.. 
           handshakeWithAPIm(app, apimanager, function(err, handshakeApimanager) {
             apimanager = handshakeApimanager;
             callback(); // should return the error.. not ready #TODO
@@ -215,9 +227,7 @@ function handshakeWithAPIm(app, apimanager, cb) {
   async.series([
     function(callback) {
       // send version encrypted using public key
-      var keyDir = __dirname + '/../../../';
-      var version ='1.0.0';
-      var private_key = fs.readFileSync(keyDir + 'id_rsa','utf8');
+
       var encryptedVersion = Crypto.privateEncrypt(private_key, new Buffer(version,'ascii'));
       var body = {
         gatewayVersion: encryptedVersion
