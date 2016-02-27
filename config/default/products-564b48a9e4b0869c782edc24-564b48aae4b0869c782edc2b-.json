@@ -172,11 +172,7 @@
           "value": "1000/min"
         },
         "apis": 
-          {
-          "ascents": {},
-          "forecasts": {},
-          "routes": {}
-          }
+          { }
       }
     }
   }

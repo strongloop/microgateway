@@ -15,6 +15,7 @@ function createProductOptimizedEntry(app, ctx)
   cycleThroughPlansInProduct(app, locals, isWildcard, product, ALLPLANS);
   }
   
+  
 function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, productCallback)
   {
   var plans = JSON.parse(JSON.stringify(product.document.plans));
@@ -26,6 +27,10 @@ function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, pr
       locals.product = product;
       locals.plan = {};
       locals.plan.apis = product.document.plans[propname].apis;
+      if (JSON.stringify(locals.plan.apis) === '{}') { // all product apis scenario
+        locals.plan.apis = product.document.apis;
+        debug("1. all product apis in plan... APIs: " + product.document.apis);
+        }
       locals.plan.name = propname;
       locals.plan.id = getPlanID(locals.product, propname);
       locals.plan.version = locals.product.document.info.version;
@@ -94,6 +99,10 @@ function ripCTX(ctx)
   if (locals.product)
     {
     locals.plan.apis = locals.product.document.plans[locals.plan.name].apis;
+    if (JSON.stringify(locals.plan.apis) === '{}') { // all product apis scenario
+      locals.plan.apis = locals.product.document.apis;
+      debug("2. all product apis in plan... APIs: " + locals.product.document.apis);
+      }
     locals.plan.id = getPlanID(locals.product, locals.plan.name);
     locals.plan.version = locals.product.document.info.version;
     locals.plan.rateLimit =

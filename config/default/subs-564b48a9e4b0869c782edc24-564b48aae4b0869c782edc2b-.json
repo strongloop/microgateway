@@ -128,9 +128,6 @@
             },
             "apis": 
               {
-              "ascents": {},
-              "forecasts": {},
-              "routes": {}
               }
           }
         }
@@ -599,9 +596,6 @@
             },
           "apis": 
             {
-            "ascents": {},
-            "forecasts": {},
-            "routes": {}
             }
           }
         }
@@ -1927,9 +1921,6 @@
             },
             "apis": 
               {
-              "ascents": {},
-              "forecasts": {},
-              "routes": {}
               }
           }
         }
