@@ -125,10 +125,7 @@
             "rate-limit": {
               "hard-limit": false,
               "value": "1000/min"
-            },
-            "apis": 
-              {
-              }
+            }
           }
         }
       }

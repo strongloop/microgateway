@@ -26,7 +26,7 @@ function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, pr
       locals.product = product;
       locals.plan = {};
       locals.plan.apis = product.document.plans[propname].apis;
-      if (JSON.stringify(locals.plan.apis) === '{}') { // all product apis scenario
+      if (JSON.stringify(locals.plan.apis) === '{}' || !locals.plan.apis) { // all product apis scenario
         locals.plan.apis = product.document.apis;
         debug("1. all product apis in plan... APIs: " + product.document.apis);
         }
@@ -98,7 +98,7 @@ function ripCTX(ctx)
   if (locals.product)
     {
     locals.plan.apis = locals.product.document.plans[locals.plan.name].apis;
-    if (JSON.stringify(locals.plan.apis) === '{}') { // all product apis scenario
+    if (JSON.stringify(locals.plan.apis) === '{}' || !locals.plan.apis) { // all product apis scenario
       locals.plan.apis = locals.product.document.apis;
       debug("2. all product apis in plan... APIs: " + locals.product.document.apis);
       }
