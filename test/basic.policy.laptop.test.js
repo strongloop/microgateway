@@ -153,4 +153,18 @@ describe('basic auth policy', function() {
       .expect(401, done);
   });
 
+  it('should pass composeDN with jsmith:foobar', function(done) {
+    request
+    .get('/basic/path-3')
+    .auth('jsmith', 'foobar')
+    .expect(200, done);
+  });
+
+  it('should fail composeDN with jsmith:wrongpass', function(done) {
+    request
+    .get('/basic/path-3')
+    .auth('jsmith', 'wrongpass')
+    .expect(401, done);
+  });
+
 });
