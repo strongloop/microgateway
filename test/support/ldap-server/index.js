@@ -1,33 +1,37 @@
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
 let ldap = require('ldapjs');
 let ldapconfig = require('./ldap-methods');
 
+function createServer (usetls) {
+  if (usetls) {
+    let tls = require('./tls.json')[0];
+    return ldap.createServer({certificate: tls.certs[0].cert, key: tls['private-key']});
+  }
+  return ldap.createServer();
+}
 
-
-let server = ldap.createServer();
-
-let tlsserver = (() => {
-  let tls = require('./tls.json')[0];
-  return ldap.createServer({ certificate: tls.certs[0].cert, key: tls['private-key'] });
-})();
-
-ldapconfig(server);
-ldapconfig(tlsserver);
+let server;
+let tlsserver;
 
 
 exports.start = function (port, tlsport) {
-  return Promise.resolve()
+  if (!!server) return Promise.resolve();
+
+  server = createServer();
+  return ldapconfig(server)
     .then(() => new Promise(resolve => {
       server.listen(port, resolve);
     }))
     .then(() => new Promise(resolve => {
-      if (tlsport)
-        tlsserver.listen(tlsport, resolve);
+      if (tlsport) {
+        tlsserver = createServer(true);
+        ldapconfig(tlsserver).then(() => {
+          tlsserver.listen(tlsport, resolve);
+        });
+      }
       else {
-        tlsserver = null;
+        //tlsserver = null;
         resolve();
       }
     }));
