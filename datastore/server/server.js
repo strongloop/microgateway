@@ -66,7 +66,7 @@ boot(app, __dirname, function(err) {
 
 function storeDatastorePort(port)
   {
-  var path = 'datastore.config'
+  var path = '.datastore'
   if (process.env[CONFIGDIR])
     {
     path = process.env[CONFIGDIR] + '/' + path;
