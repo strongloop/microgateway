@@ -31,17 +31,20 @@ exports.start = function (port, tlsport) {
         });
       }
       else {
-        //tlsserver = null;
         resolve();
       }
     }));
 };
 
 exports.stop = function() {
-  return Promise.resolve().then(() => {
+  return new Promise((resolve) => {
     server.close();
-    if (!!tlsserver)
+    server = null;
+    if (!!tlsserver) {
       tlsserver.close();
+      tlsserver = null;
+    }
+    resolve();
   });
 };
 
