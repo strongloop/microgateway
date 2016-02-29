@@ -1,0 +1,80 @@
+info:
+  version: 1.0.0
+  title: context
+  x-ibm-name: context
+  description: context test suite
+
+basePath: /
+
+swagger: '2.0'
+
+consumes:
+  - application/xml
+  - application/json
+
+produces:
+  - application/xml
+  - application/json
+
+paths:
+  /context/internal:
+    get:
+      summary: get interal context variable value
+      operationId: getInternal
+      parameters:
+        - name: param1
+          in: query
+          description: parameter 1
+          type: string
+        - name: param2
+          in: header
+          description: parameter 2
+          type: integer
+      responses:
+        '200':
+          description: 200 OK
+  /context/api:
+    get:
+      summary: get API context variable value
+      operationId: getAPI
+      responses:
+        '200':
+          description: 200 OK
+x-ibm-configuration:
+  properties:
+    foo: default_foo
+  catalogs:
+    local:
+      properties:
+        foo: local_foo
+  assembly:
+    execute:
+      - operation-switch:
+          title: operation-switch
+          case:
+            - operations:
+                - getInternal
+              execute:
+                - set-variable:
+                    title: set-variable
+                    actions:
+                      - set: message.body
+                        value: $(_.api)
+                - set-variable:
+                    title: set-content-type
+                    actions:
+                      - set: message.headers.content-type
+                        value: application/json
+            - operations:
+                - getAPI
+              execute:
+                - set-variable:
+                    title: set-variable
+                    actions:
+                      - set: message.body
+                        value: $(api)
+                - set-variable:
+                    title: set-content-type
+                    actions:
+                      - set: message.headers.content-type
+                        value: application/json

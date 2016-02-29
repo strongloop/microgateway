@@ -1,16 +1,20 @@
 {
-  "name": "cors",
+  "name": "javascript",
   "version": "1.0.0",
-  "description": "CORS Policy",
+  "description": "JavaScript Policy",
   "main": "index.js",
   "keywords": [
     "policy",
     "api",
     "mesh",
-    "cors"
+    "javascript"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "debug": "^2.2.0",
+    "lodash": "^4.5.1"
   },
   "author": "IBM",
   "license": "ISC"

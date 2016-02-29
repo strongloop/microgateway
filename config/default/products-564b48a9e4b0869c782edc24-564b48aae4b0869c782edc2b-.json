@@ -50,9 +50,10 @@
         "orgs": []
       }
     },
-    "apis": [{
-      "$ref": "uber-api:1.0.0"
-    }],
+    "apis": 
+      {
+      "uber-api": {"name": "uber-api:1.0.0"}
+      },
     "plans": {
       "gold": {
         "title": "Gold Plan",
@@ -60,9 +61,9 @@
           "hard-limit": false,
           "value": "1/sec"
         },
-        "apis": [{
-          "$ref": "uber-api:1.0.0"
-        }]
+        "apis": {
+          "uber-api": {}
+        }
       }
     }
   }
@@ -128,13 +129,12 @@
         "orgs": ["Consumer-Org-1", "Consumer-Org-2"]
       }
     },
-    "apis": [{
-      "$ref": "ascents:1.0.0"
-    }, {
-      "$ref": "forecasts:1.0.0"
-    }, {
-      "$ref": "routes:1.0.0"
-    }],
+    "apis":
+      { 
+      "ascents": {"name": "ascents:1.0.0"},
+      "forecasts": {"name": "forecasts:1.0.0"},
+      "routes": {"name": "routes:1.0.0"}
+       },
     "plans": {
       "trial": {
         "title": "Trial Climb On",
@@ -144,9 +144,10 @@
           "hard-limit": true,
           "value": "60/hour"
         },
-        "apis": [{
-          "$ref": "ascents:1.0.0"
-        }]
+        "apis": 
+          {
+          "ascents": {}
+          }
       },
       "silver": {
         "title": "Silver Climb On",
@@ -156,11 +157,11 @@
           "hard-limit": false,
           "value": "100/min"
         },
-        "apis": [{
-          "$ref": "ascents:1.0.0"
-        }, {
-          "$ref": "forecasts:1.0.0"
-        }]
+        "apis": 
+          {
+          "ascents": {},
+          "forecasts": {}
+          }
       },
       "gold": {
         "title": "Gold Climb On",
@@ -169,14 +170,7 @@
         "rate-limit": {
           "hard-limit": false,
           "value": "1000/min"
-        },
-        "apis": [{
-          "$ref": "ascents:1.0.0"
-        }, {
-          "$ref": "forecasts:1.0.0"
-        }, {
-          "$ref": "routes:1.0.0"
-        }]
+        }
       }
     }
   }

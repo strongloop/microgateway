@@ -18,16 +18,21 @@ function createProductOptimizedEntry(app, ctx)
 function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, productCallback)
   {
   var plans = JSON.parse(JSON.stringify(product.document.plans));
-  async.forEach(Object.getOwnPropertyNames(plans),
-    function(propname, propCallback) 
+  async.forEachLimit(Object.getOwnPropertyNames(plans),1,
+    function(propname, propCallback)
       {
       //overwrite with specific entry
       locals.catalog = {};
       locals.product = product;
       locals.plan = {};
       locals.plan.apis = product.document.plans[propname].apis;
+      if (JSON.stringify(locals.plan.apis) === '{}' || !locals.plan.apis) { // all product apis scenario
+        locals.plan.apis = product.document.apis;
+        debug("1. all product apis in plan... APIs: " + product.document.apis);
+        }
       locals.plan.name = propname;
       locals.plan.id = getPlanID(locals.product, propname);
+      locals.plan.version = locals.product.document.info.version;
       locals.plan.rateLimit =
         locals.product.document.plans[locals.plan.name]['rate-limit'];
       // 1. trying to add to a particular plan
@@ -36,7 +41,7 @@ function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, pr
       //    b. product that possibly doesn't have subs or security
       if (planid === ALLPLANS || locals.plan.id === planid)
         {
-        gatherDataCreateOptimizedEntry(app, locals, isWildcard, propCallback); 
+        gatherDataCreateOptimizedEntry(app, locals, isWildcard, propCallback);
         }
       else
         {
@@ -46,7 +51,7 @@ function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, pr
   if (productCallback)
     productCallback();
   }
-  
+
 function determineNeededSubscriptionOptimizedEntries(app, ctx)
   {
   var locals;
@@ -56,14 +61,14 @@ function determineNeededSubscriptionOptimizedEntries(app, ctx)
     var planid = ctx.instance['plan-registration'].id;
     findPlansToAddSubscriptions(app, locals, planid)
     }
-  else 
+  else
     {
     //specific subscription from APIm
     var isWildcard = false
-    gatherDataCreateOptimizedEntry(app, locals, isWildcard);  
+    gatherDataCreateOptimizedEntry(app, locals, isWildcard);
     }
   }
-  
+
 function findPlansToAddSubscriptions(app, passed, planid)
   {
   var isWildcard = false;
@@ -72,7 +77,7 @@ function findPlansToAddSubscriptions(app, passed, planid)
   // find optimized entries to create
   app.models.product.find(productquery, function(err, products) {
     async.forEach(products,
-      function (product, productCallback) 
+      function (product, productCallback)
       {
       cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, productCallback);
       });
@@ -86,24 +91,29 @@ function ripCTX(ctx)
   locals.subscription.id = ctx.instance.id;
   locals.credentials =
     ctx.instance.application['app-credentials'];
+  ctx.instance['plan-registration'].apis = {}; // old list, wipe it
   locals.product = ctx.instance['plan-registration'].product;
   locals.plan = {};
-  if (ctx.instance['plan-registration'].apis && ctx.instance['plan-registration'].plan)
+  locals.plan = ctx.instance['plan-registration'].plan;
+  if (locals.product)
     {
-    locals.plan.apis = ctx.instance['plan-registration'].apis;
-    locals.plan.plan = ctx.instance['plan-registration'].plan;
-    locals.plan.id = getPlanID(locals.product, locals.plan.plan.name);
-    locals.plan.name = locals.plan.plan.name;
+    locals.plan.apis = locals.product.document.plans[locals.plan.name].apis;
+    if (JSON.stringify(locals.plan.apis) === '{}' || !locals.plan.apis) { // all product apis scenario
+      locals.plan.apis = locals.product.document.apis;
+      debug("2. all product apis in plan... APIs: " + locals.product.document.apis);
+      }
+    locals.plan.id = getPlanID(locals.product, locals.plan.name);
+    locals.plan.version = locals.product.document.info.version;
     locals.plan.rateLimit =
       locals.product.document.plans[locals.plan.name]['rate-limit'];
     }
   locals.snapshot = ctx.instance['snapshot-id'];
   return locals;
   }
-  
+
 function getPlanID(product, planname)
   {
-  debug('product.document.info.name + ":" + product.document.info.version + ":" + planname: ' + 
+  debug('product.document.info.name + ":" + product.document.info.version + ":" + planname: ' +
     JSON.stringify(product.document.info.name + ":" + product.document.info.version + ":" + planname, null, 4));
   return product.document.info.name + ":" + product.document.info.version + ":" + planname;
   }
@@ -143,6 +153,7 @@ function gatherDataCreateOptimizedEntry(app, locals, isWildcard, gatherCallback)
       function(callback) {
         grabAPIs(app,
           locals.snapshot,
+          locals.product,
           locals.plan,
           function(err, apis) {
             if (err) {
@@ -221,17 +232,38 @@ function grabOrg(app, snapshot, catalog, cb) {
 }
 
 
-function grabAPIs(app, snapshot, plan, cb) {
+function grabAPIs(app, snapshot, product, plan, cb) {
   var apis = [];
-  debug('found plan: %j', plan);
+  debug('got product: %j', product);
+  debug('got plan: %j', plan);
+  var planApis = JSON.parse(JSON.stringify(plan.apis));
+  debug('planApis: %j', planApis);
+  debug('planApiProps: %j', Object.getOwnPropertyNames(planApis));
+
   async.each(
-    plan.apis,
+    Object.getOwnPropertyNames(planApis),
     function(api, done) {
       var query = {
         'where' : {
           'snapshot-id' : snapshot
         }
       };
+      var info = {};
+      if (product.document.apis[api].info) {// standard (not in document)
+        debug('info: product.document.apis[api].info');
+        info = product.document.apis[api].info;
+        }
+      else
+        {
+        // not resolved try to spit the name
+        debug('api: %j', api);
+        var apiName = product.document.apis[api]['name'].split(':');
+        debug('apiName: %j', apiName);
+        debug('info: product.document.apis[api][name]');
+        info = {'x-ibm-name': apiName[0], 'version': apiName[1]}
+        }
+
+      debug('info: %j', info);
       app.models.api.find(
         query,
         function(err, listOfApis) {
@@ -240,19 +272,7 @@ function grabAPIs(app, snapshot, plan, cb) {
             return;
           }
           listOfApis.forEach(function(DBapi) {
-            var info = {};
-            if (api.document)
-              {info = api.document.info;}
-            else
-              if (api.info) // standard (not in document)
-                {info = api.info;}
-              else
-                { // not resolved try to spit the name
-                var apiName = api['$ref'].split(':');
-                debug('apiName: %j', apiName);
-                info = {'x-ibm-name': apiName[0], 'version': apiName[1]}
-                }
-
+            debug('DBapi.document.info: %j', DBapi.document.info);
             if (DBapi.document.info['version'] ===
               info['version'] &&
               DBapi.document.info['x-ibm-name'] ===
@@ -260,7 +280,7 @@ function grabAPIs(app, snapshot, plan, cb) {
                 debug('found api in db: %j', DBapi);
                 apis.push(DBapi);
                 }
-            
+
           });
           done();
         }
@@ -298,16 +318,38 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                       methodname);
                     debug('propname operationId: %j',
                       operation.operationId);
-                    var securityEnabledForMethod = 
+                    var securityEnabledForMethod =
                       operation.security ? operation.security : api.document.security;
-                    if ((securityEnabledForMethod && !isWildcard) || 
-                        // add only security for subscriptions
-                        (!securityEnabledForMethod && isWildcard)) 
-                        // add only non-security for products (wildcard)
+                    debug('securityEnabledForMethod: ' + JSON.stringify(securityEnabledForMethod));
+                    var clientidSecurity = false;
+                    if (securityEnabledForMethod)
                       {
+                      securityEnabledForMethod.forEach(
+                        function(securityReq) {
+                            var securityProps = Object.getOwnPropertyNames(securityReq)
+                            securityProps.forEach(
+                              function(securityProp) {
+                                if (api.document.securityDefinitions &&
+                                    api.document.securityDefinitions[securityProp] &&
+                                    api.document.securityDefinitions[securityProp].type === 'apiKey')
+                                  clientidSecurity = true;
+                                  debug('clientidSecurity: ' + clientidSecurity);
+                                });
+                        });
+                      }
+                    if ((securityEnabledForMethod && clientidSecurity && !isWildcard) ||
+                        // add only security for subscriptions
+                        ((!securityEnabledForMethod || !clientidSecurity) && isWildcard)) {
+                        // add only non-clientid security for products (wildcard)
                       method.push({
+                        consumes: operation.consumes || api.document.consumes,
                         method: methodname.toUpperCase(),
                         operationId: operation.operationId,
+                        parameters: getOpParams(api.document.parameters,
+                                                api.document.paths[propname].parameters,
+                                                operation.parameters),
+                        produces: operation.produces || api.document.produces,
+                        responses: operation.responses,
                         securityDefs: api.document.securityDefinitions,
                         // operational lvl Swagger security overrides the API lvl
                         securityReqs: securityEnabledForMethod,
@@ -315,8 +357,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                       }
                   }
                 );
-                if (method.length !== 0) // no methods, no apiPaths
-                  {
+                if (method.length !== 0) { // no methods, no apiPaths
                   var regexPath = makePathRegex(
                             api.document.basePath,
                             propname);
@@ -333,6 +374,36 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             }
           );
 
+          // get API properties that user defined in the swagger
+          var ibmSwaggerExtension = api.document['x-ibm-configuration'];
+          var defaultApiProperties = ibmSwaggerExtension.properties;
+          var apiProperties = {};
+          if (defaultApiProperties) {
+            Object.getOwnPropertyNames(defaultApiProperties).forEach(
+              function(propertyName){
+                if (pieces.catalog.name &&
+                    ibmSwaggerExtension.catalogs[pieces.catalog.name] &&
+                    ibmSwaggerExtension.catalogs[pieces.catalog.name].properties[propertyName]) {
+                  apiProperties[propertyName] = ibmSwaggerExtension.catalogs[pieces.catalog.name].properties[propertyName];
+                } else {
+                  apiProperties[propertyName] = defaultApiProperties[propertyName];
+                }
+              }
+            );
+          }
+
+          // Some customers add their own extension to the swagger,
+          // so we will make the swagger available in context to customers.
+          // As the information is needed for every incoming transaction on
+          // gateway, store the data in the optimized data model.
+          var swaggerWithoutAssembly = JSON.parse(JSON.stringify(api.document));
+          delete swaggerWithoutAssembly['x-ibm-configuration'].assembly;
+
+          var assemblyFlow = {
+            assembly: api.document['x-ibm-configuration'].assembly
+          };
+
+
     /*
         "subscription-id": "string",
         "client-id": "string",
@@ -347,6 +418,9 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
         "plan-rate-limit": {},
         "api-id": "string",
         "api-base-path": "string",
+        "api-name": "string",
+        "api-version": "string",
+        "api-properties": {},
         "api-paths": [{
            "path": "string",
            "path-base": "string",
@@ -362,6 +436,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'client-secret': credential['client-secret'],
             'plan-id': pieces.plan.id,
             'plan-name': pieces.plan.name,
+            'plan-version': pieces.plan.version,
             'plan-rate-limit': pieces.plan.rateLimit,
             'product-id': pieces.product.id,
             'product-name': pieces.product.document.info.name,
@@ -370,13 +445,18 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'organization-id': pieces.org.id,
             'organization-name': pieces.org.name,
             'api-id': api.id,
+            'api-document': swaggerWithoutAssembly,
+            'api-assembly': assemblyFlow,
             'api-base-path': api.document.basePath,
+            'api-name': api.document.info.title,
+            'api-type': api.document['x-ibm-configuration']['api-type'] || 'REST',
+            'api-version': api.document.info.version,
+            'api-properties': apiProperties,
             'api-paths': apiPaths,
             'snapshot-id' : pieces.snapshot
           };
 
-        if (apiPaths.length !== 0) // no paths, no entry..
-          {
+        if (apiPaths.length !== 0) { // no paths, no entry..
           app.models.optimizedData.create(
             newOptimizedDataEntry,
             function(err, optimizedData) {
@@ -390,8 +470,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             }
           );
           }
-        else 
-          {
+        else {
           apidone();
           }
         },
@@ -416,7 +495,7 @@ function makePathRegex(basePath, apiPath) {
     if (braceBegin >= 0) {
       braceEnd = path.indexOf('}') + 1;
       var variablePath = path.substring(braceBegin, braceEnd);
-      path = path.replace(variablePath, '.*');
+      path = path.replace(variablePath, ".+");
     }
   } while (braceBegin >= 0);
   path = '^' + basePath + path + '$';
@@ -427,13 +506,26 @@ function makePathRegex(basePath, apiPath) {
 function calculateMatchingScore(apiPath) {
   var pathArray = apiPath.split('/');
   var pathScore = 0;
-  for (var i=1; i < pathArray.length; i++) {
+  for (var i=0; i < pathArray.length; i++) {
     if (pathArray[i].indexOf('{') >= 0) {
-      pathScore += i;
+      pathScore += Math.pow((pathArray.length - i), 2);
     }
   }
 
   return pathScore;
+}
+
+/**
+ * Returns a Object that denotes the parameters associated with the operation
+ *
+ * @param {Object} apiParams api-level parameters in the swagger
+ * @param {Array} pathParams path-level parameters in the swagger
+ * @param {Array} opParams op-level perameters in the swagger
+ *
+ */
+function getOpParams(apiParams, pathParams, opParams) {
+  // TODO need to join the 3 params
+  return opParams || [];
 }
 
 exports.determineNeededSubscriptionOptimizedEntries = determineNeededSubscriptionOptimizedEntries;

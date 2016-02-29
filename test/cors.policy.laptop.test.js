@@ -8,7 +8,7 @@ let echo = require('./support/echo-server');
 let mg = require('../lib/microgw');
 let should = require('should');
 
-describe('cross origin resource sharing policy', function() {
+describe('cors policy', function() {
 
   let request;
   before((done) => {
@@ -37,20 +37,35 @@ describe('cross origin resource sharing policy', function() {
       .catch(done);
   });
 
-  it('should expect cors header', function(done) {
+  it('should expect cors headers', function(done) {
     request
-      .get('/cors/path-cors')
-      .expect('Access-Control-Allow-Origin', '*')
+      .get('/cors-policy/cors1')
+      .expect('Access-Control-Allow-Credentials', 'true')
+      .expect('Access-Control-Allow-Headers', 'FOO, BAR')
+      .expect('Access-Control-Allow-Methods', 'GET, POST')
+      .expect('Access-Control-Allow-Origin', 'http://foo.example.com')
+      .expect('Access-Control-Expose-Headers', 'X-Foo-Header, X-Bar-Header')
+      .expect('Access-Control-Max-Age', 3600)
       .expect(200, done);
   });
 
   it('should not expect cors header', function(done) {
     request
-      .get('/cors-disabled/path-cors')
-      .expect(200, done)
+      .get('/cors-policy/cors2')
+      .expect(200)
       .end(function(err, res) {
         if (err) return done(err);
         var cors = res.header['Access-Control-Allow-Origin'] !== undefined;
+        cors.should.be.False();
+        cors = res.header['Access-Control-Allow-Headers'] !== undefined;
+        cors.should.be.False();
+        cors = res.header['Access-Control-Allow-Methods'] !== undefined;
+        cors.should.be.False();
+        cors = res.header['Access-Control-Expose-Headers'] !== undefined;
+        cors.should.be.False();
+        cors = res.header['Access-Control-Max-Age'] !== undefined;
+        cors.should.be.False();
+        cors = res.header['Access-Control-Allow-Credentials'] !== undefined;
         cors.should.be.False();
         done();
       });

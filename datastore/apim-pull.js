@@ -61,9 +61,9 @@ function apimpull (opts, cb) {
     port : opts.port || 443, // assume SSL
     timeout : opts.timeout * 1000 || 30 * 1000,
     srvca : opts.srvca ? fs.readFileSync(srvca) : null,
-    clikey : opts.clikey ? fs.readFileSync(key) : null,
+    clikey : opts.clikey ? opts.clikey : null,
     clipass : opts.clipass,
-    clicert : opts.clicert ? fs.readFileSync(cert)  : null,
+    clicert : opts.clicert ? opts.clicert  : null,
     outdir : opts.outdir || 'apim',
     clientid : opts.clientid || '1111-1111'
   };
@@ -236,7 +236,7 @@ function fetch (opts, cb) {
         );
       }
       else {
-        var error = new Error(opts.url +
+        var error = new Error(options.url +
                     ' failed with: ' +
                     res.statusCode);
         cb(error);
