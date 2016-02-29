@@ -58,6 +58,7 @@ describe('Context variables', function() {
           id: 'context:1.0.0',
           method: 'GET',
           name: 'context',
+          org: {},
           path: '/context/api',
           properties: {
             foo: 'default_foo'

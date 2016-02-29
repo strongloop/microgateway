@@ -8,6 +8,7 @@
     "subscription-id": "string",
     "client-id": "string",
     "client-secret": "string",
+    "client-name": "string",
     "catalog-id": "string",
     "catalog-name": "string",
     "organization-id": "string",
