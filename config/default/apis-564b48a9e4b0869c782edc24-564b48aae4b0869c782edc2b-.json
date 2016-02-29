@@ -769,6 +769,7 @@
                "basic-local": {
                     "type": "basic",
                     "description": "basic auth local ldap no tls",
+                    "x-ibm-authentication-registry": "ldap1",
                     "x-ibm-authentication-url": {
                         "url": "ldap://localhost:1389"
                     }
