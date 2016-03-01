@@ -1,33 +1,44 @@
 'use strict';
 
 let supertest = require('supertest');
-let mg = require('../lib/microgw');
-let backend = require('./support/invoke-tests/api-server');
+let microgw = require('../lib/microgw');
+let backend = require('./support/invoke-server');
+let apimServer = require('./support/mock-apim-server/apim-server');
 
 describe('invokePolicy', function() {
 
   let request;
   before((done) => {
-    process.env.CONFIG_DIR = __dirname + '/support/invoke-tests/definitions';
+    //Use production instead of CONFIG_DIR: reading from apim instead of laptop
     process.env.NODE_ENV = 'production';
-    mg.start(3000)
-      .then(() => {
-        return backend.start(8889);
-      })
-      .then(() => {
-        request = supertest('http://localhost:3000');
-      })
-      .then(done)
-      .catch((err) => {
-        console.error(err);
-        done(err);
-      });
+
+    //The apim server and datastore
+    process.env.APIMANAGER = '127.0.0.1';
+    process.env.APIMANAGER_PORT = 8081;
+    process.env.DATASTORE_PORT = 5000;
+
+    apimServer.start(
+            process.env.APIMANAGER,
+            process.env.APIMANAGER_PORT,
+            __dirname + '/definitions/invoke')
+        .then(() => microgw.start(3000))
+        .then(() => backend.start(8889))
+        .then(() => { request = supertest('http://localhost:3000'); })
+        .then(done)
+        .catch((err) => {
+            console.error(err);
+            done(err);
+            });
   });
 
   after((done) => {
-    delete process.env.CONFIG_DIR;
     delete process.env.NODE_ENV;
-    mg.stop()
+    delete process.env.APIMANAGER;
+    delete process.env.APIMANAGER_PORT;
+    delete process.env.DATASTORE_PORT;
+
+    apimServer.stop()
+      .then(() => microgw.stop())
       .then(() => backend.stop())
       .then(done, done)
       .catch(done);
@@ -123,8 +134,6 @@ describe('invokePolicy', function() {
       .set('X-DELAY-ME', '7')
       .expect(299, /Invoke policy timeout/, done);
   });
-  //skip the security related testcases for now. TODO: enable them later
-  return;
 
   /////////////////////// HTTPS servers ///////////////////////
   //8890: The server is "Sarah", whose CA is root
