@@ -1,5 +1,7 @@
+'use strict';
 var debug = require('debug')('policy:rate-limiting');
 var RateLimiter = require('limiter').RateLimiter;
+var handleResponse = require('./helper').handleResponse;
 
 module.exports = function(options) {
   options = options || {};
@@ -28,16 +30,7 @@ module.exports = function(options) {
       var reset = Math.max(interval - (Date.now() - limiter.curIntervalStart),
         0);
 
-      var res = context.res;
-      debug('Limit: %d Remaining: %d Reset: %d', limit, remaining, reset);
-      res.setHeader('X-RateLimit-Limit', limit);
-      res.setHeader('X-RateLimit-Remaining', remaining);
-      res.setHeader('X-RateLimit-Reset', reset);
-
-      if (!ok && hardLimit) {
-        res.status(429).json({error: 'Limit exceeded'});
-        return;
-      }
+      handleResponse(limit, remaining, reset, hardLimit, context, next);
     }
     next();
   };
