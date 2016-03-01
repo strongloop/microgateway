@@ -1,28 +1,32 @@
 'use strict';
 var debug = require('debug')('policy:invoke');
+var fs = require('fs');
 var url = require('url');
 var assert = require('assert');
+var zlib = require('zlib');
+var dsc = require('../../datastore/client');
 
-/*
-// TODO: This is only a sample.
-// getTlsProfile returns a promise that can be used to get the TLS Profile
-// information, but this instance is hardcoded to get one from the mock
-// datastore. This code can't be tested until Tony adds code to flow-engine to
-// resolve policy at this location (micro-gw/policy)
-
-var dsc = require('../datastore/client');
-dsc.getTlsProfile(context.get('config-snapshot-id'), 'new-tls-profile-1')
-    .then(function(result) {console.log('TLS: ' + JSON.stringify(result));},
-          function(error) {console.log('TLS ERR: ' + error);});
-
-console.log("NEWPOLICY LOC- SnapshotID: " + context.get('config-snapshot-id'));
-*/
-
-// TODO: handle self signed certificates
-//process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+//TODO: move this file to lib/ or util/?
+//one-time effort: read the cipher table into memory
+var cipherTable;
+try {
+    //the mapping table of TLS to OpenSSL ciphersuites
+    cipherTable = require(__dirname + '/cipherSuites.json');
+}
+catch (error) {
+    console.error('Warning! Cannot read the cipher table for invoke policy. %s',
+            error);
+    cipherTable = {};
+}
 
 
-function invoke(props, context, next) {
+/**
+ * Do the real work of the invoke policy: read the property and decide the
+ * parameters, establish the connection after everything is ready.
+ */
+function _main(props, context, next, tlsProfile) {
+    var logger = context.get('logger');
+
     //the default settings and error object
     var options;
     var isSecured;
@@ -33,15 +37,7 @@ function invoke(props, context, next) {
     var error = { name: 'property error' };
     var data, dataSz = 0;
 
-    var logger = context.get('logger');
-
-    if (!props || typeof props !== 'object') {
-        error.value = 'Invalid property object';
-        error.message = error.value;
-        next(error);
-        return;
-    }
-
+    //TODO: support the input and output property
     //TODO: check context.request and context.message
     assert(context.request && context.message);
 
@@ -57,10 +53,13 @@ function invoke(props, context, next) {
         return;
     }
     else {
-        if (options.protocol === 'https:')
+        if (options.protocol === 'https:') {
+            if (!tlsProfile)
+                logger.warn('No TLS profile can be used for this HTTPS connection');
             isSecured = true;
+        }
     }
-    logger.debug("invoke options: %j", options, {});
+    logger.info('invoke url: %s', options.href);
 
     //verb: default to request.verb
     verb = props.verb ? String(props.verb).toUpperCase() : context.request.verb;
@@ -74,7 +73,7 @@ function invoke(props, context, next) {
     }
     else
         options.method = verb;
-    logger.debug("invoke verb: %s", verb);
+    logger.debug('invoke verb: %s', verb);
 
     //http-version: 1.1
     if (props['http-version'] && props['http-version'] !== '1.1') {
@@ -87,7 +86,7 @@ function invoke(props, context, next) {
     //chunked-upload
     if (props['chunked-upload'] && props['chunked-upload'] !== 'false')
         useChunk = true;
-    logger.debug("invoke useChunk: %s", useChunk);
+    logger.debug('invoke useChunk: %s', useChunk);
 
     //timeout: between 1 to 86400 seconds
     if (!isNaN(parseInt(props.timeout))) {
@@ -99,29 +98,27 @@ function invoke(props, context, next) {
         else
             timeout = tmp;
     }
-    logger.debug("invoke timeout: %s", timeout);
+    logger.debug('invoke timeout: %s', timeout);
 
     //compression
-    if (props.compresssion && props.compresssion !== 'false')
+    if (props.compression === true || props.compression === 'true')
         compression = true;
-    logger.debug("invoke compression: %s", compression);
+    logger.debug('invoke compression: %s', compression);
 
     //authentication
     if (props.username && props.password)
         options.auth = props.username + ':' + props.password;
-    logger.debug("invoke auth: %s", options.auth, {});
+    logger.debug('invoke auth: %s', options.auth, {});
 
-    //TODO: get the TLS profile
-
+    //TODO: do we need the context.message.rawHeaders?
     //copy headers
     options.headers = {};
     for (var i in context.message.headers)
         options.headers[i] = context.message.headers[i];
-    delete options.headers['host'];
-    delete options.headers['connection'];
+    delete options.headers.host;
+    delete options.headers.connection;
     delete options.headers['content-length'];
 
-    //TODO: compress with zlib
     //prepare the data and dataSz
     data = context.message.body;
     assert(data);
@@ -133,39 +130,122 @@ function invoke(props, context, next) {
     }
     dataSz = data.length;
 
-    if (!useChunk)
-        options.headers['content-length'] = dataSz;
+    //Compress the data or not
+    if (compression) {
+        options.headers['Content-Encoding'] = 'gzip';
+        logger.debug('invoke will compress the data');
+    }
 
-    logger.info('invoke w/ headers: %j', options.headers, {});
+    //when compression is true, we can only use chunks
+    if (!compression && !useChunk) {
+        options.headers['Content-Length'] = dataSz;
+        logger.debug('invoke content-length = %d', dataSz);
+    }
 
-    //write the request
+    logger.debug('invoke w/ headers: %j', options.headers, {});
+
+    //setup the HTTPs settings
     var http = isSecured ? require('https') : require('http');
+    if (isSecured && tlsProfile) {
+        options.agent = false;
+        //key
+        options.key = tlsProfile['private-key'];
 
-    var request = http.request(options, function(response) {
-        //read the response
-        var target = context.message;
-
-        target.statusCode = response.statusCode;
-        target.statusMessage = response.statusMessage;
-        logger.info('invoke response: %d, %s', target.statusCode, target.statusMessage);
-
-        target.headers = {};
-        let rhrs = response.rawHeaders;
-        for(var i = 0; i < rhrs.length; i+=2) {
-            target.headers[rhrs[i]] = rhrs[i+1];
+        //cert
+        for (var c in tlsProfile.certs) {
+            if (tlsProfile.certs[c]['cert-type'] === 'CLIENT') {
+                options.cert = tlsProfile.certs[c].cert;
+                break;
+            }
         }
 
-        target.body = '';
-        response.on('data', function(chunk) {
-            target.body += chunk;
-        });
+        //ca list
+        options.ca = [];
+        for (var p in tlsProfile.certs) {
+            if (tlsProfile.certs[p]['cert-type'] === 'PUBLIC') {
+                logger.debug('invoke uses the ca: ' + tlsProfile.certs[p].name);
+                options.ca = tlsProfile.certs[p].cert;
+            }
+        }
 
-        //TODO: check the mime type and convert the target.body to JSON?
-        response.on('end', function() {
-            logger.info('invoke done');
-            next();
+        if (options.ca.length > 0 || tlsProfile['mutual-auth'])
+            options.rejectUnauthorized = true;
+
+        //secureProtocol
+        if (tlsProfile.protocols && Array.isArray(tlsProfile.protocols)) {
+            for (var j=0; j<tlsProfile.protocols.length; j++) {
+                switch (tlsProfile.protocols[j]) {
+                  case 'TLSv1':
+                    options.secureProtocol = 'TLSv1_method';
+                    break;
+                  case 'TLSv11':
+                    options.secureProtocol = 'TLSv1_1_method';
+                    break;
+                  case 'TLSv12':
+                    options.secureProtocol = 'TLSv1_2_method';
+                    break;
+                  default:
+                    logger.warn('Unsupported secure protocol: %s',
+                            tlsProfile.protocols[j]);
+                    break;
+                }
+                break;
+            }
+        }
+
+        //ciphers
+        var ciphers = [];
+        if (tlsProfile.ciphers && Array.isArray(tlsProfile.ciphers)) {
+            options.honorCipherOrder = true;
+            for (var k=0; k<tlsProfile.ciphers.length; k++) {
+                var cipher = cipherTable[tlsProfile.ciphers[k]];
+                if (cipher)
+                    ciphers.push(cipher);
+                else
+                    logger.warn("Unknown cipher: %s", tlsProfile.ciphers[k]);
+            }
+            options.ciphers = ciphers.join(':');
+        }
+    }
+
+    //write the request
+    var request;
+    try {
+        request = http.request(options, function(response) {
+            //read the response
+            var target = context.message;
+
+            //TODO: rename the reasonPhrase
+            target.statusCode = response.statusCode;
+            target.statusMessage = response.statusMessage;
+            logger.info('invoke response: %d, %s', target.statusCode, target.statusMessage);
+
+            target.headers = {};
+            var rhrs = response.rawHeaders;
+            for (var i = 0; i < rhrs.length; i+=2) {
+                target.headers[rhrs[i]] = rhrs[i+1];
+            }
+
+            target.body = [];
+            response.on('data', function(chunk) {
+                target.body += chunk;
+            });
+
+            //TODO: convert the target.body to JSON
+            response.on('end', function() {
+                logger.info('invoke done');
+                next();
+            });
         });
-    });
+    }
+    catch (err) {
+        error.name = 'connection error';
+        error.value = err.toString();
+        error.message = error.value;
+
+        next(error);
+        return;
+    }
 
     //setup the timeout callback
     request.setTimeout(timeout * 1000, function() {
@@ -173,6 +253,7 @@ function invoke(props, context, next) {
 
         error.name = 'connection error';
         error.value = 'Invoke policy timeout';
+        error.message = error.value;
 
         next(error);
         request.abort();
@@ -185,14 +266,95 @@ function invoke(props, context, next) {
 
         error.name = 'connection error';
         error.value = e.toString();
+        error.message = error.value;
 
         next(error);
     });
 
     logger.debug('invoke request: %s', data);
-    request.write(data);
-    request.end();
-};
+    if (compression) {
+        zlib.gzip(data, function(err, buffer) {
+            if (err) {
+                logger.error("cannot compress the data");
+
+                next(err);
+                request.abort();
+            }
+            else {
+                request.write(buffer);
+                request.end();
+            }
+        });
+    }
+    else {
+        request.write(data);
+        request.end();
+    }
+}
+
+/**
+ * The entry point of the invoke policy.
+ * Read the TLS profile first and do the real work then.
+ */
+function invoke(props, context, next) {
+    var logger = context.get('logger');
+
+    var isDone = false;
+    function _next(v) {
+        if (!isDone) {
+            isDone = true;
+            next(v);
+        }
+    }
+
+    if (!props || typeof props !== 'object') {
+        var error = {
+            name: 'property error',
+            value: 'Invalid property object',
+            message: 'Invalid property object'
+        };
+        _next(error);
+        return;
+    }
+
+    var snapshotId = context.get('config-snapshot-id');
+    var profile = props['tls-profile'];
+    var tlsProfile;
+    if (!profile || typeof profile !== 'string' || profile.length === 0) {
+        _main(props, context, _next);
+    }
+    else {
+        logger.debug('invoke reading the TLS profile "%s"', profile);
+
+        dsc.getTlsProfile(snapshotId, profile).then(
+            function(result) {
+                if (result && Array.isArray(result) && result.legnth > 0)
+                    tlsProfile = result[0];
+                else if (result && typeof result === 'object')
+                    tlsProfile = result;
+                else
+                    logger.error('There is no TLS profile name "%s"', profile);
+
+                if (!tlsProfile) {
+                    var error = {
+                        name: 'property error',
+                        value: 'Cannot find the TLS profile object',
+                        message: 'Cannot find the TLS profile ' + profile,
+                    };
+
+                    _next(error);
+                    return;
+                }
+                else
+                    _main(props, context, _next, tlsProfile);
+            },
+            function(error) {
+                logger.error('invoke cannot retrieve TLS profile "%s": %s',
+                    profile, error);
+                _next(error);
+            });
+    }
+}
 
 module.exports = function(config) {
     return invoke;

@@ -1,0 +1,138 @@
+info:
+  version: 1.0.0
+  title: invoke
+  x-ibm-name: invoke
+securityDefinitions:
+basePath: /invoke
+swagger: '2.0'
+paths:
+  /basic:
+    post:
+      responses:
+        '200':
+          description: 200 OK
+    get:
+      responses:
+        '200':
+          description: 200 OK
+  /testTLS:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+  /testCompression:
+    post:
+      responses:
+        '200':
+          description: 200 OK
+  /useChunks:
+    post:
+      responses:
+        '200':
+          description: 200 OK
+  /timeout5Sec:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+  /testInput:
+    post:
+      responses:
+        '200':
+          description: 200 OK
+  /testOutput:
+    post:
+      responses:
+        '200':
+          description: 200 OK
+x-ibm-configuration:
+  assembly:
+    execute:
+      - operation-switch:
+          case:
+              - operations:
+                  - path: /basic
+                    verb: POST
+                  - path: /basic
+                    verb: GET
+                execute:
+                  - invoke:
+                      target-url: 'http://localhost:8889/$(request.path)'
+
+              - operations:
+                  - path: /testTLS
+                    verb: POST
+                  - path: /testTLS
+                    verb: GET
+                execute:
+                  - invoke:
+                      target-url: 'https://localhost:$(request.headers.x-https-port)/$(request.path)'
+                      tls-profile: $(request.headers.x-tls-profile)
+
+              - operations:
+                  - path: /testCompression
+                    verb: POST
+                execute:
+                  - set-variable:
+                      actions:
+                        - set: message.body
+                          value: $(request.headers.x-raw-data)
+                  - invoke:
+                      target-url: 'http://localhost:8889/$(request.path)'
+                      compression: true
+
+              - operations:
+                  - path: /useChunks
+                    verb: POST
+                execute:
+                  - invoke:
+                      target-url: 'http://localhost:8889/$(request.path)'
+                      chunked-upload: true
+
+              - operations:
+                  - path: /timeout5Sec
+                    verb: GET
+                execute:
+                  - invoke:
+                      target-url: 'http://localhost:8889/$(request.path)'
+                      timeout: 5
+
+              - operations:
+                  - path: /testInput
+                    verb: POST
+                execute:
+                  - set-variable:
+                      actions:
+                        - set: foo.body
+                          value: "This is the custom request body"
+                  - set-variable:
+                      actions:
+                        - set: foo.headers
+                          value: { X-FOO-HDR: "the custom header" }
+                  - invoke:
+                      target-url: 'http://localhost:8889/$(request.path)'
+                      timeout: 5
+
+              - operations:
+                  - path: /testOutput
+                    verb: POST
+                execute:
+                  - invoke:
+                      target-url: 'http://localhost:8889/$(request.path)'
+                      timeout: 5
+                      output: foo
+                  - set-variable:
+                      actions:
+                        - set: foo
+                          value: message
+
+    catch:
+      - default:
+          - set-variable:
+              actions:
+                - set: message.body
+                  value: $(error.message)
+          - set-variable:
+              actions:
+                - set: message.statusCode
+                  value: 299
