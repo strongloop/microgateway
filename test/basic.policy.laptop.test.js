@@ -65,10 +65,10 @@ describe('basic auth policy', function() {
   before((done) => {
     process.env.CONFIG_DIR = __dirname + '/definitions/basic';
     process.env.DATASTORE_PORT = 5000;
-    process.env.APIMANAGER_PORT = 8080;
+    process.env.APIMANAGER_PORT = 8081;
     process.env.APIMANAGER = '127.0.0.1';
     process.env.NODE_ENV = 'production';
-    apimServer.start('127.0.0.1', 8080)
+    apimServer.start('127.0.0.1', 8081)
       .then(() => mg.start(3000))
       .then(() => {
         return ldap.start(1389, 1636);
