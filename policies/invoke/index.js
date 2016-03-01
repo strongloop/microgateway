@@ -217,8 +217,8 @@ function _main(props, context, next, tlsProfile) {
 
             //TODO: rename the reasonPhrase
             target.statusCode = response.statusCode;
-            target.statusMessage = response.statusMessage;
-            logger.info('invoke response: %d, %s', target.statusCode, target.statusMessage);
+            target.reasonPhrase = response.reasonPhrase;
+            logger.info('invoke response: %d, %s', target.statusCode, target.reasonPhrase);
 
             target.headers = {};
             var rhrs = response.rawHeaders;
