@@ -85,6 +85,22 @@ paths:
           description: parameter Bool
           type: boolean
           required: true
+        - name: X-paramArray
+          in: header
+          description: parameter Array
+          type: array
+          items:
+            type: integer
+            format: int64
+          collectionFormat: csv
+          required: true
+        - name: queryArray
+          in: query
+          description: parameter Array in query
+          type: array
+          items:
+            type: string
+          required: true
       responses:
         '200':
           description: 200 OK

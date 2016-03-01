@@ -124,8 +124,9 @@ describe('Context variables', function() {
 
   it('should produce all request.parameters', function(done) {
     request
-      .get('/v1/context/request/parameters/abc/9999?param1=value1&param2=8888&param5=1111&paramBoolean=false')
+      .get('/v1/context/request/parameters/abc/9999?param1=value1&param2=8888&param5=1111&paramBoolean=false&queryArray=1,2,3')
       .set('X-foo', 'bar')
+      .set('X-paramArray', '1024,2048,4096')
       .expect(200)
       .end(function(err, res) {
         var result = res.body;
@@ -133,14 +134,16 @@ describe('Context variables', function() {
           result = JSON.parse(result);
         }
 
-        console.log(result);
+        console.log("request.parameters result: "+JSON.stringify(result));
         assert.deepStrictEqual(result,
             {"param1":"value1",
              "param2":8888,
              "param3":9999,
              "param4":"abc",
              "X-foo":"bar",
-             "paramBoolean":false}
+             "paramBoolean":false,
+             "X-paramArray":[1024,2048,4096],
+             "queryArray":["1","2","3"]}
         );
         assert.equal(result.param5, undefined);
         done();
