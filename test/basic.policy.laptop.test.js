@@ -68,16 +68,7 @@ describe('basic auth policy', function() {
     process.env.APIMANAGER_PORT = 8080;
     process.env.APIMANAGER = '127.0.0.1';
     process.env.NODE_ENV = 'production';
-    Promise.resolve()
-      .then(() => new Promise((resolve, reject) => {
-        apimServer.start('127.0.0.1', 8080, err => {
-          if (err) {
-            reject(err);
-            return;
-          }
-          resolve();
-        });
-      }))
+    apimServer.start('127.0.0.1', 8080)
       .then(() => mg.start(3000))
       .then(() => {
         return ldap.start(1389, 1636);
@@ -100,6 +91,7 @@ describe('basic auth policy', function() {
       .then(() => mg.stop())
       .then(() => ldap.stop())
       .then(() => echo.stop())
+      .then(() => apimServer.stop())
       .then(() => {
         delete process.env.CONFIG_DIR;
         delete process.env.DATASTORE_PORT;

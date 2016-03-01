@@ -37,6 +37,7 @@ describe('data-store', function() {
     delete process.env.NODE_ENV;
     microgw.stop()
       .then(() => echo.stop())
+      .then(() => apimServer.stop())
       .then(done, done)
       .catch(done);
   });
