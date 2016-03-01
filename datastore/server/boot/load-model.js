@@ -16,6 +16,8 @@ var CONFIGDIR = environment.CONFIGDIR;
 
 var LAPTOP_RATELIMIT = environment.LAPTOP_RATELIMIT;
 
+var cliConfig = require('apiconnect-cli-config');
+
 var rootConfigPath = __dirname + '/../../../config/';
 var defaultDefinitionsDir = rootConfigPath + 'default';
 var definitionsDir = defaultDefinitionsDir;
@@ -410,56 +412,62 @@ function loadConfig(app, apimanager, models, currdir, snapdir, uid, cb) {
  * @param {callback} cb - callback that handles error or successful completion
  */
 function loadConfigFromFS(app, apimanager, models, dir, uid, cb) {
-  var files;
-  debug('loadConfigFromFS entry');
-  try {
-    files = fs.readdirSync(dir);
-  } catch (e) {
-    debug('loadConfigFromFS error');
-    cb(e);
-    return;
-  }
-  var YAMLfiles = [];
-  debug('files: ', files);
-  var jsonFile = new RegExp(/.*\.json$/);
-  var yamlFile = new RegExp(/(.*\.yaml$)|(.*\.yml$)/);
-
   // clear out existing files from model structure
   models.forEach(
     function(model) {
       model.files = [];
     }
   );
-
-  // correlate files with appropriate model
-  files.forEach(
-    function(file) {
-      debug('file match jsonFile: ', file.match(jsonFile));
-      debug('file match yamlFile: ', file.match(yamlFile));
-      // apim pull scenario (only json, no yaml)
-      if (apimanager.host && file.match(jsonFile)) {
-        for(var i = 0; i < models.length; i++) {
-          if(file.indexOf(models[i].prefix) > -1) {
-            debug('%s file: %s', models[i].name, file);
-            models[i].files.push(file);
-            break;
+    
+  if (apimanager.host) {
+    var files;
+    debug('loadConfigFromFS entry');
+    try {
+      files = fs.readdirSync(dir);
+    } catch (e) {
+      debug('loadConfigFromFS error');
+      cb(e);
+      return;
+    }
+    
+    debug('files: ', files);
+    var jsonFile = new RegExp(/.*\.json$/);
+    // correlate files with appropriate model
+    files.forEach(
+      function(file) {
+        debug('file match jsonFile: ', file.match(jsonFile));
+        // apim pull scenario (only json, no yaml)
+        if (apimanager.host && file.match(jsonFile)) {
+          for(var i = 0; i < models.length; i++) {
+            if(file.indexOf(models[i].prefix) > -1) {
+              debug('%s file: %s', models[i].name, file);
+              models[i].files.push(file);
+              break;
+            }
           }
         }
       }
-      // laptop experience scenario (only yaml, no json)
-      // might want to support json for laptop as well
-      else if (file.match(yamlFile)) {
-        YAMLfiles.push(file);
-      }
-    }
-  );
-  
-  if (apimanager.host) {
+    );
     // populate data-store models with the file contents
     populateModelsWithAPImData(app, models, dir, uid, cb);
   }
   else {
-    populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb);
+    var YAMLfiles = [];
+
+    cliConfig.loadProject(dir, {disableProjectResolution: true}).then(function(artifacts) { 
+      debug('%j', artifacts); 
+      artifacts.forEach(
+        function(artifact)
+          {
+          if (artifact.type === 'swagger')
+            {
+            YAMLfiles.push(artifact.filePath)
+            }
+          }
+        )
+        // populate data-store models with the file contents
+        populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb);
+    });
   }
 }
 
@@ -476,7 +484,7 @@ function createAPIID(api)
 /**
  * Populates data-store models with persisted content
  * @param {???} app - loopback application
- * @param {Array} YAMLfiles - list of yaml files to process
+ * @param {Array} YAMLfiles - list of yaml files to process (should only be swagger)
  * @param {string} dir - path to directory containing persisted data to load
  * @param {callback} cb - callback that handles error or successful completion
  */
@@ -486,8 +494,7 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
   async.series([
     function(seriesCallback) {
       async.forEach(YAMLfiles,
-          function(typefile, fileCallback) {
-            var file = path.join(dir, typefile);
+          function(file, fileCallback) {
             debug('Loading data from %s', file);
             var readfile;
             try {
@@ -499,25 +506,6 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
               fileCallback(e);
               return;
             }
-            // convert to json.. determine model
-            
-            // Product=
-            // product: 1.0.0
-            // info:
-            //  name: climb-on
-            //  title: Climb On
-            //  version: 1.0.0
-      
-            // API=
-            //  swagger: '2.0'
-            //  info:
-            //    x-ibm-name: route
-            //    title: Route
-            //    version: 1.0.0
-            
-            debug('readfile %s', JSON.stringify(readfile));
-            debug('Product %s', readfile.product);
-            debug('Swagger %s', readfile.swagger);
             var model = {};
             var entry = {};
             // looks like a product
