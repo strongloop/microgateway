@@ -40,8 +40,8 @@ describe('matching score test', function() {
     var clientSecret1 = 'api-level_secret';
     var clientSecret2 = 'bad_secret';
     it('client_id=' + clientId1 +
-      ' secret=' + clientSecret1 + ' "/routes/foo/bar" should not -' +
-      ' match "/routes/{id}"',
+      ' secret=' + clientSecret1 + ' "/routes/foo/bar" should -' +
+      ' match "/routes/{id} (dubious)"',
       function (done) {
         request
         .get('/v1/routes/foo/bar?client_id=' + clientId1 +
@@ -49,45 +49,6 @@ describe('matching score test', function() {
         .expect(200, done);
       });
 
-    it('client_id=' + clientId1 +
-      ' secret=' + clientSecret1 + ' "/test4/id/exists" not authorized -' +
-      ' for "/test4/id/{exists}"',
-      function (done) {
-        request
-        .get('/v1/test4/id/exists?client_id=' + clientId1 +
-          '&client_secret=' + clientSecret1)
-        .expect(200, done);
-      });
-
-    it('client_id=' + clientId1 +
-      ' secret=' + clientSecret2 + ' "/test4/id/exists" not authorized -' +
-      ' for "/test4/id/{exists}"',
-      function (done) {
-        request
-        .get('/v1/test4/id/exists?client_id=' + clientId1 +
-          '&client_secret=' + clientSecret2)
-        .expect(401, done);
-      });
-
-    it('client_id=' + clientId1 +
-      ' secret=' + clientSecret2 + ' "/test4//exists" does not match -' +
-      ' for "/test4/id/{exists}"',
-      function (done) {
-        request
-        .get('/v1/test4//exists?client_id=' + clientId1 +
-          '&client_secret=' + clientSecret2)
-        .expect(404, done);
-      });
-
-    it('client_id=' + clientId1 +
-      ' secret=' + clientSecret1 + ' "/test4/id/foo" does not match -' +
-      ' for "/test4/id/{exists}"',
-      function (done) {
-        request
-        .get('/v1/test4/foo/exists?client_id=' + clientId1 +
-          '&client_secret=' + clientSecret1)
-        .expect(200, done);
-      });
   }
 
   tests('apim');

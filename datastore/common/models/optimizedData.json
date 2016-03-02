@@ -38,7 +38,8 @@
         "produces": [],
         "responses": {},
         "securityDefs": {},
-        "securityReqs": []
+        "securityReqs": [],
+        "operation-rate-limit": {}
       }]
     }],
     "snapshot-id": "string"
