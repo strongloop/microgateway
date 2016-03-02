@@ -34,6 +34,7 @@
     "supertest": "^1.1.0"
   },
   "dependencies": {
+    "apiconnect-cli-config": "^1.0.18",
     "async": "^1.5.2",
     "auth-header": "^0.2.2",
     "basic-auth": "^1.0.3",
