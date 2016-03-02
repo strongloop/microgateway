@@ -83,11 +83,9 @@ describe('policy-loader', function() {
             let policies = loader.getPolicies();
             policies.should.have.property('cors');
             policies.should.have.property('invoke');
-            policies.should.have.property('redaction');
             policies.should.have.property('set-variable');
             policies['cors'].should.be.a.Function();
             policies['invoke'].should.be.a.Function();
-            policies['redaction'].should.be.a.Function();
             policies['set-variable'].should.be.a.Function();
             policies.should.have.property('mypolicy1');
             policies.should.have.property('mypolicy2');
@@ -111,11 +109,9 @@ describe('policy-loader', function() {
             let policies = loader.getPolicies();
             policies.should.have.property('cors');
             policies.should.have.property('invoke');
-            policies.should.have.property('redaction');
             policies.should.have.property('set-variable');
             policies['cors'].should.be.a.Function();
             policies['invoke'].should.be.a.Function();
-            policies['redaction'].should.be.a.Function();
             policies['set-variable'].should.be.a.Function();
             policies.should.have.property('mypolicy1');
             policies.should.have.property('mypolicy2');
@@ -137,18 +133,26 @@ describe('policy-loader', function() {
 
     describe('use projectDir to load policies', function() {
 
+        var cwd = process.cwd();
+        var testdir = path.resolve(__dirname, 'definitions', 'policy-loader');
+        before((done) => {
+            process.chdir(testdir);
+            done();
+        });
+
+        after((done) => {
+          process.chdir(cwd);
+            done();
+        });
+
         it('should load user policies in config correctly', function(done) {
-            var loader = policyLoader.createMGLoader(
-                    {'projectDir':
-                        path.resolve(__dirname, 'definitions', 'policy-loader') });
+            var loader = policyLoader.createMGLoader();
             let policies = loader.getPolicies();
             policies.should.have.property('cors');
             policies.should.have.property('invoke');
-            policies.should.have.property('redaction');
             policies.should.have.property('set-variable');
             policies['cors'].should.be.a.Function();
             policies['invoke'].should.be.a.Function();
-            policies['redaction'].should.be.a.Function();
             policies['set-variable'].should.be.a.Function();
             policies.should.have.property('mypolicy1');
             policies.should.have.property('mypolicy2');
