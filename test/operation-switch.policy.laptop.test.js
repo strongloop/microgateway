@@ -2,12 +2,15 @@
 
 let mg = require('../lib/microgw');
 let supertest = require('supertest');
+let os = require('os');
+let copy = require('../utils/copy.js');
 
 let request;
 
 describe('switchPolicyTesting', function() {
   before((done) => {
-    process.env.CONFIG_DIR = __dirname + '/definitions/operation-switch';
+    copy.copyRecursive(__dirname + '/definitions/operation-switch', os.tmpdir()+ '/operation-switch');
+    process.env.CONFIG_DIR = os.tmpdir()+ '/operation-switch';
     process.env.NODE_ENV = 'production';
     mg.start(3000)
       .then(() => {
@@ -21,11 +24,12 @@ describe('switchPolicyTesting', function() {
   });
 
   after((done) => {
-    delete process.env.CONFIG_DIR;
-    delete process.env.NODE_ENV;
     mg.stop()
       .then(done, done)
       .catch(done);
+    delete process.env.CONFIG_DIR;
+    copy.deleteRecursive(os.tmpdir()+ '/operation-switch');
+    delete process.env.NODE_ENV;
   });
 
   it('switchOnVerbAndPath', switchOnVerbAndPath);

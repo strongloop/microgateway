@@ -454,7 +454,7 @@ function loadConfigFromFS(app, apimanager, models, dir, uid, cb) {
   else {
     var YAMLfiles = [];
 
-    cliConfig.loadProject(dir, {disableProjectResolution: true}).then(function(artifacts) { 
+    cliConfig.loadProject(dir).then(function(artifacts) { 
       debug('%j', artifacts); 
       artifacts.forEach(
         function(artifact)

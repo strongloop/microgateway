@@ -7,12 +7,15 @@ let supertest = require('supertest');
 let echo = require('./support/echo-server');
 let mg = require('../lib/microgw');
 let should = require('should');
+let os = require('os');
+let copy = require('../utils/copy.js')
 
 describe('set-variable policy', function() {
 
   let request;
   before((done) => {
-    process.env.CONFIG_DIR = __dirname + '/definitions/set-variable';
+    copy.copyRecursive(__dirname + '/definitions/set-variable', os.tmpdir()+ '/set-variable');
+    process.env.CONFIG_DIR = os.tmpdir() + '/set-variable';
     process.env.NODE_ENV = 'production';
     mg.start(3000)
       .then(() => {
@@ -29,12 +32,13 @@ describe('set-variable policy', function() {
   });
 
   after((done) => {
-    delete process.env.CONFIG_DIR;
-    delete process.env.NODE_ENV;
     mg.stop()
       .then(() => echo.stop())
       .then(done, done)
       .catch(done);
+    delete process.env.CONFIG_DIR;
+    copy.deleteRecursive(os.tmpdir()+ '/set-variable');
+    delete process.env.NODE_ENV;
   });
 
   it('should set a simple string to a variable', function(done) {

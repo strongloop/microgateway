@@ -11,6 +11,8 @@ let mg = require('../lib/microgw');
 let dsc = require('../datastore/client');
 let should = require('should');
 let apimServer = require('./support/mock-apim-server/apim-server');
+let os = require('os');
+let copy = require('../utils/copy.js')
 
 function cleanup () {
   const rmfile = fpath => new Promise((resolve, reject) => {
@@ -63,7 +65,8 @@ describe('basic auth policy', function() {
 
   let request;
   before((done) => {
-    process.env.CONFIG_DIR = __dirname + '/definitions/basic';
+    copy.copyRecursive(__dirname + '/definitions/basic', os.tmpdir()+ '/basic');
+    process.env.CONFIG_DIR = os.tmpdir()+ '/basic';
     process.env.DATASTORE_PORT = 5000;
     process.env.APIMANAGER_PORT = 8081;
     process.env.APIMANAGER = '127.0.0.1';
@@ -94,6 +97,7 @@ describe('basic auth policy', function() {
       .then(() => apimServer.stop())
       .then(() => {
         delete process.env.CONFIG_DIR;
+        copy.deleteRecursive(os.tmpdir()+ '/basic');
         delete process.env.DATASTORE_PORT;
         delete process.env.APIMANAGER_PORT;
         delete process.env.APIMANAGER;
