@@ -7,7 +7,7 @@ let yaml = require('yamljs');
 
 let mg = require('../lib/microgw');
 
-describe('Context variables', function() {
+describe('Context variables in laptop experience', function() {
 
   let request;
   before((done) => {
@@ -55,11 +55,11 @@ describe('Context variables', function() {
             address: '*',
             hostname: 'localhost'
           },
-          id: 'context:1.0.0',
-          method: 'GET',
+          //id: 'context:1.0.0',
+          //method: 'GET',
           name: 'context',
           org: {},
-          path: '/context/api',
+          //path: '/context/api',
           properties: {
             foo: 'default_foo'
           },

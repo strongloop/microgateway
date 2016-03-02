@@ -11,7 +11,14 @@ function createProductOptimizedEntry(app, ctx)
   locals.subscription = {};  /// no subscription
   // assume we are going to create a wildcard entry...
   //     We will not if there's security configured at api level..
-  locals.credentials = [{'client-id' : '', 'client-secret': '', 'client-name': ''}];
+  locals.application = {
+      title: '',
+      credentials: [{'client-id' : '', 'client-secret': ''}],
+      developerOrg: {
+        id: '',
+        name: ''
+      }
+    };
   var isWildcard = true;
   cycleThroughPlansInProduct(app, locals, isWildcard, product, ALLPLANS);
   }
@@ -90,13 +97,18 @@ function ripCTX(ctx)
   var locals = {};
   locals.subscription = {};
   locals.subscription.id = ctx.instance.id;
-  locals.credentials =
-    ctx.instance.application['app-credentials'];
-  locals.credentials['client-name'] = ctx.instance.application.title;
+  locals.application = {
+    title: ctx.instance.application.title,
+    credentials: ctx.instance.application['app-credentials'],
+    developerOrg: ctx.instance['developer-organization']
+  };
   ctx.instance['plan-registration'].apis = {}; // old list, wipe it
   locals.product = ctx.instance['plan-registration'].product;
   locals.plan = {};
-  locals.plan = ctx.instance['plan-registration'].plan;
+  if (ctx.instance['plan-registration'].plan) {
+    locals.plan.name = ctx.instance['plan-registration'].plan.name;
+    locals.plan.title = ctx.instance['plan-registration'].plan.title;
+  }
   if (locals.product)
     {
     locals.plan.apis = locals.product.document.plans[locals.plan.name].apis;
@@ -347,7 +359,7 @@ function annotateAPIs(listOfApis, callback) {
 
 function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
   async.each(
-    pieces.credentials,
+    pieces.application.credentials,
     function(credential, creddone) { //each clientid
       async.each(
         pieces.apis,
@@ -474,7 +486,11 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'subscription-id': pieces.subscription.id,
             'client-id': credential['client-id'],
             'client-secret': credential['client-secret'],
-            'client-name': credential['client-name'],
+            'client-name': pieces.application['title'],
+            'client-org-id': pieces.application.developerOrg ?
+              pieces.application.developerOrg.id : '',
+            'client-org-name': pieces.application.developerOrg ?
+              pieces.application.developerOrg.name : '',
             'plan-id': pieces.plan.id,
             'plan-name': pieces.plan.name,
             'plan-version': pieces.plan.version,
