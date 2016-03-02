@@ -46,8 +46,28 @@ describe('set-variable policy', function() {
 
   it('should set a simple string to a variable', function(done) {
     request
-      .get('/set-variable/set-variable')
+      .post('/set-variable/set-variable')
+      .set('set-variable-case', 'set')
+      .expect('X-Test-Set-Variable', 'value1')
       .expect(200, done);
   });
+
+  it('should able to append on existing context variable', function(done) {
+    request
+      .post('/set-variable/set-variable')
+      .set('set-variable-case', 'set-and-add')
+      .expect('X-Test-Set-Variable', 'value1, value2')
+      .expect(200, done);
+  });
+
+  it('should able to clear existing context variable', function(done) {
+    request
+      .post('/set-variable/set-variable')
+      .set('set-variable-case', 'clear')
+      .set('to-be-deleted', 'test-value')
+      .expect('to-be-deleted', '')
+      .expect(200, done);
+  });
+
 });
 

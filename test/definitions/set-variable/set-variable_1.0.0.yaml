@@ -7,15 +7,36 @@ basePath: /set-variable
 swagger: '2.0'
 paths:
   /set-variable:
-    get:
+    post:
       responses:
         '200':
           description: 200 OK
 x-ibm-configuration:
   assembly:
     execute:
+      - if:
+          condition: "'$(request.headers.set-variable-case)' === 'set'"
+          execute:
+            - set-variable:
+                actions:
+                  - set: message.headers.X-Test-Set-Variable
+                    value: value1
+      - if:
+          condition: "'$(request.headers.set-variable-case)' === 'set-and-add'"
+          execute:
+            - set-variable:
+                actions:
+                  - set: message.headers.X-Test-Set-Variable
+                    value: value1
+                  - add: message.headers.X-Test-Set-Variable
+                    value: value2
+      - if:
+          condition: "'$(request.headers.set-variable-case)' === 'clear'"
+          execute:
+            - set-variable:
+                actions:
+                  - clear: message.headers.to-be-deleted
       - set-variable:
-          title: set-variable
           actions:
             - set: target-url
               value: http://localhost:8889

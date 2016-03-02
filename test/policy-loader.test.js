@@ -16,11 +16,9 @@ describe('policy-loader', function() {
             let policies = pl.getPolicies();
             policies.should.have.property('cors');
             policies.should.have.property('invoke');
-            policies.should.have.property('redaction');
             policies.should.have.property('set-variable');
             policies['cors'].should.be.a.Function();
             policies['invoke'].should.be.a.Function();
-            policies['redaction'].should.be.a.Function();
             policies['set-variable'].should.be.a.Function();
         });
     });
