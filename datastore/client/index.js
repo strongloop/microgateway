@@ -52,8 +52,8 @@ exports.apimGetDefaultCatalog = function(snapshot, orgName) {
  */
 exports.grabAPI = function(context, callback) {
   debug('grabAPI entry');
-  var snapshotFilter = '{"snapshot-id": "' + context.context.snapshot + '"}';
-  var apiFilter = '{"id": "' + context.context.api.id + '"}';
+  var snapshotFilter = '{"snapshot-id": "' + context.snapshot + '"}';
+  var apiFilter = '{"id": "' + context.api.id + '"}';
   var queryfilter =
       '{"where": { "and":[' +
       snapshotFilter + ',' +
