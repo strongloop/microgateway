@@ -47,6 +47,11 @@ describe('ratelimit basic policy', function() {
   it('should expect ratelimit header', function(done) {
     request
       .get('/ratelimit/ratelimit')
+      .expect('x-ratelimit-limit', '100')
+      .expect(function(res) {
+        var remaining = Number(res.headers['x-ratelimit-remaining']);
+        remaining.should.lessThan(100);
+      })
       .expect(200, done);
   });
 });
