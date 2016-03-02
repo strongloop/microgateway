@@ -25,10 +25,12 @@ app.get('/*', function(req, resp) {
 });
 
 app.post('/*', function(req, resp) {
+  resp.writeHead(200, req.headers);
   req.pipe(resp);
 });
 
 app.put('/*', function(req, resp) {
+  resp.writeHead(200, req.headers);
   req.pipe(resp);
 });
 
