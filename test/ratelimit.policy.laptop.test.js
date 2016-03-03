@@ -7,18 +7,12 @@ let supertest = require('supertest');
 let echo = require('./support/echo-server');
 let mg = require('../lib/microgw');
 let should = require('should');
-let os = require('os');
-let copy = require('../utils/copy.js');
-let date = new Date();
-let randomInsert = date.getTime().toString();
-let destinationDir = path.join(os.tmpdir(), randomInsert + 'ratelimit');
 
 describe('ratelimit basic policy', function() {
 
   let request;
   before((done) => {
-    copy.copyRecursive(__dirname + '/definitions/ratelimit', destinationDir);
-    process.env.CONFIG_DIR = destinationDir;
+    process.env.CONFIG_DIR = __dirname + '/definitions/ratelimit';
     process.env.NODE_ENV = 'production';
     mg.start(3000)
       .then(() => {
@@ -40,7 +34,6 @@ describe('ratelimit basic policy', function() {
       .then(done, done)
       .catch(done);
     delete process.env.CONFIG_DIR;
-    copy.deleteRecursive(destinationDir);
     delete process.env.NODE_ENV;
   });
 
