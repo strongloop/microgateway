@@ -277,7 +277,6 @@ function decryptData(data)  {
    //if we cant decrypt.. just pass original data..
   var decryptedData = data;
   var pass = getOrCreatePass();
-  debug('pass: ' + pass);
   if (pass !== '') {
     var decipher = Crypto.createDecipheriv(algorithm, pass, IV);
     decryptedData = decipher.update(data, 'base64', 'utf8');
@@ -290,7 +289,6 @@ function encryptData(data)  {
   //if we cant encrypt.. just pass clear data..
   var encryptedData = data;
   var pass = getOrCreatePass();
-  debug('pass: ' + pass);
   if (pass !== '') {
     var cipher = Crypto.createCipheriv(algorithm, pass, IV);
     encryptedData = Buffer.concat([cipher.update(new Buffer(data)), cipher.final()]); 
