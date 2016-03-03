@@ -40,7 +40,8 @@
         "responses": {},
         "securityDefs": {},
         "securityReqs": [],
-        "operation-rate-limit": {}
+        "observed-rate-limit": {},
+        "rate-limit-scope": "string"
       }]
     }],
     "snapshot-id": "string"
