@@ -93,6 +93,7 @@ describe('Context variables in laptop experience', function() {
             'application/json'
           ],
           operation: 'GET',
+          operationId: "getInternal",
           parameters: [
             {
                 description: 'parameter 1',

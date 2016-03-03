@@ -105,7 +105,6 @@ describe('Context variables testing with mock apim server', function() {
             hostname: 'localhost'
           },
           name: apiDoc.document.info.title,
-          operationId: 'routes.find',
           org: {
             id: apiDoc.organization.id,
             name: apiDoc.organization.name
