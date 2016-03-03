@@ -91,5 +91,22 @@
       "dynamic-group-filter": "",
       "tls-profile": "new-tls-profile-1"
     }
-  }
+  },
+  {
+    "name": "basic-ldap-compose-upn-no-group-auth",
+    "type": "ldap",
+    "scope": ["user"],
+    "displayName": "ActiveDirectory",
+    "description": "ComposeUPN Example",
+    "ldap-config": {
+      "host": "127.0.0.1",
+      "port": "1389",
+      "protocolVersion": "3",
+      "ssl": "false",
+      "auth-method": "bindUPN",
+      "bind-suffix": "@sixfour2.com",
+      "group-auth-method": "none"
+    }
+}
+
 ]

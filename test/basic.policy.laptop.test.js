@@ -103,60 +103,73 @@ describe('basic auth policy', function() {
       .catch(done);
   });
 
-  it('should pass with root:Hunter2', function(done) {
-    request
-      .get('/basic/path-1')
-      .auth('root', 'Hunter2')
-      .expect(200, done);
-  });
+  describe('Basic Auth with LDAP', function () {
 
-  it('should fail with root:badpass', function(done) {
-    request
-      .get('/basic/path-1')
-      .auth('root', 'badpass')
-      .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
-  });
-
-  it('should fail due to missing LDAP registry', function(done) {
-    request
+    it('should fail due to missing LDAP registry', function (done) {
+      request
       .post('/basic/path-1')
       .auth('root', 'Hunter2')
       .expect(401, done);
+    });
+
+    describe('SearchDN', function () {
+      it('should pass with root:Hunter2', function (done) {
+        request
+        .get('/basic/path-1')
+        .auth('root', 'Hunter2')
+        .expect(200, done);
+      });
+
+      it('should fail with root:badpass', function (done) {
+        request
+        .get('/basic/path-1')
+        .auth('root', 'badpass')
+        .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+      });
+    });
+
+    describe('ComposeDN', function () {
+      it('should pass composeDN with jsmith:foobar', function(done) {
+        request
+        .get('/basic/path-3')
+        .auth('jsmith', 'foobar')
+        .expect(200, done);
+      });
+
+      it('should fail composeDN with jsmith:wrongpass', function(done) {
+        request
+        .get('/basic/path-3')
+        .auth('jsmith', 'wrongpass')
+        .expect(401, done);
+      });
+    });
+
+
+    describe('With TLS', function () {
+      it('should pass with root:Hunter2 (tls)', function (done) {
+        request
+        .put('/basic/path-1')
+        .auth('root', 'Hunter2')
+        .expect(200, done);
+      });
+    });
+
   });
 
-  it('should pass with root:Hunter2 (tls)', function (done) {
-    request
-    .put('/basic/path-1')
-    .auth('root', 'Hunter2')
-    .expect(200, done);
-  });
-
-  it('should pass using http with root:Hunter2', function(done) {
-    request
+  describe('Basic Auth with HTTP', function () {
+    it('should pass using http with root:Hunter2', function (done) {
+      request
       .get('/basic/path-2')
       .auth('root', 'Hunter2')
       .expect(200, done);
-  });
+    });
 
-  it('should fail using http with root:badpass', function(done) {
-    request
+    it('should fail using http with root:badpass', function (done) {
+      request
       .get('/basic/path-2')
       .auth('root', 'badpass')
       .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
-  });
-
-  it('should pass composeDN with jsmith:foobar', function(done) {
-    request
-    .get('/basic/path-3')
-    .auth('jsmith', 'foobar')
-    .expect(200, done);
-  });
-
-  it('should fail composeDN with jsmith:wrongpass', function(done) {
-    request
-    .get('/basic/path-3')
-    .auth('jsmith', 'wrongpass')
-    .expect(401, done);
+    });
   });
 
 });

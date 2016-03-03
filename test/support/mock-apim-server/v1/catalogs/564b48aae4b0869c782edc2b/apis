@@ -1791,6 +1791,14 @@
                         "url": "ldap://localhost:1636"
                     }
                 },
+                "basic-ldap-compose-upn-no-group-auth": {
+                    "type": "basic",
+                    "description": "Compose UPN Examples: Microsoft Active Directory without Authorization Group",
+                    "x-ibm-authentication-registry": "ldap-compose-upn-no-group-auth",
+                    "x-ibm-authentication-url": {
+                        "url": "ldap://localhost:1389"
+                    }
+                },
                 "basic-http": {
                     "type": "basic",
                     "description": "",
@@ -1867,8 +1875,23 @@
                             }
                         ]
                     }
+                },
+                "/basic-ldap-compose-upn-no-group-auth": {
+                    "get": {
+                        "responses": {
+                            "200": {
+                                "description": "200 OK"
+                            }
+                        },
+                        "security": [
+                            {
+                                "basic-ldap-compose-upn-no-group-auth": []
+                            }
+                        ]
+                    }
                 }
             },
+
             "x-ibm-configuration": {
                 "assembly": {
                     "execute": [
