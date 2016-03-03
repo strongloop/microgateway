@@ -11,6 +11,9 @@ var LAPTOP_RATELIMIT='LAPTOP_RATELIMIT'
 
 // returned after info loaded in GW
 var LOADED='LOADED';
+
+var KEYNAME='id_rsa';
+var PASSWORD='gw_skel';
 	
 exports.APIMANAGER = APIMANAGER;
 exports.APIMANAGER_PORT = APIMANAGER_PORT;
@@ -22,3 +25,6 @@ exports.DATASTORE_PORT = DATASTORE_PORT;
 exports.LAPTOP_RATELIMIT = LAPTOP_RATELIMIT;
 
 exports.LOADED = LOADED;
+
+exports.KEYNAME = KEYNAME;
+exports.PASSWORD = PASSWORD;
