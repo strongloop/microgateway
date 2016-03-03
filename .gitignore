@@ -1,5 +1,4 @@
 npm-global/
-config/apim.config
 .idea/
 coverage/
 *.iml
@@ -18,3 +17,4 @@ coverage
 .vscode
 .DS_Store
 .npmrc
+.datastore

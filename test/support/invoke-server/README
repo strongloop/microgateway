@@ -1,0 +1,56 @@
+/////////////////////////////////////////////
+// Create the key and cert in the PEM format:
+//    - root: Sarah, Alice, Bob, Carol
+//    - root2: Sandy
+/////////////////////////////////////////////
+Note: make sure the common name of the server is the actual domain name or 'localhost'
+
+//the CA: root
+openssl genrsa -out root.key 4096
+openssl req -new -x509 -days 7300 -key root.key -out root.crt
+
+//the CA: root2
+openssl genrsa -out root2.key 4096
+openssl req -new -x509 -days 7300 -key root2.key -out root2.crt
+
+//Sarah, Alice, Bob, Carol are signed by root
+openssl genrsa -out sarah.key 4096
+openssl req -new -key sarah.key -out sarah.csr
+openssl x509 -req -days 7300 -in sarah.csr -CA root.crt -CAkey root.key -set_serial 01 -out sarah.crt
+
+openssl genrsa -out alice.key 4096
+openssl req -new -key alice.key -out alice.csr
+openssl x509 -req -days 7300 -in alice.csr -CA root.crt -CAkey root.key -set_serial 02 -out alice.crt
+
+openssl genrsa -out bob.key 4096
+openssl req -new -key bob.key -out bob.csr
+openssl x509 -req -days 7300 -in bob.csr -CA root.crt -CAkey root.key -set_serial 03 -out bob.crt
+
+openssl genrsa -out carol.key 4096
+openssl req -new -key carol.key -out carol.csr
+openssl x509 -req -days 7300 -in carol.csr -CA root.crt -CAkey root.key -set_serial 04 -out carol.crt
+
+//Sandy is signed by root
+openssl genrsa -out sandy.key 4096
+openssl req -new -key sandy.key -out sandy.csr
+openssl x509 -req -days 7300 -in sandy.csr -CA root2.crt -CAkey root2.key -set_serial 01 -out sandy.crt
+
+
+/////////////////////////////////////////////
+// To self-signed:
+/////////////////////////////////////////////
+openssl genrsa -out someone-key.pem 1024 -validity 3650
+openssl req -new -key someone-key.pem -out someone-csr.pem
+openssl x509 -req -in someone-csr.pem -signkey someone-key.pem -out sarah-cert.pem
+
+
+/////////////////////////////////////////////
+// OpenSSL commands:
+/////////////////////////////////////////////
+
+//Use the root.crt to validate the server at localhost:2048
+openssl s_client -tls1 -CAfile root.crt -connect localhost:2048
+
+//cipher mapping table for each TLS versions:
+https://www.openssl.org/docs/manmaster/apps/ciphers.html#CIPHER_LIST_FORMAT
+
