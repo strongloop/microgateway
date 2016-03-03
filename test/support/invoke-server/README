@@ -48,8 +48,8 @@ openssl x509 -req -in someone-csr.pem -signkey someone-key.pem -out sarah-cert.p
 // OpenSSL commands:
 /////////////////////////////////////////////
 
-//Use the root.crt to validate the server at localhost:8080
-openssl s_client -tls1 -CAfile root.crt -connect localhost:8080
+//Use the root.crt to validate the server at localhost:2048
+openssl s_client -tls1 -CAfile root.crt -connect localhost:2048
 
 //cipher mapping table for each TLS versions:
 https://www.openssl.org/docs/manmaster/apps/ciphers.html#CIPHER_LIST_FORMAT

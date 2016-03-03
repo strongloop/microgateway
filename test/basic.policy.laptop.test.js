@@ -121,7 +121,7 @@ describe('basic auth policy', function() {
     request
       .get('/basic/path-1')
       .auth('root', 'badpass')
-      .expect(401, done);
+      .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
   });
 
   it('should fail due to missing LDAP registry', function(done) {
@@ -149,7 +149,7 @@ describe('basic auth policy', function() {
     request
       .get('/basic/path-2')
       .auth('root', 'badpass')
-      .expect(401, done);
+      .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
   });
 
   it('should pass composeDN with jsmith:foobar', function(done) {
