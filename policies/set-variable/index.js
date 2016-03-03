@@ -3,7 +3,7 @@ var _ = require('lodash');
 var debug = require('debug')('policy:set-variable');
 
 module.exports = function(config) {
-  return function(props, context, next) {
+  return function(props, context, flow) {
     var hasError = props.actions.some(function(action) {
         if (action.hasOwnProperty('set')) {
             debug('set ' + action.set + '=' + action.value);
@@ -29,11 +29,11 @@ module.exports = function(config) {
                     'Action not provided in set-variable policy, ' +
                     'valid actions: set, add, and clear.',
             };
-            next(error);
+            flow.fail(error);
             return true;
         }
     });
     if (!hasError)
-        next();
+        flow.proceed();
   };
 };

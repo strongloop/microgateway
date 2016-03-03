@@ -25,11 +25,11 @@ describe('Context variables', function() {
   });
 
   after((done) => {
-    delete process.env.CONFIG_DIR;
-    delete process.env.NODE_ENV;
     mg.stop()
       .then(done, done)
       .catch(done);
+    delete process.env.CONFIG_DIR;
+    delete process.env.NODE_ENV;
   });
 
   it('should produce all $(api) context variables', function(done) {
