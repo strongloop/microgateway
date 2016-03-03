@@ -29,17 +29,22 @@ describe('ratelimit basic policy', function() {
   });
 
   after((done) => {
-    delete process.env.CONFIG_DIR;
-    delete process.env.NODE_ENV;
     mg.stop()
       .then(() => echo.stop())
       .then(done, done)
       .catch(done);
+    delete process.env.CONFIG_DIR;
+    delete process.env.NODE_ENV;
   });
 
   it('should expect ratelimit header', function(done) {
     request
       .get('/ratelimit/ratelimit')
+      .expect('x-ratelimit-limit', '100')
+      .expect(function(res) {
+        var remaining = Number(res.headers['x-ratelimit-remaining']);
+        remaining.should.lessThan(100);
+      })
       .expect(200, done);
   });
 });

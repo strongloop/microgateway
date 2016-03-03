@@ -29,12 +29,12 @@ describe('set-variable policy', function() {
   });
 
   after((done) => {
-    delete process.env.CONFIG_DIR;
-    delete process.env.NODE_ENV;
     mg.stop()
       .then(() => echo.stop())
       .then(done, done)
       .catch(done);
+    delete process.env.CONFIG_DIR;
+    delete process.env.NODE_ENV;
   });
 
   it('should set a simple string to a variable', function(done) {

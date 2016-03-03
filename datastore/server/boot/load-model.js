@@ -9,20 +9,24 @@ var logger = require('../../../../apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:datastore:server:boot:load-model'});
 var sgwapimpull = require('../../apim-pull');
 var apimpull = sgwapimpull.pull;
+var apimdecrypt = sgwapimpull.decrypt;
 var environment = require('../../../utils/environment');
 var APIMANAGER = environment.APIMANAGER;
 var APIMANAGER_PORT = environment.APIMANAGER_PORT;
 var APIMANAGER_CATALOG = environment.APIMANAGER_CATALOG;
 var CONFIGDIR = environment.CONFIGDIR;
+var KEYNAME = environment.KEYNAME;
 
 var LAPTOP_RATELIMIT = environment.LAPTOP_RATELIMIT;
+
+var cliConfig = require('apiconnect-cli-config');
 
 var rootConfigPath = __dirname + '/../../../config/';
 var defaultDefinitionsDir = rootConfigPath + 'default';
 var definitionsDir = defaultDefinitionsDir;
 
-var keyDir = __dirname + '/../../../';
-var keyFile = keyDir + 'id_rsa';
+var gatewayMain = __dirname + '/../../../';
+var keyFile = gatewayMain + KEYNAME;
 var version ='1.0.0';
 
 /**
@@ -108,7 +112,7 @@ module.exports = function(app) {
 
         if (apimanager.host && apimanager.handshakeOk === false && private_key) {
         // we have an APIm, and a key so try to handshake with it.. 
-          handshakeWithAPIm(app, apimanager, function(err, handshakeApimanager) {
+          handshakeWithAPIm(app, apimanager, private_key, function(err, handshakeApimanager) {
             apimanager = handshakeApimanager;
             callback(); // should return the error.. not ready #TODO
             })
@@ -222,7 +226,7 @@ function stageModels(app, models, cb) {
  * @param {callback} cb - callback that handles error or path to
  *                        snapshot directory
  */
-function handshakeWithAPIm(app, apimanager, cb) {
+function handshakeWithAPIm(app, apimanager, private_key, cb) {
   logger.debug('handshakeWithAPIm entry');
   
   async.series([
@@ -411,56 +415,62 @@ function loadConfig(app, apimanager, models, currdir, snapdir, uid, cb) {
  * @param {callback} cb - callback that handles error or successful completion
  */
 function loadConfigFromFS(app, apimanager, models, dir, uid, cb) {
-  var files;
-  logger.debug('loadConfigFromFS entry');
-  try {
-    files = fs.readdirSync(dir);
-  } catch (e) {
-    logger.debug('loadConfigFromFS error');
-    cb(e);
-    return;
-  }
-  var YAMLfiles = [];
-  logger.debug('files: ', files);
-  var jsonFile = new RegExp(/.*\.json$/);
-  var yamlFile = new RegExp(/(.*\.yaml$)|(.*\.yml$)/);
-
   // clear out existing files from model structure
   models.forEach(
     function(model) {
       model.files = [];
     }
   );
-
-  // correlate files with appropriate model
-  files.forEach(
-    function(file) {
-      logger.debug('file match jsonFile: ', file.match(jsonFile));
-      logger.debug('file match yamlFile: ', file.match(yamlFile));
-      // apim pull scenario (only json, no yaml)
-      if (apimanager.host && file.match(jsonFile)) {
-        for(var i = 0; i < models.length; i++) {
-          if(file.indexOf(models[i].prefix) > -1) {
-            logger.debug('%s file: %s', models[i].name, file);
-            models[i].files.push(file);
-            break;
+    
+  if (apimanager.host) {
+    var files;
+    logger.debug('loadConfigFromFS entry');
+    try {
+      files = fs.readdirSync(dir);
+    } catch (e) {
+      logger.debug('loadConfigFromFS error');
+      cb(e);
+      return;
+    }
+    
+    logger.debug('files: ', files);
+    var jsonFile = new RegExp(/.*\.json$/);
+    // correlate files with appropriate model
+    files.forEach(
+      function(file) {
+        logger.debug('file match jsonFile: ', file.match(jsonFile));
+        // apim pull scenario (only json, no yaml)
+        if (apimanager.host && file.match(jsonFile)) {
+          for(var i = 0; i < models.length; i++) {
+            if(file.indexOf(models[i].prefix) > -1) {
+              logger.debug('%s file: %s', models[i].name, file);
+              models[i].files.push(file);
+              break;
+            }
           }
         }
       }
-      // laptop experience scenario (only yaml, no json)
-      // might want to support json for laptop as well
-      else if (file.match(yamlFile)) {
-        YAMLfiles.push(file);
-      }
-    }
-  );
-  
-  if (apimanager.host) {
+    );
     // populate data-store models with the file contents
     populateModelsWithAPImData(app, models, dir, uid, cb);
   }
   else {
-    populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb);
+    var YAMLfiles = [];
+    logger.debug('dir: ' + dir )
+    cliConfig.loadProject(dir).then(function(artifacts) { 
+      logger.debug('%j', artifacts); 
+      artifacts.forEach(
+        function(artifact)
+          {
+          if (artifact.type === 'swagger')
+            {
+            YAMLfiles.push(artifact.filePath)
+            }
+          }
+        )
+        // populate data-store models with the file contents
+        populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb);
+    });
   }
 }
 
@@ -477,7 +487,7 @@ function createAPIID(api)
 /**
  * Populates data-store models with persisted content
  * @param {???} app - loopback application
- * @param {Array} YAMLfiles - list of yaml files to process
+ * @param {Array} YAMLfiles - list of yaml files to process (should only be swagger)
  * @param {string} dir - path to directory containing persisted data to load
  * @param {callback} cb - callback that handles error or successful completion
  */
@@ -487,8 +497,7 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
   async.series([
     function(seriesCallback) {
       async.forEach(YAMLfiles,
-          function(typefile, fileCallback) {
-            var file = path.join(dir, typefile);
+          function(file, fileCallback) {
             logger.debug('Loading data from %s', file);
             var readfile;
             try {
@@ -500,25 +509,6 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
               fileCallback(e);
               return;
             }
-            // convert to json.. determine model
-            
-            // Product=
-            // product: 1.0.0
-            // info:
-            //  name: climb-on
-            //  title: Climb On
-            //  version: 1.0.0
-      
-            // API=
-            //  swagger: '2.0'
-            //  info:
-            //    x-ibm-name: route
-            //    title: Route
-            //    version: 1.0.0
-            
-            logger.debug('readfile %s', JSON.stringify(readfile));
-            logger.debug('Product %s', readfile.product);
-            logger.debug('Swagger %s', readfile.swagger);
             var model = {};
             var entry = {};
             // looks like a product
@@ -762,7 +752,7 @@ function populateModelsWithAPImData(app, models, dir, uid, cb) {
           try {
             // read the content of the files into memory
             // and parse as JSON
-            readfile = JSON.parse(fs.readFileSync(file));
+            readfile = JSON.parse(apimdecrypt(fs.readFileSync(file)));
           } catch(e) {
             fileCallback(e);
             return;

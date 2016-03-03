@@ -7,12 +7,23 @@ var fs = require('fs'),
     request = require('request'),
     async = require('async'),
     extend = require('util')._extend;
+    
+var Crypto = require('crypto')
+    
+var environment = require('../utils/environment');
+var KEYNAME = environment.KEYNAME;
+var PASSWORD = environment.PASSWORD;
+var gatewayMain = __dirname + '/../';
+var keyFile = gatewayMain + KEYNAME;
+var passFile = gatewayMain + PASSWORD;
 
 /**
  * Module exports
  */
 module.exports = {
-  pull: apimpull
+  pull: apimpull,
+  decrypt: decryptData,
+  encrypt: encryptData
 };
 
 /**
@@ -225,8 +236,8 @@ function fetch (opts, cb) {
         var filename = opts.outdir + opts.prefix + 
                        new Buffer(etag).toString('base64') +
                        opts.suffix;
-        var outstream = fs.createWriteStream(filename);
-        outstream.write(JSON.stringify(JSON.parse(body),null,4));
+        var outstream = fs.createWriteStream(filename);        
+        outstream.write(encryptData(JSON.stringify(JSON.parse(body),null,4)));
         outstream.end();
         outstream.on('finish', function() {
             result = {
@@ -247,3 +258,67 @@ function fetch (opts, cb) {
   );
   req.end();
 }
+
+function getKey(file) {
+  // load key..
+  var key = '';
+  try {
+    key = fs.readFileSync(file,'utf8');
+  } catch(e) {
+    logger.debug('Can not read file: %s Error: %s', file, e);
+  }
+  return key;
+  }
+
+var algorithm = 'AES-256-CBC';
+var IV = '0000000000000000';
+
+function decryptData(data)  {
+   //if we cant decrypt.. just pass original data..
+  var decryptedData = data;
+  var pass = getOrCreatePass();
+  if (pass !== '') {
+    var decipher = Crypto.createDecipheriv(algorithm, pass, IV);
+    decryptedData = decipher.update(data, 'base64', 'utf8');
+    decryptedData += decipher.final('utf8');
+    }
+  return decryptedData;
+  }
+  
+function encryptData(data)  {
+  //if we cant encrypt.. just pass clear data..
+  var encryptedData = data;
+  var pass = getOrCreatePass();
+  if (pass !== '') {
+    var cipher = Crypto.createCipheriv(algorithm, pass, IV);
+    encryptedData = Buffer.concat([cipher.update(new Buffer(data)), cipher.final()]); 
+    }
+  return encryptedData;
+  }
+  
+function getOrCreatePass() {
+  var pass_key = '';
+  try { 
+   fs.statSync(passFile);
+   // file found
+   pass_key = Crypto.privateDecrypt(private_key, new Buffer(getKey(passFile))); 
+    }
+  catch(err) {
+    // no file.. create it..
+    var private_key = getKey(keyFile);
+    // no key, can't crate it..
+    if (private_key !== '') {
+      var password = Crypto.createHash('sha256').update('apimanager').digest();
+      var encryptedCipher = Crypto.publicEncrypt(private_key, new Buffer(password))
+      // write password to file..
+      try {
+        fs.writeFileSync(passFile,encryptedCipher);
+      } catch(e) {
+        logger.debug('Can not write file: %s Error: %s', passFile, e);
+      }
+      pass_key = password;
+      }
+    }
+  return pass_key;
+  }
+  
