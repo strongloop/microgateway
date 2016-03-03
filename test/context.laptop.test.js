@@ -89,8 +89,8 @@ describe('Context variables in laptop experience', function() {
             assembly: swagger['x-ibm-configuration'].assembly
           },
           consumes: [
-            'application/xml',
-            'application/json'
+            'application/json',
+            'application/xml'
           ],
           operation: 'GET',
           operationId: "getInternal",
@@ -110,8 +110,8 @@ describe('Context variables in laptop experience', function() {
           ],
           path: '/context/internal',
           produces: [
-            'application/xml',
-            'application/json'
+            'application/json',
+            'application/xml'
           ],
           responses: {
             '200': {
@@ -199,5 +199,63 @@ describe('Context variables in laptop experience', function() {
         done();
       });
   });
+
+  describe('should parse body according to API consumes', function() {
+    var http = require('http');
+    function postData(payloadBuff, callback) {
+      var options = {
+        hostname: 'localhost',
+        port: 3000,
+        path: '/v1/context/body-parse',
+        method: 'POST',
+        headers: {
+          'Content-Length': payloadBuff.length
+        }
+      };
+      var req = http.request(options, (res) => {
+        var responseData = '';
+        res.setEncoding('utf8');
+        res.on('data', (chunk) => {
+          responseData += chunk;
+        });
+        res.on('end', () => {
+          callback(undefined, responseData);
+        });
+      });
+
+      req.on('error', (e) => {
+        callback(e, undefined);
+      });
+
+      req.write(payloadBuff);
+      req.end();
+    }
+
+    it('parse as JSON', function(done) {
+      var dataString = JSON.stringify({ hello: 'world'}, undefined, 4);
+      var dataInBuffer = new Buffer(dataString);
+      postData(dataInBuffer, function(error, response) {
+        if (error) throw error;
+        // the data that we sent is a beautified JSON containing indent
+        // expect the gateway parse payload as JSON, and stringify w/o indent
+        assert.strictEqual(response, JSON.stringify(JSON.parse(dataString)));
+        done();
+      });
+    });
+
+    it('parse as String', function(done) {
+      var dataString = '<hello>world</hello>';
+      var dataInBuffer = new Buffer(dataString);
+      postData(dataInBuffer, function(error, response) {
+        if (error) throw error;
+        // expect the gateway JSON.stringify the string,
+        // therefore there should be double quotes
+        assert.strictEqual(response, '"'+dataString+'"');
+        done();
+      });
+    });
+
+  });
+
 
 });

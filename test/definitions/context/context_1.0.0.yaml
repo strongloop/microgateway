@@ -9,12 +9,12 @@ basePath: /v1
 swagger: '2.0'
 
 consumes:
-  - application/xml
   - application/json
+  - application/xml
 
 produces:
-  - application/xml
   - application/json
+  - application/xml
 
 paths:
   /context:
@@ -25,6 +25,18 @@ paths:
           in: query
           description: the context name
           type: string
+      responses:
+        '200':
+          description: 200 OK
+  /context/api:
+    get:
+      summary: get API context variable value
+      responses:
+        '200':
+          description: 200 OK
+  /context/body-parse:
+    post:
+      summary: verify request.body data type is correct
       responses:
         '200':
           description: 200 OK
@@ -41,12 +53,6 @@ paths:
           in: header
           description: parameter 2
           type: integer
-      responses:
-        '200':
-          description: 200 OK
-  /context/api:
-    get:
-      summary: get API context variable value
       responses:
         '200':
           description: 200 OK
@@ -157,19 +163,6 @@ x-ibm-configuration:
                       - set: message.headers.content-type
                         value: application/json
             - operations:
-                - getInternal
-              execute:
-                - set-variable:
-                    title: set-variable
-                    actions:
-                      - set: message.body
-                        value: $(_.api)
-                - set-variable:
-                    title: set-content-type
-                    actions:
-                      - set: message.headers.content-type
-                        value: application/json
-            - operations:
                 - path: /context/api
                   verb: get
               execute:
@@ -178,6 +171,28 @@ x-ibm-configuration:
                     actions:
                       - set: message.body
                         value: $(api)
+                - set-variable:
+                    title: set-content-type
+                    actions:
+                      - set: message.headers.content-type
+                        value: application/json
+            - operations:
+                - path: /context/body-parse
+                  verb: post
+              execute:
+                - javascript:
+                    title: write context variable to message.body
+                    source: |
+                      message.body = JSON.stringify(request.body);
+                      message.headers['content-type'] = 'text/plain';
+            - operations:
+                - getInternal
+              execute:
+                - set-variable:
+                    title: set-variable
+                    actions:
+                      - set: message.body
+                        value: $(_.api)
                 - set-variable:
                     title: set-content-type
                     actions:
