@@ -1,5 +1,6 @@
 'use strict';
-var debug = require('debug')('policy:invoke');
+var logger = require('../../../apiconnect-cli-logger/logger.js')
+               .child({loc: 'apiconnect-microgateway:policies:invoke'});
 var fs = require('fs');
 var url = require('url');
 var assert = require('assert');
@@ -14,7 +15,7 @@ try {
     cipherTable = require(__dirname + '/cipherSuites.json');
 }
 catch (err) {
-    console.error('Warning! Cannot read the cipher table for invoke policy. %s',
+    logger.error('Warning! Cannot read the cipher table for invoke policy. %s',
             err);
     cipherTable = {};
 }
@@ -25,7 +26,7 @@ catch (err) {
  * parameters, establish the connection after everything is ready.
  */
 function _main(props, context, next, tlsProfile) {
-    var logger = context.get('logger');
+    //var logger = context.get('logger');
 
     //the default settings and error object
     var options;

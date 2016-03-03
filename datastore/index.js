@@ -1,5 +1,7 @@
 'use strict'
 
+var logger = require('../../apiconnect-cli-logger/logger.js')
+               .child({loc: 'apiconnect-microgateway:datastore'});
 let forever = require('forever-monitor');
 
 let child;
@@ -15,11 +17,11 @@ exports.start = function(fork) {
       });
 
       child.on('restart', function() {
-        console.error('datastore restarting, count=' + child.times);
+        logger.error('datastore restarting, count=' + child.times);
       });
 
       child.on('exit', function() {
-        console.error('datastore exited');
+        logger.error('datastore exited');
       });
 
       child.on('message', function(msg) {

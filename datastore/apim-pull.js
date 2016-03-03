@@ -1,6 +1,8 @@
 /**
  * Module dependencies
  */
+var logger = require('../../apiconnect-cli-logger/logger.js')
+               .child({loc: 'apiconnect-microgateway:datastore:apim-pull'});
 var fs = require('fs'),
     request = require('request'),
     async = require('async'),
@@ -95,7 +97,7 @@ function getDataBasedOnCatalog(options, catalogs, models, cb) {
         function(model, modelcallback) {
           pullDataFromEndp(options, catalog, model, function(err) {
               if (err) {
-                console.error(err);
+                logger.error(err);
               }
               modelcallback(err);
             }
