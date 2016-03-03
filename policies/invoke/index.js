@@ -24,9 +24,7 @@ catch (err) {
  * Do the real work of the invoke policy: read the property and decide the
  * parameters, establish the connection after everything is ready.
  */
-function _main(props, context, next, tlsProfile) {
-    var logger = context.get('logger');
-
+function _main(props, context, next, logger, tlsProfile) {
     //the default settings and error object
     var options;
     var isSecured;
@@ -297,14 +295,18 @@ function _main(props, context, next, tlsProfile) {
  * The entry point of the invoke policy.
  * Read the TLS profile first and do the real work then.
  */
-function invoke(props, context, next) {
-    var logger = context.get('logger');
+function invoke(props, context, flow) {
+    var logger = flow.logger;
 
     var isDone = false;
     function _next(v) {
         if (!isDone) {
             isDone = true;
-            next(v);
+            if(v) {
+                flow.fail(v)
+            } else {
+                flow.proceed();
+            }
         }
     }
 
@@ -322,7 +324,7 @@ function invoke(props, context, next) {
     var profile = props['tls-profile'];
     var tlsProfile;
     if (!profile || typeof profile !== 'string' || profile.length === 0) {
-        _main(props, context, _next);
+        _main(props, context, _next, logger);
     }
     else {
         logger.debug('[invoke] reading the TLS profile "%s"', profile);
@@ -344,7 +346,7 @@ function invoke(props, context, next) {
                     return;
                 }
                 else
-                    _main(props, context, _next, tlsProfile);
+                    _main(props, context, _next, logger, tlsProfile);
             },
             function(e) {
                 logger.error('[invoke] error w/ retrieving TLS profile: %s', e);

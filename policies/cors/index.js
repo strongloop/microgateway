@@ -1,8 +1,8 @@
 'use strict';
 var debug = require('debug')('policy:cors');
 module.exports = function(config) {
-  return function(props, ctx, next) {
-    ctx._flow.subscribe('FINISH', (event, next) => {
+  return function(props, ctx, flow) {
+    flow.subscribe('FINISH', (event, next) => {
       let allowCreds = props['allow-credentials'];
       if (allowCreds === true) {
         ctx.message.headers['Access-Control-Allow-Credentials'] = 'true';
@@ -29,6 +29,6 @@ module.exports = function(config) {
       }
       next();
     });
-    next();
+    flow.proceed();
   };
 };
