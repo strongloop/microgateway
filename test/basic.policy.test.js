@@ -56,7 +56,7 @@ describe('basic auth policy', function() {
     .post('/v1/ascents?client_id=' +  clientId1)
     .auth('root', 'badpass')
     .send({date: 'today', route: '66'})
-    .expect(401, done);
+    .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
   });
 
   it(`client_id=${clientId1} should fail with http and "root"/"Hunter3"`, function(done) {
@@ -64,7 +64,7 @@ describe('basic auth policy', function() {
       .put('/v1/ascents?client_id=' +  clientId1)
       .auth('root', 'Hunter3')
       .send({date: 'today', route: '66'})
-      .expect(401, done);
+      .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
   });
 
   it(`client_id=${clientId1} should pass with http and "root"/"Hunter2"`, function(done) {
