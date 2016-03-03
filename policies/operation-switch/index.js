@@ -11,12 +11,12 @@ var debug = require('debug')('policy:operation-switch');
  *    - path: the context var name for retriving the API operation path
  */
 module.exports = function (config) {
-    return function (props, context, next) {
-        var logger  = context.get('logger');
+    return function (props, context, flow) {
+        var logger  = flow.logger;
 
         function resume() {
             logger.info('[operation-switch] Subflow is complete');
-            next();
+            flow.proceed();
         }
 
         var actualOpId = context.get('api.operationId');
@@ -50,11 +50,11 @@ module.exports = function (config) {
 
         if (subflow) {
             logger.info('[operation-switch] Operation matched. Executing the subflow');
-            context._flow.invoke({ execute: subflow}, resume);
+            flow.invoke({ execute: subflow}, resume);
         }
         else {
             logger.info('[operation-switch] No operation matched. Skip the policy');
-            next();
+            flow.proceed();
         }
     };
 };
