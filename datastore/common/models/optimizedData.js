@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var async = require('async');
 var debug = require('debug')('micro-gateway:data-store');
 var jsonRefs = require('json-refs');
@@ -584,8 +585,19 @@ function calculateMatchingScore(apiPath) {
  *
  */
 function getOpParams(apiParams, pathParams, opParams) {
-  // TODO need to join the 3 params
-  return opParams || [];
+  var unionParams = _.unionWith(opParams, pathParams, opParamComparator);
+  return unionParams;
+}
+
+/**
+ * Returns true if two parameter definition is the same.
+ * Parameters defined in operation overwrites the ones defined in path level.
+ *
+ * @param {Object} opParam a operation-level API parameter
+ * @param {Object} pathParam a path-level API parameter
+ */
+function opParamComparator(opParam, pathParam) {
+  return (opParam.name === pathParam.name);
 }
 
 exports.determineNeededSubscriptionOptimizedEntries = determineNeededSubscriptionOptimizedEntries;

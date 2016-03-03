@@ -51,6 +51,17 @@ paths:
         '200':
           description: 200 OK
   /context/request/parameters/{param4}/{param3}:
+    parameters:
+      - name: param3
+        in: path
+        description: parameter 3
+        type: integer
+        required: true
+      - name: param4
+        in: header
+        description: parameter 4
+        type: integer
+        required: true
     get:
       summary: get request parameter value
       operationId: getParameters
@@ -65,12 +76,7 @@ paths:
           description: parameter 2
           type: integer
           required: true
-        - name: param3
-          in: path
-          description: parameter 3
-          type: integer
-          required: true
-        - name: param4
+        - name: param4              # overwrite param4 definition
           in: path
           description: parameter 4
           type: string
@@ -129,6 +135,11 @@ x-ibm-configuration:
                         name: name,
                         value: get(name)
                       };
+                - set-variable:
+                    title: set-content-type
+                    actions:
+                      - set: message.headers.content-type
+                        value: application/json
             - operations:
                 - getInternal
               execute:

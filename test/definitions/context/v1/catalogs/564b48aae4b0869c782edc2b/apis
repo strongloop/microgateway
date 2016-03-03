@@ -387,7 +387,7 @@
                 "assembly": {
                     "execute": [{
                     "javascript": {
-                            "source": "message.body = {\n  api: get('api'),\n  client: get('client'),\n  env: get('env'),\n  plan: get('plan')\n};\n"
+                            "source": "message.body = {\n  api: get('api'),\n  client: get('client'),\n  env: get('env'),\n  plan: get('plan')\n};set('message.headers.content-type','application/json');\n"
                             }
                                 }]
                 },
@@ -759,7 +759,7 @@
                 "assembly": {
                     "execute": [{
                         "javascript": {
-                                "source": "message.body = {\n  api: get('api'),\n  client: get('client'),\n  env: get('env'),\n  plan: get('plan')\n};\n"
+                                "source": "message.body = {\n  api: get('api'),\n  client: get('client'),\n  env: get('env'),\n  plan: get('plan')\n};set('message.headers.content-type','application/json');\n"
                                 }
                                 }]
                 },
@@ -1107,7 +1107,7 @@
                 "assembly": {
                     "execute": [{
                         "javascript": {
-                                "source": "message.body = {\n  api: get('api'),\n  client: get('client'),\n  env: get('env'),\n  plan: get('plan')\n};\n"
+                                "source": "message.body = {\n  api: get('api'),\n  client: get('client'),\n  env: get('env'),\n  plan: get('plan')\n};set('message.headers.content-type','application/json');\n"
                                 }
                                 }]
                 },
@@ -1734,7 +1734,7 @@
         "assembly": {
                     "execute": [{
                         "javascript": {
-                                "source": "message.body = {\n  api: get('api'),\n  client: get('client'),\n  env: get('env'),\n  plan: get('plan')\n};\n"
+                                "source": "message.body = {\n  api: get('api'),\n  client: get('client'),\n  env: get('env'),\n  plan: get('plan')\n};set('message.headers.content-type','application/json');\n"
                                 }
                                 }]
                 },
@@ -1885,7 +1885,7 @@
                     "execute": [
                         {
                             "javascript": {
-                                "source": "message.body = {\n  api: get('api'),\n  client: get('client'),\n  env: get('env'),\n  plan: get('plan')\n};\n"
+                                "source": "message.body = {\n  api: get('api'),\n  client: get('client'),\n  env: get('env'),\n  plan: get('plan')\n};set('message.headers.content-type','application/json');\n"
                             }
                         }
                     ]
