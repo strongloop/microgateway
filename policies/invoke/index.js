@@ -6,12 +6,11 @@ var assert = require('assert');
 var zlib = require('zlib');
 var dsc = require('../../datastore/client');
 
-//TODO: move this file to lib/ or util/?
 //one-time effort: read the cipher table into memory
 var cipherTable;
 try {
     //the mapping table of TLS to OpenSSL ciphersuites
-    cipherTable = require(__dirname + '/cipherSuites.json');
+    cipherTable = require(__dirname + '/../../lib/cipher-suites.json');
 }
 catch (err) {
     console.error('Warning! Cannot read the cipher table for invoke policy. %s',
@@ -26,6 +25,7 @@ catch (err) {
  */
 function _main(props, context, next, logger, tlsProfile) {
     //the default settings and error object
+    var readSrc, writeDst;
     var options;
     var isSecured;
     var verb;
@@ -34,10 +34,6 @@ function _main(props, context, next, logger, tlsProfile) {
     var compression = false;
     var error = { name: 'property error' };
     var data, dataSz = 0;
-
-    //TODO: support the input and output property
-    //TODO: check context.request and context.message
-    assert(context.request && context.message);
 
     if (typeof props['target-url'] === 'string')
         options = url.parse(props['target-url']);
@@ -60,7 +56,8 @@ function _main(props, context, next, logger, tlsProfile) {
     logger.info('[invoke] url: %s', options.href);
 
     //verb: default to request.verb
-    verb = props.verb ? String(props.verb).toUpperCase() : context.request.verb;
+    verb = props.verb ? String(props.verb).toUpperCase() :
+            (context.request ? context.request.verb : undefined);
     if (verb !== 'POST' && verb !== 'GET' && verb !== 'PUT' &&
         verb !== 'DELETE' && verb !== 'OPTIONS' && verb !== 'HEAD' &&
         verb !== 'PATCH') {
@@ -108,11 +105,65 @@ function _main(props, context, next, logger, tlsProfile) {
         options.auth = props.username + ':' + props.password;
     logger.debug('[invoke] auth: %s', options.auth, {});
 
-    //TODO: do we need the context.message.rawHeaders?
+    //readSrc: decide where to read the data
+    var validIdentifier = /^[$A-Z_][0-9A-Z_$]*$/i;
+    if (props.input) {
+        if (typeof props.input === 'string') {
+            if (validIdentifier.test(props.input)) {
+                if (context[props.input] &&
+                        typeof context[props.input] === 'object') {
+                    logger.info('[invoke] will read data and headers from "%s"',
+                        props.input);
+                    readSrc = context[props.input];
+                }
+            }
+        }
+
+        if (!readSrc) {
+            logger.error('Cannot read data or headers from the input ' + 
+                    'property "%s"', props.input);
+            error.value = 'Invalid input: "' + props.input + '"';
+            error.message = error.value;
+            next(error);
+            return;
+        }
+    }
+    else
+        readSrc = context.message;
+
+    //writeDst: decide where to write the response
+    if (props.output) {
+        if (typeof props.output === 'string') {
+            if (validIdentifier.test(props.output)) {
+                logger.info('[invoke] the output destination will be set to %s',
+                        props.output);
+                context[props.output] = {};
+                writeDst = context[props.output];
+            }
+        }
+
+        if (!writeDst) {
+            logger.error('The output property "%s" is not a valid javascript ' +
+                    'identifier.', props.output);
+            error.value = 'Invalid output: "' + props.output + '"';
+            error.message = error.value;
+            next(error);
+            return;
+        }
+    }
+    else {
+        if (context.message === undefined)
+            //In fact, this should never happen
+            context.message = {};
+
+        writeDst = context.message;
+    }
+
+    //TODO: do we need the rawHeaders from context.message?
     //copy headers
     options.headers = {};
-    for (var i in context.message.headers)
-        options.headers[i] = context.message.headers[i];
+    for (var i in readSrc.headers)
+        options.headers[i] = readSrc.headers[i];
     delete options.headers.host;
     delete options.headers.connection;
     delete options.headers['content-length'];
@@ -120,8 +171,7 @@ function _main(props, context, next, logger, tlsProfile) {
     delete options.headers['transfer-encoding'];
 
     //prepare the data and dataSz
-    data = context.message.body;
-    assert(data);
+    data = (readSrc.body === undefined ? '' : readSrc.body);
     if (!Buffer.isBuffer(data) && typeof data !== 'string') {
         if (typeof data === 'object')
             data = JSON.stringify(data);
@@ -213,28 +263,50 @@ function _main(props, context, next, logger, tlsProfile) {
     try {
         request = http.request(options, function(response) {
             //read the response
-            var target = context.message;
-
-            //TODO: rename the reasonPhrase
-            target.statusCode = response.statusCode;
-            target.reasonPhrase = response.reasonPhrase;
+            writeDst.statusCode = response.statusCode;
+            writeDst.reasonPhrase = response.reasonPhrase;
             logger.info('[invoke] response is received: %d, %s',
-                target.statusCode, target.reasonPhrase);
-
-            target.headers = {};
+                writeDst.statusCode, writeDst.reasonPhrase);
+            writeDst.headers = {};
             var rhrs = response.rawHeaders;
             for (var i = 0; i < rhrs.length; i+=2) {
-                target.headers[rhrs[i]] = rhrs[i+1];
+                writeDst.headers[rhrs[i]] = rhrs[i+1];
             }
 
-            target.body = [];
-            response.on('data', function(chunk) {
-                target.body += chunk;
+            var chunks = [];
+            response.on('data', function(data) {
+                chunks.push(data);
             });
 
-            //TODO: convert the target.body to JSON
             response.on('end', function() {
                 logger.info('[invoke] done');
+
+                //Decide whether the body should be a Buffer or JSON object.
+                //If the content-type says it is a JSON object, try to parse it.
+                var tmp = Buffer.concat(chunks);
+                var ctype = response.headers['content-type'];
+                if (ctype && ctype.toLowerCase().indexOf('json') !== -1) {
+                    try {
+                        tmp = JSON.parse(tmp);
+                    }
+                    catch(e) {
+                        logger.warn('Failed parse the body (%s) as JSON: %s. ' +
+                            'Leave it as a Buffer object', ctype, e);
+                    }
+                }
+                writeDst.body = tmp;
+
+                //Let Express itself to decide the final transfer-encoding
+                var discard = [ 'transfer-encoding' ];
+                for (var m in discard) {
+                    var tbd = discard[m];
+                    for (var n in writeDst.headers) {
+                        if (n.toLowerCase() === tbd) {
+                            delete writeDst.headers[n];
+                            break;
+                        }
+                    }
+                }
                 next();
             });
         });
