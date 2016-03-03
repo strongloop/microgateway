@@ -20,6 +20,7 @@
     "plan-rate-limit": {},
     "api-id": "string",
     "api-document": {},
+    "api-document-resolved": {},
     "api-assembly": {},
     "api-base-path": "string",
     "api-name": "string",

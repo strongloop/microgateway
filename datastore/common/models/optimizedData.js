@@ -1,5 +1,6 @@
 var async = require('async');
 var debug = require('debug')('micro-gateway:data-store');
+var jsonRefs = require('json-refs');
 
 var ALLPLANS = 'ALLPLANS';
 function createProductOptimizedEntry(app, ctx)
@@ -166,6 +167,13 @@ function gatherDataCreateOptimizedEntry(app, locals, isWildcard, gatherCallback)
         );
       },
       function(callback) {
+        annotateAPIs(locals.apis,
+          function(err) {
+            callback(err);
+          }
+        );
+      },
+      function(callback) {
         createOptimizedDataEntry(
           app,
           locals,
@@ -278,7 +286,9 @@ function grabAPIs(app, snapshot, product, plan, cb) {
               DBapi.document.info['x-ibm-name'] ===
               info['x-ibm-name']) {
                 debug('found api in db: %j', DBapi);
-                apis.push(DBapi);
+                // need to stringify API as we need to add metadata to it
+                // and not changing the underlying model
+                apis.push(JSON.parse(JSON.stringify(DBapi)));
                 }
 
           });
@@ -292,6 +302,47 @@ function grabAPIs(app, snapshot, product, plan, cb) {
   );
 }
 
+/**
+ * Add additional metadata to the API object, the following metadata
+ * will be added in this function:
+ *  - 'document-resolved':  store the swagger after resolving JSON refs
+ *  - 'document-wo-assembly': store the swagger w/o assembly data
+ *
+ * @param {Array} listOfApis is an array of API object
+ * @param {Function} callback is called after annotation is done
+ */
+function annotateAPIs(listOfApis, callback) {
+  debug('annotate API metadatas');
+
+  async.each(listOfApis,
+    function(api, next) {
+      // populate 'document-wo-assembly'
+      // Some customers add their own extension to the swagger,
+      // so we will make the swagger available in context to customers.
+      var swaggerWithoutAssembly = JSON.parse(JSON.stringify(api.document));
+      delete swaggerWithoutAssembly['x-ibm-configuration'].assembly;
+      api['document-wo-assembly'] = swaggerWithoutAssembly;
+
+      // populate 'document-resolved'
+      jsonRefs.resolveRefs(api.document)
+        .then(function(res) {
+          // saved the resolved swagger document if any JSON ref in it;
+          if (Object.keys(res.refs).length > 0) {
+            debug('store resolved API swagger document');
+            api['document-resolved'] = res.resolved;
+          }
+        }, function(err) {
+          // error when resolving json-refs
+          debug('error when resolving JSON references: %j', err);
+        })
+        .then(next, next); // end of jsonRefs promise resolution
+    },
+    function(err) {
+      debug('All API swaggers have been annotated');
+      callback(err);
+    }
+  ); // end of async.each() call
+}
 
 function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
   async.each(
@@ -313,7 +364,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                 Object.getOwnPropertyNames(
                   propnames).forEach(
                   function(methodname) {
-		                var operation = propnames[methodname];
+                    var operation = propnames[methodname];
                     debug('propname method: %j',
                       methodname);
                     debug('propname operationId: %j',
@@ -392,18 +443,6 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             );
           }
 
-          // Some customers add their own extension to the swagger,
-          // so we will make the swagger available in context to customers.
-          // As the information is needed for every incoming transaction on
-          // gateway, store the data in the optimized data model.
-          var swaggerWithoutAssembly = JSON.parse(JSON.stringify(api.document));
-          delete swaggerWithoutAssembly['x-ibm-configuration'].assembly;
-
-          var assemblyFlow = {
-            assembly: api.document['x-ibm-configuration'].assembly
-          };
-
-
     /*
         "subscription-id": "string",
         "client-id": "string",
@@ -445,8 +484,11 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'organization-id': pieces.org.id,
             'organization-name': pieces.org.name,
             'api-id': api.id,
-            'api-document': swaggerWithoutAssembly,
-            'api-assembly': assemblyFlow,
+            'api-document': api['document-wo-assembly'],
+            'api-document-resolved': api['document-resolved'],
+            'api-assembly': {
+                assembly: api.document['x-ibm-configuration'].assembly
+              },
             'api-base-path': api.document.basePath,
             'api-name': api.document.info.title,
             'api-type': api.document['x-ibm-configuration']['api-type'] || 'REST',
