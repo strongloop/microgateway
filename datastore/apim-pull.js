@@ -265,7 +265,7 @@ function getKey(file) {
   try {
     key = fs.readFileSync(file,'utf8');
   } catch(e) {
-    console.log('Can not read file: %s Error: %s', file, e);
+    debug('Can not read file: %s Error: %s', file, e);
   }
   return key;
   }
@@ -314,7 +314,7 @@ function getOrCreatePass() {
       try {
         fs.writeFileSync(passFile,encryptedCipher);
       } catch(e) {
-        console.log('Can not write file: %s Error: %s', passFile, e);
+        debug('Can not write file: %s Error: %s', passFile, e);
       }
       pass_key = password;
       }

@@ -106,7 +106,7 @@ module.exports = function(app) {
         try {
           private_key = fs.readFileSync(keyFile,'utf8');
         } catch(e) {
-          console.log('Can not load key: %s Error: %s', keyFile, e);
+          debug('Can not load key: %s Error: %s', keyFile, e);
         }
 
         if (apimanager.host && apimanager.handshakeOk === false && private_key) {
