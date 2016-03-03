@@ -35,7 +35,7 @@ function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, pr
       locals.product = product;
       locals.plan = {};
       locals.plan.apis = product.document.plans[propname].apis;
-      if (JSON.stringify(locals.plan.apis) === '{}' || !locals.plan.apis) { // all product apis scenario
+      if (_.isEmpty(locals.plan.apis)) { // all product apis scenario
         locals.plan.apis = product.document.apis;
         debug("1. all product apis in plan... APIs: " + product.document.apis);
         }
@@ -113,7 +113,7 @@ function ripCTX(ctx)
   if (locals.product)
     {
     locals.plan.apis = locals.product.document.plans[locals.plan.name].apis;
-    if (JSON.stringify(locals.plan.apis) === '{}' || !locals.plan.apis) { // all product apis scenario
+    if (_.isEmpty(locals.plan.apis)) { // all product apis scenario
       locals.plan.apis = locals.product.document.apis;
       debug("2. all product apis in plan... APIs: " + locals.product.document.apis);
       }
@@ -366,7 +366,11 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
         pieces.apis,
         function(api, apidone) {  // each api
           var apiPaths = [];
-          var pathsProp = JSON.parse(JSON.stringify(api.document['paths']));
+
+          // use JSON-ref resolved document if available
+          var apiDocument = api['document-resolved'] || api.document;
+
+          var pathsProp = apiDocument.paths;
           debug('pathsProp ' +
                 Object.getOwnPropertyNames(pathsProp));
           Object.getOwnPropertyNames(pathsProp).forEach(
@@ -374,7 +378,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
               var method = [];
               if (propname.indexOf('/') > -1) {
                 debug('propname: ' + propname);
-                var propnames = JSON.parse(JSON.stringify(api.document.paths[propname]));
+                var propnames = apiDocument.paths[propname];
                 Object.getOwnPropertyNames(
                   propnames).forEach(
                   function(methodname) {
@@ -384,7 +388,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                     debug('propname operationId: %j',
                       operation.operationId);
                     var securityEnabledForMethod =
-                      operation.security ? operation.security : api.document.security;
+                      operation.security ? operation.security : apiDocument.security;
                     debug('securityEnabledForMethod: ' + JSON.stringify(securityEnabledForMethod));
                     var clientidSecurity = false;
                     if (securityEnabledForMethod)
@@ -394,9 +398,9 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                             var securityProps = Object.getOwnPropertyNames(securityReq)
                             securityProps.forEach(
                               function(securityProp) {
-                                if (api.document.securityDefinitions &&
-                                    api.document.securityDefinitions[securityProp] &&
-                                    api.document.securityDefinitions[securityProp].type === 'apiKey')
+                                if (apiDocument.securityDefinitions &&
+                                    apiDocument.securityDefinitions[securityProp] &&
+                                    apiDocument.securityDefinitions[securityProp].type === 'apiKey')
                                   clientidSecurity = true;
                                   debug('clientidSecurity: ' + clientidSecurity);
                                 });
@@ -407,15 +411,14 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                         ((!securityEnabledForMethod || !clientidSecurity) && isWildcard)) {
                         // add only non-clientid security for products (wildcard)
                       method.push({
-                        consumes: operation.consumes || api.document.consumes,
+                        consumes: operation.consumes || apiDocument.consumes,
                         method: methodname.toUpperCase(),
                         operationId: operation.operationId,
-                        parameters: getOpParams(api.document.parameters,
-                                                api.document.paths[propname].parameters,
+                        parameters: getOpParams(apiDocument.paths[propname].parameters,
                                                 operation.parameters),
-                        produces: operation.produces || api.document.produces,
+                        produces: operation.produces || apiDocument.produces,
                         responses: operation.responses,
-                        securityDefs: api.document.securityDefinitions,
+                        securityDefs: apiDocument.securityDefinitions,
                         // operational lvl Swagger security overrides the API lvl
                         securityReqs: securityEnabledForMethod,
                         });
@@ -424,7 +427,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                 );
                 if (method.length !== 0) { // no methods, no apiPaths
                   var regexPath = makePathRegex(
-                            api.document.basePath,
+                            apiDocument.basePath,
                             propname);
                   var apiPath = {
                     path: propname,
@@ -440,7 +443,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
           );
 
           // get API properties that user defined in the swagger
-          var ibmSwaggerExtension = api.document['x-ibm-configuration'];
+          var ibmSwaggerExtension = apiDocument['x-ibm-configuration'];
           var defaultApiProperties = ibmSwaggerExtension.properties;
           var apiProperties = {};
           if (defaultApiProperties) {
@@ -506,12 +509,12 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'api-document': api['document-wo-assembly'],
             'api-document-resolved': api['document-resolved'],
             'api-assembly': {
-                assembly: api.document['x-ibm-configuration'].assembly
+                assembly: apiDocument['x-ibm-configuration'].assembly
               },
-            'api-base-path': api.document.basePath,
-            'api-name': api.document.info.title,
-            'api-type': api.document['x-ibm-configuration']['api-type'] || 'REST',
-            'api-version': api.document.info.version,
+            'api-base-path': apiDocument.basePath,
+            'api-name': apiDocument.info.title,
+            'api-type': apiDocument['x-ibm-configuration']['api-type'] || 'REST',
+            'api-version': apiDocument.info.version,
             'api-properties': apiProperties,
             'api-paths': apiPaths,
             'snapshot-id' : pieces.snapshot
@@ -579,12 +582,11 @@ function calculateMatchingScore(apiPath) {
 /**
  * Returns a Object that denotes the parameters associated with the operation
  *
- * @param {Object} apiParams api-level parameters in the swagger
  * @param {Array} pathParams path-level parameters in the swagger
  * @param {Array} opParams op-level perameters in the swagger
  *
  */
-function getOpParams(apiParams, pathParams, opParams) {
+function getOpParams(pathParams, opParams) {
   var unionParams = _.unionWith(opParams, pathParams, opParamComparator);
   return unionParams;
 }

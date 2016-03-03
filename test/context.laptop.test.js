@@ -151,6 +151,37 @@ describe('Context variables in laptop experience', function() {
       });
   });
 
+  it('should resolve JSON-references', function(done) {
+    request
+      .get('/v1/context/request/parameters/abc/9999?param1=value1&param2=8888&param5=1111&paramBoolean=false&queryArray=1,2,3&paramRef1=foo')
+      .set('X-foo', 'bar')
+      .set('X-paramArray', '1024,2048,4096')
+      .set('X-PARAM-REF-2', true)
+      .expect(200)
+      .end(function(err, res) {
+        var result = res.body;
+        if (_.isString(result)) {
+          result = JSON.parse(result);
+        }
+
+        console.log("request.parameters result: "+JSON.stringify(result));
+        assert.deepStrictEqual(result,
+            {param1:'value1',
+             param2:8888,
+             param3:9999,
+             param4:'abc',
+             'X-foo':'bar',
+             paramBoolean:false,
+             'X-paramArray':[1024,2048,4096],
+             queryArray:['1','2','3'],
+             paramRef1: 'foo',
+             'X-PARAM-REF-2': true }
+        );
+        assert.equal(result.param5, undefined);
+        done();
+      });
+  });
+
   it('should copy $(api.properties.*) to context root level', function(done) {
     request
       .get('/v1/context?name=foo')
