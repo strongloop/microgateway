@@ -2,7 +2,7 @@
 
 var _ = require('lodash');
 var debug = require('debug')('context-test');
-var loopback = require('loopback');
+var express = require('express');
 var request = require('supertest');
 
 var context = require('../lib/context');
@@ -11,7 +11,7 @@ var errhandler = require('../lib/error-handler');
 describe('Error middleware', function() {
 
   it ('should return default status code and message', function(done) {
-    var app = loopback();
+    var app = express();
     app.use(context());
     app.use(function(req, resp, next) {
       next("Error on purpose");
@@ -26,7 +26,7 @@ describe('Error middleware', function() {
     var errorObject = {
       name: 'TestError',
     }
-    var app = loopback();
+    var app = express();
     app.use(context());
     app.use(function(req, resp, next) {
       next(errorObject);
@@ -38,7 +38,7 @@ describe('Error middleware', function() {
   });
 
   it('should return customized status code and message', function(done) {
-    var app = loopback();
+    var app = express();
     app.use(context());
     app.use(function(req, resp, next) {
       req.ctx.set('error.statusCode', 777);
@@ -61,7 +61,7 @@ describe('Error middleware', function() {
     var errorHeaders = {
       'X-Error': 'Not working'
     };
-    var app = loopback();
+    var app = express();
     app.use(context());
     app.use(function(req, resp, next) {
       req.ctx.set('error.headers', errorHeaders);
