@@ -8,11 +8,13 @@ var Request = require('request');
 var debug = require('debug')('micro-gateway:data-store');
 var sgwapimpull = require('../../apim-pull');
 var apimpull = sgwapimpull.pull;
+var apimdecrypt = sgwapimpull.decrypt;
 var environment = require('../../../utils/environment');
 var APIMANAGER = environment.APIMANAGER;
 var APIMANAGER_PORT = environment.APIMANAGER_PORT;
 var APIMANAGER_CATALOG = environment.APIMANAGER_CATALOG;
 var CONFIGDIR = environment.CONFIGDIR;
+var KEYNAME = environment.KEYNAME;
 
 var LAPTOP_RATELIMIT = environment.LAPTOP_RATELIMIT;
 
@@ -22,8 +24,8 @@ var rootConfigPath = __dirname + '/../../../config/';
 var defaultDefinitionsDir = rootConfigPath + 'default';
 var definitionsDir = defaultDefinitionsDir;
 
-var keyDir = __dirname + '/../../../';
-var keyFile = keyDir + 'id_rsa';
+var gatewayMain = __dirname + '/../../../';
+var keyFile = gatewayMain + KEYNAME;
 var version ='1.0.0';
 
 /**
@@ -104,12 +106,12 @@ module.exports = function(app) {
         try {
           private_key = fs.readFileSync(keyFile,'utf8');
         } catch(e) {
-          console.log('Can not load key: %s Error: %s', keyFile, e);
+          debug('Can not load key: %s Error: %s', keyFile, e);
         }
 
         if (apimanager.host && apimanager.handshakeOk === false && private_key) {
         // we have an APIm, and a key so try to handshake with it.. 
-          handshakeWithAPIm(app, apimanager, function(err, handshakeApimanager) {
+          handshakeWithAPIm(app, apimanager, private_key, function(err, handshakeApimanager) {
             apimanager = handshakeApimanager;
             callback(); // should return the error.. not ready #TODO
             })
@@ -223,7 +225,7 @@ function stageModels(app, models, cb) {
  * @param {callback} cb - callback that handles error or path to
  *                        snapshot directory
  */
-function handshakeWithAPIm(app, apimanager, cb) {
+function handshakeWithAPIm(app, apimanager, private_key, cb) {
   debug('handshakeWithAPIm entry');
   
   async.series([
@@ -453,7 +455,7 @@ function loadConfigFromFS(app, apimanager, models, dir, uid, cb) {
   }
   else {
     var YAMLfiles = [];
-
+    debug('dir: ' + dir )
     cliConfig.loadProject(dir).then(function(artifacts) { 
       debug('%j', artifacts); 
       artifacts.forEach(
@@ -749,7 +751,7 @@ function populateModelsWithAPImData(app, models, dir, uid, cb) {
           try {
             // read the content of the files into memory
             // and parse as JSON
-            readfile = JSON.parse(fs.readFileSync(file));
+            readfile = JSON.parse(apimdecrypt(fs.readFileSync(file)));
           } catch(e) {
             fileCallback(e);
             return;
