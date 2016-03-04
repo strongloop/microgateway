@@ -133,8 +133,7 @@
       { 
       "ascents": {"name": "ascents:1.0.0"},
       "forecasts": {"name": "forecasts:1.0.0"},
-      "routes": {"name": "routes:1.0.0"},
-      "ratelimit": {"name": "ratelimit:1.0.0"}
+      "routes": {"name": "routes:1.0.0"}
        },
     "plans": {
       "trial": {
