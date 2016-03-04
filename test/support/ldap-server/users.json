@@ -1,0 +1,41 @@
+{
+  "root": {
+    "dn": "cn=root, ou=myorg, ou=com",
+    "pass": "Hunter2",
+    "attributes": {
+      "cn": "root",
+      "uid": "0",
+      "gid": "0",
+      "description": "root",
+      "homedirectory": "/root",
+      "shell": "/bin/bash",
+      "objectclass": "unixUser"
+    }
+  },
+  "jsmith": {
+    "dn": "cn=jsmith, ou=myorg, ou=com",
+    "pass": "foobar",
+    "attributes": {
+      "cn": "jsmith",
+      "uid": "1000",
+      "gid": "1000",
+      "description": "Joe Smith,Room 1007,(234)555-8910,(234)555-0044,email",
+      "homedirectory": "/home/jsmith",
+      "shell": "/bin/sh",
+      "objectclass": "unixUser"
+    }
+  },
+  "ldapjs": {
+    "dn": "cn=ldapjs, ou=myorg, ou=com",
+    "pass": "helloworld",
+    "attributes": {
+      "cn": "ldapjs",
+      "uid": "1001",
+      "gid": "1000",
+      "description": "",
+      "homedirectory": "/home/ldapjs",
+      "shell": "/bin/bash",
+      "objectclass": "unixUser"
+    }
+  }
+}
