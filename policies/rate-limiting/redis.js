@@ -12,7 +12,7 @@ module.exports = function(options) {
 
   var limit = options.limit;
   var interval = options.interval;
-  var hardLimit = options.hardLimit;
+  var reject = options.reject;
 
   var limiter = RateLimiter({
     redis: client,
@@ -35,7 +35,7 @@ module.exports = function(options) {
         return flow.fail(err);
       }
       let remaining = timeLeft > 0 ? 0 : options.limit;
-      handleResponse(limit, remaining, timeLeft, hardLimit, context, flow);
+      handleResponse(limit, remaining, timeLeft, reject, context, flow);
     });
   };
 };

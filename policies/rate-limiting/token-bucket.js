@@ -9,7 +9,7 @@ module.exports = function(options) {
 
   var limit = options.limit;
   var interval = options.interval;
-  var hardLimit = options.hardLimit;
+  var reject = options.reject;
 
   var limiters = {};
 
@@ -21,7 +21,8 @@ module.exports = function(options) {
       limiter = limiters[key];
       if (!limiter) {
         logger.debug('Creating rate limiter: %d %d', limit, interval);
-        limiter = new RateLimiter(limit, interval);
+        // Use +1 so that we can treat remaining 0 as no more
+        limiter = new RateLimiter(limit + 1, interval);
         limiters[key] = limiter;
       }
 
@@ -31,10 +32,9 @@ module.exports = function(options) {
       var reset = Math.max(interval - (Date.now() - limiter.curIntervalStart),
         0);
 
-      handleResponse(limit, remaining, reset, hardLimit, context, flow);
+      handleResponse(limit, remaining, reset, reject, context, flow);
     } else {
       flow.proceed();
     }
   };
 };
-

@@ -6,8 +6,9 @@ let echo = require('./support/echo-server');
 let mg = require('../lib/microgw');
 var path = require('path');
 var fs = require('fs');
+var async = require('async');
 
-describe('matching score test', function() {
+describe('opertaion rate limiting test', function() {
 
   let request;
   before((done) => {
@@ -41,16 +42,11 @@ describe('matching score test', function() {
     
     it('client_id=' + clientId1 + ' secret=' + clientSecret1 + ' "/ratelimit1" should pass"',
       function (done) {
-        request
-        .get('/v1/ratelimit1?client_id=' + clientId1 + '&client_secret=' + clientSecret1)
-        .expect(200, done);
-      });
-    
-    it('client_id=' + clientId1 + ' secret=' + clientSecret1 + ' "/ratelimit1" should pass"',
-      function (done) {
-        request
-        .get('/v1/ratelimit1?client_id=' + clientId1 + '&client_secret=' + clientSecret1)
-        .expect(200, done);
+        async.times(2, function(n, next) {
+          request
+            .get('/v1/ratelimit1?client_id=' + clientId1 + '&client_secret=' + clientSecret1)
+            .expect(200, next);
+        }, done);
       });
     
     // it('client_id=' + clientId1 + ' secret=' + clientSecret1 + ' "/ratelimit1" should pass"',
@@ -104,23 +100,11 @@ describe('matching score test', function() {
 
     it('client_id=' + clientId1 + ' secret=' + clientSecret1 + ' "/ratelimit2" should pass"',
       function (done) {
-        request
-        .get('/v1/ratelimit2?client_id=' + clientId1 + '&client_secret=' + clientSecret1)
-        .expect(200, done);
-      });
-
-    it('client_id=' + clientId1 + ' secret=' + clientSecret1 + ' "/ratelimit2" should pass"',
-      function (done) {
-        request
-        .get('/v1/ratelimit2?client_id=' + clientId1 + '&client_secret=' + clientSecret1)
-        .expect(200, done);
-      });
-    
-    it('client_id=' + clientId1 + ' secret=' + clientSecret1 + ' "/ratelimit2" should pass"',
-      function (done) {
-        request
-        .get('/v1/ratelimit2?client_id=' + clientId1 + '&client_secret=' + clientSecret1)
-        .expect(200, done);
+        async.times(3, function(n, next) {
+          request
+            .get('/v1/ratelimit2?client_id=' + clientId1 + '&client_secret=' + clientSecret1)
+            .expect(200, next);
+        }, done);
       });
     
     it('client_id=' + clientId1 + ' secret=' + clientSecret1 + ' "/ratelimit2" should reject"',
