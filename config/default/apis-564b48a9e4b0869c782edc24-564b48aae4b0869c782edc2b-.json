@@ -1,4 +1,87 @@
-[
+[  {
+      "catalog": {
+          "default": false,
+          "id": "564b48aae4b0869c782edc2b",
+          "name": "sb",
+          "sandbox": true,
+          "title": "Sandbox",
+          "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+      },
+      "document": {
+        "info": {
+            "contact": {
+                "email": "joedeveloper@someemailservice.com",
+                "name": "Joe API Developer",
+                "url": "http://developer.acme.com/contacturl"
+            },
+            "description": "The /v1 set of Forecast APIs",
+            "license": {
+                "name": "License Name Goes Here...",
+                "url": "http://developer.acme.com/licenseurl"
+            },
+            "termsOfService": "The Terms of Service for the API are ...",
+            "title": "ratelimit",
+            "version": "1.0.0",
+            "x-ibm-name": "ratelimit"
+        },
+        "basePath": "/ratelimit",
+        "swagger": "2.0",
+        "paths": {
+          "/ratelimitA": {
+            "get": {
+              "operationId": "ratelimitA",
+              "responses": {
+                "200": {
+                  "description": "200 OK"
+                }
+              }
+            }
+          },
+          "/ratelimitB": {
+            "get": {
+              "operationId": "ratelimitB",
+              "responses": {
+                "200": {
+                  "description": "200 OK"
+                }
+              }
+            }
+          },
+          "/ratelimitC": {
+            "get": {
+              "operationId": "ratelimitC",
+              "responses": {
+                "200": {
+                  "description": "200 OK"
+                }
+              }
+            }
+          },
+          "/ratelimitD": {
+            "get": {
+              "operationId": "ratelimitD",
+              "responses": {
+                "200": {
+                  "description": "200 OK"
+                }
+              }
+            }
+          }
+        },
+        "x-ibm-configuration": {
+          "assembly": {
+            "execute": [
+              {
+                "invoke": {
+                  "title": "invoke",
+                  "target-url": "http://localhost:8889/"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
     {
         "catalog": {
             "default": false,
@@ -1841,6 +1924,26 @@
                             "routes"
                         ]
                     }
+                },
+                "/ratelimit1": {
+                  "get": {
+                    "operationId": "ratelimit1",
+                    "responses": {
+                      "200": {
+                        "description": "200 OK"
+                      }
+                    }
+                  }
+                },
+                "/ratelimit2": {
+                  "get": {
+                    "operationId": "ratelimit2",
+                    "responses": {
+                      "200": {
+                        "description": "200 OK"
+                      }
+                    }
+                  }
                 },
                 "/test4/{id}/exists": {
                     "get": {

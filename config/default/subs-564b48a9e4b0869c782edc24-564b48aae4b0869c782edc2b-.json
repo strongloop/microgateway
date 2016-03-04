@@ -125,7 +125,29 @@
             "rate-limit": {
               "hard-limit": false,
               "value": "1000/min"
-            }
+            },
+            "apis": 
+              {
+                "ascents": {},
+                "routes": {},
+                "ratelimit": {
+                    "operations": [
+                      {
+                        "operationId": "ratelimitB",
+                        "rate-limit": {
+                          "value": "4/10minute"
+                        }
+                      },
+                      {
+                        "operation": "get",
+                        "path": "/ratelimitC",
+                        "rate-limit": {
+                          "value": "2/10minute"
+                        }
+                      } 
+                    ]
+                }
+              }            
           }
         }
       }
@@ -553,7 +575,8 @@
           { 
           "ascents": {"name": "ascents:1.0.0"},
           "forecasts": {"name": "forecasts:1.0.0"},
-          "routes": {"name": "routes:1.0.0"}
+          "routes": {"name": "routes:1.0.0"},
+          "ratelimit": {"name": "ratelimit:1.0.0"}
           },
         "plans": {
           "trial": {
@@ -593,6 +616,61 @@
             },
           "apis": 
             {
+              "ascents": {},
+              "forecasts": {},
+              "routes": {
+                "operations": [
+                  {
+                    "operationId": "ratelimit1",
+                    "rate-limit": {
+                      "value": "2/10minute",
+                      "hard-limit": true
+                    }
+                  },
+                  {
+                    "path": "/ratelimit2",
+                    "operation": "get",
+                    "rate-limit": {
+                      "value": "3/10minute",
+                      "hard-limit": true
+
+                    }
+                  },
+                  {"operationId": "routes.test1"},
+                  {"operationId": "routes.test2"},
+                  {"operationId": "routes.test3"},
+                  {"operationId": "routes.find"},
+                  {"operationId": "routes.create"},
+                  {"operationId": "routes.upsert"},
+                  {"operationId": "routes.get.createChangeStream"},
+                  {"operationId": "routes.post.createChangeStream"},
+                  {"operationId": "routes.count"},
+                  {"operationId": "routes.findOne"},
+                  {"operationId": "routes.updateAll"},
+                  {"operationId": "routes.deleteById"},
+                  {"operationId": "routes.findById"},
+                  {"operationId": "routes.id.exists"},
+                  {"operationId": "routes.prototype.updateAttributes"},
+                  {"operationId": "routes.exists"}
+                ]
+              },
+              "ratelimit": {
+                  "operations": [
+                    {
+                      "operationId": "ratelimitB",
+                      "rate-limit": {
+                        "value": "4/10minute"
+                      }
+                    },
+                    {
+                      "operation": "get",
+                      "path": "/ratelimitC",
+                      "rate-limit": {
+                        "value": "2/10minute"
+                      }
+                    } 
+                  ]
+              }
             }
           }
         }
@@ -1918,6 +1996,23 @@
             },
             "apis": 
               {
+                "ratelimit": {
+                    "operations": [
+                      {
+                        "operationId": "ratelimitB",
+                        "rate-limit": {
+                          "value": "4/10minute"
+                        }
+                      },
+                      {
+                        "operation": "get",
+                        "path": "/ratelimitC",
+                        "rate-limit": {
+                          "value": "2/10minute"
+                        }
+                      } 
+                    ]
+                }
               }
           }
         }
