@@ -4,20 +4,24 @@ var debug = require('debug')('policy:rate-limiting');
 
 exports.handleResponse =
   function(limit, remaining, reset, reject, context, flow) {
-    if (remaining <= 0 && hardLimit) {
-      let resMsg = context.get('message');
-      if (!resMsg) {
-        resMsg = {};
-        context.set('message', resMsg);
-      }
-      resMsg.statusCode = 429;
-      resMsg.body = {error: 'Limit exceeded'};
+    if (remaining <= 0 && reject) {
+      let resMsg = setupHeaders();
       var err = new Error('Rate limit exceeded');
       err.statusCode = 429;
+      err.name = 'RateLimitExceeded';
+      context.error = err;
+      debug('Rate limit exceeded: %j', err);
       return flow.fail(err);
     }
 
     context.subscribe('post-flow', function(event, done) {
+      setupHeaders();
+      done();
+    });
+
+    return flow.proceed();
+
+    function setupHeaders() {
       let resMsg = context.get('message');
       if (!resMsg) {
         resMsg = {};
@@ -32,8 +36,6 @@ exports.handleResponse =
       resMsgHeaders['X-RateLimit-Limit'] = limit;
       resMsgHeaders['X-RateLimit-Remaining'] = remaining;
       resMsgHeaders['X-RateLimit-Reset'] = reset;
-      done();
-    });
-
-    return flow.proceed();
+      return resMsg;
+    }
   };
