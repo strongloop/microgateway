@@ -101,23 +101,27 @@ module.exports = function(app) {
           }
        );
       },
-      function(callback) {
-        // load key..
-        var private_key = '';
-        try {
-          private_key = fs.readFileSync(keyFile,'utf8');
-        } catch(e) {
-          logger.debug('Can not load key: %s Error: %s', keyFile, e);
+      function (callback) {
+        if (!apimanager.host || apimanager.handshakeOk) {
+          //if we don't have the APIM contact info, or we already done the handshake, bail out
+          return callback();
         }
 
-        if (apimanager.host && apimanager.handshakeOk === false && private_key) {
-        // we have an APIm, and a key so try to handshake with it.. 
-          handshakeWithAPIm(app, apimanager, private_key, function(err, handshakeApimanager) {
-            apimanager = handshakeApimanager;
-            callback(); // should return the error.. not ready #TODO
-            })
-          }
-        else { callback();}       
+        // load key..
+        var private_key = null;
+        try {
+          private_key = fs.readFileSync(keyFile, 'utf8');
+        } catch (e) {
+          //don't proceed with the handshake, since we could not read the private key
+          logger.debug('Can not load key: %s Error: %s', keyFile, e);
+          return callback();
+        }
+
+        // we have an APIm, and a key so try to handshake with it..
+        handshakeWithAPIm(app, apimanager, private_key, function (err, handshakeApimanager) {
+          apimanager = handshakeApimanager;
+          callback(); // should return the error.. not ready #TODO
+        });
       }
     ],
     // load the data into the models
@@ -147,9 +151,9 @@ function loadData(app, apimanager, models, currdir) {
     [
       function(callback) {
         logger.debug('apimanager before pullFromAPIm: ' + JSON.stringify(apimanager))
-        if (apimanager.host) { 
+        if (apimanager.host) {
             // && apimanager.handshakeOk << shouldn't call if handshake failed.. not ready #TODO
-        // we have an APIm, handshake succeeded, so try to pull data.. 
+          // we have an APIm, handshake succeeded, so try to pull data..
           pullFromAPIm(apimanager, snapshotID, function(err, dir) {
             snapdir = dir;
             callback();
@@ -220,6 +224,100 @@ function stageModels(app, models, cb) {
   );
 }
 /**
+ * Compute the signature headers "date", "digest", and "authorization" headers
+ * according to IETF I-D draft-cavage-http-signatures-05 using rsa-sha256 algorithm
+ *
+ * If the `date` header already exists in the input, it's used as-is
+ * If the `digest` header already exists in the input, it's used as-is (which means that body is ignored)
+ *
+ *
+ * @param body (String): Message body (ignored if there is already a digest header)
+ * @param headers (Object): Contains the existing list of headers
+ * @param keyId (String): Identifier for the private key, ends up in the "keyId" param of the authorization header
+ * @param private_key (String): RSA Private key to be used for the signature
+ * @returns {*}
+ */
+
+
+function addSignatureHeaders(body, headers, keyId, private_key) {
+  var sign = function (str, private_key) {
+    var sign = Crypto.createSign('RSA-SHA256');
+    sign.update(str);
+    return sign.sign(private_key, 'base64');
+  };
+
+  var sha256 = function (str, encoding) {
+    var bodyStr = JSON.stringify(str);
+    var hash = Crypto.createHash('sha256');
+    hash.update(bodyStr);
+    return hash.digest(encoding);
+  };
+
+  if (!headers) {
+    headers = {};
+  }
+
+  if (!headers['date']) {
+    headers['date'] = (new Date()).toUTCString()
+  }
+
+  if (!headers['digest']) {
+    headers['digest'] = 'SHA256=' + sha256(body, 'base64');
+  }
+
+
+  var combine = function (names, headers) {
+    var parts = [];
+    names.forEach(function (e) {
+      parts.push(e + ": " + headers[e]);
+    });
+    return parts.join("\n");
+  };
+
+  headers['authorization'] = 'Signature ' +
+    'keyId="' + keyId + '", ' +
+    'headers="date digest", ' +
+    'algorithm="rsa-sha256", ' +
+    'signature="' + sign(combine(['date', 'digest'], headers), private_key) + '"';
+
+  return headers;
+}
+
+
+/**
+ * This function decrypts and parses an encrypted response body sent by APIM
+ * The body must be in the following format:
+ *
+ * {
+ *   "key": "base64(encrypted_with_public_key(aes_256_symmetric_key))"
+ *   "cipher": "base64(encrypted_with_aes_256_key(json_payload_as_string))"
+ * }
+ *
+ *
+ * @param body
+ * @param public_key
+ *
+ */
+function decryptAPIMResponse(body, private_key) {
+  var key = Crypto.privateDecrypt(
+    {
+      key: private_key,
+      padding: constants.RSA_PKCS1_PADDING
+    },
+    new Buffer(body.key, 'base64')
+  );
+
+  var iv = new Buffer(16);
+  iv.fill(0);
+  var decipher = Crypto.createDecipheriv('aes-256-cbc', key, iv);
+  var plainText = decipher.update(body.cipher, 'base64', 'utf8');
+  plainText += decipher.final('utf8');
+
+  return JSON.parse(plainText);
+}
+
+
+/**
  * Attempt to handshake from APIm server
  * @param {???} app - loopback application
  * @param {Object} config - configuration pointing to APIm server
@@ -231,70 +329,64 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
   
   async.series([
     function(callback) {
-      // send version encrypted using public key
 
-      var encryptedVersion = Crypto.privateEncrypt(private_key, new Buffer(version,'ascii'));
-      var body = {
-        gatewayVersion: encryptedVersion
-      }
-      logger.debug('EncryptedBody:' + JSON.stringify(body));
-          
+      var body = JSON.stringify({
+        gatewayVersion: version
+      });
+
+      var headers = {
+        'content-type': 'application/json'
+      };
+
+      addSignatureHeaders(body, headers, "micro-gw-catalog/"+apimanager.catalog, private_key);
+
+      logger.debug(JSON.stringify(headers, null, 2));
+
       var apimHandshakeUrl = 'https://' + apimanager.host + ':' + apimanager.port + '/v1/catalogs/' + apimanager.catalog + '/handshake/';
       
       Request({
         url: apimHandshakeUrl,
         method: 'POST',
         json: body,
-        headers: {
-          'content-type': 'application/json'
+        headers: headers,
+        agentOptions: {
+          rejectUnauthorized: false //FIXME: need to eventually remove this
           }
         },       
       function(err, res, body) {
         if (err) {
           logger.debug('Failed to communicate with %s: %s ', apimHandshakeUrl, err);
-          callback(err);
+          return callback(err);
         }
-        else {
-          logger.debug('statusCode: ' + res.statusCode);          
-          if (res.statusCode === 200) {
-            var algorithm = 'AES-256-CBC';
-            var IV = '0000000000000000';
-            logger.debug('body: ' + JSON.stringify(res.body));
-            var password = Crypto.privateDecrypt(private_key, new Buffer(res.body.Key));
-            logger.debug('password: ' + password);
-            var decipher = Crypto.createDecipheriv(algorithm, password, IV);
-            var decrypted = decipher.update(res.body.cipher, 'base64', 'utf8');
-            decrypted += decipher.final('utf8');
-            logger.debug('decrypted: ' + decrypted);
-            var jsonDecrypted = JSON.parse(decrypted);
-            
-            logger.debug('jsonDecrypted: ' + JSON.stringify(jsonDecrypted));
-            
-            apimanager.clicert = jsonDecrypted.managerCert;
-            apimanager.clikey = jsonDecrypted.managerKey;
-            apimanager.clientid = jsonDecrypted.clientID;
-            
-            logger.debug('apimanager.clicert: ' + apimanager.clicert);
-            logger.debug('apimanager.clikey: ' + apimanager.clikey);
-            logger.debug('apimanager.clientid: ' + apimanager.clientid);
 
-            logger.debug('apimanager: ' + JSON.stringify(apimanager));          
-            callback(null, apimanager);
-            }
-          else {
-            var error = new Error(apimHandshakeUrl +
-                            ' failed with: ' +
-                            res.statusCode);
-            callback(error);
-            }
-          }
+        logger.debug('statusCode: ' + res.statusCode);
+        if (res.statusCode !== 200) {
+          logger.debug(apimHandshakeUrl + ' failed with: ' + res.statusCode);
+          return callback(new Error(apimHandshakeUrl + ' failed with: ' + res.statusCode));
+        }
+
+        var json = decryptAPIMResponse(body, private_key);
+        logger.debug(JSON.stringify(json, null, 2));
+
+        if (!json.microGateway) {
+          return callback(new Error(apimHandshakeUrl + ' response did not contain "microGateway" section'));
+        }
+
+        var ugw = json.microGateway;
+        apimanager.clicert = ugw.cert;
+        apimanager.clikey = ugw.key;
+        apimanager.clientid = ugw.clientID;
+
+        logger.debug('apimanager.clicert: ' + apimanager.clicert);
+        logger.debug('apimanager.clikey: ' + apimanager.clikey);
+        logger.debug('apimanager.clientid: ' + apimanager.clientid);
+
+        logger.debug('apimanager: ' + JSON.stringify(apimanager, null, 2));
+        callback(null, apimanager);
         });
       }],
     function(err) {
-      if (err)
-        apimanager.handshakeOk = false;
-      else
-        apimanager.handshakeOk = true;
+      apimanager.handshakeOk = !err;
       logger.debug('handshakeWithAPIm exit');
       cb(err, apimanager);
     });
