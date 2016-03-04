@@ -90,7 +90,8 @@ describe('Context variables in laptop experience', function() {
           },
           consumes: [
             'application/json',
-            'application/xml'
+            'application/xml',
+            'application/x-www-form-urlencoded'
           ],
           operation: 'GET',
           operationId: "getInternal",
@@ -123,7 +124,7 @@ describe('Context variables in laptop experience', function() {
       });
   });
 
-  it('should produce all request.parameters', function(done) {
+  it('should produce all request.parameters - GET', function(done) {
     request
       .get('/v1/context/request/parameters/abc/9999?param1=value1&param2=8888&param5=1111&paramBoolean=false&queryArray=1&queryArray=2&queryArray=3')
       .set('X-foo', 'bar')
@@ -152,6 +153,30 @@ describe('Context variables in laptop experience', function() {
         );
         assert.equal(result.param5, undefined);
         assert.equal(result.param6, undefined);
+        done();
+      });
+  });
+
+  it('should produce all request.parameters - POST', function(done) {
+    request
+      .post('/v1/context/request/parameters/abc/9999')
+      .type('form')
+      .set('param4', 2222)
+      .send({param2: 8888})
+      .send({param1: 'value1'})
+      .end(function(err, res) {
+        var result = res.body;
+        if (_.isString(result)) {
+          result = JSON.parse(result);
+        }
+
+        console.log("request.parameters result: "+JSON.stringify(result));
+        assert.deepStrictEqual(result,
+            {"param1":"value1",
+             "param2":8888,
+             "param3":9999,
+             "param4":2222}
+        );
         done();
       });
   });

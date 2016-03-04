@@ -11,6 +11,7 @@ swagger: '2.0'
 consumes:
   - application/json
   - application/xml
+  - application/x-www-form-urlencoded
 
 produces:
   - application/json
@@ -132,6 +133,23 @@ paths:
       responses:
         '200':
           description: 200 OK
+    post:
+      summary: post request parameter value
+      operationId: postParameters
+      parameters:
+        - name: param1
+          in: formData
+          description: parameter 1
+          type: string
+          required: true
+        - name: param2
+          in: formData
+          description: parameter 2
+          type: integer
+          required: true
+      responses:
+        '200':
+          description: 200 OK
 
 x-ibm-configuration:
   properties:
@@ -200,6 +218,7 @@ x-ibm-configuration:
                         value: application/json
             - operations:
                 - getParameters
+                - postParameters
               execute:
                 - set-variable:
                     title: set-variable
