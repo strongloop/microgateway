@@ -1,35 +1,39 @@
 'use strict';
 
 var debug = require('debug')('policy:rate-limiting');
-exports.handleResponse = function(limit, remaining, reset, reject, context, next) {
-  if (remaining <= 0 && hardLimit) {
-    let resMsg = context.get('message');
-    if (!resMsg) {
-      resMsg = {};
-      context.set('message', resMsg);
-    }
-    resMsg.statusCode = 429;
-    resMsg.body = {error: 'Limit exceeded'};
-    var err = new Error('Rate limit exceeded');
-    err.statusCode = 429;
-    return next(err);
-  }
 
-  context.subscribe('post-flow', function(event, done) {
-    let resMsg = context.get('message');
-    if (!resMsg) {
-      resMsg = {};
-      context.set('message', resMsg);
+exports.handleResponse =
+  function(limit, remaining, reset, reject, context, flow) {
+    if (remaining <= 0 && hardLimit) {
+      let resMsg = context.get('message');
+      if (!resMsg) {
+        resMsg = {};
+        context.set('message', resMsg);
+      }
+      resMsg.statusCode = 429;
+      resMsg.body = {error: 'Limit exceeded'};
+      var err = new Error('Rate limit exceeded');
+      err.statusCode = 429;
+      return flow.fail(err);
     }
-    var resMsgHeaders = resMsg && resMsg.headers;
-    if (!resMsgHeaders) {
-      resMsgHeaders = {};
-      resMsg.headers = resMsgHeaders;
-    }
-    debug('Limit: %d Remaining: %d Reset: %d', limit, remaining, reset);
-    resMsgHeaders['X-RateLimit-Limit'] = limit;
-    resMsgHeaders['X-RateLimit-Remaining'] = remaining;
-    resMsgHeaders['X-RateLimit-Reset'] = reset;
-    done();
-  });
-};
+
+    context.subscribe('post-flow', function(event, done) {
+      let resMsg = context.get('message');
+      if (!resMsg) {
+        resMsg = {};
+        context.set('message', resMsg);
+      }
+      var resMsgHeaders = resMsg && resMsg.headers;
+      if (!resMsgHeaders) {
+        resMsgHeaders = {};
+        resMsg.headers = resMsgHeaders;
+      }
+      debug('Limit: %d Remaining: %d Reset: %d', limit, remaining, reset);
+      resMsgHeaders['X-RateLimit-Limit'] = limit;
+      resMsgHeaders['X-RateLimit-Remaining'] = remaining;
+      resMsgHeaders['X-RateLimit-Reset'] = reset;
+      done();
+    });
+
+    return flow.proceed();
+  };

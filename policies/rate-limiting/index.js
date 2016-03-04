@@ -38,7 +38,7 @@ module.exports = function(options) {
     limit: limit,
     interval: interval,
     reject: reject,
-    prefix: options.prefix || 'ibm-micro-gateway',
+    prefix: options.prefix || 'ibm-apiconnect-microgateway',
     redis: options.redis,
     getKey: getKey
   };
@@ -50,28 +50,33 @@ module.exports = function(options) {
   }
 
   if (config.redis) {
+    debug('Create a redis based rate limiter: %j', config);
     return redisLimiter(config);
-  }
-  return tokenBucketLimiter(config);
-};
-
-/**
- * Build the key for rate limiting from the request
- * @param {Context} context The context object
- * @returns {string} The rate limiting key
- */
-function getKey(context) {
-  context = context || {};
-  var flowContext = context.flowContext || {};
-  var client = flowContext.client || {};
-  var clientApp = client.app || {};
-  var clientId = clientApp.id;
-  var plan = flowContext.plan || {};
-  var planId = plan.id;
-  if (clientId != null) {
-    return planId + '/' + clientId;
   } else {
-    return null;
+    debug('Create a local token bucket based rate limiter: %j', config);
+    return tokenBucketLimiter(config);
   }
-}
+
+  /**
+   * Build the key for rate limiting from the context object
+   * @param {Context} context The context object
+   * @returns {string} The rate limiting key
+   */
+  function getKey(context) {
+    context = context || {};
+    var flowContext = context.flowContext || {};
+    var client = flowContext.client || {};
+    var clientApp = client.app || {};
+    var clientId = clientApp.id;
+    if (clientId == null) {
+      return null;
+    }
+    // Use the scope as the namespace. The scope contains information about the
+    // plan or operation path
+    var scope = config.scope;
+    scope = scope || '*';
+    return scope + ':' + clientId;
+  }
+
+};
 

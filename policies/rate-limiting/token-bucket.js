@@ -12,7 +12,7 @@ module.exports = function(options) {
 
   var limiters = {};
 
-  return function inProcessRateLimiting(props, context, next) {
+  return function inProcessRateLimiting(props, context, flow) {
     var limiter;
     var key = options.getKey(context);
     debug('Key: %s', key);
@@ -30,9 +30,10 @@ module.exports = function(options) {
       var reset = Math.max(interval - (Date.now() - limiter.curIntervalStart),
         0);
 
-      handleResponse(limit, remaining, reset, hardLimit, context, next);
+      handleResponse(limit, remaining, reset, hardLimit, context, flow);
+    } else {
+      flow.proceed();
     }
-    next();
   };
 };
 
