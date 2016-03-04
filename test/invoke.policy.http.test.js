@@ -57,7 +57,7 @@ describe('invokePolicy', function() {
       .expect(/z-method: POST/)
       .expect(/z-content-length: 21/)
       .expect(/z-transfer-encoding: undefined/)
-      .expect(200, /z-url: \/invoke\/basic/)
+      .expect(200, /z-url: \/\/invoke\/basic/)
       .end(function(err, res) {
           done(err);
       });
@@ -69,7 +69,7 @@ describe('invokePolicy', function() {
     request
       .get('/invoke/basic')
       .expect(200, /z-method: GET/)
-      .expect(200, /z-url: \/invoke\/basic/, done);
+      .expect(200, /z-url: \/\/invoke\/basic/, done);
   });
 
   //a HEAD response has no body
@@ -151,7 +151,7 @@ describe('invokePolicy', function() {
     request
       .get('/invoke/timeout5Sec')
       .set('X-DELAY-ME', '2')
-      .expect(200, /z-url: \/invoke\/timeout5Sec/, done);
+      .expect(200, /z-url: \/\/invoke\/timeout5Sec/, done);
   });
 
   it('request-timeouted', function(done) {
@@ -198,7 +198,7 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8890')
       .set('X-TLS-PROFILE', 'tls-profile-serverSarah-1')
-      .expect(/url: \/invoke\/testTLS/)
+      .expect(/url: \/\/invoke\/testTLS/)
       .expect(200, done)
   });
 
@@ -233,7 +233,7 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8892')
       .set('X-TLS-PROFILE', 'tls-profile-require-tls10')
-      .expect(/url: \/invoke\/testTLS/)
+      .expect(/url: \/\/invoke\/testTLS/)
       .expect(200, done);
   });
 
@@ -305,7 +305,7 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8895')
       .set('X-TLS-PROFILE', 'tls-profile-alice-2')
-      .expect(/url: \/invoke\/testTLS/)
+      .expect(/url: \/\/invoke\/testTLS/)
       .expect(200, done);
   });
 
@@ -316,7 +316,7 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8895')
       .set('X-TLS-PROFILE', 'tls-profile-bob-2')
-      .expect(/url: \/invoke\/testTLS/)
+      .expect(/url: \/\/invoke\/testTLS/)
       .expect(200, done);
   });
 
@@ -339,7 +339,7 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8896')
       .set('X-TLS-PROFILE', 'tls-profile-sandy-2')
-      .expect(/url: \/invoke\/testTLS/)
+      .expect(/url: \/\/invoke\/testTLS/)
       .expect(200, done);
   });
 
@@ -362,7 +362,7 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8897')
       .set('X-TLS-PROFILE', 'tls-profile-sandy-2')
-      .expect(/url: \/invoke\/testTLS/)
+      .expect(/url: \/\/invoke\/testTLS/)
       .expect(200, done);
   });
 
