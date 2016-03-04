@@ -57,7 +57,7 @@ function _main(props, context, next, logger, tlsProfile) {
 
     //verb: default to request.verb
     verb = props.verb ? String(props.verb).toUpperCase() :
-            (context.request ? context.request.verb : undefined);
+            (context.request ? context.request.verb.toUpperCase() : undefined);
     if (verb !== 'POST' && verb !== 'GET' && verb !== 'PUT' &&
         verb !== 'DELETE' && verb !== 'OPTIONS' && verb !== 'HEAD' &&
         verb !== 'PATCH') {
@@ -159,16 +159,36 @@ function _main(props, context, next, logger, tlsProfile) {
         writeDst = context.message;
     }
 
-    //TODO: do we need the rawHeaders from context.message?
-    //copy headers
+    //copy headers but the original case must be kept
     options.headers = {};
-    for (var i in readSrc.headers)
-        options.headers[i] = readSrc.headers[i];
-    delete options.headers.host;
-    delete options.headers.connection;
-    delete options.headers['content-length'];
-    delete options.headers['content-encoding'];
-    delete options.headers['transfer-encoding'];
+
+    //The received request headers are kept in rawHeaders. It is an array but
+    //not an object, ex: [ 'Host', 'localhost:443', 'Content-Length', '21', ...]
+    var rawHdrs = context.message.rawHeaders || [];
+
+    //The headers that should not be copied
+    var excludes = ['host','connection','content-length','transfer-encoding'];
+
+    for (var hdrK in readSrc.headers) {
+        var skip = false;
+        for (var h=0; h<excludes.length; h++) {
+            if (excludes[h] === hdrK) {
+                skip = true;
+                break;
+            }
+        }
+
+        if (!skip) {
+            var rawKey = undefined;
+            for (var i=0; i<rawHdrs.length; i+=2) {
+                if (rawHdrs[i].toLowerCase() === hdrK) {
+                    rawKey = rawHdrs[i];
+                    break;
+                }
+            }
+            options.headers[rawKey || hdrK] = readSrc.headers[hdrK];
+        }
+    }
 
     //prepare the data and dataSz
     data = (readSrc.body === undefined ? '' : readSrc.body);
@@ -375,7 +395,7 @@ function invoke(props, context, flow) {
         if (!isDone) {
             isDone = true;
             if(v) {
-                flow.fail(v)
+                flow.fail(v);
             } else {
                 flow.proceed();
             }

@@ -43,6 +43,7 @@
     "chokidar": "^1.4.2",
     "compression": "^1.6.1",
     "cors": "^2.7.1",
+    "csv-parse": "^1.0.2",
     "express": "^4.13.4",
     "flow-engine": "^1.x",
     "forever-monitor": "^1.7.0",
