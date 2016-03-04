@@ -129,17 +129,35 @@
     "title": "compose-upn",
     "description": "ComposeUPN Example",
     "ldap-config": {
-      "host": "9.23.27.8",
+      "host": "capstonead1.rtp.raleigh.ibm.com",
       "port": "389",
       "protocol-version": "3",
       "ssl": "false",
       "auth-method": "bindUPN",
-      "bind-suffix": "@ibm.net",
+      "bind-suffix": "@capstonead1.rtp.raleigh.ibm.com",
       "group-auth-method": "none",
       "static-group-dn": "",
       "static-group-filter-prefix": "",
       "static-group-filter-suffix": "",
       "static-group-scope": "sub",
+      "dynamic-group-filter": ""
+    }
+  },
+  {
+    "id": "56bbacbae4b0f7b17cf97540",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/registries/56bbacbae4b0f7b17cf97540",
+    "name": "compose-upn-dynamic-group-auth",
+    "type": "ldap",
+    "title": "compose-upn-dynamic-group-auth",
+    "description": "ComposeUPN Example",
+    "ldap-config": {
+      "host": "capstonead1.rtp.raleigh.ibm.com",
+      "port": "389",
+      "protocol-version": "3",
+      "ssl": "false",
+      "auth-method": "bindUPN",
+      "bind-suffix": "@capstonead1.rtp.raleigh.ibm.com",
+      "group-auth-method": "dynamicAuth",
       "dynamic-group-filter": ""
     }
   }

@@ -145,10 +145,10 @@ describe('basic auth policy', function() {
     });
 
     describe('ComposeUPN', function () {
-      it('should pass with biswas:spneg0TAI', function (done) {
+      it('should pass with user1:c@pstone123', function (done) {
         request
         .get('/basic/compose-upn')
-        .auth('biswas', 'spneg0TAI')
+        .auth('user1', 'c@pstone123')
         .expect(200, done);
       });
     });
