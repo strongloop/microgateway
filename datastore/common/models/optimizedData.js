@@ -1,6 +1,6 @@
 var _ = require('lodash');
 var async = require('async');
-var logger = require('../../../../apiconnect-cli-logger/logger.js')
+var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:datastore:optimizedData'});
 var jsonRefs = require('json-refs');
 

@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 
-var logger = require('../../../apiconnect-cli-logger/logger.js')
+var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:datastore:apim-export'});
 var sgwapimpull = require('../apim-pull'),
     program = require('commander'),

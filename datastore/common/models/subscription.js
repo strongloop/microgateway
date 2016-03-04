@@ -1,5 +1,5 @@
 var app = require('../../server/server');
-var logger = require('../../../../apiconnect-cli-logger/logger.js')
+var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:datastore:models:subscription'});
 var OptimizedData = require('./optimizedData.js');
 

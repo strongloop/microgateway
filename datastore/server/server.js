@@ -5,7 +5,7 @@ var boot = require('loopback-boot');
 var async = require('async');
 var fs = require('fs');
 var environment = require('../../utils/environment');
-var logger = require('../../../apiconnect-cli-logger/logger.js')
+var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:datastore:server:server'});
 var DATASTORE_PORT = environment.DATASTORE_PORT;
 var CONFIGDIR = environment.CONFIGDIR;

@@ -2,7 +2,7 @@
 var moment = require('moment');
 var redisLimiter = require('./redis');
 var tokenBucketLimiter = require('./token-bucket');
-var logger = require('../../../apiconnect-cli-logger/logger.js')
+var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:policies:rate-limiting'});
 var assert = require('assert');
 

@@ -1,6 +1,6 @@
 'use strict';
 
-var logger = require('../../../apiconnect-cli-logger/logger.js')
+var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:policies:rate-limiting:helper'});
 exports.handleResponse = function(limit, remaining, reset, reject, context, next) {
   if (remaining <= 0 && hardLimit) {

@@ -5,7 +5,7 @@ var YAML = require('yamljs');
 var constants = require('constants');
 var Crypto = require('crypto');
 var Request = require('request');
-var logger = require('../../../../apiconnect-cli-logger/logger.js')
+var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:datastore:server:boot:load-model'});
 var sgwapimpull = require('../../apim-pull');
 var apimpull = sgwapimpull.pull;

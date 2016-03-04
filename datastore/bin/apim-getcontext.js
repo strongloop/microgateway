@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-var logger = require('../../../apiconnect-cli-logger/logger.js')
+var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:datastore:apim-getcontext'});
 var program = require('commander');
 var apimlookup = require('../../lib/preflow/apim-lookup');

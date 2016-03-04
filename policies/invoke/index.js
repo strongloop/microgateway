@@ -1,5 +1,5 @@
 'use strict';
-var logger = require('../../../apiconnect-cli-logger/logger.js')
+var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:policies:invoke'});
 var fs = require('fs');
 var url = require('url');

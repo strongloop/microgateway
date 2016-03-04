@@ -1,6 +1,6 @@
 'use strict'
 var request = require('request');
-var logger = require('../../../apiconnect-cli-logger/logger.js')
+var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:datastore:client'});
 const host = '127.0.0.1'; // data-store's listening interface
 

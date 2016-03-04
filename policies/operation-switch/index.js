@@ -1,6 +1,6 @@
 'use strict';
 
-var logger = require('../../../apiconnect-cli-logger/logger.js')
+var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:policies:operation-switch'});
 
 /**
