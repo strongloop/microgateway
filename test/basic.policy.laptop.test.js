@@ -144,6 +144,14 @@ describe('basic auth policy', function() {
       });
     });
 
+    describe('ComposeUPN', function () {
+      it('should pass with biswas:spneg0TAI', function (done) {
+        request
+        .get('/basic/compose-upn')
+        .auth('biswas', 'spneg0TAI')
+        .expect(200, done);
+      });
+    });
 
     describe('With TLS', function () {
       it('should pass with root:Hunter2 (tls)', function (done) {

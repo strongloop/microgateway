@@ -93,20 +93,62 @@
     }
   },
   {
+    "id": "56bbacbae4b0f7b17cf97540",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/registries/56bbacbae4b0f7b17cf97540",
     "name": "basic-ldap-compose-upn-no-group-auth",
     "type": "ldap",
-    "scope": ["user"],
-    "displayName": "ActiveDirectory",
+    "title": "basic-ldap-compose-upn-no-group-auth",
     "description": "ComposeUPN Example",
     "ldap-config": {
       "host": "127.0.0.1",
       "port": "1389",
-      "protocolVersion": "3",
+      "protocol-version": "3",
       "ssl": "false",
+      "authenticated-bind": false,
+      "authenticated-bind-admin-dn": "",
+      "authenticated-bind-password": "",
+      "search-dn-base": "",
+      "search-dn-filter-prefix": "",
+      "search-dn-filter-suffix": "",
       "auth-method": "bindUPN",
-      "bind-suffix": "@sixfour2.com",
-      "group-auth-method": "none"
+      "bind-prefix": "",
+      "bind-suffix": "@ibm.com",
+      "group-auth-method": "none",
+      "static-group-dn": "",
+      "static-group-filter-prefix": "",
+      "static-group-filter-suffix": "",
+      "static-group-scope": "sub",
+      "dynamic-group-filter": ""
     }
-}
+  },
+  {
+    "id": "56bbacbae4b0f7b17cf97540",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/registries/56bbacbae4b0f7b17cf97540",
+    "name": "compose-upn",
+    "type": "ldap",
+    "title": "compose-upn",
+    "description": "ComposeUPN Example",
+    "ldap-config": {
+      "host": "9.23.27.8",
+      "port": "389",
+      "protocol-version": "3",
+      "ssl": "false",
+      "authenticated-bind": false,
+      "authenticated-bind-admin-dn": "",
+      "authenticated-bind-password": "",
+      "search-dn-base": "",
+      "search-dn-filter-prefix": "",
+      "search-dn-filter-suffix": "",
+      "auth-method": "bindUPN",
+      "bind-prefix": "",
+      "bind-suffix": "@ibm.net",
+      "group-auth-method": "none",
+      "static-group-dn": "",
+      "static-group-filter-prefix": "",
+      "static-group-filter-suffix": "",
+      "static-group-scope": "sub",
+      "dynamic-group-filter": ""
+    }
+  }
 
 ]
