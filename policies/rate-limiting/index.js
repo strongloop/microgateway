@@ -2,12 +2,13 @@
 var moment = require('moment');
 var redisLimiter = require('./redis');
 var tokenBucketLimiter = require('./token-bucket');
-var debug = require('debug')('policy:rate-limiting');
+var logger = require('apiconnect-cli-logger/logger.js')
+               .child({loc: 'apiconnect-microgateway:policies:rate-limiting'});
 var assert = require('assert');
 
 module.exports = function(options) {
   options = options || {};
-  debug('rate limiting policy is configured: %j', options);
+  logger.debug('rate limiting policy is configured: %j', options);
 
   var limit = options.requests || options.limit || 1000;
   var period = options.period || options.interval || 1;
@@ -32,7 +33,7 @@ module.exports = function(options) {
   var interval = moment.duration(period, unit).asMilliseconds();
   var reject = options['reject'] || options['hard-limit'] || false;
 
-  debug('Limit: %d/%d%s Reject: %s', limit, period, unit, reject);
+  logger.debug('Limit: %d/%d%s Reject: %s', limit, period, unit, reject);
 
   var config = {
     limit: limit,

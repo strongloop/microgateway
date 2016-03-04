@@ -5,7 +5,8 @@ var YAML = require('yamljs');
 var constants = require('constants');
 var Crypto = require('crypto');
 var Request = require('request');
-var debug = require('debug')('micro-gateway:data-store');
+var logger = require('apiconnect-cli-logger/logger.js')
+               .child({loc: 'apiconnect-microgateway:datastore:server:boot:load-model'});
 var sgwapimpull = require('../../apim-pull');
 var apimpull = sgwapimpull.pull;
 var apimdecrypt = sgwapimpull.decrypt;
@@ -106,7 +107,7 @@ module.exports = function(app) {
         try {
           private_key = fs.readFileSync(keyFile,'utf8');
         } catch(e) {
-          debug('Can not load key: %s Error: %s', keyFile, e);
+          logger.debug('Can not load key: %s Error: %s', keyFile, e);
         }
 
         if (apimanager.host && apimanager.handshakeOk === false && private_key) {
@@ -145,7 +146,7 @@ function loadData(app, apimanager, models, currdir) {
   async.series(
     [
       function(callback) {
-        debug('apimanager before pullFromAPIm: ' + JSON.stringify(apimanager))
+        logger.debug('apimanager before pullFromAPIm: ' + JSON.stringify(apimanager))
         if (apimanager.host) { 
             // && apimanager.handshakeOk << shouldn't call if handshake failed.. not ready #TODO
         // we have an APIm, handshake succeeded, so try to pull data.. 
@@ -202,7 +203,7 @@ function scheduleLoadData(app, apimanager, models, dir) {
  *                        successful completion
  */
 function stageModels(app, models, cb) {
-  debug('stageModels entry');
+  logger.debug('stageModels entry');
   async.forEach(models,
     function(model, callback) {
       app.dataSources.db.automigrate(
@@ -213,7 +214,7 @@ function stageModels(app, models, cb) {
       );
     },
     function(err) {
-      debug('stageModels exit');
+      logger.debug('stageModels exit');
       cb(err);
     }
   );
@@ -226,7 +227,7 @@ function stageModels(app, models, cb) {
  *                        snapshot directory
  */
 function handshakeWithAPIm(app, apimanager, private_key, cb) {
-  debug('handshakeWithAPIm entry');
+  logger.debug('handshakeWithAPIm entry');
   
   async.series([
     function(callback) {
@@ -236,7 +237,7 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
       var body = {
         gatewayVersion: encryptedVersion
       }
-      debug('EncryptedBody:' + JSON.stringify(body));
+      logger.debug('EncryptedBody:' + JSON.stringify(body));
           
       var apimHandshakeUrl = 'https://' + apimanager.host + ':' + apimanager.port + '/v1/catalogs/' + apimanager.catalog + '/handshake/';
       
@@ -250,34 +251,34 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
         },       
       function(err, res, body) {
         if (err) {
-          debug('Failed to communicate with %s: %s ', apimHandshakeUrl, err);
+          logger.debug('Failed to communicate with %s: %s ', apimHandshakeUrl, err);
           callback(err);
         }
         else {
-          debug('statusCode: ' + res.statusCode);          
+          logger.debug('statusCode: ' + res.statusCode);          
           if (res.statusCode === 200) {
             var algorithm = 'AES-256-CBC';
             var IV = '0000000000000000';
-            debug('body: ' + JSON.stringify(res.body));
+            logger.debug('body: ' + JSON.stringify(res.body));
             var password = Crypto.privateDecrypt(private_key, new Buffer(res.body.Key));
-            debug('password: ' + password);
+            logger.debug('password: ' + password);
             var decipher = Crypto.createDecipheriv(algorithm, password, IV);
             var decrypted = decipher.update(res.body.cipher, 'base64', 'utf8');
             decrypted += decipher.final('utf8');
-            debug('decrypted: ' + decrypted);
+            logger.debug('decrypted: ' + decrypted);
             var jsonDecrypted = JSON.parse(decrypted);
             
-            debug('jsonDecrypted: ' + JSON.stringify(jsonDecrypted));
+            logger.debug('jsonDecrypted: ' + JSON.stringify(jsonDecrypted));
             
             apimanager.clicert = jsonDecrypted.managerCert;
             apimanager.clikey = jsonDecrypted.managerKey;
             apimanager.clientid = jsonDecrypted.clientID;
             
-            debug('apimanager.clicert: ' + apimanager.clicert);
-            debug('apimanager.clikey: ' + apimanager.clikey);
-            debug('apimanager.clientid: ' + apimanager.clientid);
+            logger.debug('apimanager.clicert: ' + apimanager.clicert);
+            logger.debug('apimanager.clikey: ' + apimanager.clikey);
+            logger.debug('apimanager.clientid: ' + apimanager.clientid);
 
-            debug('apimanager: ' + JSON.stringify(apimanager));          
+            logger.debug('apimanager: ' + JSON.stringify(apimanager));          
             callback(null, apimanager);
             }
           else {
@@ -294,7 +295,7 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
         apimanager.handshakeOk = false;
       else
         apimanager.handshakeOk = true;
-      debug('handshakeWithAPIm exit');
+      logger.debug('handshakeWithAPIm exit');
       cb(err, apimanager);
     });
   }
@@ -307,14 +308,14 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
  *                        snapshot directory
  */
 function pullFromAPIm(apimanager, uid, cb) {
-  debug('pullFromAPIm entry');
+  logger.debug('pullFromAPIm entry');
   // Have an APIm, grab latest if we can..
   var snapdir =  rootConfigPath +
                   uid +
                   '/';
   fs.mkdir(snapdir, function(err) {
       if (err) {
-        debug('pullFromAPIm exit(1)');
+        logger.debug('pullFromAPIm exit(1)');
         cb(null, '');
         return;
       }
@@ -336,22 +337,22 @@ function pullFromAPIm(apimanager, uid, cb) {
       options['clicert'] = apimanager.clicert;
       options['clientid'] = apimanager.clientid;
       options['outdir'] = snapdir;
-      debug('apimpull start');
+      logger.debug('apimpull start');
       apimpull(options,function(err, response) {
           if (err) {
-            console.error(err);
+            logger.error(err);
             try {
               fs.rmdirSync(snapdir);
             } catch(e) {
-              console.error(e);
+              logger.error(e);
               //continue
             }
             snapdir = '';
             // falling through
             // try loading from local files
           }
-          debug(response);
-          debug('pullFromAPIm exit(2)');
+          logger.debug(response);
+          logger.debug('pullFromAPIm exit(2)');
           cb(null, snapdir);
         }
       );
@@ -370,15 +371,15 @@ function pullFromAPIm(apimanager, uid, cb) {
  * @param {callback} cb - callback that handles error or successful completion
  */
 function loadConfig(app, apimanager, models, currdir, snapdir, uid, cb) {
-  debug('loadConfig entry');
+  logger.debug('loadConfig entry');
 
   var dirToLoad = (snapdir === '') ?
                     (currdir + '/') :
                     snapdir;
   loadConfigFromFS(app, apimanager, models, dirToLoad, uid, function(err) {
       if (err) {
-        console.error(err);
-        debug('loadConfig error(1)');
+        logger.error(err);
+        logger.debug('loadConfig error(1)');
         cb(err);
         return;
       }
@@ -386,7 +387,7 @@ function loadConfig(app, apimanager, models, currdir, snapdir, uid, cb) {
         // update current snapshot pointer
         updateSnapshot(app, uid, function(err) {
             if (err) {
-              debug('loadConfig error(2)');
+              logger.debug('loadConfig error(2)');
               cb(err);
               return;
             }
@@ -396,7 +397,7 @@ function loadConfig(app, apimanager, models, currdir, snapdir, uid, cb) {
             if (snapdir === dirToLoad) {
                 process.env[CONFIGDIR] = snapdir;
             }
-            debug('loadConfig exit');
+            logger.debug('loadConfig exit');
             cb();
           }
         );
@@ -423,26 +424,26 @@ function loadConfigFromFS(app, apimanager, models, dir, uid, cb) {
     
   if (apimanager.host) {
     var files;
-    debug('loadConfigFromFS entry');
+    logger.debug('loadConfigFromFS entry');
     try {
       files = fs.readdirSync(dir);
     } catch (e) {
-      debug('loadConfigFromFS error');
+      logger.debug('loadConfigFromFS error');
       cb(e);
       return;
     }
     
-    debug('files: ', files);
+    logger.debug('files: ', files);
     var jsonFile = new RegExp(/.*\.json$/);
     // correlate files with appropriate model
     files.forEach(
       function(file) {
-        debug('file match jsonFile: ', file.match(jsonFile));
+        logger.debug('file match jsonFile: ', file.match(jsonFile));
         // apim pull scenario (only json, no yaml)
         if (apimanager.host && file.match(jsonFile)) {
           for(var i = 0; i < models.length; i++) {
             if(file.indexOf(models[i].prefix) > -1) {
-              debug('%s file: %s', models[i].name, file);
+              logger.debug('%s file: %s', models[i].name, file);
               models[i].files.push(file);
               break;
             }
@@ -455,9 +456,9 @@ function loadConfigFromFS(app, apimanager, models, dir, uid, cb) {
   }
   else {
     var YAMLfiles = [];
-    debug('dir: ' + dir )
+    logger.debug('dir: ' + dir )
     cliConfig.loadProject(dir).then(function(artifacts) { 
-      debug('%j', artifacts); 
+      logger.debug('%j', artifacts); 
       artifacts.forEach(
         function(artifact)
           {
@@ -491,13 +492,13 @@ function createAPIID(api)
  * @param {callback} cb - callback that handles error or successful completion
  */
 function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
-  debug('populateModelsWithLocalData entry');
+  logger.debug('populateModelsWithLocalData entry');
   var apis = {};
   async.series([
     function(seriesCallback) {
       async.forEach(YAMLfiles,
           function(file, fileCallback) {
-            debug('Loading data from %s', file);
+            logger.debug('Loading data from %s', file);
             var readfile;
             try {
               // read the content of the files into memory
@@ -512,7 +513,7 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
             var entry = {};
             // looks like a product
             if (readfile.product) {
-              console.log('product found: skipping')
+              logger.debug('product found: skipping')
             }
             // looks like an API
             if (readfile.swagger) {
@@ -530,11 +531,11 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
                 entry,
                 function(err, mymodel) {
                   if (err) {
-                    console.error(err);
+                    logger.error(err);
                     fileCallback(err);
                     return;
                   }
-                  debug('%s created: %j',
+                  logger.debug('%s created: %j',
                         model.name,
                         mymodel);
                   fileCallback();
@@ -585,17 +586,17 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
             }
           }
         }
-        debug('creating static product and attaching apis: ' + JSON.stringify(entry, null, 4))
+        logger.debug('creating static product and attaching apis: ' + JSON.stringify(entry, null, 4))
 
         app.models['product'].create(
           entry,
           function(err, mymodel) {
             if (err) {
-              console.error(err);
+              logger.error(err);
               seriesCallback(err);
               return;
             }
-            debug('%s created: %j',
+            logger.debug('%s created: %j',
                   'product',
                   mymodel);
           seriesCallback();
@@ -631,11 +632,11 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
               subscription,
               function(err, mymodel) {
                 if (err) {
-                  console.error(err);
+                  logger.error(err);
                   subsCallback(err);
                   return;
                 }
-                debug('%s created: %j',
+                logger.debug('%s created: %j',
                       modelname,
                       mymodel);
                 subsCallback();
@@ -657,7 +658,7 @@ function findAndReplace(object, value, replacevalue){
       findAndReplace(object[x], value, replacevalue);
     }
     if(typeof object[x] === 'string' && object[x].indexOf(value) > -1){ 
-      debug('found variable to replace: ' + value + ' with ' + replacevalue);
+      logger.debug('found variable to replace: ' + value + ' with ' + replacevalue);
       object[x] = object[x].replace(value, replacevalue);
     }
   }
@@ -683,9 +684,9 @@ function expandAPIData(apidoc, dir)
       Object.getOwnPropertyNames(apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties).forEach(
         function (property) 
           {
-          debug('property: ' + property);
+          logger.debug('property: ' + property);
           var propertyvalue = '$(' + property + ')';
-          debug('propertyvalue: ' + propertyvalue);
+          logger.debug('propertyvalue: ' + propertyvalue);
           var replacementvalue;
           // is it an environment var?? $(envVar)
           var regEx = /\$\((.*)\)/;
@@ -693,7 +694,7 @@ function expandAPIData(apidoc, dir)
           var envvar = matches[1];
           if (envvar) {
             if (!process.env[envvar]) {
-              debug('Environment Variable not set for :' + envvar);
+              logger.debug('Environment Variable not set for :' + envvar);
               }
             replacementvalue = process.env[envvar];
             }
@@ -718,7 +719,7 @@ function loadAPIsFromYAML(listOfAPIs, dir)
     try {
       api = YAML.load(apiFile);
     } catch(e) {
-      debug('Load failed of: ', apiFile);
+      logger.debug('Load failed of: ', apiFile);
       api = YAML.load(apiFile+'.yaml');
     }
     //scope data down
@@ -740,13 +741,13 @@ function loadAPIsFromYAML(listOfAPIs, dir)
  * @param {callback} cb - callback that handles error or successful completion
  */
 function populateModelsWithAPImData(app, models, dir, uid, cb) {
-  debug('populateModelsWithAPImData entry');
+  logger.debug('populateModelsWithAPImData entry');
   async.forEach(models,
     function(model, modelCallback) {
       async.forEach(model.files,
         function(typefile, fileCallback) {
           var file = path.join(dir, typefile);
-          debug('Loading data from %s', file);
+          logger.debug('Loading data from %s', file);
           var readfile;
           try {
             // read the content of the files into memory
@@ -756,7 +757,7 @@ function populateModelsWithAPImData(app, models, dir, uid, cb) {
             fileCallback(e);
             return;
           }
-          debug('filecontents: ', readfile);
+          logger.debug('filecontents: ', readfile);
           // inject 'snapshot-id' property
           readfile.forEach(
             function(obj) {
@@ -768,11 +769,11 @@ function populateModelsWithAPImData(app, models, dir, uid, cb) {
             readfile,
             function(err, mymodel) {
               if (err) {
-                console.error(err);
+                logger.error(err);
                 fileCallback(err);
                 return;
               }
-              debug('%s created: %j',
+              logger.debug('%s created: %j',
                     model.name,
                     mymodel);
               fileCallback();
@@ -785,7 +786,7 @@ function populateModelsWithAPImData(app, models, dir, uid, cb) {
       );
     },
     function(err) {
-      debug('populateModelsWithAPImData exit');
+      logger.debug('populateModelsWithAPImData exit');
       cb(err);
     }
   ); 
@@ -798,7 +799,7 @@ function populateModelsWithAPImData(app, models, dir, uid, cb) {
  * @param {callback} cb - callback that handles error or successful completion
  */
 function populateSnapshot(app, uid, cb) {
-  debug('populateSnapshot entry');
+  logger.debug('populateSnapshot entry');
 
   app.models.snapshot.create(
     {
@@ -808,11 +809,11 @@ function populateSnapshot(app, uid, cb) {
     },
     function(err, mymodel) {
       if (err) {
-        debug('populateSnapshot error');
+        logger.debug('populateSnapshot error');
         cb(err);
         return;
       }
-      debug('populateSnapshot exit: %j', mymodel);
+      logger.debug('populateSnapshot exit: %j', mymodel);
       cb();
     }
   );
@@ -825,7 +826,7 @@ function populateSnapshot(app, uid, cb) {
  * @param {callback} cb - callback that handles error or successful completion
  */
 function updateSnapshot(app, uid, cb) {
-  debug('updateSnapshot entry');
+  logger.debug('updateSnapshot entry');
 
   app.models.snapshot.findOne(
     {
@@ -847,7 +848,7 @@ function updateSnapshot(app, uid, cb) {
           }
         );
         app.models.snapshot.release(instance.id, function(err) {
-            if (err) console.error(err);
+            if (err) logger.error(err);
           }
         );
       }
@@ -855,7 +856,7 @@ function updateSnapshot(app, uid, cb) {
   );
   app.models.snapshot.findById(uid, function(err, instance) {
       if (err) {
-        debug('updateSnapshot error(1)');
+        logger.debug('updateSnapshot error(1)');
         cb(err);
         return;
       }
@@ -866,11 +867,11 @@ function updateSnapshot(app, uid, cb) {
         },
         function(err, instance) {
           if (err) {
-            debug('updateSnapshot error(2)');
+            logger.debug('updateSnapshot error(2)');
             cb(err);
             return;
           }
-          debug('updateSnapshot exit');
+          logger.debug('updateSnapshot exit');
           cb();
         }
       );

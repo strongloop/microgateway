@@ -1,6 +1,7 @@
 'use strict';
 
-var debug = require('debug')('policy:rate-limiting');
+var logger = require('apiconnect-cli-logger/logger.js')
+               .child({loc: 'apiconnect-microgateway:policies:rate-limiting:helper'});
 exports.handleResponse = function(limit, remaining, reset, reject, context, next) {
   if (remaining <= 0 && hardLimit) {
     let resMsg = context.get('message');
@@ -26,7 +27,7 @@ exports.handleResponse = function(limit, remaining, reset, reject, context, next
       resMsgHeaders = {};
       resMsg.headers = resMsgHeaders;
     }
-    debug('Limit: %d Remaining: %d Reset: %d', limit, remaining, reset);
+    logger.debug('Limit: %d Remaining: %d Reset: %d', limit, remaining, reset);
     resMsgHeaders['X-RateLimit-Limit'] = limit;
     resMsgHeaders['X-RateLimit-Remaining'] = remaining;
     resMsgHeaders['X-RateLimit-Reset'] = reset;

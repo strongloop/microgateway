@@ -1,5 +1,7 @@
 #! /usr/bin/env node
 
+var logger = require('apiconnect-cli-logger/logger.js')
+               .child({loc: 'apiconnect-microgateway:datastore:apim-getcontext'});
 var program = require('commander');
 var apimlookup = require('../../lib/preflow/apim-lookup');
 var contextget = apimlookup.contextget;
@@ -19,5 +21,5 @@ options['clientid'] = program.clientid;
 
 
 contextget(options,function(error, response) {
-        console.log('context: ' + JSON.stringify(response,null,4));
+        logger.debug('context: ' + JSON.stringify(response,null,4));
 });

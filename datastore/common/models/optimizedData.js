@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var async = require('async');
-var debug = require('debug')('micro-gateway:data-store');
+var logger = require('apiconnect-cli-logger/logger.js')
+               .child({loc: 'apiconnect-microgateway:datastore:optimizedData'});
 var jsonRefs = require('json-refs');
 
 var ALLPLANS = 'ALLPLANS';
@@ -37,7 +38,7 @@ function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, pr
       locals.plan.apis = product.document.plans[propname].apis;
       if (_.isEmpty(locals.plan.apis)) { // all product apis scenario
         locals.plan.apis = product.document.apis;
-        debug("1. all product apis in plan... APIs: " + product.document.apis);
+        logger.debug("1. all product apis in plan... APIs: " + product.document.apis);
         }
       locals.plan.name = propname;
       locals.plan.id = getPlanID(locals.product, propname);
@@ -115,7 +116,7 @@ function ripCTX(ctx)
     locals.plan.apis = locals.product.document.plans[locals.plan.name].apis;
     if (_.isEmpty(locals.plan.apis)) { // all product apis scenario
       locals.plan.apis = locals.product.document.apis;
-      debug("2. all product apis in plan... APIs: " + locals.product.document.apis);
+      logger.debug("2. all product apis in plan... APIs: " + locals.product.document.apis);
       }
     locals.plan.id = getPlanID(locals.product, locals.plan.name);
     locals.plan.version = locals.product.document.info.version;
@@ -128,7 +129,7 @@ function ripCTX(ctx)
 
 function getPlanID(product, planname)
   {
-  debug('product.document.info.name + ":" + product.document.info.version + ":" + planname: ' +
+  logger.debug('product.document.info.name + ":" + product.document.info.version + ":" + planname: ' +
     JSON.stringify(product.document.info.name + ":" + product.document.info.version + ":" + planname, null, 4));
   return product.document.info.name + ":" + product.document.info.version + ":" + planname;
   }
@@ -204,7 +205,7 @@ function gatherDataCreateOptimizedEntry(app, locals, isWildcard, gatherCallback)
     ],
     function(err, results) {
       if (err) {
-        console.error(err);
+        logger.error(err);
       }
       if (gatherCallback)
         gatherCallback();
@@ -256,11 +257,11 @@ function grabOrg(app, snapshot, catalog, cb) {
 
 function grabAPIs(app, snapshot, product, plan, cb) {
   var apis = [];
-  debug('got product: %j', product);
-  debug('got plan: %j', plan);
+  logger.debug('got product: %j', product);
+  logger.debug('got plan: %j', plan);
   var planApis = JSON.parse(JSON.stringify(plan.apis));
-  debug('planApis: %j', planApis);
-  debug('planApiProps: %j', Object.getOwnPropertyNames(planApis));
+  logger.debug('planApis: %j', planApis);
+  logger.debug('planApiProps: %j', Object.getOwnPropertyNames(planApis));
 
   async.each(
     Object.getOwnPropertyNames(planApis),
@@ -272,20 +273,20 @@ function grabAPIs(app, snapshot, product, plan, cb) {
       };
       var info = {};
       if (product.document.apis[api].info) {// standard (not in document)
-        debug('info: product.document.apis[api].info');
+        logger.debug('info: product.document.apis[api].info');
         info = product.document.apis[api].info;
         }
       else
         {
         // not resolved try to spit the name
-        debug('api: %j', api);
+        logger.debug('api: %j', api);
         var apiName = product.document.apis[api]['name'].split(':');
-        debug('apiName: %j', apiName);
-        debug('info: product.document.apis[api][name]');
+        logger.debug('apiName: %j', apiName);
+        logger.debug('info: product.document.apis[api][name]');
         info = {'x-ibm-name': apiName[0], 'version': apiName[1]}
         }
 
-      debug('info: %j', info);
+      logger.debug('info: %j', info);
       app.models.api.find(
         query,
         function(err, listOfApis) {
@@ -294,12 +295,12 @@ function grabAPIs(app, snapshot, product, plan, cb) {
             return;
           }
           listOfApis.forEach(function(DBapi) {
-            debug('DBapi.document.info: %j', DBapi.document.info);
+            logger.debug('DBapi.document.info: %j', DBapi.document.info);
             if (DBapi.document.info['version'] ===
               info['version'] &&
               DBapi.document.info['x-ibm-name'] ===
               info['x-ibm-name']) {
-                debug('found api in db: %j', DBapi);
+                logger.debug('found api in db: %j', DBapi);
                 // need to stringify API as we need to add metadata to it
                 // and not changing the underlying model
                 apis.push(JSON.parse(JSON.stringify(DBapi)));
@@ -326,7 +327,7 @@ function grabAPIs(app, snapshot, product, plan, cb) {
  * @param {Function} callback is called after annotation is done
  */
 function annotateAPIs(listOfApis, callback) {
-  debug('annotate API metadatas');
+  logger.debug('annotate API metadatas');
 
   async.each(listOfApis,
     function(api, next) {
@@ -342,17 +343,17 @@ function annotateAPIs(listOfApis, callback) {
         .then(function(res) {
           // saved the resolved swagger document if any JSON ref in it;
           if (Object.keys(res.refs).length > 0) {
-            debug('store resolved API swagger document');
+            logger.debug('store resolved API swagger document');
             api['document-resolved'] = res.resolved;
           }
         }, function(err) {
           // error when resolving json-refs
-          debug('error when resolving JSON references: %j', err);
+          logger.debug('error when resolving JSON references: %j', err);
         })
         .then(next, next); // end of jsonRefs promise resolution
     },
     function(err) {
-      debug('All API swaggers have been annotated');
+      logger.debug('All API swaggers have been annotated');
       callback(err);
     }
   ); // end of async.each() call
@@ -371,25 +372,25 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
           var apiDocument = api['document-resolved'] || api.document;
 
           var pathsProp = apiDocument.paths;
-          debug('pathsProp ' +
+          logger.debug('pathsProp ' +
                 Object.getOwnPropertyNames(pathsProp));
           Object.getOwnPropertyNames(pathsProp).forEach(
             function(propname) {
               var method = [];
               if (propname.indexOf('/') > -1) {
-                debug('propname: ' + propname);
+                logger.debug('propname: ' + propname);
                 var propnames = apiDocument.paths[propname];
                 Object.getOwnPropertyNames(
                   propnames).forEach(
                   function(methodname) {
                     var operation = propnames[methodname];
-                    debug('propname method: %j',
+                    logger.debug('propname method: %j',
                       methodname);
-                    debug('propname operationId: %j',
+                    logger.debug('propname operationId: %j',
                       operation.operationId);
                     var securityEnabledForMethod =
                       operation.security ? operation.security : apiDocument.security;
-                    debug('securityEnabledForMethod: ' + JSON.stringify(securityEnabledForMethod));
+                    logger.debug('securityEnabledForMethod: ' + JSON.stringify(securityEnabledForMethod));
                     var clientidSecurity = false;
                     if (securityEnabledForMethod)
                       {
@@ -402,7 +403,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                                     apiDocument.securityDefinitions[securityProp] &&
                                     apiDocument.securityDefinitions[securityProp].type === 'apiKey')
                                   clientidSecurity = true;
-                                  debug('clientidSecurity: ' + clientidSecurity);
+                                  logger.debug('clientidSecurity: ' + clientidSecurity);
                                 });
                         });
                       }
@@ -485,7 +486,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
           }],
          TODO: "snapshot-id": "string"
         */
-          debug('pieces: ' + JSON.stringify(pieces,null,4));
+          logger.debug('pieces: ' + JSON.stringify(pieces,null,4));
           var newOptimizedDataEntry = {
             'subscription-id': pieces.subscription.id,
             'client-id': credential['client-id'],
@@ -528,7 +529,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                 apidone(err);
                 return;
               }
-              debug('optimizedData created: %j',
+              logger.debug('optimizedData created: %j',
                   optimizedData);
               apidone();
             }
@@ -551,7 +552,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
 
 function makePathRegex(basePath, apiPath) {
   var path = apiPath;
-  debug('path: ', path);
+  logger.debug('path: ', path);
   var braceBegin = -1;
   var braceEnd = -1;
   do {
@@ -563,7 +564,7 @@ function makePathRegex(basePath, apiPath) {
     }
   } while (braceBegin >= 0);
   path = '^' + basePath + path + '$';
-  debug('path after: ', path);
+  logger.debug('path after: ', path);
   return path;
 }
 

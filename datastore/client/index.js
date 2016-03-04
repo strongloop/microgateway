@@ -1,6 +1,7 @@
 'use strict'
 var request = require('request');
-var debug = require('debug')('micro-gateway:datastore:client');
+var logger = require('apiconnect-cli-logger/logger.js')
+               .child({loc: 'apiconnect-microgateway:datastore:client'});
 const host = '127.0.0.1'; // data-store's listening interface
 
 /**
@@ -25,15 +26,15 @@ exports.apimGetDefaultCatalog = function(snapshot, orgName) {
 
   return new Promise((resolve, reject) => {
     request({url: queryurl}, (error, response, body) => {
-      debug('error: ', error);
-      //debug('body: %j', body);
-      //debug('response: %j', response);
+      logger.debug('error: ', error);
+      //logger.debug('body: %j', body);
+      //logger.debug('response: %j', response);
       if (error) {
         reject(Error(error));
         return;
       }
       var catalogs = JSON.parse(body);
-      debug('catalog returned: %j', catalogs);
+      logger.debug('catalog returned: %j', catalogs);
       if (catalogs.length === 1) {
         resolve(catalogs[0].name);
       } else {
@@ -51,7 +52,7 @@ exports.apimGetDefaultCatalog = function(snapshot, orgName) {
  *                              or output context
  */
 exports.grabAPI = function(context, callback) {
-  debug('grabAPI entry');
+  logger.debug('grabAPI entry');
   var snapshotFilter = '{"snapshot-id": "' + context.snapshot + '"}';
   var apiFilter = '{"id": "' + context.api.id + '"}';
   var queryfilter =
@@ -67,12 +68,12 @@ exports.grabAPI = function(context, callback) {
       url : queryurl
     },
     function(error, response, body) {
-      debug('error: ', error);
-      // debug('body: %j' , body);
-      // debug('response: %j' , response);
+      logger.debug('error: ', error);
+      // logger.debug('body: %j' , body);
+      // logger.debug('response: %j' , response);
       if (error) {
         callback(error);
-        debug('grabAPI error exit');
+        logger.debug('grabAPI error exit');
         return;
       }
       try {
@@ -81,15 +82,15 @@ exports.grabAPI = function(context, callback) {
         callback(e, null);
         return;
       }
-      debug('grabAPI request exit');
+      logger.debug('grabAPI request exit');
       callback(null, api[0]); // there should only be one result
     }
   );
-  debug('grabAPI exit');
+  logger.debug('grabAPI exit');
 }
 
 exports.getCurrentSnapshot = function() {
-  debug('getCurrentSnapshot entry');
+  logger.debug('getCurrentSnapshot entry');
   // build request to send to data-store
   const port = process.env['DATASTORE_PORT'];
   const queryurl = `http://${host}:${port}/api/snapshots/current`;
@@ -98,23 +99,23 @@ exports.getCurrentSnapshot = function() {
   // for matching API(s)
   return new Promise((resolve, reject) => {
     request({url: queryurl}, (error, response, body) => {
-      debug('error: ', error);
-      //debug('body: %j', body);
-      //debug('response: %j', response);
+      logger.debug('error: ', error);
+      //logger.debug('body: %j', body);
+      //logger.debug('response: %j', response);
       // exit early on error
       if (error) {
         reject(new Error(error));
         return;
       }
       var snapshot = JSON.parse(body);
-      debug('snapshot: ', snapshot.snapshot.id);
+      logger.debug('snapshot: ', snapshot.snapshot.id);
       resolve(snapshot.snapshot.id);
     });
   });
 }
 
 exports.releaseCurrentSnapshot = function(id) {
-  debug('releaseCurrentSnapshot entry');
+  logger.debug('releaseCurrentSnapshot entry');
   // build request to send to data-store
   const port = process.env['DATASTORE_PORT'];
   const queryurl = `http://${host}:${port}/api/snapshots/release?id=${id}`;
@@ -123,23 +124,23 @@ exports.releaseCurrentSnapshot = function(id) {
   // for matching API(s)
   return new Promise((resolve, reject) => {
     request({url: queryurl}, (error, response, body) => {
-      debug('error: ', error);
-      debug('body: %j', body);
-      debug('response: %j', response);
+      logger.debug('error: ', error);
+      logger.debug('body: %j', body);
+      logger.debug('response: %j', response);
       // exit early on error
       if (error) {
-        debug('releaseCurrentSnapshot error');
+        logger.debug('releaseCurrentSnapshot error');
         reject(new Error(error));
         return;
       }
-      debug('releaseCurrentSnapshot exit');
+      logger.debug('releaseCurrentSnapshot exit');
       resolve(id);
     });
   });
 }
 
 exports.getTlsProfile = function(snapshot, tlsProfleName) {
-  debug('getTlsProfile entry snapshot:' + snapshot +
+  logger.debug('getTlsProfile entry snapshot:' + snapshot +
                               '\n tlsProfleName:' + tlsProfleName );
   // build request to send to data-store
   let snapshotFilter = `{"snapshot-id": "${snapshot }"}`;
@@ -153,9 +154,9 @@ exports.getTlsProfile = function(snapshot, tlsProfleName) {
   // for matching API(s)
   return new Promise((resolve, reject) => {
     request({url: queryurl}, function (error, response, body) {
-      debug('error: ', error);
-      debug('body: %j', body);
-      debug('response: %j', response);
+      logger.debug('error: ', error);
+      logger.debug('body: %j', body);
+      logger.debug('response: %j', response);
       // exit early on error
       if (error) {
         reject(new Error(error));
@@ -168,7 +169,7 @@ exports.getTlsProfile = function(snapshot, tlsProfleName) {
 }
 
 exports.getRegistry = function(snapshot, registryName) {
-  debug('getRegistry entry snapshot:' + snapshot +
+  logger.debug('getRegistry entry snapshot:' + snapshot +
                               '\n registryName:' + registryName );
   // build request to send to data-store
   let snapshotFilter = `{"snapshot-id": "${snapshot }"}`;
@@ -182,9 +183,9 @@ exports.getRegistry = function(snapshot, registryName) {
   // for matching API(s)
   return new Promise((resolve, reject) => {
     request({url: queryurl}, function (error, response, body) {
-      debug('error: ', error);
-      debug('body: %j', body);
-      debug('response: %j', response);
+      logger.debug('error: ', error);
+      logger.debug('body: %j', body);
+      logger.debug('response: %j', response);
       // exit early on error
       if (error) {
         reject(new Error(error));
