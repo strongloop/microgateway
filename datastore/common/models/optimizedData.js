@@ -394,7 +394,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
 
                     var allowOperation = false;
                     var observedRatelimit = pieces.plan.rateLimit;
-                    var rateLimitScope = pieces.plan.name;
+                    var rateLimitScope = pieces.plan.id;
                     // Does the plan neglect to specify APIs, or is the api listed in the plan with no operations listed? Then allow any operation
                     if ((pieces.plan.apis === undefined) || 
                         (pieces.plan.apis[api.document.info['x-ibm-name']] !== undefined && 
@@ -420,9 +420,9 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                             observedRatelimit=planOp["rate-limit"];
                             
                             if (opId) {
-                              rateLimitScope = opId;
+                              rateLimitScope = pieces.plan.id+":"+opId;
                             } else {
-                              rateLimitScope = opMeth+":"+opPath;
+                              rateLimitScope = pieces.plan.id+":"+opMeth+":"+opPath;
                             }
                           }
                         }
