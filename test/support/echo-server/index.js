@@ -20,10 +20,6 @@ app.get('/auth', function(req, resp) {
   }
 });
 
-app.post('/analytics', function(req, res) {
-    res.send(req.url);
-});
-
 app.get('/*', function(req, resp) {
   resp.send(req.url);
 });

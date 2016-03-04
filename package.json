@@ -63,7 +63,6 @@
     "request": "^2.69.0",
     "rolling-rate-limiter": "^0.1.2",
     "type-is": "^1.6.11",
-    "uuid": "^2.0.1",
     "yamljs": "^0.2.4"
   }
 }

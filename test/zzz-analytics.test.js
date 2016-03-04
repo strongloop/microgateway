@@ -7,39 +7,34 @@ let supertest = require('supertest');
 let echo = require('./support/echo-server');
 let apimServer = require('./support/mock-apim-server2/apim-server');
 let should = require('should');
-let os = require('os');
-let copy = require('../utils/copy.js')
-let date = new Date();
-let randomInsert = date.getTime().toString();
-let destinationDir = path.join(os.tmpdir(), randomInsert + 'set-variable');
 
 describe('analytics', function() {
 
   let request;
   let mg;
   before((done) => {
-    copy.copyRecursive(__dirname + '/definitions/set-variable', destinationDir);
-    process.env.CONFIG_DIR = destinationDir;
+    process.env.CONFIG_DIR = __dirname + '/definitions/set-variable';
     process.env.NODE_ENV = 'production';
     process.env.APIMMANAGER = 'localhost';
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     delete require.cache[require.resolve('../lib/microgw')];
     mg = require('../lib/microgw');
     mg.start(3000)
-      .then(() => {
-        return echo.start(8889);
-      })
-      .then( () => {
+    .then(() => {
+      return echo.start(8889);
+    })
+    .then( () => {
         return apimServer.start('localhost', 9443);
-      })
-      .then(() => {
-        request = supertest('http://localhost:3000');
-      })
-      .then(done)
-      .catch((err) => {
-        console.error(err);
-        done(err);
-      });
+    })
+    .then(() => {
+      request = supertest('http://localhost:3000');
+    })
+    .then(done)
+    .catch((err) => {
+      console.error(err);
+      done(err);
+    });
+
   });
 
   after((done) => {
@@ -56,7 +51,6 @@ describe('analytics', function() {
       .then(() => {
         delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
         delete process.env.CONFIG_DIR;
-        copy.deleteRecursive(destinationDir);
         delete process.env.NODE_ENV;
         delete process.env.APIMMANAGER;
       })
