@@ -1,7 +1,8 @@
 'use strict';
 const vm    = require('vm');
 const _     = require('lodash');
-const debug = require('debug')('policy:javascript');
+var logger = require('apiconnect-cli-logger/logger.js')
+               .child({loc: 'apiconnect-microgateway:policies:javascript'});
 
 module.exports = function(config) {
   return function(props, context, flow) {

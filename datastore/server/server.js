@@ -5,6 +5,8 @@ var boot = require('loopback-boot');
 var async = require('async');
 var fs = require('fs');
 var environment = require('../../utils/environment');
+var logger = require('apiconnect-cli-logger/logger.js')
+               .child({loc: 'apiconnect-microgateway:datastore:server:server'});
 var DATASTORE_PORT = environment.DATASTORE_PORT;
 var CONFIGDIR = environment.CONFIGDIR;
 
@@ -24,7 +26,7 @@ app.start = function() {
       var baseUrl = app.get('url').replace(/\/$/, '');
       var port = app.get('port');
       process.env['DATASTORE_PORT'] = port;
-      console.log('Web server listening at: %s port: %s', baseUrl, port);
+      logger.debug('Web server listening at: %s port: %s', baseUrl, port);
       // save to file for explorer
       storeDatastorePort(port)
       // send to gateway
@@ -32,7 +34,7 @@ app.start = function() {
 
       if (app.get('loopback-component-explorer')) {
         var explorerPath = app.get('loopback-component-explorer').mountPath;
-        console.log('Browse your REST API at %s%s', baseUrl, explorerPath);
+        logger.debug('Browse your REST API at %s%s', baseUrl, explorerPath);
       }
     });
     app.close = function(cb) {

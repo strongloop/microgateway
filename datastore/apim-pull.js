@@ -1,12 +1,12 @@
 /**
  * Module dependencies
  */
+var logger = require('apiconnect-cli-logger/logger.js')
+               .child({loc: 'apiconnect-microgateway:datastore:apim-pull'});
 var fs = require('fs'),
     request = require('request'),
     async = require('async'),
     extend = require('util')._extend;
-    
-var debug = require('debug')('micro-gateway:data-store');
     
 var Crypto = require('crypto')
     
@@ -108,7 +108,7 @@ function getDataBasedOnCatalog(options, catalogs, models, cb) {
         function(model, modelcallback) {
           pullDataFromEndp(options, catalog, model, function(err) {
               if (err) {
-                console.error(err);
+                logger.error(err);
               }
               modelcallback(err);
             }
@@ -265,7 +265,7 @@ function getKey(file) {
   try {
     key = fs.readFileSync(file,'utf8');
   } catch(e) {
-    debug('Can not read file: %s Error: %s', file, e);
+    logger.debug('Can not read file: %s Error: %s', file, e);
   }
   return key;
   }
@@ -314,7 +314,7 @@ function getOrCreatePass() {
       try {
         fs.writeFileSync(passFile,encryptedCipher);
       } catch(e) {
-        debug('Can not write file: %s Error: %s', passFile, e);
+        logger.debug('Can not write file: %s Error: %s', passFile, e);
       }
       pass_key = password;
       }
