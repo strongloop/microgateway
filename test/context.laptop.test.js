@@ -94,7 +94,7 @@ describe('Context variables in laptop experience', function() {
             'application/x-www-form-urlencoded'
           ],
           operation: 'GET',
-          operationId: "getInternal",
+          operationId: 'getInternal',
           parameters: [
             {
                 description: 'parameter 1',
@@ -116,7 +116,7 @@ describe('Context variables in laptop experience', function() {
           ],
           responses: {
             '200': {
-              description: "200 OK"
+              description: '200 OK'
             }
           }
         });
@@ -124,7 +124,7 @@ describe('Context variables in laptop experience', function() {
       });
   });
 
-  it('should produce all request.parameters - GET', function(done) {
+  it('should produce path/query/header request.parameters', function(done) {
     request
       .get('/v1/context/request/parameters/abc/9999?param1=value1&param2=8888&param5=1111&paramBoolean=false&queryArray=1&queryArray=2&queryArray=3')
       .set('X-foo', 'bar')
@@ -157,7 +157,7 @@ describe('Context variables in laptop experience', function() {
       });
   });
 
-  it('should produce all request.parameters - POST', function(done) {
+  it('should produce formData request.parameters', function(done) {
     request
       .post('/v1/context/request/parameters/abc/9999')
       .type('form')
@@ -170,12 +170,35 @@ describe('Context variables in laptop experience', function() {
           result = JSON.parse(result);
         }
 
-        console.log("request.parameters result: "+JSON.stringify(result));
+        console.log('request.parameters result: '+JSON.stringify(result));
         assert.deepStrictEqual(result,
-            {"param1":"value1",
-             "param2":8888,
-             "param3":9999,
-             "param4":2222}
+            {param1:'value1',
+             param2:8888,
+             param3:9999,
+             param4:2222}
+        );
+        done();
+      });
+  });
+
+  it('should produce body request.parameters', function(done) {
+    var payload = 'hello world';
+    request
+      .put('/v1/context/request/parameters/abc/9999')
+      .type('text/plain')
+      .set('param4', 4444)
+      .send(payload)
+      .end(function(err, res) {
+        var result = res.body;
+        if (_.isString(result)) {
+          result = JSON.parse(result);
+        }
+
+        console.log('request.parameters result: '+JSON.stringify(result));
+        assert.deepStrictEqual(result,
+            {param1:payload,
+             param3:9999,
+             param4:4444}
         );
         done();
       });
@@ -194,7 +217,7 @@ describe('Context variables in laptop experience', function() {
           result = JSON.parse(result);
         }
 
-        console.log("request.parameters result: "+JSON.stringify(result));
+        console.log('request.parameters result: '+JSON.stringify(result));
         assert.deepStrictEqual(result,
             {param1:'value1',
              param2:8888,

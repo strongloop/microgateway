@@ -150,6 +150,18 @@ paths:
       responses:
         '200':
           description: 200 OK
+    put:
+      summary: put request parameter value
+      operationId: putParameters
+      parameters:
+        - name: param1
+          in: body
+          description: parameter 1
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 200 OK
 
 x-ibm-configuration:
   properties:
@@ -219,6 +231,7 @@ x-ibm-configuration:
             - operations:
                 - getParameters
                 - postParameters
+                - putParameters
               execute:
                 - set-variable:
                     title: set-variable
