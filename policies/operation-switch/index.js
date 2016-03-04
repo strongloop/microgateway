@@ -1,6 +1,7 @@
 'use strict';
 
-var debug = require('debug')('policy:operation-switch');
+var logger = require('apiconnect-cli-logger/logger.js')
+               .child({loc: 'apiconnect-microgateway:policies:operation-switch'});
 
 /**
  *  Returns a new operation-switch policy function
