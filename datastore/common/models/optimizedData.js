@@ -1,5 +1,7 @@
+var _ = require('lodash');
 var async = require('async');
 var debug = require('debug')('micro-gateway:data-store');
+var jsonRefs = require('json-refs');
 
 var ALLPLANS = 'ALLPLANS';
 function createProductOptimizedEntry(app, ctx)
@@ -10,7 +12,14 @@ function createProductOptimizedEntry(app, ctx)
   locals.subscription = {};  /// no subscription
   // assume we are going to create a wildcard entry...
   //     We will not if there's security configured at api level..
-  locals.credentials = [{'client-id' : '', 'client-secret': ''}];
+  locals.application = {
+      title: '',
+      credentials: [{'client-id' : '', 'client-secret': ''}],
+      developerOrg: {
+        id: '',
+        name: ''
+      }
+    };
   var isWildcard = true;
   cycleThroughPlansInProduct(app, locals, isWildcard, product, ALLPLANS);
   }
@@ -26,7 +35,7 @@ function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, pr
       locals.product = product;
       locals.plan = {};
       locals.plan.apis = product.document.plans[propname].apis;
-      if (JSON.stringify(locals.plan.apis) === '{}' || !locals.plan.apis) { // all product apis scenario
+      if (_.isEmpty(locals.plan.apis)) { // all product apis scenario
         locals.plan.apis = product.document.apis;
         debug("1. all product apis in plan... APIs: " + product.document.apis);
         }
@@ -89,16 +98,22 @@ function ripCTX(ctx)
   var locals = {};
   locals.subscription = {};
   locals.subscription.id = ctx.instance.id;
-  locals.credentials =
-    ctx.instance.application['app-credentials'];
+  locals.application = {
+    title: ctx.instance.application.title,
+    credentials: ctx.instance.application['app-credentials'],
+    developerOrg: ctx.instance['developer-organization']
+  };
   ctx.instance['plan-registration'].apis = {}; // old list, wipe it
   locals.product = ctx.instance['plan-registration'].product;
   locals.plan = {};
-  locals.plan = ctx.instance['plan-registration'].plan;
+  if (ctx.instance['plan-registration'].plan) {
+    locals.plan.name = ctx.instance['plan-registration'].plan.name;
+    locals.plan.title = ctx.instance['plan-registration'].plan.title;
+  }
   if (locals.product)
     {
     locals.plan.apis = locals.product.document.plans[locals.plan.name].apis;
-    if (JSON.stringify(locals.plan.apis) === '{}' || !locals.plan.apis) { // all product apis scenario
+    if (_.isEmpty(locals.plan.apis)) { // all product apis scenario
       locals.plan.apis = locals.product.document.apis;
       debug("2. all product apis in plan... APIs: " + locals.product.document.apis);
       }
@@ -162,6 +177,13 @@ function gatherDataCreateOptimizedEntry(app, locals, isWildcard, gatherCallback)
             }
             locals.apis = apis;
             callback();
+          }
+        );
+      },
+      function(callback) {
+        annotateAPIs(locals.apis,
+          function(err) {
+            callback(err);
           }
         );
       },
@@ -278,7 +300,9 @@ function grabAPIs(app, snapshot, product, plan, cb) {
               DBapi.document.info['x-ibm-name'] ===
               info['x-ibm-name']) {
                 debug('found api in db: %j', DBapi);
-                apis.push(DBapi);
+                // need to stringify API as we need to add metadata to it
+                // and not changing the underlying model
+                apis.push(JSON.parse(JSON.stringify(DBapi)));
                 }
 
           });
@@ -292,16 +316,61 @@ function grabAPIs(app, snapshot, product, plan, cb) {
   );
 }
 
+/**
+ * Add additional metadata to the API object, the following metadata
+ * will be added in this function:
+ *  - 'document-resolved':  store the swagger after resolving JSON refs
+ *  - 'document-wo-assembly': store the swagger w/o assembly data
+ *
+ * @param {Array} listOfApis is an array of API object
+ * @param {Function} callback is called after annotation is done
+ */
+function annotateAPIs(listOfApis, callback) {
+  debug('annotate API metadatas');
+
+  async.each(listOfApis,
+    function(api, next) {
+      // populate 'document-wo-assembly'
+      // Some customers add their own extension to the swagger,
+      // so we will make the swagger available in context to customers.
+      var swaggerWithoutAssembly = JSON.parse(JSON.stringify(api.document));
+      delete swaggerWithoutAssembly['x-ibm-configuration'].assembly;
+      api['document-wo-assembly'] = swaggerWithoutAssembly;
+
+      // populate 'document-resolved'
+      jsonRefs.resolveRefs(api.document)
+        .then(function(res) {
+          // saved the resolved swagger document if any JSON ref in it;
+          if (Object.keys(res.refs).length > 0) {
+            debug('store resolved API swagger document');
+            api['document-resolved'] = res.resolved;
+          }
+        }, function(err) {
+          // error when resolving json-refs
+          debug('error when resolving JSON references: %j', err);
+        })
+        .then(next, next); // end of jsonRefs promise resolution
+    },
+    function(err) {
+      debug('All API swaggers have been annotated');
+      callback(err);
+    }
+  ); // end of async.each() call
+}
 
 function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
   async.each(
-    pieces.credentials,
+    pieces.application.credentials,
     function(credential, creddone) { //each clientid
       async.each(
         pieces.apis,
         function(api, apidone) {  // each api
           var apiPaths = [];
-          var pathsProp = JSON.parse(JSON.stringify(api.document['paths']));
+
+          // use JSON-ref resolved document if available
+          var apiDocument = api['document-resolved'] || api.document;
+
+          var pathsProp = apiDocument.paths;
           debug('pathsProp ' +
                 Object.getOwnPropertyNames(pathsProp));
           Object.getOwnPropertyNames(pathsProp).forEach(
@@ -309,17 +378,17 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
               var method = [];
               if (propname.indexOf('/') > -1) {
                 debug('propname: ' + propname);
-                var propnames = JSON.parse(JSON.stringify(api.document.paths[propname]));
+                var propnames = apiDocument.paths[propname];
                 Object.getOwnPropertyNames(
                   propnames).forEach(
                   function(methodname) {
-		                var operation = propnames[methodname];
+                    var operation = propnames[methodname];
                     debug('propname method: %j',
                       methodname);
                     debug('propname operationId: %j',
                       operation.operationId);
                     var securityEnabledForMethod =
-                      operation.security ? operation.security : api.document.security;
+                      operation.security ? operation.security : apiDocument.security;
                     debug('securityEnabledForMethod: ' + JSON.stringify(securityEnabledForMethod));
                     var clientidSecurity = false;
                     if (securityEnabledForMethod)
@@ -329,9 +398,9 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                             var securityProps = Object.getOwnPropertyNames(securityReq)
                             securityProps.forEach(
                               function(securityProp) {
-                                if (api.document.securityDefinitions &&
-                                    api.document.securityDefinitions[securityProp] &&
-                                    api.document.securityDefinitions[securityProp].type === 'apiKey')
+                                if (apiDocument.securityDefinitions &&
+                                    apiDocument.securityDefinitions[securityProp] &&
+                                    apiDocument.securityDefinitions[securityProp].type === 'apiKey')
                                   clientidSecurity = true;
                                   debug('clientidSecurity: ' + clientidSecurity);
                                 });
@@ -342,15 +411,14 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                         ((!securityEnabledForMethod || !clientidSecurity) && isWildcard)) {
                         // add only non-clientid security for products (wildcard)
                       method.push({
-                        consumes: operation.consumes || api.document.consumes,
+                        consumes: operation.consumes || apiDocument.consumes,
                         method: methodname.toUpperCase(),
                         operationId: operation.operationId,
-                        parameters: getOpParams(api.document.parameters,
-                                                api.document.paths[propname].parameters,
+                        parameters: getOpParams(apiDocument.paths[propname].parameters,
                                                 operation.parameters),
-                        produces: operation.produces || api.document.produces,
+                        produces: operation.produces || apiDocument.produces,
                         responses: operation.responses,
-                        securityDefs: api.document.securityDefinitions,
+                        securityDefs: apiDocument.securityDefinitions,
                         // operational lvl Swagger security overrides the API lvl
                         securityReqs: securityEnabledForMethod,
                         });
@@ -359,7 +427,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                 );
                 if (method.length !== 0) { // no methods, no apiPaths
                   var regexPath = makePathRegex(
-                            api.document.basePath,
+                            apiDocument.basePath,
                             propname);
                   var apiPath = {
                     path: propname,
@@ -375,7 +443,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
           );
 
           // get API properties that user defined in the swagger
-          var ibmSwaggerExtension = api.document['x-ibm-configuration'];
+          var ibmSwaggerExtension = apiDocument['x-ibm-configuration'];
           var defaultApiProperties = ibmSwaggerExtension.properties;
           var apiProperties = {};
           if (defaultApiProperties) {
@@ -391,18 +459,6 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
               }
             );
           }
-
-          // Some customers add their own extension to the swagger,
-          // so we will make the swagger available in context to customers.
-          // As the information is needed for every incoming transaction on
-          // gateway, store the data in the optimized data model.
-          var swaggerWithoutAssembly = JSON.parse(JSON.stringify(api.document));
-          delete swaggerWithoutAssembly['x-ibm-configuration'].assembly;
-
-          var assemblyFlow = {
-            assembly: api.document['x-ibm-configuration'].assembly
-          };
-
 
     /*
         "subscription-id": "string",
@@ -434,6 +490,11 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'subscription-id': pieces.subscription.id,
             'client-id': credential['client-id'],
             'client-secret': credential['client-secret'],
+            'client-name': pieces.application['title'],
+            'client-org-id': pieces.application.developerOrg ?
+              pieces.application.developerOrg.id : '',
+            'client-org-name': pieces.application.developerOrg ?
+              pieces.application.developerOrg.name : '',
             'plan-id': pieces.plan.id,
             'plan-name': pieces.plan.name,
             'plan-version': pieces.plan.version,
@@ -445,12 +506,15 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'organization-id': pieces.org.id,
             'organization-name': pieces.org.name,
             'api-id': api.id,
-            'api-document': swaggerWithoutAssembly,
-            'api-assembly': assemblyFlow,
-            'api-base-path': api.document.basePath,
-            'api-name': api.document.info.title,
-            'api-type': api.document['x-ibm-configuration']['api-type'] || 'REST',
-            'api-version': api.document.info.version,
+            'api-document': api['document-wo-assembly'],
+            'api-document-resolved': api['document-resolved'],
+            'api-assembly': {
+                assembly: apiDocument['x-ibm-configuration'].assembly
+              },
+            'api-base-path': apiDocument.basePath,
+            'api-name': apiDocument.info.title,
+            'api-type': apiDocument['x-ibm-configuration']['api-type'] || 'REST',
+            'api-version': apiDocument.info.version,
             'api-properties': apiProperties,
             'api-paths': apiPaths,
             'snapshot-id' : pieces.snapshot
@@ -518,14 +582,24 @@ function calculateMatchingScore(apiPath) {
 /**
  * Returns a Object that denotes the parameters associated with the operation
  *
- * @param {Object} apiParams api-level parameters in the swagger
  * @param {Array} pathParams path-level parameters in the swagger
  * @param {Array} opParams op-level perameters in the swagger
  *
  */
-function getOpParams(apiParams, pathParams, opParams) {
-  // TODO need to join the 3 params
-  return opParams || [];
+function getOpParams(pathParams, opParams) {
+  var unionParams = _.unionWith(opParams, pathParams, opParamComparator);
+  return unionParams;
+}
+
+/**
+ * Returns true if two parameter definition is the same.
+ * Parameters defined in operation overwrites the ones defined in path level.
+ *
+ * @param {Object} opParam a operation-level API parameter
+ * @param {Object} pathParam a path-level API parameter
+ */
+function opParamComparator(opParam, pathParam) {
+  return (opParam.name === pathParam.name);
 }
 
 exports.determineNeededSubscriptionOptimizedEntries = determineNeededSubscriptionOptimizedEntries;

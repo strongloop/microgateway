@@ -8,6 +8,8 @@ var request = require('supertest');
 
 var context = require('../lib/context');
 
+const API_PATH_HEADER = 'X-API-PATH';
+
 describe('Context middleware', function() {
 
   describe('Request category variables', function() {
@@ -15,6 +17,9 @@ describe('Context middleware', function() {
     app.use(context());
     app.use(function(req, resp) {
       var ctx = req.ctx;
+
+      ctx.set('api.document.basePath', '');
+      ctx.set('_.api.path', req.get(API_PATH_HEADER));
 
       var result = {
         verb:           ctx.get('request.verb'),
@@ -54,7 +59,8 @@ describe('Context middleware', function() {
                            'content-length',
                            'content-type',
                            'host',
-                           'user-agent'
+                           'user-agent',
+                           API_PATH_HEADER.toLowerCase()
                          ];
       removeHeader.forEach(function(value) {
         delete headers[value];
@@ -67,13 +73,14 @@ describe('Context middleware', function() {
       var expect = {
         verb: 'GET',
         uri: '/',
-        path: '',
+        path: '/',
         'content-type': undefined,
         authorization: undefined,
         headers: {}
       };
       request(app)
         .get('/')
+        .set(API_PATH_HEADER, '/')
         .expect(function(res) {
           verifyResponse(res, expect);
         })
@@ -84,13 +91,14 @@ describe('Context middleware', function() {
       var expect = {
         verb: 'GET',
         uri: '/x/y/z',
-        path: 'x/y/z',
+        path: '/x/y/z',
         'content-type': undefined,
         authorization: undefined,
         headers: {}
       };
       request(app)
         .get('/x/y/z')
+        .set(API_PATH_HEADER, '/x/y/z')
         .expect(function(res) {
           verifyResponse(res, expect);
         })
@@ -101,13 +109,14 @@ describe('Context middleware', function() {
       var expect = {
         verb: 'GET',
         uri: '/foo/bar?param1=1&param2=2',
-        path: 'foo/bar',
+        path: '/foo/bar',
         'content-type': undefined,
         authorization: undefined,
         headers: {}
       };
       request(app)
         .get('/foo/bar?param1=1&param2=2')
+        .set(API_PATH_HEADER, '/foo/bar')
         .expect(function(res) {
           verifyResponse(res, expect);
         })
@@ -118,7 +127,7 @@ describe('Context middleware', function() {
       var expect = {
         verb: 'GET',
         uri: '/foo/bar?param1=1&param2=2',
-        path: 'foo/bar',
+        path: '/foo/bar',
         'content-type': undefined,
         authorization: undefined,
         headers: {
@@ -128,6 +137,7 @@ describe('Context middleware', function() {
       request(app)
         .get('/foo/bar?param1=1&param2=2')
         .set(expect.headers)
+        .set(API_PATH_HEADER, '/foo/bar')
         .expect(function(res) {
           verifyResponse(res, expect);
         })
@@ -138,13 +148,14 @@ describe('Context middleware', function() {
       var expect = {
         verb: 'POST',
         uri: '/foo',
-        path: 'foo',
+        path: '/foo',
         'content-type': 'application/json',
         authorization: undefined,
         headers: {}
       };
       request(app)
         .post('/foo')
+        .set(API_PATH_HEADER, '/foo')
         .send({message: 'Hello World'})
         .expect(function(res) {
           verifyResponse(res, expect);
@@ -249,55 +260,81 @@ describe('Context middleware', function() {
 
     describe('should produce req.path according to api.basepath', function() {
       var apiBasePath;
-      var requestedPath;
-      var expectedPath;
+      var expectedRequestPath;
       var myapp = loopback();
       myapp.use(context());
       myapp.use(function(req, resp) {
         var ctx = req.ctx;
 
         // set the API basepath
-        ctx.set('api.basepath', apiBasePath);
+        ctx.set('api.document.basePath', apiBasePath);
+        ctx.set('_.api.path', req.get(API_PATH_HEADER));
         try {
-          // the expected path should not include the preceding `/`
-          expectedPath = requestedPath.substr(1);
-          assert.strictEqual(ctx.get('request.path'), expectedPath);
+          assert.strictEqual(ctx.get('request.path'), expectedRequestPath);
           resp.send('done');
         } catch (error) {
-          resp.send(error);
+          resp.status(500).send(error);
         }
       });
 
-      it('should work with URL w/o query params', function(done) {
-        apiBasePath = '/foo';
-        requestedPath = '/foo/bar';
+      /**
+       * @parameter basepath: the API basepath
+       * @parameter requstPath: the URI to send
+       * @parameter expect: the expected $(request.path) value
+       * @parameter done: the mocha test callback
+       */
+      function sendRequest(basepath, apiPath, requestPath, expect, done) {
+        apiBasePath = basepath;
+        expectedRequestPath = expect;
         request(myapp)
-          .get(requestedPath)
+          .get(requestPath)
+          .set(API_PATH_HEADER, apiPath)
           .expect(200, 'done', done);
-      });
+      }
 
-      it('should work with URL w/ query params', function(done) {
-        apiBasePath = '/foo';
-        requestedPath = '/foo/bar';
-        request(myapp)
-          .get(requestedPath + '?name=hello')
-          .expect(200, 'done', done);
-      });
+      var testData = [
+        // basePath is undefined in the swagger
+        { base: undefined, apiPath: '/a/b', request: '/a/b', expect: '/a/b'},
 
-      it('should work when api.basepath not exist', function(done) {
-        apiBasePath = undefined;
-        requestedPath = '/foo/bar';
-        request(myapp)
-          .get(requestedPath)
-          .expect(200, 'done', done);
+        // basePath is '' in the swagger
+        { base: '', apiPath: '/foo', request: '/foo', expect: '/foo'},
+        { base: '', apiPath: '/foo/bar', request: '/foo/bar', expect: '/foo/bar'},
+
+        // basePath is '/' in the swagger
+        { base: '/', apiPath: '/foo', request: '/foo',      expect: '/foo'},
+        { base: '/', apiPath: '/foo/bar', request: '/foo/bar',  expect: '/foo/bar'},
+        { base: '/', apiPath: '/foo/bar', request: '/foo/bar?name=hello',  expect: '/foo/bar'},
+
+        // basePath is '/foo' in the swagger (one level)
+        { base: '/foo', apiPath: '/',     request: '/foo',      expect: '/foo'},
+        { base: '/foo', apiPath: '/',     request: '/foo/',     expect: '/foo/'},
+        { base: '/foo', apiPath: '/bar',  request: '/foo/bar',  expect: '/foo/bar'},
+        { base: '/foo', apiPath: '/bar/', request: '/foo/bar/', expect: '/foo/bar/'},
+        { base: '/foo', apiPath: '/bar',  request: '/foo/bar?=hello', expect: '/foo/bar'},
+
+        // basePath is '/v1/test' in the swagger (two levels)
+        { base: '/v1/test', apiPath: '/foo', request: '/v1/test/foo', expect: '/v1/test/foo'},
+
+        // basePath does not start with '/' is invalid
+
+        // basePath ends with '/'
+        { base: '/v1/test/', apiPath: '/foo', request: '/v1/test/foo', expect: '/v1/test/foo'}
+      ];
+
+      testData.forEach(function(data) {
+        it('$(request.path) should be "' + data.expect + 
+           '" when basepath=' + data.base +
+           ' and request URI=' + data.request, function(done) {
+          sendRequest(data.base, data.apiPath, data.request, data.expect, done);
+        });
       });
 
       it('should work when api.basepath mismatch originalUrl', function(done) {
         apiBasePath = 'foot';
-        requestedPath = '/foo/bar';
         request(myapp)
-          .get(requestedPath)
-          .expect(200, 'done', done);
+          .get('/foo/bar')
+          .set(API_PATH_HEADER, '/bar')
+          .expect(500, done);
       });
     });
 
@@ -374,7 +411,9 @@ describe('Context middleware', function() {
             .set('X-METHOD-NAME', method)
             .type('text')
             .send('hello world')
-            .expect(500, done);
+            .expect(500, 
+                    method === 'HEAD' ? '' : { name: "PopulateContextError", message: 'Invalid ' + method + ' request with payload'},
+                    done);
         });
       });
     }); // end of 'should reject/ignore non-empty payload when needed' test

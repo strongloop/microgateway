@@ -5,36 +5,57 @@ let path = require('path');
 let express = require('express');
 let supertest = require('supertest');
 let echo = require('./support/echo-server');
-let mg = require('../lib/microgw');
+let apimServer = require('./support/mock-apim-server2/apim-server');
 let should = require('should');
 
-describe('set-variable policy', function() {
+describe('analytics', function() {
 
   let request;
+  let mg;
   before((done) => {
     process.env.CONFIG_DIR = __dirname + '/definitions/set-variable';
     process.env.NODE_ENV = 'production';
+    process.env.APIMMANAGER = 'localhost';
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    delete require.cache[require.resolve('../lib/microgw')];
+    mg = require('../lib/microgw');
     mg.start(3000)
-      .then(() => {
-        return echo.start(8889);
-      })
-      .then(() => {
-        request = supertest('http://localhost:3000');
-      })
-      .then(done)
-      .catch((err) => {
-        console.error(err);
-        done(err);
-      });
+    .then(() => {
+      return echo.start(8889);
+    })
+    .then( () => {
+        return apimServer.start('localhost', 9443);
+    })
+    .then(() => {
+      request = supertest('http://localhost:3000');
+    })
+    .then(done)
+    .catch((err) => {
+      console.error(err);
+      done(err);
+    });
+
   });
 
   after((done) => {
     mg.stop()
+      .then(() => {
+        return new Promise( (resolve, reject) => {
+          setTimeout( () => {
+            resolve();
+          }, 5000);
+        });
+      })
       .then(() => echo.stop())
+      .then(() => apimServer.stop())
+      .then(() => {
+        delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+        delete process.env.CONFIG_DIR;
+        delete process.env.NODE_ENV;
+        delete process.env.APIMMANAGER;
+      })
       .then(done, done)
       .catch(done);
-    delete process.env.CONFIG_DIR;
-    delete process.env.NODE_ENV;
   });
 
   it('should set a simple string to a variable', function(done) {

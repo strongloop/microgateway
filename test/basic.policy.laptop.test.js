@@ -11,8 +11,6 @@ let mg = require('../lib/microgw');
 let dsc = require('../datastore/client');
 let should = require('should');
 let apimServer = require('./support/mock-apim-server/apim-server');
-let os = require('os');
-let copy = require('../utils/copy.js');
 
 function cleanup () {
   const rmfile = fpath => new Promise((resolve, reject) => {
@@ -64,12 +62,8 @@ function cleanup () {
 describe('basic auth policy', function() {
 
   let request;
-  let date = new Date();
-  let randomInsert = date.getTime().toString();
-  let destinationDir = path.join(os.tmpdir(), randomInsert + 'basic');
   before((done) => {
-    copy.copyRecursive(__dirname + '/definitions/basic', destinationDir);
-    process.env.CONFIG_DIR = destinationDir;
+    process.env.CONFIG_DIR = __dirname + '/definitions/basic';
     process.env.DATASTORE_PORT = 5000;
     process.env.APIMANAGER_PORT = 8081;
     process.env.APIMANAGER = '127.0.0.1';
@@ -100,7 +94,6 @@ describe('basic auth policy', function() {
       .then(() => apimServer.stop())
       .then(() => {
         delete process.env.CONFIG_DIR;
-        copy.deleteRecursive(destinationDir);
         delete process.env.DATASTORE_PORT;
         delete process.env.APIMANAGER_PORT;
         delete process.env.APIMANAGER;
@@ -121,7 +114,7 @@ describe('basic auth policy', function() {
     request
       .get('/basic/path-1')
       .auth('root', 'badpass')
-      .expect(401, done);
+      .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
   });
 
   it('should fail due to missing LDAP registry', function(done) {
@@ -149,7 +142,7 @@ describe('basic auth policy', function() {
     request
       .get('/basic/path-2')
       .auth('root', 'badpass')
-      .expect(401, done);
+      .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
   });
 
   it('should pass composeDN with jsmith:foobar', function(done) {

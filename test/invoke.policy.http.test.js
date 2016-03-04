@@ -46,6 +46,7 @@ describe('invokePolicy', function() {
 
   var data = { msg: 'Hello world' };
 
+  //invoke policy to post a request
   it('post', function(done) {
     this.timeout(10000);
 
@@ -56,7 +57,7 @@ describe('invokePolicy', function() {
       .expect(/z-method: POST/)
       .expect(/z-content-length: 21/)
       .expect(/z-transfer-encoding: undefined/)
-      .expect(200, /z-url: \/invoke\/basic/)
+      .expect(200, /z-url: \/\/invoke\/basic/)
       .end(function(err, res) {
           done(err);
       });
@@ -68,10 +69,38 @@ describe('invokePolicy', function() {
     request
       .get('/invoke/basic')
       .expect(200, /z-method: GET/)
-      .expect(200, /z-url: \/invoke\/basic/, done);
+      .expect(200, /z-url: \/\/invoke\/basic/, done);
   });
 
-  it('authOK', function(done) {
+  //a HEAD response has no body
+  it('head', function(done) {
+    this.timeout(10000);
+
+    request
+      .head('/invoke/basic')
+      .expect(200, /^$/, done);
+  });
+
+  //the target-url contains an invalid host name
+  it('host-not-found', function(done) {
+    this.timeout(10000);
+
+    request
+      .get('/invoke/dynHost')
+      .set('X-TEST-HOSTNAME', 'cannot.be.valid.com')
+      .expect(299, /'connection error' Error: getaddrinfo ENOTFOUND/, done);
+  });
+
+  //the invoke policy receives a 500 error from the server
+  it('test-500-rror', function(done) {
+    this.timeout(10000);
+
+    request
+      .get('/invoke/test500Error')
+      .expect(500, /This is a test for 500 error/, done);
+  });
+
+  it('auth-OK', function(done) {
     this.timeout(10000);
 
     request
@@ -80,7 +109,7 @@ describe('invokePolicy', function() {
       .expect(200, /z-method: GET/, done);
   });
 
-  it('authNG', function(done) {
+  it('auth-NG', function(done) {
     this.timeout(10000);
 
     request
@@ -122,7 +151,7 @@ describe('invokePolicy', function() {
     request
       .get('/invoke/timeout5Sec')
       .set('X-DELAY-ME', '2')
-      .expect(200, /z-url: \/invoke\/timeout5Sec/, done);
+      .expect(200, /z-url: \/\/invoke\/timeout5Sec/, done);
   });
 
   it('request-timeouted', function(done) {
@@ -169,7 +198,7 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8890')
       .set('X-TLS-PROFILE', 'tls-profile-serverSarah-1')
-      .expect(/url: \/invoke\/testTLS/)
+      .expect(/url: \/\/invoke\/testTLS/)
       .expect(200, done)
   });
 
@@ -194,8 +223,8 @@ describe('invokePolicy', function() {
       .expect(299, /Cannot find the TLS profile "not-found"/, done);
   });
 
-  //openssl s_client -tls1_2 -CAfile root.crt -connect localhost:8080
-  //openssl s_client -tls1 -CAfile root.crt -connect localhost:8080
+  //openssl s_client -tls1_2 -CAfile root.crt -connect localhost:port
+  //openssl s_client -tls1 -CAfile root.crt -connect localhost:port
   //Both of server and client use the TLS v1.0
   it('require-tls10', function(done) {
     this.timeout(10000);
@@ -204,7 +233,7 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8892')
       .set('X-TLS-PROFILE', 'tls-profile-require-tls10')
-      .expect(/url: \/invoke\/testTLS/)
+      .expect(/url: \/\/invoke\/testTLS/)
       .expect(200, done);
   });
 
@@ -276,7 +305,7 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8895')
       .set('X-TLS-PROFILE', 'tls-profile-alice-2')
-      .expect(/url: \/invoke\/testTLS/)
+      .expect(/url: \/\/invoke\/testTLS/)
       .expect(200, done);
   });
 
@@ -287,7 +316,7 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8895')
       .set('X-TLS-PROFILE', 'tls-profile-bob-2')
-      .expect(/url: \/invoke\/testTLS/)
+      .expect(/url: \/\/invoke\/testTLS/)
       .expect(200, done);
   });
 
@@ -310,7 +339,7 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8896')
       .set('X-TLS-PROFILE', 'tls-profile-sandy-2')
-      .expect(/url: \/invoke\/testTLS/)
+      .expect(/url: \/\/invoke\/testTLS/)
       .expect(200, done);
   });
 
@@ -333,7 +362,7 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8897')
       .set('X-TLS-PROFILE', 'tls-profile-sandy-2')
-      .expect(/url: \/invoke\/testTLS/)
+      .expect(/url: \/\/invoke\/testTLS/)
       .expect(200, done);
   });
 
@@ -347,5 +376,48 @@ describe('invokePolicy', function() {
       .expect(299, /Error: socket hang up/, done);
   });
 
-  //TODO: add testcase for input and output
+  //to read the data and headers from somewhere other than the context.message
+  it('test-input', function(done) {
+    this.timeout(10000);
+
+    request
+      .post('/invoke/testInput')
+      .send(data)
+      .expect(/z-method: POST/)
+      .expect(/z-secret-1: test 123/)
+      .expect(200, /body: This is a custom body message/, done);
+  });
+
+  //to save the result of invoke policy somewhere other than the context.message
+  it('test-output', function(done) {
+    this.timeout(10000);
+
+    request
+      .get('/invoke/testOutput')
+      .expect('X-TOKEN-ID', 'foo')
+      .expect(202, /You are accepted/, done);
+  });
+
+  //The api server returns a message of length 5 and header 'Content-Length:5'.
+  //Then a set-variable policy modifies the message without changing the
+  //Content-Length. Let's see what'll happen.
+  //It turns out that express will update the Content-Length
+  it('test-content-length', function(done) {
+    this.timeout(10000);
+
+    request
+      .get('/invoke/testContentLength')
+      .expect('Content-Length', 95)
+      .expect(200, /This is a very long message/, done);
+  });
+
+  //the returned body might be parsed as JSON depending on the content-type
+  it('test-json', function(done) {
+    this.timeout(10000);
+
+    request
+      .get('/invoke/testJSON')
+      .expect(200, /The quantity is 150 and the price is 23/, done);
+  });
+
 });
