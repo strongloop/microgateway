@@ -99,7 +99,7 @@ paths:
           items:
             type: integer
             format: int64
-          collectionFormat: csv
+          collectionFormat: ssv
           required: true
         - name: queryArray
           in: query
@@ -107,7 +107,21 @@ paths:
           type: array
           items:
             type: string
+          collectionFormat: multi
           required: true
+        - name: X-expireDate
+          in: header
+          description: parameter expire date
+          type: dateTime
+        - name: param6
+          in: query
+          description: parameter 6 reuqired but not existed
+          type: string
+          required: true
+        - name: X-param7
+          in: header
+          description: parameter 7 is an object
+          type: object
         - $ref: '#/parameters/ParamRef2'
       responses:
         '200':

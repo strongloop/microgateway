@@ -125,9 +125,11 @@ describe('Context variables in laptop experience', function() {
 
   it('should produce all request.parameters', function(done) {
     request
-      .get('/v1/context/request/parameters/abc/9999?param1=value1&param2=8888&param5=1111&paramBoolean=false&queryArray=1,2,3')
+      .get('/v1/context/request/parameters/abc/9999?param1=value1&param2=8888&param5=1111&paramBoolean=false&queryArray=1&queryArray=2&queryArray=3')
       .set('X-foo', 'bar')
-      .set('X-paramArray', '1024,2048,4096')
+      .set('X-paramArray', '1024 2048 4096')
+      .set('X-expireDate', '1995-12-17T03:24:00')
+      .set('X-param7', '{"a": 1234, "b": true}')
       .expect(200)
       .end(function(err, res) {
         var result = res.body;
@@ -135,27 +137,30 @@ describe('Context variables in laptop experience', function() {
           result = JSON.parse(result);
         }
 
-        console.log("request.parameters result: "+JSON.stringify(result));
+        console.log('request.parameters result: '+JSON.stringify(result));
         assert.deepStrictEqual(result,
-            {"param1":"value1",
-             "param2":8888,
-             "param3":9999,
-             "param4":"abc",
-             "X-foo":"bar",
-             "paramBoolean":false,
-             "X-paramArray":[1024,2048,4096],
-             "queryArray":["1","2","3"]}
+            {param1:'value1',
+             param2:8888,
+             param3:9999,
+             param4:'abc',
+             'X-foo':'bar',
+             paramBoolean:false,
+             'X-paramArray':[1024,2048,4096],
+             queryArray:['1', '2', '3'],
+             'X-expireDate':'1995-12-16T19:24:00.000Z',
+             'X-param7': {"a":1234,"b":true}}
         );
         assert.equal(result.param5, undefined);
+        assert.equal(result.param6, undefined);
         done();
       });
   });
 
   it('should resolve JSON-references', function(done) {
     request
-      .get('/v1/context/request/parameters/abc/9999?param1=value1&param2=8888&param5=1111&paramBoolean=false&queryArray=1,2,3&paramRef1=foo')
+      .get('/v1/context/request/parameters/abc/9999?param1=value1&param2=8888&param5=1111&paramBoolean=false&queryArray=1&queryArray=2&queryArray=3&paramRef1=foo')
       .set('X-foo', 'bar')
-      .set('X-paramArray', '1024,2048,4096')
+      .set('X-paramArray', '1024 2048 4096')
       .set('X-PARAM-REF-2', true)
       .expect(200)
       .end(function(err, res) {
