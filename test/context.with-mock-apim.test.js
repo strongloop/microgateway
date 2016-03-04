@@ -80,7 +80,7 @@ describe('Context variables testing with mock apim server', function() {
           id: 'uber:1.0.0:gold',
           name: 'gold',
           version: '1.0.0',
-          'rate-limit': {
+          rateLimit: {
             'hard-limit': false,
             'value': '1/sec'
           }
@@ -131,7 +131,7 @@ describe('Context variables testing with mock apim server', function() {
           id: 'apim:1.0.0:gold',
           name: 'gold',
           version: '1.0.0',
-          'rate-limit': {
+          rateLimit: {
             'hard-limit': false,
             'value': '1000/min'
           }
