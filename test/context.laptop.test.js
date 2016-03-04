@@ -129,7 +129,7 @@ describe('Context variables in laptop experience', function() {
       .get('/v1/context/request/parameters/abc/9999?param1=value1&param2=8888&param5=1111&paramBoolean=false&queryArray=1&queryArray=2&queryArray=3')
       .set('X-foo', 'bar')
       .set('X-paramArray', '1024 2048 4096')
-      .set('X-expireDate', '1995-12-17T03:24:00')
+      .set('X-expireDate', '1995-12-17T03:24:00 Z')
       .set('X-param7', '{"a": 1234, "b": true}')
       .expect(200)
       .end(function(err, res) {
@@ -148,7 +148,7 @@ describe('Context variables in laptop experience', function() {
              paramBoolean:false,
              'X-paramArray':[1024,2048,4096],
              queryArray:['1', '2', '3'],
-             'X-expireDate':'1995-12-16T19:24:00.000Z',
+             'X-expireDate':'1995-12-17T03:24:00.000Z',
              'X-param7': {"a":1234,"b":true}}
         );
         assert.equal(result.param5, undefined);
