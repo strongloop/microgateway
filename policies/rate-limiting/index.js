@@ -30,7 +30,13 @@ module.exports = function(options) {
     unit = (parts[3] || unit).trim();
   }
 
-  var interval = moment.duration(period, unit).asMilliseconds();
+  // moment.duration does not like 'min' as a unit of measure, conver to 'm'
+  // TODO do we need to do this for more units?
+  if (unit == 'min') {
+    unit='m';
+  }
+  
+  var interval =moment.duration(period, unit).asMilliseconds();
   var reject = options['reject'] || options['hard-limit'] || false;
 
   logger.debug('Limit: %d/%d%s Reject: %s', limit, period, unit, reject);
@@ -51,10 +57,10 @@ module.exports = function(options) {
   }
 
   if (config.redis) {
-    debug('Create a redis based rate limiter: %j', config);
+    logger.debug('Create a redis based rate limiter: %j', config);
     return redisLimiter(config);
   } else {
-    debug('Create a local token bucket based rate limiter: %j', config);
+    logger.debug('Create a local token bucket based rate limiter: %j', config);
     return tokenBucketLimiter(config);
   }
 
@@ -80,4 +86,3 @@ module.exports = function(options) {
   }
 
 };
-
