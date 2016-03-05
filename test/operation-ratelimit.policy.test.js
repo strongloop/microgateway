@@ -49,12 +49,12 @@ describe('opertaion rate limiting test', function() {
         }, done);
       });
     
-    // it('client_id=' + clientId1 + ' secret=' + clientSecret1 + ' "/ratelimit1" should reject"',
-    //   function (done) {
-    //     request
-    //     .get('/v1/ratelimit1?client_id=' + clientId1 + '&client_secret=' + clientSecret1)
-    //     .expect(429, done);
-    //   });
+    it('client_id=' + clientId1 + ' secret=' + clientSecret1 + ' "/ratelimit1" should reject"',
+      function (done) {
+        request
+        .get('/v1/ratelimit1?client_id=' + clientId1 + '&client_secret=' + clientSecret1)
+        .expect(429, done);
+      });
 
     it('client_id=' + clientId1 + ' secret=' + clientSecret1 + ' "/ratelimit2" should pass"',
       function (done) {
@@ -65,12 +65,12 @@ describe('opertaion rate limiting test', function() {
         }, done);
       });
     
-    // it('client_id=' + clientId1 + ' secret=' + clientSecret1 + ' "/ratelimit2" should reject"',
-    //   function (done) {
-    //     request
-    //     .get('/v1/ratelimit2?client_id=' + clientId1 + '&client_secret=' + clientSecret1)
-    //     .expect(429, done);
-    //   });
+    it('client_id=' + clientId1 + ' secret=' + clientSecret1 + ' "/ratelimit2" should reject"',
+      function (done) {
+        request
+        .get('/v1/ratelimit2?client_id=' + clientId1 + '&client_secret=' + clientSecret1)
+        .expect(429, done);
+      });
     
     it('client_id=' + clientId1 + ' secret=' + clientSecret1 + ' "/ratelimit3" should be 404"',
       function (done) {
