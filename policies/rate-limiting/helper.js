@@ -1,17 +1,17 @@
 'use strict';
 
 var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'apiconnect-microgateway:policies:rate-limiting:helper'});
+  .child({loc: 'apiconnect-microgateway:policies:rate-limiting:helper'});
 
 exports.handleResponse =
   function(limit, remaining, reset, reject, context, flow) {
-    if (remaining <= 0 && reject) {
+    if (remaining < 0 && reject) {
       let resMsg = setupHeaders();
       var err = new Error('Rate limit exceeded');
       err.statusCode = 429;
       err.name = 'RateLimitExceeded';
       context.error = err;
-      debug('Rate limit exceeded: %j', err);
+      logger.debug('Rate limit exceeded: %j', err);
       return flow.fail(err);
     }
 

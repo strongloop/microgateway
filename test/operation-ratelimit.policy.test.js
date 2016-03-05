@@ -18,7 +18,6 @@ describe('opertaion rate limiting test', function() {
       .then(() => echo.start(8889))
       .then(() => {
         request = supertest('http://localhost:3000');
-        console.log ('setup test1');
       })
       .then(done)
       .catch((err) => {

@@ -3,7 +3,7 @@ var moment = require('moment');
 var redisLimiter = require('./redis');
 var tokenBucketLimiter = require('./token-bucket');
 var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'apiconnect-microgateway:policies:rate-limiting'});
+  .child({loc: 'apiconnect-microgateway:policies:rate-limiting'});
 var assert = require('assert');
 
 module.exports = function(options) {
@@ -30,13 +30,32 @@ module.exports = function(options) {
     unit = (parts[3] || unit).trim();
   }
 
-  // moment.duration does not like 'min' as a unit of measure, conver to 'm'
-  // TODO do we need to do this for more units?
-  if (unit == 'min') {
-    unit='m';
+  // moment.duration does not like 'min' as a unit of measure, convert to 'm'
+  // See http://momentjs.com/docs/#/durations/creating/
+  switch (unit) {
+    case 'min':
+    case 'mins':
+      unit = 'm';
+      break;
+    case 'sec':
+    case 'secs':
+      unit = 's';
+      break;
+    case 'yr':
+    case 'yrs':
+      unit = 'y';
+      break;
+    case 'hr':
+    case 'hrs':
+      unit = 'h';
+      break;
+    case 'wk':
+    case 'wks':
+      unit = 'w';
+      break;
   }
-  
-  var interval =moment.duration(period, unit).asMilliseconds();
+
+  var interval = moment.duration(period, unit).asMilliseconds();
   var reject = options['reject'] || options['hard-limit'] || false;
 
   logger.debug('Limit: %d/%d%s Reject: %s', limit, period, unit, reject);

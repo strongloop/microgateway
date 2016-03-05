@@ -424,7 +424,6 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                             } else {
                               rateLimitScope = pieces.plan.id+":"+opMeth+":"+opPath;
                             }
-console.log("RATELIMITSCOPE:" + rateLimitScope);
                           }
                         }
                       });
