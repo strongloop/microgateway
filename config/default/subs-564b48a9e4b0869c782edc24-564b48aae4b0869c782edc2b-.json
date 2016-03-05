@@ -1961,6 +1961,23 @@
             },
             "apis": 
               {
+                "ratelimit": {
+                    "operations": [
+                      {
+                        "operationId": "ratelimitB",
+                        "rate-limit": {
+                          "value": "4/10minute"
+                        }
+                      },
+                      {
+                        "operation": "get",
+                        "path": "/ratelimitC",
+                        "rate-limit": {
+                          "value": "2/10minute"
+                        }
+                      } 
+                    ]
+                }
               }
           }
         }
