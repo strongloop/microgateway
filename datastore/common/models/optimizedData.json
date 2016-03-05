@@ -42,7 +42,9 @@
         "produces": [],
         "responses": {},
         "securityDefs": {},
-        "securityReqs": []
+        "securityReqs": [],
+        "observed-rate-limit": {},
+        "rate-limit-scope": "string"
       }]
     }],
     "snapshot-id": "string"

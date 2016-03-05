@@ -391,6 +391,45 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                     var securityEnabledForMethod =
                       operation.security ? operation.security : apiDocument.security;
                     logger.debug('securityEnabledForMethod: ' + JSON.stringify(securityEnabledForMethod));
+
+                    var allowOperation = false;
+                    var observedRatelimit = pieces.plan.rateLimit;
+                    var rateLimitScope = pieces.plan.id;
+                    // Does the plan neglect to specify APIs, or is the api listed in the plan with no operations listed? Then allow any operation
+                    if ((pieces.plan.apis === undefined) || 
+                        (pieces.plan.apis[api.document.info['x-ibm-name']] !== undefined && 
+                         pieces.plan.apis[api.document.info['x-ibm-name']].operations === undefined)){
+                      allowOperation = true;
+                    } else {
+                      //Look to see if we got an operationID match
+                      var operations = pieces.plan.apis[api.document.info['x-ibm-name']].operations;
+                      var loop_index;
+
+                      operations.forEach(function(planOp) {
+                        var opId = planOp.operationId;
+                        var opMeth = planOp.operation;
+                        var opPath = planOp.path;
+                        
+                        if ((opId !== undefined && opId === operation.operationId) || 
+                              (opMeth !== undefined && opPath !== undefined &&
+                               opMeth.toUpperCase() === methodname.toUpperCase() && 
+                               opPath.toUpperCase() === propname.toUpperCase())) {
+                          allowOperation = true;
+                          // Look for some operation scoped ratelimit metadata
+                          if (planOp["rate-limit"] !== undefined) {
+                            observedRatelimit=planOp["rate-limit"];
+
+                            if (opId) {
+                              rateLimitScope = pieces.plan.id+":"+opId;
+                            } else {
+                              rateLimitScope = pieces.plan.id+":"+opMeth+":"+opPath;
+                            }
+console.log("RATELIMITSCOPE:" + rateLimitScope);
+                          }
+                        }
+                      });
+                    }
+
                     var clientidSecurity = false;
                     if (securityEnabledForMethod)
                       {
@@ -407,9 +446,10 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                                 });
                         });
                       }
-                    if ((securityEnabledForMethod && clientidSecurity && !isWildcard) ||
+                    if (allowOperation && 
+                        ((securityEnabledForMethod && clientidSecurity && !isWildcard) ||
                         // add only security for subscriptions
-                        ((!securityEnabledForMethod || !clientidSecurity) && isWildcard)) {
+                        ((!securityEnabledForMethod || !clientidSecurity) && isWildcard))) {
                         // add only non-clientid security for products (wildcard)
                       method.push({
                         consumes: operation.consumes || apiDocument.consumes,
@@ -422,6 +462,8 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                         securityDefs: apiDocument.securityDefinitions,
                         // operational lvl Swagger security overrides the API lvl
                         securityReqs: securityEnabledForMethod,
+                        'observed-rate-limit': observedRatelimit,
+                        'rate-limit-scope': rateLimitScope
                         });
                       }
                   }

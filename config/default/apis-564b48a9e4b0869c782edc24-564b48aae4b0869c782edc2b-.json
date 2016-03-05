@@ -1842,6 +1842,36 @@
                         ]
                     }
                 },
+                "/ratelimit1": {
+                  "get": {
+                    "operationId": "ratelimit1",
+                    "responses": {
+                      "200": {
+                        "description": "200 OK"
+                      }
+                    }
+                  }
+                },
+                "/ratelimit2": {
+                  "get": {
+                    "operationId": "ratelimit2",
+                    "responses": {
+                      "200": {
+                        "description": "200 OK"
+                      }
+                    }
+                  }
+                },
+                "/ratelimit3": {
+                  "get": {
+                    "operationId": "ratelimit3",
+                    "responses": {
+                      "200": {
+                        "description": "200 OK"
+                      }
+                    }
+                  }
+                },
                 "/test4/{id}/exists": {
                     "get": {
                         "deprecated": false,

@@ -2,6 +2,7 @@
 var RateLimiter = require('rolling-rate-limiter');
 var redis = require('redis');
 var handleResponse = require('./helper').handleResponse;
+var debug = require('debug')('policy:rate-limiting');
 
 module.exports = function(options) {
   options = options || {};
@@ -11,7 +12,7 @@ module.exports = function(options) {
 
   var limit = options.limit;
   var interval = options.interval;
-  var hardLimit = options.hardLimit;
+  var reject = options.reject;
 
   var limiter = RateLimiter({
     redis: client,
@@ -22,17 +23,19 @@ module.exports = function(options) {
 
   var hardLimit = options.hardLimit;
 
-  return function(props, context, next) {
+  return function(props, context, flow) {
 
     var key = options.getKey(context);
+    debug('Key: %s', key);
+    if (!key) {
+      return flow.proceed();
+    }
     limiter(key, function(err, timeLeft) {
       if (err) {
-        return next(err);
+        return flow.fail(err);
       }
       let remaining = timeLeft > 0 ? 0 : options.limit;
-      handleResponse(limit, remaining, timeLeft, hardLimit, context, next);
+      handleResponse(limit, remaining, timeLeft, reject, context, flow);
     });
-
   };
-
 };
