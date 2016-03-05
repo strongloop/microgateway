@@ -393,8 +393,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                     logger.debug('securityEnabledForMethod: ' + JSON.stringify(securityEnabledForMethod));
 
                     var allowOperation = false;
-                    var observedRatelimit = pieces.plan.rateLimit;
-                    var rateLimitScope = pieces.plan.id;
+                    var operationRatelimit = pieces.plan.rateLimit;
                     // Does the plan neglect to specify APIs, or is the api listed in the plan with no operations listed? Then allow any operation
                     if ((pieces.plan.apis === undefined) || 
                         (pieces.plan.apis[api.document.info['x-ibm-name']] !== undefined && 
@@ -417,13 +416,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                           allowOperation = true;
                           // Look for some operation scoped ratelimit metadata
                           if (planOp["rate-limit"] !== undefined) {
-                            observedRatelimit=planOp["rate-limit"];
-                            
-                            if (opId) {
-                              rateLimitScope = pieces.plan.id+":"+opId;
-                            } else {
-                              rateLimitScope = pieces.plan.id+":"+opMeth+":"+opPath;
-                            }
+                            operationRatelimit=planOp["rate-limit"];
                           }
                         }
                       });
@@ -461,8 +454,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                         securityDefs: apiDocument.securityDefinitions,
                         // operational lvl Swagger security overrides the API lvl
                         securityReqs: securityEnabledForMethod,
-                        'observed-rate-limit': observedRatelimit,
-                        'rate-limit-scope': rateLimitScope
+                        'operation-rate-limit': operationRatelimit
                         });
                       }
                   }
