@@ -210,15 +210,6 @@
             ]
           }
         }
-      },
-      "platinum": {
-        "title": "Platinum Climb On",
-        "description": "blah blah",
-        "approval": true,
-        "rate-limit": {
-          "hard-limit": false,
-          "value": "10000/min"
-        }
       }
     }
   }
