@@ -1,6 +1,4 @@
 'use strict';
-var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'apiconnect-microgateway:policies:invoke'});
 var fs = require('fs');
 var url = require('url');
 var assert = require('assert');

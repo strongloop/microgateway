@@ -1,8 +1,8 @@
 'use strict';
-var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'apiconnect-microgateway:policies:cors'});
 module.exports = function(config) {
   return function(props, ctx, flow) {
+    var logger = flow.logger;
+
     flow.subscribe('FINISH', (event, next) => {
       let allowCreds = props['allow-credentials'];
       if (allowCreds === true) {
