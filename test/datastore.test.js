@@ -18,8 +18,8 @@ describe('data-store', function() {
     process.env.APIMANAGER = '127.0.0.1';
     process.env.NODE_ENV = 'production';
     echo.start(8889)
-      .then(function() { apimServer.start('127.0.0.1', 8890); } )
-      .then(function() { microgw.start(3000); } )
+      .then(function() { return apimServer.start('127.0.0.1', 8890); } )
+      .then(function() { return microgw.start(3000); } )
       .then(function() {
         request = supertest('http://localhost:5000');
       })

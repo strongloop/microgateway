@@ -58,7 +58,7 @@ exports.stop = function() {
   return new Promise(function(resolve, reject) {
     server.close(function() {
       resolve(0);
-    })
+    });
   });
 };
 
