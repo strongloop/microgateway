@@ -14,7 +14,7 @@ module.exports = function(config) {
       return;
     }
     //need to wrap the code snippet into a function first
-    var script = new vm.Script('() => {' + props.source + '}()');
+    var script = new vm.Script('(function() {' + props.source + '})()');
     try {
       //use context as this to run the wrapped function
       script.runInNewContext(context);

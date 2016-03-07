@@ -10,10 +10,10 @@ describe('javascript policy', function() {
       var context = {request:
                           {uri: 'http://localhost/foo'}
                      };
-      var code = `if (request.uri === undefined ||
-                    request.uri !== "http://localhost/foo") {
-                    throw {name:'PropertyNotFound'};
-                  }`;
+      var code = "if (request.uri === undefined || " +
+        "request.uri !== 'http://localhost/foo') {" +
+        "throw {name:'PropertyNotFound'};" +
+        "}";
       var flow = {
         'proceed': function() {
           done();
@@ -37,9 +37,8 @@ describe('javascript policy', function() {
                           {uri: 'http://localhost/foo'},
                       myval: 1
                      };
-      var code = `request.uri = 'http://localhost/bar';
-                  myval = 'myvalue';
-        `;
+      var code = "request.uri = 'http://localhost/bar';" +
+        "myval = 'myvalue';";
 
       var flow = {
           'proceed': function() {
@@ -66,7 +65,7 @@ describe('javascript policy', function() {
       var context = {request:
                           {uri: 'http://localhost/foo'}
                      };
-      var code = `delete request.uri;`;
+      var code = "delete request.uri;";
 
       var flow = {
           'proceed': function() {
@@ -91,7 +90,7 @@ describe('javascript policy', function() {
       var context = {request:
                           {uri: 'http://localhost/foo'}
                      };
-      var code = `var a = 'localvar'; a = request.uri;`;
+      var code = "var a = 'localvar'; a = request.uri;";
 
       var flow = {
           'proceed': function() {
@@ -119,11 +118,10 @@ describe('javascript policy', function() {
       var context = {request:
                           {uri: 'http://localhost/foo'}
                      };
-      var code = `function fool(bar) {
-          return bar+'xxx';
-        }
-        request.uri = fool('http://localhost/');
-        `;
+      var code = "function fool(bar) {" +
+        "return bar+'xxx';" +
+        "}" +
+        "request.uri = fool('http://localhost/');";
 
       var flow = {
           'proceed': function() {
@@ -149,7 +147,7 @@ describe('javascript policy', function() {
                           {uri: 'http://localhost/foo'},
                      myval : '1'
                      };
-      var code = `myval = parseInt(myval);`;
+      var code = "myval = parseInt(myval);";
 
       var flow = {
           'proceed': function() {
@@ -176,7 +174,7 @@ describe('javascript policy', function() {
                           {uri: 'http://localhost/foo'},
                      myval: '1'
                      };
-      var code = `myval = JSON.stringify({ 'a': 'a', 'b':'b'});`;
+      var code = "myval = JSON.stringify({ 'a': 'a', 'b':'b'});";
 
       var flow = {
           'proceed': function() {
@@ -204,7 +202,7 @@ describe('javascript policy', function() {
 //      var context = {request:
 //                          {uri: 'http://localhost/foo'}
 //                     };
-//      var code = `let a = 'bar'; request.uri = 'http://localhost/' + a;`;
+//      var code = "let a = 'bar'; request.uri = 'http://localhost/' + a;";
 //
 //      javascriptPolicy({source: code}, context, function(error) {
 //        should(error).be.a.Undefined();
@@ -218,12 +216,11 @@ describe('javascript policy', function() {
       var context = {request:
                           {uri: 'http://localhost/foo'}
                      };
-      var code = `try {
-          var vm = require('vm');
-        } catch (e) {
-          request.uri = 'http://localhost/bar'
-        }`;
-
+      var code = "try {" +
+        "var vm = require('vm');" +
+        "} catch (e) {" +
+        "request.uri = 'http://localhost/bar'" +
+        "}";
 
       var flow = {
           'proceed': function() {
@@ -249,11 +246,11 @@ describe('javascript policy', function() {
                           {uri: 'http://localhost/foo'},
                      myval: '1'
                      };
-      var code = `var total = 0;
-        [1, 2, 3].forEach(function(val) {
-          total += val;
-        });
-        myval = total;`;
+      var code = "var total = 0;" +
+        "[1, 2, 3].forEach(function(val) {" +
+        "total += val;" +
+        "});" +
+        "myval = total;";
 
       var flow = {
           'proceed': function() {
@@ -278,7 +275,7 @@ describe('javascript policy', function() {
       var context = {request:
                           {uri: 'http://localhost/foo'}
                      };
-      var code = `var vm = require('vm');`;
+      var code = "var vm = require('vm');";
 
       var flow = {
           'proceed': function() {
@@ -304,7 +301,7 @@ describe('javascript policy', function() {
       var context = {request:
                           {uri: 'http://localhost/foo'}
                      };
-      var code = `process.env;`;
+      var code = "process.env;";
 
       var flow = {
           'proceed': function() {
@@ -330,7 +327,7 @@ describe('javascript policy', function() {
       var context = {request:
                           {uri: 'http://localhost/foo'}
                      };
-      var code = `setTimeout(function() {request.uri='xxx';}, 1000);`;
+      var code = "setTimeout(function() {request.uri='xxx';}, 1000);";
 
       var flow = {
           'proceed': function() {
