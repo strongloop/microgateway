@@ -16,6 +16,7 @@ describe('data-store', function() {
     process.env.DATASTORE_PORT = 5000;
     process.env.APIMANAGER_PORT = 8890;
     process.env.APIMANAGER = '127.0.0.1';
+    process.env.APIMANAGER_REFRESH_INTERVAL = 15 * 1000; // 15 seconds
     process.env.NODE_ENV = 'production';
     echo.start(8889)
       .then(() => apimServer.start('127.0.0.1', 8890))
