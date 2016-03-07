@@ -11,26 +11,26 @@ var async = require('async');
 describe('opertaion rate limiting test', function() {
 
   var request;
-  before((done) => {
+  before(function(done) {
     process.env.APIMANAGER = '127.0.0.1';
     process.env.NODE_ENV = 'production';
     mg.start(3000)
-      .then(() => echo.start(8889))
-      .then(() => {
+      .then(function() { return echo.start(8889); })
+      .then(function() {
         request = supertest('http://localhost:3000');
       })
       .then(done)
-      .catch((err) => {
+      .catch(function(err) {
         console.error(err);
         done(err);
       });
   });
 
-  after((done) => {
+  after(function(done) {
     delete process.env.APIMANAGER;
     delete process.env.NODE_ENV;
     echo.stop()
-      .then(() => mg.stop())
+      .then(function() { return mg.stop(); })
       .then(done, done);
   });
 
