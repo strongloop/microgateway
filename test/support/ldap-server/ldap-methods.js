@@ -48,7 +48,7 @@ module.exports = function (server, authreq) {
   }
 
   return loadPasswdFile().then(function() {
-    return server.bind('cn=root', function (req, res, next) {
+    server.bind('cn=root', function (req, res, next) {
       if (req.dn.toString() !== 'cn=root' || req.credentials !== 'secret')
         return next(new ldap.InvalidCredentialsError());
       res.end();
