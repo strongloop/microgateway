@@ -21,7 +21,7 @@ exports.apimGetDefaultCatalog = function(snapshot, orgName) {
       orgNameFilter + ',' +
       defaultOrgFilter + ']}}';
 
-  var queryurl = 'http://' + host + ':' + process.env['DATASTORE_PORT'] +
+  var queryurl = 'http://' + host + ':' + process.env.DATASTORE_PORT +
       '/api/catalogs?filter=' + encodeURIComponent(queryfilter);
 
   return new Promise((resolve, reject) => {
@@ -59,7 +59,7 @@ exports.grabAPI = function(context, callback) {
       '{"where": { "and":[' +
       snapshotFilter + ',' +
       apiFilter + ']}}';
-  var queryurl = 'http://' + host + ':' + process.env['DATASTORE_PORT'] +
+  var queryurl = 'http://' + host + ':' + process.env.DATASTORE_PORT +
       '/api/apis?filter=' + encodeURIComponent(queryfilter);
   var api = {};
 
@@ -92,7 +92,7 @@ exports.grabAPI = function(context, callback) {
 exports.getCurrentSnapshot = function() {
   logger.debug('getCurrentSnapshot entry');
   // build request to send to data-store
-  const port = process.env['DATASTORE_PORT'];
+  const port = process.env.DATASTORE_PORT;
   const queryurl = `http://${host}:${port}/api/snapshots/current`;
 
   // send request to optimizedData model from data-store
