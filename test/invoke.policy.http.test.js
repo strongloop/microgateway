@@ -1,14 +1,14 @@
 'use strict';
 
-let supertest = require('supertest');
-let microgw = require('../lib/microgw');
-let backend = require('./support/invoke-server');
-let apimServer = require('./support/mock-apim-server/apim-server');
+var supertest = require('supertest');
+var microgw = require('../lib/microgw');
+var backend = require('./support/invoke-server');
+var apimServer = require('./support/mock-apim-server/apim-server');
 
 describe('invokePolicy', function() {
 
-  let request;
-  before((done) => {
+  var request;
+  before(function(done) {
     //Use production instead of CONFIG_DIR: reading from apim instead of laptop
     process.env.NODE_ENV = 'production';
 
@@ -21,25 +21,25 @@ describe('invokePolicy', function() {
             process.env.APIMANAGER,
             process.env.APIMANAGER_PORT,
             __dirname + '/definitions/invoke')
-        .then(() => microgw.start(3000))
-        .then(() => backend.start(8889))
-        .then(() => { request = supertest('http://localhost:3000'); })
+        .then(function() { microgw.start(3000); })
+        .then(function() { backend.start(8889); })
+        .then(function() { request = supertest('http://localhost:3000'); })
         .then(done)
-        .catch((err) => {
+        .catch(function(err) {
             console.error(err);
             done(err);
             });
   });
 
-  after((done) => {
+  after(function(done) {
     delete process.env.NODE_ENV;
     delete process.env.APIMANAGER;
     delete process.env.APIMANAGER_PORT;
     delete process.env.DATASTORE_PORT;
 
     apimServer.stop()
-      .then(() => microgw.stop())
-      .then(() => backend.stop())
+      .then(function() { microgw.stop(); })
+      .then(function() { backend.stop(); })
       .then(done, done)
       .catch(done);
   });

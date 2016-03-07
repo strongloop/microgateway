@@ -1,30 +1,30 @@
 'use strict';
 
-let _ = require('lodash');
-let assert = require('assert');
-let supertest = require('supertest');
-let yaml = require('yamljs');
+var _ = require('lodash');
+var assert = require('assert');
+var supertest = require('supertest');
+var yaml = require('yamljs');
 
-let mg = require('../lib/microgw');
+var mg = require('../lib/microgw');
 
 describe('Context variables in laptop experience', function() {
 
-  let request;
-  before((done) => {
+  var request;
+  before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/context';
     process.env.NODE_ENV = 'production';
     mg.start(3000)
-      .then(() => {
+      .then(function() {
         request = supertest('http://localhost:3000');
       })
       .then(done)
-      .catch((err) => {
+      .catch(function(err) {
         console.error(err);
         done(err);
       });
   });
 
-  after((done) => {
+  after(function(done) {
     mg.stop()
       .then(done, done)
       .catch(done);
@@ -44,7 +44,7 @@ describe('Context variables in laptop experience', function() {
 
         result.endpoint.address = '*';
 
-        let swagger =
+        var swagger =
           yaml.load(process.env.CONFIG_DIR + '/context_1.0.0.yaml');
 
         delete swagger['x-ibm-configuration'].assembly;
@@ -81,7 +81,7 @@ describe('Context variables in laptop experience', function() {
           result = JSON.parse(result);
         }
 
-        let swagger =
+        var swagger =
           yaml.load(process.env.CONFIG_DIR + '/context_1.0.0.yaml');
 
         assert.deepStrictEqual(result, {
@@ -260,18 +260,18 @@ describe('Context variables in laptop experience', function() {
           'Content-Length': payloadBuff.length
         }
       };
-      var req = http.request(options, (res) => {
+      var req = http.request(options, function(res) {
         var responseData = '';
         res.setEncoding('utf8');
-        res.on('data', (chunk) => {
+        res.on('data', function(chunk) {
           responseData += chunk;
         });
-        res.on('end', () => {
+        res.on('end', function() {
           callback(undefined, responseData);
         });
       });
 
-      req.on('error', (e) => {
+      req.on('error', function(e) {
         callback(e, undefined);
       });
 

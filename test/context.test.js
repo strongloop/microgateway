@@ -8,7 +8,7 @@ var request = require('supertest');
 
 var context = require('../lib/context');
 
-const API_PATH_HEADER = 'X-API-PATH';
+var API_PATH_HEADER = 'X-API-PATH';
 
 describe('Context middleware', function() {
 

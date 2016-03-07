@@ -1,7 +1,7 @@
 'use strict';
-const javascriptPolicy = require('../policies/javascript')();
-const should           = require('should');
-const bunyan           = require('bunyan');
+var javascriptPolicy = require('../policies/javascript')();
+var should           = require('should');
+var bunyan           = require('bunyan');
 
 describe('javascript policy', function() {
   describe('access context', function() {

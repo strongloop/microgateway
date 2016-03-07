@@ -1,48 +1,48 @@
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
-let express = require('express');
-let supertest = require('supertest');
-let echo = require('./support/echo-server');
-let ldap = require('./support/ldap-server');
-let mg = require('../lib/microgw');
-let should = require('should');
+var fs = require('fs');
+var path = require('path');
+var express = require('express');
+var supertest = require('supertest');
+var echo = require('./support/echo-server');
+var ldap = require('./support/ldap-server');
+var mg = require('../lib/microgw');
+var should = require('should');
 
 describe('basic auth policy', function() {
 
-  let request;
-  before((done) => {
+  var request;
+  before(function(done) {
     process.env.APIMANAGER = '127.0.0.1';
     process.env.NODE_ENV = 'production';
     mg.start(3000)
-      .then(() => {
+      .then(function() {
         return ldap.start(1389);
       })
-      .then(() => {
+      .then(function() {
         return echo.start(8889);
       })
-      .then(() => {
+      .then(function() {
         request = supertest('http://localhost:3000');
       })
       .then(done)
-      .catch((err) => {
+      .catch(function(err) {
         console.error(err);
         done(err);
       });
   });
 
-  after((done) => {
+  after(function(done) {
     delete process.env.APIMANAGER;
     delete process.env.NODE_ENV;
     mg.stop()
-      .then(() => ldap.stop())
-      .then(() => echo.stop())
+      .then(function() { ldap.stop(); })
+      .then(function() { echo.stop(); })
       .then(done, done)
       .catch(done);
   });
 
-  let clientId1 = 'fb82cb59-ba95-4c34-8612-e63697d7b845';
+  var clientId1 = 'fb82cb59-ba95-4c34-8612-e63697d7b845';
   it(`client_id=${clientId1} should pass with "root"/"Hunter2"`, function(done) {
     request
       .post('/v1/ascents?client_id=' +  clientId1)

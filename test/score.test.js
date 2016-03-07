@@ -1,15 +1,15 @@
 'use strict';
 
-let express = require('express');
-let supertest = require('supertest');
-let echo = require('./support/echo-server');
-let mg = require('../lib/microgw');
+var express = require('express');
+var supertest = require('supertest');
+var echo = require('./support/echo-server');
+var mg = require('../lib/microgw');
 var path = require('path');
 var fs = require('fs');
 
 describe('matching score test', function() {
 
-  let request;
+  var request;
   before((done) => {
     process.env.APIMANAGER = '127.0.0.1';
     process.env.NODE_ENV = 'production';

@@ -1,98 +1,104 @@
 'use strict';
 
-let _ = require('lodash');
-let fs = require('fs');
-let path = require('path');
-let express = require('express');
-let supertest = require('supertest');
-let echo = require('./support/echo-server');
-let ldap = require('./support/ldap-server');
-let mg = require('../lib/microgw');
-let dsc = require('../datastore/client');
-let should = require('should');
-let apimServer = require('./support/mock-apim-server/apim-server');
+var _ = require('lodash');
+var fs = require('fs');
+var path = require('path');
+var express = require('express');
+var supertest = require('supertest');
+var echo = require('./support/echo-server');
+var ldap = require('./support/ldap-server');
+var mg = require('../lib/microgw');
+var dsc = require('../datastore/client');
+var should = require('should');
+var apimServer = require('./support/mock-apim-server/apim-server');
 
 function cleanup () {
-  const rmfile = fpath => new Promise((resolve, reject) => {
-    console.log(`Removing file ${fpath}`);
-    fs.unlink(fpath, err => {
-      if (err) {
-        console.error(`Error removing ${fpath}`);
-        reject(err);
-      }
-      else
-        resolve();
-    })
-  });
-
-  const readdir = dir => new Promise((resolve, reject) => {
-    fs.readdir(ssdir, (err, files) => {
-      if (err) {
-        console.error(`Error while reading ${ssdir}`);
-        reject(err);
-      }
-      else
-        resolve(files);
+  var rmfile = function(fpath) {
+    new Promise(function(resolve, reject) {
+      console.log(`Removing file ${fpath}`);
+      fs.unlink(fpath, function(err) {
+        if (err) {
+          console.error(`Error removing ${fpath}`);
+          reject(err);
+        }
+        else
+          resolve();
+      })
     });
-  });
+  };
 
-  let ssdir;
+  var readdir = function(dir) {
+    new Promise(function(resolve, reject) {
+      fs.readdir(ssdir, function(err, files) {
+        if (err) {
+          console.error(`Error while reading ${ssdir}`);
+          reject(err);
+        }
+        else
+          resolve(files);
+      });
+    });
+  };
+
+  var ssdir;
 
   return dsc.getCurrentSnapshot()
-    .then(id => {
+    .then(function(id) {
       ssdir = path.resolve(__dirname, '../config', id);
       return readdir(ssdir);
     })
-    .then(files => new Promise((resolve) => {
-      console.log(`Removing ${ssdir}`);
-      let p = Promise.all(_.map(files, f => rmfile(path.resolve(ssdir, f))));
-      p = p.then(() => {
-        fs.rmdir(ssdir, err => {
-          if (err)
-            console.error(`Error removing ${fpath}`);
-          resolve(p);
+    .then(function(files) {
+      new Promise(function(resolve) {
+        console.log(`Removing ${ssdir}`);
+        var p = Promise.all(_.map(files, function(f) { rmfile(path.resolve(ssdir, f)); }));
+        p = p.then(function() {
+          fs.rmdir(ssdir, function(err) {
+            if (err)
+              console.error(`Error removing ${fpath}`);
+            resolve(p);
+          });
         });
-      })
-    }))
-    .catch(err => {
+      });
+    })
+    .catch(function(err) {
       console.error('cleanup() failed due to error', err);
     });
 }
 
 describe('basic auth policy', function() {
 
-  let request;
-  before((done) => {
+  var request;
+  before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/basic';
     process.env.DATASTORE_PORT = 5000;
     process.env.APIMANAGER_PORT = 8081;
     process.env.APIMANAGER = '127.0.0.1';
     process.env.NODE_ENV = 'production';
     apimServer.start('127.0.0.1', 8081)
-      .then(() => mg.start(3000))
-      .then(() => {
+      .then(function() { mg.start(3000); })
+      .then(function() {
         return ldap.start(1389, 1636);
       })
-      .then(() => {
+      .then(function() {
         return echo.start(8889);
       })
-      .then(() => {
+      .then(function() {
         request = supertest('http://localhost:3000');
       })
       .then(done)
-      .catch((err) => {
+      .catch(function(err) {
         console.error(err);
         done(err);
       });
   });
 
-  after((done) => {
+  after(function(done) {
     cleanup()
-      .then(() => mg.stop())
-      .then(() => ldap.stop())
-      .then(() => echo.stop())
-      .then(() => apimServer.stop())
-      .then(() => {
+      .then(function() { mg.stop(); })
+      .then(function() { ldap.stop(); })
+      .then(function() { echo.stop(); })
+      .then(function() { apimServer.stop(); })
+      .then(function() {
         delete process.env.CONFIG_DIR;
         delete process.env.DATASTORE_PORT;
         delete process.env.APIMANAGER_PORT;

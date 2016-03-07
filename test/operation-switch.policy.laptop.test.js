@@ -1,9 +1,9 @@
 'use strict';
 
-let mg = require('../lib/microgw');
-let supertest = require('supertest');
+var mg = require('../lib/microgw');
+var supertest = require('supertest');
 
-let request;
+var request;
 
 describe('switchPolicyTesting', function() {
   before((done) => {

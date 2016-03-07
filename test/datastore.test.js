@@ -1,17 +1,17 @@
 'use strict';
 
-let _ = require('lodash');
-let assert = require('assert');
-let fs = require('fs');
-let path = require('path');
-let echo = require('./support/echo-server');
-let supertest = require('supertest');
-let microgw = require('../lib/microgw');
-let apimServer = require('./support/mock-apim-server/apim-server');
+var _ = require('lodash');
+var assert = require('assert');
+var fs = require('fs');
+var path = require('path');
+var echo = require('./support/echo-server');
+var supertest = require('supertest');
+var microgw = require('../lib/microgw');
+var apimServer = require('./support/mock-apim-server/apim-server');
 
 describe('data-store', function() {
-  let request;
-  let snapshotID, oldSnapshotID;
+  var request;
+  var snapshotID, oldSnapshotID;
   before((done) => {
     process.env.DATASTORE_PORT = 5000;
     process.env.APIMANAGER_PORT = 8890;

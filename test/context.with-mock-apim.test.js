@@ -1,18 +1,18 @@
 'use strict';
 
-let _ = require('lodash');
-let apimServer = require('./support/mock-apim-server/apim-server');
-let assert = require('assert');
-let debug = require('debug')('context-test');
-let fs = require('fs');
-let microgw = require('../lib/microgw');
-let supertest = require('supertest');
+var _ = require('lodash');
+var apimServer = require('./support/mock-apim-server/apim-server');
+var assert = require('assert');
+var debug = require('debug')('context-test');
+var fs = require('fs');
+var microgw = require('../lib/microgw');
+var supertest = require('supertest');
 
 
 describe('Context variables testing with mock apim server', function() {
-  let request, path, apiDocuments;
+  var request, path, apiDocuments;
 
-  before((done) => {
+  before(function(done) {
     process.env.DATASTORE_PORT = 5000;
     process.env.APIMANAGER_PORT = 8081;
     process.env.APIMANAGER = '127.0.0.1';
@@ -21,25 +21,25 @@ describe('Context variables testing with mock apim server', function() {
     path = __dirname + '/definitions/context';
 
     apimServer.start('127.0.0.1', 8081, path)
-      .then(() => microgw.start(3000))
-      .then(() => apiDocuments = getAPIDefinitions())
-      .then(() => {
+      .then(function() { microgw.start(3000); })
+      .then(function() { apiDocuments = getAPIDefinitions(); })
+      .then(function() {
         request = supertest('http://localhost:3000');
       })
       .then(done)
-      .catch((err) => {
+      .catch(function(err) {
         console.error(err);
         done(err);
       });
   });
 
-  after((done) => {
+  after(function(done) {
     delete process.env.DATASTORE_PORT;
     delete process.env.APIMANAGER_PORT;
     delete process.env.APIMANAGER;
     delete process.env.NODE_ENV;
     microgw.stop()
-      .then(() => apimServer.stop())
+      .then(function() { apimServer.stop(); })
       .then(done, done)
       .catch(done);
   });

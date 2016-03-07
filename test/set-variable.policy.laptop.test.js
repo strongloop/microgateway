@@ -1,16 +1,16 @@
 'use strict';
 
-let fs = require('fs');
-let path = require('path');
-let express = require('express');
-let supertest = require('supertest');
-let echo = require('./support/echo-server');
-let mg = require('../lib/microgw');
-let should = require('should');
+var fs = require('fs');
+var path = require('path');
+var express = require('express');
+var supertest = require('supertest');
+var echo = require('./support/echo-server');
+var mg = require('../lib/microgw');
+var should = require('should');
 
 describe('set-variable policy', function() {
 
-  let request;
+  var request;
   before((done) => {
     process.env.CONFIG_DIR = __dirname + '/definitions/set-variable';
     process.env.NODE_ENV = 'production';
