@@ -14,7 +14,7 @@ describe('preflow and flow-engine integration', function() {
     process.env.APIMANAGER = '127.0.0.1';
     process.env.NODE_ENV = 'production';
     mg.start(3000)
-      .then(function () { echo.start(8889); })
+      .then(function () { return echo.start(8889); })
       .then(function () {
         request = supertest('http://localhost:3000');
         console.log ('setup test1');
@@ -30,7 +30,7 @@ describe('preflow and flow-engine integration', function() {
     delete process.env.APIMANAGER;
     delete process.env.NODE_ENV;
     echo.stop()
-      .then(function () { mg.stop(); })
+      .then(function () { return mg.stop(); })
       .then(done, done);
   });
 

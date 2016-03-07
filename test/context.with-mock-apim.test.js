@@ -21,7 +21,7 @@ describe('Context variables testing with mock apim server', function() {
     path = __dirname + '/definitions/context';
 
     apimServer.start('127.0.0.1', 8081, path)
-      .then(function() { microgw.start(3000); })
+      .then(function() { return microgw.start(3000); })
       .then(function() { apiDocuments = getAPIDefinitions(); })
       .then(function() {
         request = supertest('http://localhost:3000');
@@ -39,7 +39,7 @@ describe('Context variables testing with mock apim server', function() {
     delete process.env.APIMANAGER;
     delete process.env.NODE_ENV;
     microgw.stop()
-      .then(function() { apimServer.stop(); })
+      .then(function() { return apimServer.stop(); })
       .then(done, done)
       .catch(done);
   });

@@ -5,6 +5,8 @@ var microgw = require('../lib/microgw');
 var backend = require('./support/invoke-server');
 var apimServer = require('./support/mock-apim-server/apim-server');
 
+process.on('uncaughtException', function(err) { console.log('-=-=-=' + err); });
+
 describe('invokePolicy', function() {
 
   var request;
@@ -21,8 +23,8 @@ describe('invokePolicy', function() {
             process.env.APIMANAGER,
             process.env.APIMANAGER_PORT,
             __dirname + '/definitions/invoke')
-        .then(function() { microgw.start(3000); })
-        .then(function() { backend.start(8889); })
+        .then(function() { return microgw.start(3000); })
+        .then(function() { return backend.start(8889); })
         .then(function() { request = supertest('http://localhost:3000'); })
         .then(done)
         .catch(function(err) {
@@ -38,8 +40,8 @@ describe('invokePolicy', function() {
     delete process.env.DATASTORE_PORT;
 
     apimServer.stop()
-      .then(function() { microgw.stop(); })
-      .then(function() { backend.stop(); })
+      .then(function() { return microgw.stop(); })
+      .then(function() { return backend.stop(); })
       .then(done, done)
       .catch(done);
   });

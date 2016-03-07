@@ -36,8 +36,8 @@ describe('basic auth policy', function() {
     delete process.env.APIMANAGER;
     delete process.env.NODE_ENV;
     mg.stop()
-      .then(function() { ldap.stop(); })
-      .then(function() { echo.stop(); })
+      .then(function() { return ldap.stop(); })
+      .then(function() { return echo.stop(); })
       .then(done, done)
       .catch(done);
   });

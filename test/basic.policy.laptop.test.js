@@ -14,7 +14,7 @@ var apimServer = require('./support/mock-apim-server/apim-server');
 
 function cleanup () {
   var rmfile = function(fpath) {
-    new Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
       console.log(`Removing file ${fpath}`);
       fs.unlink(fpath, function(err) {
         if (err) {
@@ -28,7 +28,7 @@ function cleanup () {
   };
 
   var readdir = function(dir) {
-    new Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
       fs.readdir(ssdir, function(err, files) {
         if (err) {
           console.error(`Error while reading ${ssdir}`);
@@ -48,9 +48,9 @@ function cleanup () {
       return readdir(ssdir);
     })
     .then(function(files) {
-      new Promise(function(resolve) {
+      return new Promise(function(resolve) {
         console.log(`Removing ${ssdir}`);
-        var p = Promise.all(_.map(files, function(f) { rmfile(path.resolve(ssdir, f)); }));
+        var p = Promise.all(_.map(files, function(f) { return rmfile(path.resolve(ssdir, f)); }));
         p = p.then(function() {
           fs.rmdir(ssdir, function(err) {
             if (err)
@@ -75,7 +75,7 @@ describe('basic auth policy', function() {
     process.env.APIMANAGER = '127.0.0.1';
     process.env.NODE_ENV = 'production';
     apimServer.start('127.0.0.1', 8081)
-      .then(function() { mg.start(3000); })
+      .then(function() { return mg.start(3000); })
       .then(function() {
         return ldap.start(1389, 1636);
       })
@@ -94,10 +94,10 @@ describe('basic auth policy', function() {
 
   after(function(done) {
     cleanup()
-      .then(function() { mg.stop(); })
-      .then(function() { ldap.stop(); })
-      .then(function() { echo.stop(); })
-      .then(function() { apimServer.stop(); })
+      .then(function() { return mg.stop(); })
+      .then(function() { return ldap.stop(); })
+      .then(function() { return echo.stop(); })
+      .then(function() { return apimServer.stop(); })
       .then(function() {
         delete process.env.CONFIG_DIR;
         delete process.env.DATASTORE_PORT;

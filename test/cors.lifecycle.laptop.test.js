@@ -30,7 +30,7 @@ describe('cross origin resource sharing policy', function() {
 
   after(function(done) {
     mg.stop()
-      .then(function() { echo.stop(); })
+      .then(function() { return echo.stop(); })
       .then(done, done)
       .catch(done);
     delete process.env.CONFIG_DIR;
