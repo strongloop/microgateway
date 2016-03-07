@@ -273,6 +273,8 @@ describe('invokePolicy', function() {
       .expect(299, /Error: write EPROTO/, done);
   });
 
+  /*
+  Disable the PSK cipher
   //'no ciphers available' or 'write EPROTO'?
   it('use-cipher-PSK_WITH_CAMELLIA_128_CBC_SHA256', function(done) {
     this.timeout(10000);
@@ -283,6 +285,7 @@ describe('invokePolicy', function() {
       .set('X-TLS-PROFILE', 'use-cipher-PSK_WITH_CAMELLIA_128_CBC_SHA256')
       .expect(299, /SSL23_CLIENT_HELLO:no ciphers available/, done);
   });
+  */
 
   //The client expects the server to be Sarah and uses the CA 'root' for auth.
   //However, the server is Sandy who should be authenticated using 'root2'.

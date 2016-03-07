@@ -3,7 +3,7 @@ var moment = require('moment');
 var redisLimiter = require('./redis');
 var tokenBucketLimiter = require('./token-bucket');
 var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'apiconnect-microgateway:policies:rate-limiting'});
+  .child({loc: 'apiconnect-microgateway:policies:rate-limiting'});
 var assert = require('assert');
 
 module.exports = function(options) {
@@ -30,6 +30,31 @@ module.exports = function(options) {
     unit = (parts[3] || unit).trim();
   }
 
+  // moment.duration does not like 'min' as a unit of measure, convert to 'm'
+  // See http://momentjs.com/docs/#/durations/creating/
+  switch (unit) {
+    case 'min':
+    case 'mins':
+      unit = 'm';
+      break;
+    case 'sec':
+    case 'secs':
+      unit = 's';
+      break;
+    case 'yr':
+    case 'yrs':
+      unit = 'y';
+      break;
+    case 'hr':
+    case 'hrs':
+      unit = 'h';
+      break;
+    case 'wk':
+    case 'wks':
+      unit = 'w';
+      break;
+  }
+
   var interval = moment.duration(period, unit).asMilliseconds();
   var reject = options['reject'] || options['hard-limit'] || false;
 
@@ -39,7 +64,7 @@ module.exports = function(options) {
     limit: limit,
     interval: interval,
     reject: reject,
-    prefix: options.prefix || 'ibm-micro-gateway',
+    prefix: options.prefix || 'ibm-apiconnect-microgateway',
     redis: options.redis,
     getKey: getKey
   };
@@ -51,28 +76,32 @@ module.exports = function(options) {
   }
 
   if (config.redis) {
+    logger.debug('Create a redis based rate limiter: %j', config);
     return redisLimiter(config);
-  }
-  return tokenBucketLimiter(config);
-};
-
-/**
- * Build the key for rate limiting from the request
- * @param {Context} context The context object
- * @returns {string} The rate limiting key
- */
-function getKey(context) {
-  context = context || {};
-  var flowContext = context.flowContext || {};
-  var client = flowContext.client || {};
-  var clientApp = client.app || {};
-  var clientId = clientApp.id;
-  var plan = flowContext.plan || {};
-  var planId = plan.id;
-  if (clientId != null) {
-    return planId + '/' + clientId;
   } else {
-    return null;
+    logger.debug('Create a local token bucket based rate limiter: %j', config);
+    return tokenBucketLimiter(config);
   }
-}
 
+  /**
+   * Build the key for rate limiting from the context object
+   * @param {Context} context The context object
+   * @returns {string} The rate limiting key
+   */
+  function getKey(context) {
+    context = context || {};
+    var flowContext = context.flowContext || {};
+    var client = flowContext.client || {};
+    var clientApp = client.app || {};
+    var clientId = clientApp.id;
+    if (clientId == null) {
+      return null;
+    }
+    // Use the scope as the namespace. The scope contains information about the
+    // plan or operation path
+    var scope = config.scope;
+    scope = scope || '*';
+    return scope + ':' + clientId;
+  }
+
+};

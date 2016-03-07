@@ -1,21 +1,25 @@
 {
   "name": "apiconnect-microgateway",
   "version": "1.0.0",
-  "description": "API Mesh MicroGateway",
+  "description": "API Connect MicroGateway",
   "main": "index.js",
   "scripts": {
     "lint": "eslint ./ && jscs ./",
     "start": "node .",
     "test": "mocha -t 600000"
   },
+  "engines": {
+    "node": ">=4.0.0" 
+  },
   "repository": {
     "type": "git",
-    "url": "git@github.ibm.com:apimesh/micro-gw.git"
+    "url": "git@github.ibm.com:apimesh/apiconnect-microgateway.git"
   },
   "keywords": [
     "ibm",
     "api",
-    "mesh",
+    "connect",
+    "apiconnect",
     "gateway",
     "microservices",
     "enforce"
@@ -35,6 +39,7 @@
   },
   "dependencies": {
     "apiconnect-cli-config": "^1.0.18",
+    "apiconnect-cli-logger": "^1.0.4",
     "async": "^1.5.2",
     "auth-header": "^0.2.2",
     "basic-auth": "^1.0.3",

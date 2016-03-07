@@ -1,10 +1,10 @@
 'use strict';
 var _ = require('lodash');
-var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'apiconnect-microgateway:policies:set-variable'});
 
 module.exports = function(config) {
   return function(props, context, flow) {
+    var logger = flow.logger;
+
     var hasError = props.actions.some(function(action) {
         if (action.hasOwnProperty('set')) {
             logger.debug('set ' + action.set + '=' + action.value);
