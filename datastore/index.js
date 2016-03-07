@@ -6,6 +6,10 @@ let forever = require('forever-monitor');
 
 let child;
 let server;
+var sigtermHandler = function() {
+                       child.kill(true);
+                       process.exit(0);
+                     };
 exports.start = function(fork) {
   return new Promise((resolve, reject) => {
     if (fork) {
@@ -44,10 +48,7 @@ exports.start = function(fork) {
 
       child.start();
 
-      process.on('SIGTERM', function() {
-        child.kill(true);
-        process.exit(0);
-      });
+      process.on('SIGTERM', sigtermHandler);
 
     } else {
       process.send = function(msg) {
@@ -66,6 +67,7 @@ exports.stop = function() {
   return new Promise((resolve, reject) => {
     if (child) {
       child.stop();
+      process.removeListener('SIGTERM', sigtermHandler);
       resolve();
     }
     if (server) {
