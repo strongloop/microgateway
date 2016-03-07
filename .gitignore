@@ -18,3 +18,5 @@ coverage
 .DS_Store
 .npmrc
 .datastore
+.apiconnect
+test/definitions/policy-loader/token

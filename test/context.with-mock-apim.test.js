@@ -10,7 +10,7 @@ var supertest = require('supertest');
 
 
 describe('Context variables testing with mock apim server', function() {
-  var request, path, apiDocuments;
+  var request, datastoreRequest, path, apiDocuments;
 
   before(function(done) {
     process.env.DATASTORE_PORT = 5000;
@@ -25,6 +25,7 @@ describe('Context variables testing with mock apim server', function() {
       .then(function() { apiDocuments = getAPIDefinitions(); })
       .then(function() {
         request = supertest('http://localhost:3000');
+        datastoreRequest = supertest('http://localhost:5000');
       })
       .then(done)
       .catch(function(err) {
@@ -146,7 +147,25 @@ describe('Context variables testing with mock apim server', function() {
         verifyResponse(res.body, expected);
       })
       .end(done);
+
   });
+
+  it('cleanup snapshots directory',
+    function(done) {
+      var expect = {snapshot : {}};
+      datastoreRequest
+        .get('/api/snapshots')
+        .end(function (err, res) {
+          var snapshotID = res.body[0].id;
+          console.log(snapshotID);
+          datastoreRequest.get('/api/snapshots/release?id=' + snapshotID)
+            .expect(function(res) {
+              assert(_.isEqual(expect, res.body)); 
+            }
+          ).end(done)
+        });
+    }
+  );
 
   function verifyResponse(actual, expected) {
     // compare and remove the variables whose value changes per environment
