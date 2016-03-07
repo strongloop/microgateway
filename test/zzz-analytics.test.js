@@ -13,7 +13,7 @@ describe('analytics', function() {
 
   var request;
   var mg;
-  before((done) => {
+  before(function (done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/set-variable';
     process.env.NODE_ENV = 'production';
     process.env.APIMMANAGER = 'localhost';
@@ -21,35 +21,35 @@ describe('analytics', function() {
     delete require.cache[require.resolve('../lib/microgw')];
     mg = require('../lib/microgw');
     mg.start(3000)
-    .then(() => {
+    .then(function() {
       return echo.start(8889);
     })
-    .then( () => {
+    .then(function() {
         return apimServer.start('localhost', 9443);
     })
-    .then(() => {
+    .then(function() {
       request = supertest('http://localhost:3000');
     })
     .then(done)
-    .catch((err) => {
+    .catch(function(err) {
       console.error(err);
       done(err);
     });
 
   });
 
-  after((done) => {
-    mg.stop()
-      .then(() => {
-        return new Promise( (resolve, reject) => {
-          setTimeout( () => {
+  after(function (done) {
+    return mg.stop()
+      .then(function() {
+        return new Promise(function(resolve, reject) {
+          setTimeout(function() {
             resolve();
           }, 5000);
         });
       })
-      .then(() => echo.stop())
-      .then(() => apimServer.stop())
-      .then(() => {
+      .then(function() { return echo.stop(); })
+      .then(function() { return apimServer.stop(); })
+      .then(function() {
         delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
         delete process.env.CONFIG_DIR;
         delete process.env.NODE_ENV;
