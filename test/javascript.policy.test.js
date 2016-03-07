@@ -15,10 +15,10 @@ describe('javascript policy', function() {
                     throw {name:'PropertyNotFound'};
                   }`;
       var flow = {
-        'proceed': () => {
+        'proceed': function() {
           done();
         },
-        'fail': (error) => {
+        'fail': function(error) {
           throw new Error('failed');
         },
         'logger': bunyan.createLogger(
@@ -42,12 +42,12 @@ describe('javascript policy', function() {
         `;
 
       var flow = {
-          'proceed': () => {
+          'proceed': function() {
             context.request.uri.should.exactly('http://localhost/bar');
             context.myval.should.exactly('myvalue');
             done();
           },
-          'fail': (error) => {
+          'fail': function(error) {
             throw new Error('failed');
           },
           'logger': bunyan.createLogger(
@@ -69,11 +69,11 @@ describe('javascript policy', function() {
       var code = `delete request.uri;`;
 
       var flow = {
-          'proceed': () => {
+          'proceed': function() {
             should(context.request.uri).be.a.Undefined();
             done();
           },
-          'fail': (error) => {
+          'fail': function(error) {
             throw new Error('failed');
           },
           'logger': bunyan.createLogger(
@@ -94,11 +94,11 @@ describe('javascript policy', function() {
       var code = `var a = 'localvar'; a = request.uri;`;
 
       var flow = {
-          'proceed': () => {
+          'proceed': function() {
             should(context.a).be.a.Undefined();
             done();
           },
-          'fail': (error) => {
+          'fail': function(error) {
             throw new Error('failed');
           },
           'logger': bunyan.createLogger(
@@ -126,11 +126,11 @@ describe('javascript policy', function() {
         `;
 
       var flow = {
-          'proceed': () => {
+          'proceed': function() {
             context.request.uri.should.exactly('http://localhost/xxx');
             done();
           },
-          'fail': (error) => {
+          'fail': function(error) {
             throw new Error('failed');
           },
           'logger': bunyan.createLogger(
@@ -152,11 +152,11 @@ describe('javascript policy', function() {
       var code = `myval = parseInt(myval);`;
 
       var flow = {
-          'proceed': () => {
+          'proceed': function() {
             should(context.myval).exactly(1).and.be.a.Number();
             done();
           },
-          'fail': (error) => {
+          'fail': function(error) {
             throw new Error('failed');
           },
           'logger': bunyan.createLogger(
@@ -179,13 +179,13 @@ describe('javascript policy', function() {
       var code = `myval = JSON.stringify({ 'a': 'a', 'b':'b'});`;
 
       var flow = {
-          'proceed': () => {
+          'proceed': function() {
             should(context['myval']).
                 exactly(JSON.stringify({ 'a': 'a', 'b':'b'})).
                 and.be.a.String();
             done();
           },
-          'fail': (error) => {
+          'fail': function(error) {
             throw new Error('failed');
           },
           'logger': bunyan.createLogger(
@@ -206,7 +206,7 @@ describe('javascript policy', function() {
 //                     };
 //      var code = `let a = 'bar'; request.uri = 'http://localhost/' + a;`;
 //
-//      javascriptPolicy({source: code}, context, error => {
+//      javascriptPolicy({source: code}, context, function(error) {
 //        should(error).be.a.Undefined();
 //        context.request.uri.should.exactly('http://localhost/bar');
 //        done();
@@ -226,11 +226,11 @@ describe('javascript policy', function() {
 
 
       var flow = {
-          'proceed': () => {
+          'proceed': function() {
             context.request.uri.should.exactly('http://localhost/bar');
             done();
           },
-          'fail': (error) => {
+          'fail': function(error) {
             throw new Error('failed');
           },
           'logger': bunyan.createLogger(
@@ -250,17 +250,17 @@ describe('javascript policy', function() {
                      myval: '1'
                      };
       var code = `var total = 0;
-        [1, 2, 3].forEach( (val) => {
+        [1, 2, 3].forEach(function(val) {
           total += val;
         });
         myval = total;`;
 
       var flow = {
-          'proceed': () => {
+          'proceed': function() {
             should(context.myval).exactly(6).and.be.a.Number();
             done();
           },
-          'fail': (error) => {
+          'fail': function(error) {
             throw new Error('failed');
           },
           'logger': bunyan.createLogger(
@@ -281,10 +281,10 @@ describe('javascript policy', function() {
       var code = `var vm = require('vm');`;
 
       var flow = {
-          'proceed': () => {
+          'proceed': function() {
             throw new Error('failed');
           },
-          'fail': (error) => {
+          'fail': function(error) {
             error.name.should.exactly('ReferenceError');
             done();
           },
@@ -307,10 +307,10 @@ describe('javascript policy', function() {
       var code = `process.env;`;
 
       var flow = {
-          'proceed': () => {
+          'proceed': function() {
             throw new Error('failed');
           },
-          'fail': (error) => {
+          'fail': function(error) {
             error.name.should.exactly('ReferenceError');
             done();
           },
@@ -330,13 +330,13 @@ describe('javascript policy', function() {
       var context = {request:
                           {uri: 'http://localhost/foo'}
                      };
-      var code = `setTimeout(()=>{request.uri='xxx';}, 1000);`;
+      var code = `setTimeout(function() {request.uri='xxx';}, 1000);`;
 
       var flow = {
-          'proceed': () => {
+          'proceed': function() {
             throw new Error('failed');
           },
-          'fail': (error) => {
+          'fail': function(error) {
             error.name.should.exactly('ReferenceError');
             done();
           },

@@ -11,26 +11,26 @@ var should = require('should');
 describe('ratelimit basic policy', function() {
 
   var request;
-  before((done) => {
+  before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/ratelimit';
     process.env.NODE_ENV = 'production';
     mg.start(3000)
-      .then(() => {
+      .then(function() {
         return echo.start(8889);
       })
-      .then(() => {
+      .then(function() {
         request = supertest('http://localhost:3000');
       })
       .then(done)
-      .catch((err) => {
+      .catch(function(err) {
         console.error(err);
         done(err);
       });
   });
 
-  after((done) => {
+  after(function(done) {
     mg.stop()
-      .then(() => echo.stop())
+      .then(function() { return echo.stop(); })
       .then(done, done)
       .catch(done);
     delete process.env.CONFIG_DIR;

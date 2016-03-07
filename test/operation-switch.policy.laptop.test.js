@@ -6,21 +6,21 @@ var supertest = require('supertest');
 var request;
 
 describe('switchPolicyTesting', function() {
-  before((done) => {
+  before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/operation-switch';
     process.env.NODE_ENV = 'production';
     mg.start(3000)
-      .then(() => {
+      .then(function() {
         request = supertest('http://localhost:3000');
       })
       .then(done)
-      .catch((err) => {
+      .catch(function(err) {
         console.error(err);
         done(err);
       });
   });
 
-  after((done) => {
+  after(function(done) {
     mg.stop()
       .then(done, done)
       .catch(done);
