@@ -1,7 +1,8 @@
 'use strict';
 
-let ldap = require('ldapjs');
-let ldapconfig = require('./ldap-methods');
+var Promise = require('bluebird');
+var ldap = require('ldapjs');
+var ldapconfig = require('./ldap-methods');
 
 function createServer (usetls) {
   if (usetls) {
@@ -11,8 +12,8 @@ function createServer (usetls) {
   return ldap.createServer();
 }
 
-let server;
-let tlsserver;
+var server;
+var tlsserver;
 
 
 exports.start = function (port, tlsport) {
@@ -20,10 +21,10 @@ exports.start = function (port, tlsport) {
 
   server = createServer();
   return ldapconfig(server)
-    .then(() => new Promise(resolve => {
+    .then(function() { return new Promise(function(resolve) {
       server.listen(port, resolve);
-    }))
-    .then(() => new Promise(resolve => {
+    }); })
+    .then(function() { return new Promise(function(resolve) {
       if (tlsport) {
         tlsserver = createServer(true);
         ldapconfig(tlsserver).then(() => {
@@ -33,11 +34,11 @@ exports.start = function (port, tlsport) {
       else {
         resolve();
       }
-    }));
+    }); });
 };
 
 exports.stop = function() {
-  return new Promise((resolve) => {
+  return new Promise(function(resolve) {
     server.close();
     server = null;
     if (!!tlsserver) {
@@ -50,7 +51,7 @@ exports.stop = function() {
 
 if (require.main === module) {
   exports.start(1389, 1636).
-    then(() => {
+    then(function() {
       console.log('ldap-server started on port 1389');
     });
 }

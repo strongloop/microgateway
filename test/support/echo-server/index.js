@@ -1,5 +1,6 @@
 'use strict'
 
+var Promise = require('bluebird');
 var express = require('express');
 var app = express();
 var ah = require('auth-header');
