@@ -45,7 +45,8 @@ describe('data-store', function() {
   function verifyResponseArray(res, expected) {
     assert.strictEqual(res.length, expected.length);
     var current = -1;
-    var usedvalues = Array(res.length).fill(false);
+    var usedvalues = new Array(res.length);
+    _.fill(usedvalues, false);
 
     for(var i = 0; i < expected.length; i++) {
       var expect = expected[i];
@@ -102,7 +103,7 @@ describe('data-store', function() {
         .get('/api/snapshots/current')
         .expect(function(res) {
             verifyResponseSingle(res.body.snapshot, expect);
-            assert(res.body.snapshot.id === snapshotID); // ID should be same as previous
+            assert.strictEqual(res.body.snapshot.id, snapshotID); // ID should be same as previous
           }
         ).end(done);
     }
@@ -114,7 +115,7 @@ describe('data-store', function() {
         .get('/api/snapshots/current')
         .expect(function(res) {
             verifyResponseSingle(res.body.snapshot, expect);
-            assert(res.body.snapshot.id === snapshotID); // ID should be same as previous
+            assert.strictEqual(res.body.snapshot.id, snapshotID); // ID should be same as previous
           }
         ).end(function (err, res) {
             if (err) return done(err);
