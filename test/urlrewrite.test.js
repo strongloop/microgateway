@@ -15,7 +15,7 @@ describe('urlrewrite', function() {
     process.env.NODE_ENV = 'production';
     process.env.WLPN_APP_ROUTE = 'http:///apim/sb'
     mg.start(3000)
-      .then(function() {echo.start(8889);})
+      .then(function() { return echo.start(8889); })
       .then(function() {
         request = supertest('http://localhost:3000');
         console.log ('setup test1');
@@ -31,7 +31,7 @@ describe('urlrewrite', function() {
     delete process.env.APIMANAGER;
     delete process.env.NODE_ENV;
     echo.stop()
-      .then(function() {mg.stop();})
+      .then(function() { return mg.stop(); })
       .then(done, done);
   });
 

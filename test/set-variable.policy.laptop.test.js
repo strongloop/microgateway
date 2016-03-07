@@ -29,7 +29,7 @@ describe('set-variable policy', function() {
   });
 
   after(function(done) {
-    return mg.stop()
+    mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
       .catch(done);
