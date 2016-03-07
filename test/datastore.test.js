@@ -12,32 +12,32 @@ var apimServer = require('./support/mock-apim-server/apim-server');
 describe('data-store', function() {
   var request;
   var snapshotID, oldSnapshotID;
-  before((done) => {
+  before(function(done) {
     process.env.DATASTORE_PORT = 5000;
     process.env.APIMANAGER_PORT = 8890;
     process.env.APIMANAGER = '127.0.0.1';
     process.env.NODE_ENV = 'production';
     echo.start(8889)
-      .then(() => apimServer.start('127.0.0.1', 8890))
-      .then(() => microgw.start(3000))
-      .then(() => {
+      .then(function() { apimServer.start('127.0.0.1', 8890); } )
+      .then(function() { microgw.start(3000); } )
+      .then(function() {
         request = supertest('http://localhost:5000');
       })
       .then(done)
-      .catch((err) => {
+      .catch(function(err) {
         console.error(err);
         done(err);
       });
   });
 
-  after((done) => {
+  after(function(done) {
     delete process.env.DATASTORE_PORT;
     delete process.env.APIMANAGER_PORT;
     delete process.env.APIMANAGER;
     delete process.env.NODE_ENV;
     microgw.stop()
-      .then(() => echo.stop())
-      .then(() => apimServer.stop())
+      .then(function() { echo.stop(); } )
+      .then(function() { apimServer.stop(); })
       .then(done, done)
       .catch(done);
   });

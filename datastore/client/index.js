@@ -143,12 +143,12 @@ exports.getTlsProfile = function(snapshot, tlsProfleName) {
   logger.debug('getTlsProfile entry snapshot:' + snapshot +
                               '\n tlsProfleName:' + tlsProfleName );
   // build request to send to data-store
-  let snapshotFilter = `{"snapshot-id": "${snapshot }"}`;
-  let tlsNameFilter = `{"name": "${tlsProfleName }"}`;
-  let queryfilter = `{"where": { "and":[${snapshotFilter}, ${tlsNameFilter}]}}`;
+  var snapshotFilter = `{"snapshot-id": "${snapshot }"}`;
+  var tlsNameFilter = `{"name": "${tlsProfleName }"}`;
+  var queryfilter = `{"where": { "and":[${snapshotFilter}, ${tlsNameFilter}]}}`;
   const port = process.env['DATASTORE_PORT'];
 
-  let queryurl = `http://${host}:${port}/api/tlsprofiles?filter=${encodeURIComponent(queryfilter)}`;
+  var queryurl = `http://${host}:${port}/api/tlsprofiles?filter=${encodeURIComponent(queryfilter)}`;
 
   // send request to data-store to get the reqiested TLS Profile
   // for matching API(s)
@@ -172,12 +172,12 @@ exports.getRegistry = function(snapshot, registryName) {
   logger.debug('getRegistry entry snapshot:' + snapshot +
                               '\n registryName:' + registryName );
   // build request to send to data-store
-  let snapshotFilter = `{"snapshot-id": "${snapshot }"}`;
-  let registryNameFilter = `{"name": "${registryName }"}`;
-  let queryfilter = `{"where": { "and":[${snapshotFilter}, ${registryNameFilter}]}}`;
+  var snapshotFilter = `{"snapshot-id": "${snapshot }"}`;
+  var registryNameFilter = `{"name": "${registryName }"}`;
+  var queryfilter = `{"where": { "and":[${snapshotFilter}, ${registryNameFilter}]}}`;
   const port = process.env['DATASTORE_PORT'];
 
-  let queryurl = `http://${host}:${port}/api/registries?filter=${encodeURIComponent(queryfilter)}`;
+  var queryurl = `http://${host}:${port}/api/registries?filter=${encodeURIComponent(queryfilter)}`;
 
   // send request to data-store to get the requested Registry Profile
   // for matching API(s)
