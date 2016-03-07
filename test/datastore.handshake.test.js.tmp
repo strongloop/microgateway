@@ -16,7 +16,7 @@ describe('handshake', function() {
     process.env.APIMANAGER_CATALOG = 1234;
     process.env.NODE_ENV = 'production';
     apimServer.start()
-      .then(function() { microgw.start(3000); })
+      .then(function() { return microgw.start(3000); })
       .then(function() {
         request = supertest('https://localhost:5555');
       })
