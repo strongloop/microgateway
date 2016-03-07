@@ -4,9 +4,11 @@ var loopback = require('loopback');
 var boot = require('loopback-boot');
 var async = require('async');
 var fs = require('fs');
+var path = require('path');
 var environment = require('../../utils/environment');
 var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:datastore:server:server'});
+var cliConfig = require('apiconnect-cli-config');
 var DATASTORE_PORT = environment.DATASTORE_PORT;
 var CONFIGDIR = environment.CONFIGDIR;
 
@@ -54,12 +56,14 @@ boot(app, __dirname, function(err) {
 
 function storeDatastorePort(port)
   {
-  var path = '.datastore'
+  var localPath = '.datastore'
   if (process.env[CONFIGDIR])
     {
-    path = process.env[CONFIGDIR] + '/' + path;
+    var projectInfo = cliConfig.inspectPath(process.env[CONFIGDIR]);
+    localPath = path.join(projectInfo.basePath, localPath);
     }
-  fs.writeFile(path, JSON.stringify({port: port}), 'utf8', function (err) {
+  logger.debug('.datastore path:', localPath);
+  fs.writeFile(localPath, JSON.stringify({port: port}), 'utf8', function (err) {
     if (err) throw err;
     });
   }
