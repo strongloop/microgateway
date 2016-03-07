@@ -11,6 +11,7 @@ var mg = require('../lib/microgw');
 var dsc = require('../datastore/client');
 var should = require('should');
 var apimServer = require('./support/mock-apim-server/apim-server');
+var Promise = requier('bluebird');
 
 function cleanup () {
   var rmfile = function(fpath) {

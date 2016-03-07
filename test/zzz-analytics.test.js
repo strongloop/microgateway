@@ -7,6 +7,7 @@ var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var apimServer = require('./support/mock-apim-server2/apim-server');
 var should = require('should');
+var Promise = require('bluebird');
 
 describe('analytics', function() {
 

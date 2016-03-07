@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 var multer = require('multer');
 var Crypto = require('crypto');
 var upload = multer();
+var Promise = require('bluebird');
 var key = fs.readFileSync(__dirname + '/key.pem');
 var cert = fs.readFileSync(__dirname + '/cert.pem')
 var public_key = fs.readFileSync(__dirname + '/id_rsa.pub','utf8');
