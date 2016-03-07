@@ -39,7 +39,6 @@ var server;
 exports.start = function(port) {
   return new Promise(function(resolve, reject) {
     server = app.listen(port, function() {
-      console.log('echo-server listening on port %d', port);
       resolve();
     });
   });
@@ -55,13 +54,10 @@ exports.stop = function() {
       resolve();
     }
   });
-}
+};
 
 exports.app = app;
 
 if (require.main === module) {
-  exports.start(8889).
-    then(function() {
-      console.log('echo-server listening on port 8889');
-    });
+  exports.start(8889);
 }

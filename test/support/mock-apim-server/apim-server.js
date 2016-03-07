@@ -34,8 +34,6 @@ exports.start = function (host, port, path) {
             console.error('> Error serving ' + request.url + ' - ' + err.message);
             response.writeHead(err.status, err.headers);
             response.end();
-          } else {
-            console.log('> ' + request.url + ' - ' + res.message);
           }
         }
       );
@@ -46,7 +44,6 @@ exports.start = function (host, port, path) {
       if (err) {
         reject(err);
       } else {
-        console.log('mock-apim-server listening on port ' + port);
         resolve();
       }
     });

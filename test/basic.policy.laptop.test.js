@@ -16,7 +16,6 @@ var Promise = require('bluebird');
 function cleanup () {
   var rmfile = function(fpath) {
     return new Promise(function(resolve, reject) {
-      console.log('Removing file %s', fpath);
       fs.unlink(fpath, function(err) {
         if (err) {
           console.error('Error removing %s', fpath);
@@ -24,7 +23,7 @@ function cleanup () {
         }
         else
           resolve();
-      })
+      });
     });
   };
 
@@ -50,12 +49,11 @@ function cleanup () {
     })
     .then(function(files) {
       return new Promise(function(resolve) {
-        console.log('Removing %s', ssdir);
         var p = Promise.all(_.map(files, function(f) { return rmfile(path.resolve(ssdir, f)); }));
         p = p.then(function() {
           fs.rmdir(ssdir, function(err) {
             if (err)
-              console.error('Error removing %s', fpath);
+              console.error('Error removing file', err);
             resolve(p);
           });
         });

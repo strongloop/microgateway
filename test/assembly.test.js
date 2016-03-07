@@ -17,7 +17,6 @@ describe('preflow and flow-engine integration', function() {
       .then(function () { return echo.start(8889); })
       .then(function () {
         request = supertest('http://localhost:3000');
-        console.log ('setup test1');
       })
       .then(done)
       .catch(function(err) {
