@@ -606,9 +606,9 @@ describe('Context middleware', function() {
       ctxTimezoneStr = ctxTimezoneStr.substring(1);
       ctxTimezoneStr.split(':').forEach(function(value, index) {
         if (index === 0) {
-          ctxTimezoneOffset += 60 * Number.parseInt(value);
+          ctxTimezoneOffset += 60 * parseInt(value);
         } else {
-          ctxTimezoneOffset += Number.parseInt(value);
+          ctxTimezoneOffset += parseInt(value);
         }
       });
       ctxTimezoneOffset = isBehindGMT ? ctxTimezoneOffset : -ctxTimezoneOffset;
