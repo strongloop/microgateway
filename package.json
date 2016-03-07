@@ -9,7 +9,7 @@
     "test": "mocha -t 600000"
   },
   "engines": {
-    "node": ">=4.0.0" 
+    "node": ">=0.10.43" 
   },
   "repository": {
     "type": "git",
@@ -43,6 +43,7 @@
     "async": "^1.5.2",
     "auth-header": "^0.2.2",
     "basic-auth": "^1.0.3",
+    "bluebird": "^3.3.3",
     "body-parser": "^1.14.2",
     "bunyan": "^1.7.1",
     "chokidar": "^1.4.2",
