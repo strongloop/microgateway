@@ -1,5 +1,5 @@
 'use strict';
-const assert = require('assert');
+var assert = require('assert');
 
 module.exports = function(config) {
     return function(props, context, next) {
