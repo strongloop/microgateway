@@ -9,7 +9,7 @@ var userfile = path.join(__dirname, 'users.json');
 
 module.exports = function (server, authreq) {
 
-  var users = new Map();
+  var users = {};
 
   function authorize (req, res, next) {
     if (authreq === false)
@@ -26,7 +26,7 @@ module.exports = function (server, authreq) {
       res.end();
       return next();
     });
-    users.set(key, user);
+    users[key] = user;
   }
 
   function loadPasswdFile () {
@@ -38,7 +38,7 @@ module.exports = function (server, authreq) {
         var userdata = JSON.parse(data);
 
         _.forEach(userdata, function(user, key) {
-          if (!users.has(key))
+          if (typeof user[key] === 'undefined')
             doBind(key, user);
         });
 
@@ -57,11 +57,12 @@ module.exports = function (server, authreq) {
 
 
     server.search('ou=myorg,ou=com', authorize, function (req, res, next) {
-      for (let user of users.values()) {
+      _.forEach(users, function (user) {
+      //for (var user of users.values()) {
         if (req.filter.matches(user.attributes)) {
           res.send(user);
         }
-      }
+      });
       res.end();
       return next();
     });
