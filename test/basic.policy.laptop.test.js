@@ -16,10 +16,10 @@ var Promise = require('bluebird');
 function cleanup () {
   var rmfile = function(fpath) {
     return new Promise(function(resolve, reject) {
-      console.log(`Removing file ${fpath}`);
+      console.log('Removing file %s', fpath);
       fs.unlink(fpath, function(err) {
         if (err) {
-          console.error(`Error removing ${fpath}`);
+          console.error('Error removing %s', fpath);
           reject(err);
         }
         else
@@ -32,7 +32,7 @@ function cleanup () {
     return new Promise(function(resolve, reject) {
       fs.readdir(ssdir, function(err, files) {
         if (err) {
-          console.error(`Error while reading ${ssdir}`);
+          console.error('Error while reading %s', ssdir);
           reject(err);
         }
         else
@@ -50,12 +50,12 @@ function cleanup () {
     })
     .then(function(files) {
       return new Promise(function(resolve) {
-        console.log(`Removing ${ssdir}`);
+        console.log('Removing %s', ssdir);
         var p = Promise.all(_.map(files, function(f) { return rmfile(path.resolve(ssdir, f)); }));
         p = p.then(function() {
           fs.rmdir(ssdir, function(err) {
             if (err)
-              console.error(`Error removing ${fpath}`);
+              console.error('Error removing %s', fpath);
             resolve(p);
           });
         });

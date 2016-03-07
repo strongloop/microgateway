@@ -43,7 +43,7 @@ describe('basic auth policy', function() {
   });
 
   var clientId1 = 'fb82cb59-ba95-4c34-8612-e63697d7b845';
-  it(`client_id=${clientId1} should pass with "root"/"Hunter2"`, function(done) {
+  it('client_id=' + clientId1 + ' should pass with "root"/"Hunter2"', function(done) {
     request
       .post('/v1/ascents?client_id=' +  clientId1)
       .auth('root', 'Hunter2')
@@ -51,7 +51,7 @@ describe('basic auth policy', function() {
       .expect(200, '{"date":"today","route":"66"}', done);
   });
 
-  it(`client_id=${clientId1} should fail`, function(done) {
+  it('client_id=' + clientId1 + ' should fail', function(done) {
     request
     .post('/v1/ascents?client_id=' +  clientId1)
     .auth('root', 'badpass')
@@ -59,7 +59,7 @@ describe('basic auth policy', function() {
     .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
   });
 
-  it(`client_id=${clientId1} should fail with http and "root"/"Hunter3"`, function(done) {
+  it('client_id=' + clientId1 + ' should fail with http and "root"/"Hunter3"', function(done) {
     request
       .put('/v1/ascents?client_id=' +  clientId1)
       .auth('root', 'Hunter3')
@@ -67,7 +67,7 @@ describe('basic auth policy', function() {
       .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
   });
 
-  it(`client_id=${clientId1} should pass with http and "root"/"Hunter2"`, function(done) {
+  it('client_id=' + clientId1 + ' should pass with http and "root"/"Hunter2"', function(done) {
     request
       .put('/v1/ascents?client_id=' +  clientId1)
       .auth('root', 'Hunter2')

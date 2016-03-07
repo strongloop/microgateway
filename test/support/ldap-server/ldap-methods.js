@@ -1,15 +1,15 @@
 'use strict';
 
-let _ = require('lodash');
-let fs = require('fs');
-let path = require('path');
-let ldap = require('ldapjs');
+var _ = require('lodash');
+var fs = require('fs');
+var path = require('path');
+var ldap = require('ldapjs');
 
-let userfile = path.join(__dirname, 'users.json');
+var userfile = path.join(__dirname, 'users.json');
 
 module.exports = function (server, authreq) {
 
-  const users = new Map();
+  var users = new Map();
 
   function authorize (req, res, next) {
     if (authreq === false)
@@ -30,14 +30,14 @@ module.exports = function (server, authreq) {
   }
 
   function loadPasswdFile () {
-    return new Promise((resolve, reject) => {
+    return new Promise(function (resolve, reject) {
       fs.readFile(userfile, 'utf8', function (err, data) {
         if (err)
           return reject(err);
 
-        const userdata = JSON.parse(data);
+        var userdata = JSON.parse(data);
 
-        _.forEach(userdata, (user, key) => {
+        _.forEach(userdata, function(user, key) {
           if (!users.has(key))
             doBind(key, user);
         });
@@ -47,8 +47,8 @@ module.exports = function (server, authreq) {
     });
   }
 
-  return loadPasswdFile().then(() => {
-    server.bind('cn=root', function (req, res, next) {
+  return loadPasswdFile().then(function() {
+    return server.bind('cn=root', function (req, res, next) {
       if (req.dn.toString() !== 'cn=root' || req.credentials !== 'secret')
         return next(new ldap.InvalidCredentialsError());
       res.end();
