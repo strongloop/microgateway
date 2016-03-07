@@ -1,30 +1,29 @@
 'use strict';
 module.exports = function(config) {
   return function(props, ctx, flow) {
-    var logger = flow.logger;
 
-    flow.subscribe('FINISH', (event, next) => {
-      let allowCreds = props['allow-credentials'];
+    flow.subscribe('FINISH', function(event, next) {
+      var allowCreds = props['allow-credentials'];
       if (allowCreds === true) {
         ctx.message.headers['Access-Control-Allow-Credentials'] = 'true';
       }
-      let allowHeaders = props['allow-headers'];
+      var allowHeaders = props['allow-headers'];
       if (allowHeaders) {
         ctx.message.headers['Access-Control-Allow-Headers'] = allowHeaders;
       }
-      let allowMethods = props['allow-methods'];
+      var allowMethods = props['allow-methods'];
       if (allowMethods) {
         ctx.message.headers['Access-Control-Allow-Methods'] = allowMethods;
       }
-      let allowOrigin = props['allow-origin'];
+      var allowOrigin = props['allow-origin'];
       if (allowOrigin) {
         ctx.message.headers['Access-Control-Allow-Origin'] = allowOrigin;
       }
-      let exposeHeaders = props['expose-headers'];
+      var exposeHeaders = props['expose-headers'];
       if (exposeHeaders) {
         ctx.message.headers['Access-Control-Expose-Headers'] = exposeHeaders;
       }
-      let maxAge = props['max-age'];
+      var maxAge = props['max-age'];
       if (maxAge) {
         ctx.message.headers['Access-Control-Max-Age'] = maxAge.toString();
       }
