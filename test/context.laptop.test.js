@@ -49,7 +49,7 @@ describe('Context variables in laptop experience', function() {
 
         delete swagger['x-ibm-configuration'].assembly;
 
-        assert.deepStrictEqual(result, {
+        assert.deepEqual(result, {
           document: swagger,
           endpoint: {
             address: '*',
@@ -84,7 +84,7 @@ describe('Context variables in laptop experience', function() {
         var swagger =
           yaml.load(process.env.CONFIG_DIR + '/context_1.0.0.yaml');
 
-        assert.deepStrictEqual(result, {
+        assert.deepEqual(result, {
           assembly: {
             assembly: swagger['x-ibm-configuration'].assembly
           },
@@ -139,7 +139,7 @@ describe('Context variables in laptop experience', function() {
         }
 
         console.log('request.parameters result: '+JSON.stringify(result));
-        assert.deepStrictEqual(result,
+        assert.deepEqual(result,
             {param1:'value1',
              param2:8888,
              param3:9999,
@@ -171,7 +171,7 @@ describe('Context variables in laptop experience', function() {
         }
 
         console.log('request.parameters result: '+JSON.stringify(result));
-        assert.deepStrictEqual(result,
+        assert.deepEqual(result,
             {param1:'value1',
              param2:8888,
              param3:9999,
@@ -195,7 +195,7 @@ describe('Context variables in laptop experience', function() {
         }
 
         console.log('request.parameters result: '+JSON.stringify(result));
-        assert.deepStrictEqual(result,
+        assert.deepEqual(result,
             {param1:payload,
              param3:9999,
              param4:4444}
@@ -218,7 +218,7 @@ describe('Context variables in laptop experience', function() {
         }
 
         console.log('request.parameters result: '+JSON.stringify(result));
-        assert.deepStrictEqual(result,
+        assert.deepEqual(result,
             {param1:'value1',
              param2:8888,
              param3:9999,
@@ -240,7 +240,7 @@ describe('Context variables in laptop experience', function() {
       .get('/v1/context?name=foo')
       .expect(200)
       .end(function(err, res) {
-        assert.deepStrictEqual(res.body, {
+        assert.deepEqual(res.body, {
           name: 'foo',
           value: 'default_foo'
         });
