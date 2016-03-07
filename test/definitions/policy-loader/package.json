@@ -1,0 +1,11 @@
+{
+  "name": "for-testing",
+  "version": "1.0.0",
+  "description": "policy-loader test",
+  "main": "index.js",
+  "author": "IBM Gateway Team",
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "dependencies": {
+    "loopback": "^2.26.2"
+  }
+}

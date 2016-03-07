@@ -1,0 +1,7 @@
+{
+    "mypolicy1": {
+        "settings" : {
+            "foo" : "bar2"
+        }
+    }
+}
