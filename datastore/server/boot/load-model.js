@@ -700,14 +700,20 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
       var subscriptions = [
             {
             'catalog': {},
-            'id': 'test subscription',
+            'id': 'defaultSubsID',
             'application': {
-              'id': 'app name',
+              'id': 'defaultAppID',
+              'title': 'defaultAppTitle',
               'oauth-redirection-uri': 'https://localhost',
               'app-credentials': [{
                 'client-id': 'default',
                 'client-secret': 'CRexOpCRkV1UtjNvRZCVOczkUrNmGyHzhkGKJXiDswo='
               }]
+            },
+            'developer-organization': {
+              'id': 'defaultOrgID',
+              'name': 'defaultOrgName',
+              'title': 'defaultOrgTitle'
             },
             'plan-registration': {
               'id': 'ALLPLANS'
