@@ -1,6 +1,3 @@
 {
-  "extends": "strongloop",
-  "env": {
-    "mocha": true
-  }
+  "extends": "apiconnect"
 }
