@@ -2,6 +2,7 @@
 
 var Promise = require('bluebird');
 var express = require('express');
+var https = require('https');
 var app = express();
 var ah = require('auth-header');
 
@@ -36,9 +37,15 @@ app.put('/*', function(req, resp) {
 });
 
 var server;
+var tlsserver;
 exports.start = function(port) {
   return new Promise(function(resolve, reject) {
     server = app.listen(port, function() {
+      var tls = require('./tls')[0];
+      tlsserver = https.createServer({
+        key: tls['private-key'],
+        cert: tls.certs[0].cert
+      }, app).listen(61801);
       resolve();
     });
   });
@@ -46,8 +53,14 @@ exports.start = function(port) {
 
 exports.stop = function() {
   return new Promise(function(resolve, reject) {
+    if (tlsserver) {
+      tlsserver.close();
+      tlsserver = null;
+    }
+
     if (server) {
       server.close(function() {
+        server = null;
         resolve();
       });
     } else {
