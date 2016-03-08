@@ -1813,6 +1813,14 @@
                     "x-ibm-authentication-url": {
                         "url": "http://localhost:8889/auth"
                     }
+                },
+                "basic-https": {
+                    "type": "basic",
+                    "description": "",
+                    "x-ibm-authentication-url": {
+                        "url": "https://localhost:61801/auth",
+                        "tls-profile": "new-tls-profile-1"
+                    }
                 }
             },
             "basePath": "/basic",
@@ -1908,6 +1916,20 @@
                         "security": [
                             {
                                 "compose-upn": []
+                            }
+                        ]
+                    }
+                },
+                "/basic-https": {
+                    "get": {
+                        "responses": {
+                            "200": {
+                                "description": "200 OK"
+                            }
+                        },
+                        "security": [
+                            {
+                                "basic-https": []
                             }
                         ]
                     }
