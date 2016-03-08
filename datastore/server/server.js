@@ -27,7 +27,7 @@ app.start = function() {
       app.emit('started');
       var baseUrl = app.get('url').replace(/\/$/, '');
       var port = app.get('port');
-      process.env['DATASTORE_PORT'] = port;
+      process.env.DATASTORE_PORT = port;
       logger.debug('Web server listening at: %s port: %s', baseUrl, port);
       // save to file for explorer
       storeDatastorePort(port)

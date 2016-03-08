@@ -1,5 +1,6 @@
 'use strict';
 
+var Promise = require('bluebird');
 var fs = require('fs');
 var zlib = require('zlib');
 var http = require('http');

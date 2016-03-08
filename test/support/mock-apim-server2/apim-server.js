@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 var multer = require('multer');
 var Crypto = require('crypto');
 var upload = multer();
+var Promise = require('bluebird');
 var key = fs.readFileSync(__dirname + '/key.pem');
 var cert = fs.readFileSync(__dirname + '/cert.pem')
 var public_key = fs.readFileSync(__dirname + '/id_rsa.pub','utf8');
@@ -23,12 +24,12 @@ var test1 = false;
 var test2 = false;
 
 
-let server;
+var server;
 exports.start = function(h, p) {
   var port = p || PORT;
   var host = h || HOST;
-  return new Promise((resolve, reject) => {
-    server = https.createServer(https_options, app).listen(port, host, () => {
+  return new Promise(function(resolve, reject) {
+    server = https.createServer(https_options, app).listen(port, host, function() {
       console.log('HTTPS Server listening on %s:%s', host, port);
       resolve();
     });
@@ -37,9 +38,9 @@ exports.start = function(h, p) {
 
 
 exports.stop = function() {
-  return new Promise((resolve, reject) => {
+  return new Promise(function(resolve, reject) {
     if (server) {
-      server.close(() => {
+      server.close(function() {
         resolve();
       });
     } else {
@@ -52,7 +53,7 @@ exports.app = app;
 
 if (require.main === module) {
   exports.start().
-    then(() => {
+    then(function() {
     });
 }
 

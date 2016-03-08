@@ -8,7 +8,7 @@ var request = require('supertest');
 
 var context = require('../lib/context');
 
-const API_PATH_HEADER = 'X-API-PATH';
+var API_PATH_HEADER = 'X-API-PATH';
 
 describe('Context middleware', function() {
 
@@ -606,9 +606,9 @@ describe('Context middleware', function() {
       ctxTimezoneStr = ctxTimezoneStr.substring(1);
       ctxTimezoneStr.split(':').forEach(function(value, index) {
         if (index === 0) {
-          ctxTimezoneOffset += 60 * Number.parseInt(value);
+          ctxTimezoneOffset += 60 * parseInt(value);
         } else {
-          ctxTimezoneOffset += Number.parseInt(value);
+          ctxTimezoneOffset += parseInt(value);
         }
       });
       ctxTimezoneOffset = isBehindGMT ? ctxTimezoneOffset : -ctxTimezoneOffset;

@@ -7,14 +7,6 @@
      "catch"
   ],
   "disallowSpacesInsideObjectBrackets": null,
-  "maximumLineLength": {
-     "value": 80
-  },
-  "maximumLineLength": {
-	  "value": 80,
-	  "allowComments": true,
-	  "allowRegex": true
-  },
   "validateIndentation": 2,
   "validateQuoteMarks": "'",
 
@@ -51,13 +43,10 @@
   "requireSpacesInFunctionExpression": {
 	  "beforeOpeningCurlyBrace": true
   },
+
   "disallowSpacesInAnonymousFunctionExpression": {
 	  "beforeOpeningRoundBrace": true
   },
-  "disallowSpacesInsideObjectBrackets": "all",
-  "disallowSpacesInsideArrayBrackets": "all",
-  "disallowSpacesInsideParentheses": true,
-
   "disallowNewlineBeforeBlockStatements": true,
 
   "jsDoc": {
@@ -73,4 +62,6 @@
      "checkRedundantAccess": true,
      "requireNewlineAfterDescription": true
   }
+
+  "disallowArrowFunctions": true
 }

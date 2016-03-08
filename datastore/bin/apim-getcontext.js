@@ -15,9 +15,9 @@ program
   .option('-c, --clientid <clientid>', 'clientid of request')
   .parse(process.argv);
 
-options['path'] = program.path;
-options['method'] = program.method;
-options['clientid'] = program.clientid;
+options.path = program.path;
+options.method = program.method;
+options.clientid = program.clientid;
 
 
 contextget(options,function(error, response) {

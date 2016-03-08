@@ -287,7 +287,9 @@ function _main(props, context, next, logger, tlsProfile) {
             logger.info('[invoke] response is received: %d, %s',
                 writeDst.statusCode, writeDst.reasonPhrase);
             writeDst.headers = {};
-            var rhrs = response.rawHeaders;
+
+            //note: there is no response.rawHeaders for node v0.10.43
+            var rhrs = response.rawHeaders || response.headers;
             for (var i = 0; i < rhrs.length; i+=2) {
                 writeDst.headers[rhrs[i]] = rhrs[i+1];
             }
