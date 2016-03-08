@@ -241,34 +241,34 @@ describe('javascript policy', function() {
     });
 
     // using arrow function
-    it('should be able to use arrow function', function(done) {
-      var context = {request:
-                          {uri: 'http://localhost/foo'},
-                     myval: '1'
-                     };
-      var code = "var total = 0;" +
-        "[1, 2, 3].forEach(function(val) {" +
-        "total += val;" +
-        "});" +
-        "myval = total;";
-
-      var flow = {
-          'proceed': function() {
-            should(context.myval).exactly(6).and.be.a.Number();
-            done();
-          },
-          'fail': function(error) {
-            throw new Error('failed');
-          },
-          'logger': bunyan.createLogger(
-              {
-                name:'flow-engine',
-                stream: process.stdout,
-                level: 'debug'
-            })
-        };
-      javascriptPolicy({source: code}, context, flow);
-    });
+//    it('should be able to use arrow function', function(done) {
+//      var context = {request:
+//                          {uri: 'http://localhost/foo'},
+//                     myval: '1'
+//                     };
+//      var code = "var total = 0;" +
+//        "[1, 2, 3].forEach(function(val) {" +
+//        "total += val;" +
+//        "});" +
+//        "myval = total;";
+//
+//      var flow = {
+//          'proceed': function() {
+//            should(context.myval).exactly(6).and.be.a.Number();
+//            done();
+//          },
+//          'fail': function(error) {
+//            throw new Error('failed');
+//          },
+//          'logger': bunyan.createLogger(
+//              {
+//                name:'flow-engine',
+//                stream: process.stdout,
+//                level: 'debug'
+//            })
+//        };
+//      javascriptPolicy({source: code}, context, flow);
+//    });
 
     // no require
     it('should not be able to call require()', function(done) {
@@ -347,5 +347,28 @@ describe('javascript policy', function() {
       javascriptPolicy({source: code}, context, flow);
     });
 
+    // console for logging
+    it('should be able to console', function(done) {
+      var context = {request:
+                          {uri: 'http://localhost/foo'}
+                     };
+      var code = "console.error(request.uri); console.info('this is a test:%s', 'foo');";
+
+      var flow = {
+          'proceed': function() {
+            done();
+          },
+          'fail': function(error) {
+            throw new Error('failed');
+          },
+          'logger': bunyan.createLogger(
+              {
+                name:'flow-engine',
+                stream: process.stdout,
+                level: 'debug'
+            })
+        };
+      javascriptPolicy({source: code}, context, flow);
+    });
   });
 });
