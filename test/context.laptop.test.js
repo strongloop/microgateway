@@ -1,30 +1,30 @@
 'use strict';
 
-let _ = require('lodash');
-let assert = require('assert');
-let supertest = require('supertest');
-let yaml = require('yamljs');
+var _ = require('lodash');
+var assert = require('assert');
+var supertest = require('supertest');
+var yaml = require('yamljs');
 
-let mg = require('../lib/microgw');
+var mg = require('../lib/microgw');
 
 describe('Context variables in laptop experience', function() {
 
-  let request;
-  before((done) => {
+  var request;
+  before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/context';
     process.env.NODE_ENV = 'production';
     mg.start(3000)
-      .then(() => {
+      .then(function() {
         request = supertest('http://localhost:3000');
       })
       .then(done)
-      .catch((err) => {
+      .catch(function(err) {
         console.error(err);
         done(err);
       });
   });
 
-  after((done) => {
+  after(function(done) {
     mg.stop()
       .then(done, done)
       .catch(done);
@@ -44,12 +44,12 @@ describe('Context variables in laptop experience', function() {
 
         result.endpoint.address = '*';
 
-        let swagger =
+        var swagger =
           yaml.load(process.env.CONFIG_DIR + '/context_1.0.0.yaml');
 
         delete swagger['x-ibm-configuration'].assembly;
 
-        assert.deepStrictEqual(result, {
+        assert.deepEqual(result, {
           document: swagger,
           endpoint: {
             address: '*',
@@ -58,7 +58,10 @@ describe('Context variables in laptop experience', function() {
           //id: 'context:1.0.0',
           //method: 'GET',
           name: 'context',
-          org: {},
+          org: {  
+            "id": "defaultOrgID",
+            "name": "defaultOrgName"
+            },
           //path: '/context/api',
           properties: {
             foo: 'default_foo'
@@ -81,10 +84,10 @@ describe('Context variables in laptop experience', function() {
           result = JSON.parse(result);
         }
 
-        let swagger =
+        var swagger =
           yaml.load(process.env.CONFIG_DIR + '/context_1.0.0.yaml');
 
-        assert.deepStrictEqual(result, {
+        assert.deepEqual(result, {
           assembly: {
             assembly: swagger['x-ibm-configuration'].assembly
           },
@@ -139,7 +142,7 @@ describe('Context variables in laptop experience', function() {
         }
 
         console.log('request.parameters result: '+JSON.stringify(result));
-        assert.deepStrictEqual(result,
+        assert.deepEqual(result,
             {param1:'value1',
              param2:8888,
              param3:9999,
@@ -171,7 +174,7 @@ describe('Context variables in laptop experience', function() {
         }
 
         console.log('request.parameters result: '+JSON.stringify(result));
-        assert.deepStrictEqual(result,
+        assert.deepEqual(result,
             {param1:'value1',
              param2:8888,
              param3:9999,
@@ -195,7 +198,7 @@ describe('Context variables in laptop experience', function() {
         }
 
         console.log('request.parameters result: '+JSON.stringify(result));
-        assert.deepStrictEqual(result,
+        assert.deepEqual(result,
             {param1:payload,
              param3:9999,
              param4:4444}
@@ -218,7 +221,7 @@ describe('Context variables in laptop experience', function() {
         }
 
         console.log('request.parameters result: '+JSON.stringify(result));
-        assert.deepStrictEqual(result,
+        assert.deepEqual(result,
             {param1:'value1',
              param2:8888,
              param3:9999,
@@ -240,7 +243,7 @@ describe('Context variables in laptop experience', function() {
       .get('/v1/context?name=foo')
       .expect(200)
       .end(function(err, res) {
-        assert.deepStrictEqual(res.body, {
+        assert.deepEqual(res.body, {
           name: 'foo',
           value: 'default_foo'
         });
@@ -260,18 +263,18 @@ describe('Context variables in laptop experience', function() {
           'Content-Length': payloadBuff.length
         }
       };
-      var req = http.request(options, (res) => {
+      var req = http.request(options, function(res) {
         var responseData = '';
         res.setEncoding('utf8');
-        res.on('data', (chunk) => {
+        res.on('data', function(chunk) {
           responseData += chunk;
         });
-        res.on('end', () => {
+        res.on('end', function() {
           callback(undefined, responseData);
         });
       });
 
-      req.on('error', (e) => {
+      req.on('error', function(e) {
         callback(e, undefined);
       });
 

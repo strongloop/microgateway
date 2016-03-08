@@ -1,44 +1,44 @@
 'use strict';
 
-let _ = require('lodash');
-let assert = require('assert');
-let fs = require('fs');
-let path = require('path');
-let echo = require('./support/echo-server');
-let supertest = require('supertest');
-let microgw = require('../lib/microgw');
-let apimServer = require('./support/mock-apim-server/apim-server');
+var _ = require('lodash');
+var assert = require('assert');
+var fs = require('fs');
+var path = require('path');
+var echo = require('./support/echo-server');
+var supertest = require('supertest');
+var microgw = require('../lib/microgw');
+var apimServer = require('./support/mock-apim-server/apim-server');
 
 describe('data-store', function() {
-  let request;
-  let snapshotID, oldSnapshotID;
-  before((done) => {
+  var request;
+  var snapshotID, oldSnapshotID;
+  before(function(done) {
     process.env.DATASTORE_PORT = 5000;
     process.env.APIMANAGER_PORT = 8890;
     process.env.APIMANAGER = '127.0.0.1';
     process.env.APIMANAGER_REFRESH_INTERVAL = 15 * 1000; // 15 seconds
     process.env.NODE_ENV = 'production';
     echo.start(8889)
-      .then(() => apimServer.start('127.0.0.1', 8890))
-      .then(() => microgw.start(3000))
-      .then(() => {
+      .then(function() { return apimServer.start('127.0.0.1', 8890); } )
+      .then(function() { return microgw.start(3000); } )
+      .then(function() {
         request = supertest('http://localhost:5000');
       })
       .then(done)
-      .catch((err) => {
+      .catch(function(err) {
         console.error(err);
         done(err);
       });
   });
 
-  after((done) => {
+  after(function(done) {
     delete process.env.DATASTORE_PORT;
     delete process.env.APIMANAGER_PORT;
     delete process.env.APIMANAGER;
     delete process.env.NODE_ENV;
     microgw.stop()
-      .then(() => echo.stop())
-      .then(() => apimServer.stop())
+      .then(function() { echo.stop(); } )
+      .then(function() { apimServer.stop(); })
       .then(done, done)
       .catch(done);
   });
@@ -46,7 +46,8 @@ describe('data-store', function() {
   function verifyResponseArray(res, expected) {
     assert.strictEqual(res.length, expected.length);
     var current = -1;
-    var usedvalues = Array(res.length).fill(false);
+    var usedvalues = new Array(res.length);
+    _.fill(usedvalues, false);
 
     for(var i = 0; i < expected.length; i++) {
       var expect = expected[i];
@@ -103,7 +104,7 @@ describe('data-store', function() {
         .get('/api/snapshots/current')
         .expect(function(res) {
             verifyResponseSingle(res.body.snapshot, expect);
-            assert(res.body.snapshot.id === snapshotID); // ID should be same as previous
+            assert.strictEqual(res.body.snapshot.id, snapshotID); // ID should be same as previous
           }
         ).end(done);
     }
@@ -115,7 +116,7 @@ describe('data-store', function() {
         .get('/api/snapshots/current')
         .expect(function(res) {
             verifyResponseSingle(res.body.snapshot, expect);
-            assert(res.body.snapshot.id === snapshotID); // ID should be same as previous
+            assert.strictEqual(res.body.snapshot.id, snapshotID); // ID should be same as previous
           }
         ).end(function (err, res) {
             if (err) return done(err);

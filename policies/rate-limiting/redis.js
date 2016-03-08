@@ -34,7 +34,7 @@ module.exports = function(options) {
       if (err) {
         return flow.fail(err);
       }
-      let remaining = timeLeft > 0 ? 0 : options.limit;
+      var remaining = timeLeft > 0 ? 0 : options.limit;
       handleResponse(limit, remaining, timeLeft, reject, context, flow);
     });
   };

@@ -1,4 +1,5 @@
-var  fs = require('fs')
+var Promise = require('bluebird')
+  , fs = require('fs')
   , https = require('https')
   , static = require('node-static')
   , port = 8080
@@ -17,7 +18,7 @@ var server;
  * @param path {string} optional, specifying the path to load apim config files
  */
 exports.start = function (host, port, path) {
-  return new Promise((resolve, reject) => {
+  return new Promise(function(resolve, reject) {
     path = path || __dirname;
 
     var options = {
@@ -33,19 +34,16 @@ exports.start = function (host, port, path) {
             console.error('> Error serving ' + request.url + ' - ' + err.message);
             response.writeHead(err.status, err.headers);
             response.end();
-          } else {
-            console.log('> ' + request.url + ' - ' + res.message);
           }
         }
       );
     }
 
     server = https.createServer(options, serveFiles);
-    server.listen(port, host, (err) => {
+    server.listen(port, host, function(err) {
       if (err) {
         reject(err);
       } else {
-        console.log('mock-apim-server listening on port ' + port);
         resolve();
       }
     });
@@ -54,10 +52,10 @@ exports.start = function (host, port, path) {
 };
 
 exports.stop = function() {
-  return new Promise((resolve, reject) => {
-    server.close(() => {
+  return new Promise(function(resolve, reject) {
+    server.close(function() {
       resolve(0);
-    })
+    });
   });
 };
 

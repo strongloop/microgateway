@@ -30,7 +30,12 @@ describe('policy-loader', function() {
                 path.resolve(__dirname, 'definitions',
                         'policy-loader', 'location2')
             ];
-            var pl = policyLoader.create(paths);
+            var pl = policyLoader.create(paths, {
+                'mypolicy1': {
+                    'settings': {
+                        'foo': 'bar2'
+                    }
+                }});
             pl.should.be.a.Object();
             var policies = pl.getPolicies();
             policies.should.have.property('mypolicy1');

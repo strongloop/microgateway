@@ -1,17 +1,19 @@
 'use strict'
 
+var Promise = require('bluebird');
 var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:datastore'});
-let forever = require('forever-monitor');
+var forever = require('forever-monitor');
 
-let child;
-let server;
+var child;
+var server;
 var sigtermHandler = function() {
                        child.kill(true);
                        process.exit(0);
                      };
+
 exports.start = function(fork) {
-  return new Promise((resolve, reject) => {
+  return new Promise(function(resolve, reject) {
     if (fork) {
       child = new (forever.Monitor)('./datastore/server/server.js', {
         max: 10,
@@ -53,7 +55,7 @@ exports.start = function(fork) {
     } else {
       process.send = function(msg) {
         if (msg.LOADED) {
-          process.send = () => {};
+          process.send = function() {};
           resolve();
         }
       };
@@ -64,14 +66,19 @@ exports.start = function(fork) {
 };
 
 exports.stop = function() {
-  return new Promise((resolve, reject) => {
+  return new Promise(function(resolve, reject) {
     if (child) {
+      child.on('exit', function() {
+        child = undefined; // reset child
+        resolve();
+      });
       child.stop();
+
       process.removeListener('SIGTERM', sigtermHandler);
-      resolve();
     }
     if (server) {
-      server.close(() => {
+      server.close(function() {
+        server = undefined; // reset server
         resolve();
       });
     }

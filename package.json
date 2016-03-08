@@ -9,7 +9,7 @@
     "test": "mocha -t 600000"
   },
   "engines": {
-    "node": ">=4.0.0" 
+    "node": ">=0.10.43" 
   },
   "repository": {
     "type": "git",
@@ -28,8 +28,8 @@
   "license": "SEE LICENSE IN LICENSE.txt",
   "devDependencies": {
     "debug": "^2.2.0",
-    "eslint": "^1.10.3",
-    "eslint-config-strongloop": "^1.0.2",
+    "eslint": "^1.x",
+    "eslint-config-apiconnect": "^1.x",
     "jscs": "^2.9.0",
     "mocha": "^2.4.5",
     "node-static": "^0.7.7",
@@ -43,6 +43,7 @@
     "async": "^1.5.2",
     "auth-header": "^0.2.2",
     "basic-auth": "^1.0.3",
+    "bluebird": "^3.3.3",
     "body-parser": "^1.14.2",
     "bunyan": "^1.7.1",
     "chokidar": "^1.4.2",

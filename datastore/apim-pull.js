@@ -232,7 +232,7 @@ function fetch (opts, cb) {
         cb(err);
       }
       else if (res.statusCode === 200) {
-        var etag = res.headers['etag'] ? res.headers['etag'] : '';
+        var etag = res.headers.etag ? res.headers.etag : '';
         var filename = opts.outdir + opts.prefix + 
                        new Buffer(etag).toString('base64') +
                        opts.suffix;
