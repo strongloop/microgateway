@@ -37,7 +37,7 @@ exports.apimGetDefaultCatalog = function(snapshot, orgName) {
       //logger.debug('body: %j', body);
       //logger.debug('response: %j', response);
       if (error) {
-        reject(Error(error));
+        reject(error);
         return;
       }
       var catalogs = JSON.parse(body);
@@ -122,7 +122,7 @@ exports.getCurrentSnapshot = function() {
       //logger.debug('response: %j', response);
       // exit early on error
       if (error) {
-        reject(new Error(error));
+        reject(error);
         return;
       }
       var snapshot = JSON.parse(body);
@@ -154,7 +154,7 @@ exports.releaseCurrentSnapshot = function(id) {
       // exit early on error
       if (error) {
         logger.debug('releaseCurrentSnapshot error');
-        reject(new Error(error));
+        reject(error);
         return;
       }
       logger.debug('releaseCurrentSnapshot exit');
@@ -189,7 +189,7 @@ exports.getTlsProfile = function(snapshot, tlsProfleName) {
       logger.debug('response: %j', response);
       // exit early on error
       if (error) {
-        reject(new Error(error));
+        reject(error);
         return;
       }
       resolve(JSON.parse(body));
@@ -224,7 +224,7 @@ exports.getRegistry = function(snapshot, registryName) {
       logger.debug('response: %j', response);
       // exit early on error
       if (error) {
-        reject(new Error(error));
+        reject(error);
         return;
       }
       resolve(JSON.parse(body));
