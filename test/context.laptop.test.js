@@ -58,7 +58,10 @@ describe('Context variables in laptop experience', function() {
           //id: 'context:1.0.0',
           //method: 'GET',
           name: 'context',
-          org: {},
+          org: {  
+            "id": "defaultOrgID",
+            "name": "defaultOrgName"
+            },
           //path: '/context/api',
           properties: {
             foo: 'default_foo'
