@@ -5,6 +5,7 @@ var YAML = require('yamljs');
 var constants = require('constants');
 var Crypto = require('crypto');
 var Request = require('request');
+var url = require('url');
 var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:datastore:server:boot:load-model'});
 var sgwapimpull = require('../../apim-pull');
@@ -87,7 +88,7 @@ module.exports = function(app) {
         if (process.env[CONFIGDIR])
           definitionsDir = process.env[CONFIGDIR];
         else {
-          process.env['ROOTCONFIGDIR'] = rootConfigPath;
+          process.env.ROOTCONFIGDIR = rootConfigPath;
           definitionsDir = defaultDefinitionsDir;
         }
         callback();
@@ -257,12 +258,12 @@ function addSignatureHeaders(body, headers, keyId, private_key) {
     headers = {};
   }
 
-  if (!headers['date']) {
-    headers['date'] = (new Date()).toUTCString()
+  if (!headers.date) {
+    headers.date = (new Date()).toUTCString()
   }
 
-  if (!headers['digest']) {
-    headers['digest'] = 'SHA256=' + sha256(body, 'base64');
+  if (!headers.digest) {
+    headers.digest = 'SHA256=' + sha256(body, 'base64');
   }
 
 
@@ -274,7 +275,7 @@ function addSignatureHeaders(body, headers, keyId, private_key) {
     return parts.join("\n");
   };
 
-  headers['authorization'] = 'Signature ' +
+  headers.authorization = 'Signature ' +
     'keyId="' + keyId + '", ' +
     'headers="date digest", ' +
     'algorithm="rsa-sha256", ' +
@@ -342,7 +343,13 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
 
       logger.debug(JSON.stringify(headers, null, 2));
 
-      var apimHandshakeUrl = 'https://' + apimanager.host + ':' + apimanager.port + '/v1/catalogs/' + apimanager.catalog + '/handshake/';
+      var apimHandshakeUrlObj = {
+        protocol: 'https',
+        hostname: apimanager.host,
+        port: apimanager.port,
+        pathname: '/v1/catalogs/' + apimanager.catalog + '/handshake/'
+      }
+      var apimHandshakeUrl = url.format(apimHandshakeUrlObj);
       
       Request({
         url: apimHandshakeUrl,
@@ -423,12 +430,12 @@ function pullFromAPIm(apimanager, uid, cb) {
       };*/
 
       var options = {};
-      options['host'] = apimanager.host;
-      options['port'] = apimanager.port;
-      options['clikey'] = apimanager.clikey;
-      options['clicert'] = apimanager.clicert;
-      options['clientid'] = apimanager.clientid;
-      options['outdir'] = snapdir;
+      options.host = apimanager.host;
+      options.port = apimanager.port;
+      options.clikey = apimanager.clikey;
+      options.clicert = apimanager.clicert;
+      options.clientid = apimanager.clientid;
+      options.outdir = snapdir;
       logger.debug('apimpull start');
       apimpull(options,function(err, response) {
           if (err) {
@@ -568,12 +575,12 @@ function loadConfigFromFS(app, apimanager, models, dir, uid, cb) {
 
 function createProductID(product)
   {
-  return (product.info['name'] + ':' + product.info['version']);
+  return (product.info.name + ':' + product.info.version);
   }
   
 function createAPIID(api)
   {
-  return (api.info['x-ibm-name'] + ':' + api.info['version']);
+  return (api.info['x-ibm-name'] + ':' + api.info.version);
   }
 
 /**
@@ -586,6 +593,40 @@ function createAPIID(api)
 function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
   logger.debug('populateModelsWithLocalData entry');
   var apis = {};
+  var subscriptions = [
+            {
+            'organization': {
+              'id': 'defaultOrgID',
+              'name': 'defaultOrgName',
+              'title': 'defaultOrgTitle'
+            },
+            'catalog': {
+              'id': 'defaultCatalogID',
+              'name': 'defaultCatalogName',
+              'title': 'defaultCatalogTitle'
+            },
+            'id': 'defaultSubsID',
+            'application': {
+              'id': 'defaultAppID',
+              'title': 'defaultAppTitle',
+              'oauth-redirection-uri': 'https://localhost',
+              'app-credentials': [{
+                'client-id': 'default',
+                'client-secret': 'CRexOpCRkV1UtjNvRZCVOczkUrNmGyHzhkGKJXiDswo='
+              }]
+            },
+            'developer-organization': {
+              'id': 'defaultOrgID',
+              'name': 'defaultOrgName',
+              'title': 'defaultOrgTitle'
+            },
+            'plan-registration': {
+              'id': 'ALLPLANS'
+                }
+            }
+            ];
+  var catalog = subscriptions[0].catalog;
+  catalog.organization = subscriptions[0].organization;
   async.series([
     function(seriesCallback) {
       async.forEach(YAMLfiles,
@@ -642,11 +683,28 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
       ); 
       seriesCallback();
     },
+    function(seriesCallback) {
+        catalog['snapshot-id'] = uid;
+        app.models['catalog'].create(
+          catalog,
+          function(err, mymodel) {
+            if (err) {
+              logger.error(err);
+              seriesCallback(err);
+              return;
+            }
+            logger.debug('%s created: %j',
+                  'catalog',
+                  mymodel);
+          seriesCallback();
+          }
+        );
+    },
     // create product with all the apis defined
     function(seriesCallback) {
         var entry = {};
-        // no catalog
-        entry.catalog = {};
+        // add catalog
+        entry.catalog = catalog;
         entry['snapshot-id'] = uid;
         var rateLimit = '100/hour';
         if (process.env[LAPTOP_RATELIMIT])
@@ -680,7 +738,7 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
         }
         logger.debug('creating static product and attaching apis: ' + JSON.stringify(entry, null, 4))
 
-        app.models['product'].create(
+        app.models.product.create(
           entry,
           function(err, mymodel) {
             if (err) {
@@ -697,24 +755,6 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
       },
     // Hardcode default subscription for all plans
     function(seriesCallback) {
-      var subscriptions = [
-            {
-            'catalog': {},
-            'id': 'test subscription',
-            'application': {
-              'id': 'app name',
-              'oauth-redirection-uri': 'https://localhost',
-              'app-credentials': [{
-                'client-id': 'default',
-                'client-secret': 'CRexOpCRkV1UtjNvRZCVOczkUrNmGyHzhkGKJXiDswo='
-              }]
-            },
-            'plan-registration': {
-              'id': 'ALLPLANS'
-                }
-            }
-            ];
-
         async.forEach(subscriptions,
           function(subscription, subsCallback) 
             {

@@ -226,6 +226,7 @@ function grabCatalog(app, snapshot, product, cb) {
         cb(err);
         return;
       }
+      logger.debug('grabCatalog found: %j', myproduct);
       catalog = myproduct.catalog;
       cb(null, catalog);
     }
@@ -246,6 +247,7 @@ function grabOrg(app, snapshot, catalog, cb) {
         cb(err);
         return;
       }
+      logger.debug('grabOrg found: %j', mycatalog);
       if (mycatalog)
         org = mycatalog.organization;
       else {org={};}
@@ -280,7 +282,7 @@ function grabAPIs(app, snapshot, product, plan, cb) {
         {
         // not resolved try to spit the name
         logger.debug('api: %j', api);
-        var apiName = product.document.apis[api]['name'].split(':');
+        var apiName = product.document.apis[api].name.split(':');
         logger.debug('apiName: %j', apiName);
         logger.debug('info: product.document.apis[api][name]');
         info = {'x-ibm-name': apiName[0], 'version': apiName[1]}
@@ -296,8 +298,8 @@ function grabAPIs(app, snapshot, product, plan, cb) {
           }
           listOfApis.forEach(function(DBapi) {
             logger.debug('DBapi.document.info: %j', DBapi.document.info);
-            if (DBapi.document.info['version'] ===
-              info['version'] &&
+            if (DBapi.document.info.version ===
+              info.version &&
               DBapi.document.info['x-ibm-name'] ===
               info['x-ibm-name']) {
                 logger.debug('found api in db: %j', DBapi);
@@ -532,7 +534,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'subscription-id': pieces.subscription.id,
             'client-id': credential['client-id'],
             'client-secret': credential['client-secret'],
-            'client-name': pieces.application['title'],
+            'client-name': pieces.application.title,
             'client-org-id': pieces.application.developerOrg ?
               pieces.application.developerOrg.id : '',
             'client-org-name': pieces.application.developerOrg ?

@@ -68,12 +68,17 @@ exports.start = function(fork) {
 exports.stop = function() {
   return new Promise(function(resolve, reject) {
     if (child) {
+      child.on('exit', function() {
+        child = undefined; // reset child
+        resolve();
+      });
       child.stop();
+
       process.removeListener('SIGTERM', sigtermHandler);
-      resolve();
     }
     if (server) {
       server.close(function() {
+        server = undefined; // reset server
         resolve();
       });
     }

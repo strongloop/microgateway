@@ -1,6 +1,7 @@
 'use strict'
 var Promise = require('bluebird');
 var request = require('request');
+var url = require('url');
 var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:datastore:client'});
 var host = '127.0.0.1'; // data-store's listening interface
@@ -22,8 +23,14 @@ exports.apimGetDefaultCatalog = function(snapshot, orgName) {
       orgNameFilter + ',' +
       defaultOrgFilter + ']}}';
 
-  var queryurl = 'http://' + host + ':' + process.env['DATASTORE_PORT'] +
-      '/api/catalogs?filter=' + encodeURIComponent(queryfilter);
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/catalogs',
+        query: {filter : queryfilter}
+  };
+  var queryurl = url.format(queryurlObj);
 
   return new Promise(function(resolve, reject) {
     request({url: queryurl}, function(error, response, body) {
@@ -31,7 +38,7 @@ exports.apimGetDefaultCatalog = function(snapshot, orgName) {
       //logger.debug('body: %j', body);
       //logger.debug('response: %j', response);
       if (error) {
-        reject(Error(error));
+        reject(error);
         return;
       }
       var catalogs = JSON.parse(body);
@@ -60,8 +67,14 @@ exports.grabAPI = function(context, callback) {
       '{"where": { "and":[' +
       snapshotFilter + ',' +
       apiFilter + ']}}';
-  var queryurl = 'http://' + host + ':' + process.env['DATASTORE_PORT'] +
-      '/api/apis?filter=' + encodeURIComponent(queryfilter);
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/apis',
+        query: {filter : queryfilter}
+  };
+  var queryurl = url.format(queryurlObj);
   var api = {};
 
   request(
@@ -93,9 +106,13 @@ exports.grabAPI = function(context, callback) {
 exports.getCurrentSnapshot = function() {
   logger.debug('getCurrentSnapshot entry');
   // build request to send to data-store
-  var port = process.env['DATASTORE_PORT'];
-  var queryurl = 'http://' + host + ':' + port + '/api/snapshots/current';
-
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/snapshots/current'
+  };
+  var queryurl = url.format(queryurlObj);
   // send request to optimizedData model from data-store
   // for matching API(s)
   return new Promise(function(resolve, reject) {
@@ -105,7 +122,7 @@ exports.getCurrentSnapshot = function() {
       //logger.debug('response: %j', response);
       // exit early on error
       if (error) {
-        reject(new Error(error));
+        reject(error);
         return;
       }
       var snapshot = JSON.parse(body);
@@ -118,8 +135,14 @@ exports.getCurrentSnapshot = function() {
 exports.releaseCurrentSnapshot = function(id) {
   logger.debug('releaseCurrentSnapshot entry');
   // build request to send to data-store
-  var port = process.env['DATASTORE_PORT'];
-  var queryurl = 'http://' + host + ':' + port + '/api/snapshots/release?id=' + id;
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/snapshots/release',
+        query: {id : id}
+  };
+  var queryurl = url.format(queryurlObj);
 
   // send request to optimizedData model from data-store
   // for matching API(s)
@@ -131,7 +154,7 @@ exports.releaseCurrentSnapshot = function(id) {
       // exit early on error
       if (error) {
         logger.debug('releaseCurrentSnapshot error');
-        reject(new Error(error));
+        reject(error);
         return;
       }
       logger.debug('releaseCurrentSnapshot exit');
@@ -152,9 +175,15 @@ exports.getTlsProfile = function(snapshot, tlsProfleName) {
       ]
     }
   });
-  var port = process.env['DATASTORE_PORT'];
 
-  var queryurl = 'http://' + host + ':' + port + '/api/tlsprofiles?filter=' + encodeURIComponent(queryfilter);
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/tlsprofiles',
+        query: {filter : queryfilter}
+  };
+  var queryurl = url.format(queryurlObj);
 
   // send request to data-store to get the reqiested TLS Profile
   // for matching API(s)
@@ -165,7 +194,7 @@ exports.getTlsProfile = function(snapshot, tlsProfleName) {
       logger.debug('response: %j', response);
       // exit early on error
       if (error) {
-        reject(new Error(error));
+        reject(error);
         return;
       }
       resolve(JSON.parse(body));
@@ -186,9 +215,15 @@ exports.getRegistry = function(snapshot, registryName) {
       ]
     }
   });
-  var port = process.env['DATASTORE_PORT'];
 
-  var queryurl = 'http://' + host + ':' + port + '/api/registries?filter=' + encodeURIComponent(queryfilter);
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/registries',
+        query: {filter : queryfilter}
+  };
+  var queryurl = url.format(queryurlObj);
 
   // send request to data-store to get the requested Registry Profile
   // for matching API(s)
@@ -199,7 +234,7 @@ exports.getRegistry = function(snapshot, registryName) {
       logger.debug('response: %j', response);
       // exit early on error
       if (error) {
-        reject(new Error(error));
+        reject(error);
         return;
       }
       resolve(JSON.parse(body));
