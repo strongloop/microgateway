@@ -593,6 +593,40 @@ function createAPIID(api)
 function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
   logger.debug('populateModelsWithLocalData entry');
   var apis = {};
+  var subscriptions = [
+            {
+            'organization': {
+              'id': 'defaultOrgID',
+              'name': 'defaultOrgName',
+              'title': 'defaultOrgTitle'
+            },
+            'catalog': {
+              'id': 'defaultCatalogID',
+              'name': 'defaultCatalogName',
+              'title': 'defaultCatalogTitle'
+            },
+            'id': 'defaultSubsID',
+            'application': {
+              'id': 'defaultAppID',
+              'title': 'defaultAppTitle',
+              'oauth-redirection-uri': 'https://localhost',
+              'app-credentials': [{
+                'client-id': 'default',
+                'client-secret': 'CRexOpCRkV1UtjNvRZCVOczkUrNmGyHzhkGKJXiDswo='
+              }]
+            },
+            'developer-organization': {
+              'id': 'defaultOrgID',
+              'name': 'defaultOrgName',
+              'title': 'defaultOrgTitle'
+            },
+            'plan-registration': {
+              'id': 'ALLPLANS'
+                }
+            }
+            ];
+  var catalog = subscriptions[0].catalog;
+  catalog.organization = subscriptions[0].organization;
   async.series([
     function(seriesCallback) {
       async.forEach(YAMLfiles,
@@ -649,11 +683,28 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
       ); 
       seriesCallback();
     },
+    function(seriesCallback) {
+        catalog['snapshot-id'] = uid;
+        app.models['catalog'].create(
+          catalog,
+          function(err, mymodel) {
+            if (err) {
+              logger.error(err);
+              seriesCallback(err);
+              return;
+            }
+            logger.debug('%s created: %j',
+                  'catalog',
+                  mymodel);
+          seriesCallback();
+          }
+        );
+    },
     // create product with all the apis defined
     function(seriesCallback) {
         var entry = {};
-        // no catalog
-        entry.catalog = {};
+        // add catalog
+        entry.catalog = catalog;
         entry['snapshot-id'] = uid;
         var rateLimit = '100/hour';
         if (process.env[LAPTOP_RATELIMIT])
@@ -704,24 +755,6 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
       },
     // Hardcode default subscription for all plans
     function(seriesCallback) {
-      var subscriptions = [
-            {
-            'catalog': {},
-            'id': 'test subscription',
-            'application': {
-              'id': 'app name',
-              'oauth-redirection-uri': 'https://localhost',
-              'app-credentials': [{
-                'client-id': 'default',
-                'client-secret': 'CRexOpCRkV1UtjNvRZCVOczkUrNmGyHzhkGKJXiDswo='
-              }]
-            },
-            'plan-registration': {
-              'id': 'ALLPLANS'
-                }
-            }
-            ];
-
         async.forEach(subscriptions,
           function(subscription, subsCallback) 
             {

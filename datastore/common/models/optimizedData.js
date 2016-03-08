@@ -226,6 +226,7 @@ function grabCatalog(app, snapshot, product, cb) {
         cb(err);
         return;
       }
+      logger.debug('grabCatalog found: %j', myproduct);
       catalog = myproduct.catalog;
       cb(null, catalog);
     }
@@ -246,6 +247,7 @@ function grabOrg(app, snapshot, catalog, cb) {
         cb(err);
         return;
       }
+      logger.debug('grabOrg found: %j', mycatalog);
       if (mycatalog)
         org = mycatalog.organization;
       else {org={};}
