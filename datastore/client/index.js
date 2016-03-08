@@ -1,9 +1,10 @@
 'use strict'
+var Promise = require('bluebird');
 var request = require('request');
 var url = require('url');
 var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:datastore:client'});
-const host = '127.0.0.1'; // data-store's listening interface
+var host = '127.0.0.1'; // data-store's listening interface
 
 /**
  * Finds the default catalog/environment for a specific provider
@@ -31,8 +32,8 @@ exports.apimGetDefaultCatalog = function(snapshot, orgName) {
   };
   var queryurl = url.format(queryurlObj);
 
-  return new Promise((resolve, reject) => {
-    request({url: queryurl}, (error, response, body) => {
+  return new Promise(function(resolve, reject) {
+    request({url: queryurl}, function(error, response, body) {
       logger.debug('error: ', error);
       //logger.debug('body: %j', body);
       //logger.debug('response: %j', response);
@@ -112,11 +113,10 @@ exports.getCurrentSnapshot = function() {
         pathname: '/api/snapshots/current'
   };
   var queryurl = url.format(queryurlObj);
-
   // send request to optimizedData model from data-store
   // for matching API(s)
-  return new Promise((resolve, reject) => {
-    request({url: queryurl}, (error, response, body) => {
+  return new Promise(function(resolve, reject) {
+    request({url: queryurl}, function(error, response, body) {
       logger.debug('error: ', error);
       //logger.debug('body: %j', body);
       //logger.debug('response: %j', response);
@@ -146,8 +146,8 @@ exports.releaseCurrentSnapshot = function(id) {
 
   // send request to optimizedData model from data-store
   // for matching API(s)
-  return new Promise((resolve, reject) => {
-    request({url: queryurl}, (error, response, body) => {
+  return new Promise(function(resolve, reject) {
+    request({url: queryurl}, function(error, response, body) {
       logger.debug('error: ', error);
       logger.debug('body: %j', body);
       logger.debug('response: %j', response);
@@ -167,9 +167,14 @@ exports.getTlsProfile = function(snapshot, tlsProfleName) {
   logger.debug('getTlsProfile entry snapshot:' + snapshot +
                               '\n tlsProfleName:' + tlsProfleName );
   // build request to send to data-store
-  let snapshotFilter = `{"snapshot-id": "${snapshot }"}`;
-  let tlsNameFilter = `{"name": "${tlsProfleName }"}`;
-  let queryfilter = `{"where": { "and":[${snapshotFilter}, ${tlsNameFilter}]}}`;
+  var queryfilter = JSON.stringify({
+    where: {
+      and: [
+        { 'snapshot-id': snapshot},
+        { name: tlsProfleName}
+      ]
+    }
+  });
 
   var queryurlObj = {
         protocol: 'http',
@@ -182,7 +187,7 @@ exports.getTlsProfile = function(snapshot, tlsProfleName) {
 
   // send request to data-store to get the reqiested TLS Profile
   // for matching API(s)
-  return new Promise((resolve, reject) => {
+  return new Promise(function(resolve, reject) {
     request({url: queryurl}, function (error, response, body) {
       logger.debug('error: ', error);
       logger.debug('body: %j', body);
@@ -202,9 +207,14 @@ exports.getRegistry = function(snapshot, registryName) {
   logger.debug('getRegistry entry snapshot:' + snapshot +
                               '\n registryName:' + registryName );
   // build request to send to data-store
-  let snapshotFilter = `{"snapshot-id": "${snapshot }"}`;
-  let registryNameFilter = `{"name": "${registryName }"}`;
-  let queryfilter = `{"where": { "and":[${snapshotFilter}, ${registryNameFilter}]}}`;
+  var queryfilter = JSON.stringify({
+    where: {
+      and: [
+        { 'snapshot-id': snapshot},
+        { name: registryName}
+      ]
+    }
+  });
 
   var queryurlObj = {
         protocol: 'http',
@@ -217,7 +227,7 @@ exports.getRegistry = function(snapshot, registryName) {
 
   // send request to data-store to get the requested Registry Profile
   // for matching API(s)
-  return new Promise((resolve, reject) => {
+  return new Promise(function(resolve, reject) {
     request({url: queryurl}, function (error, response, body) {
       logger.debug('error: ', error);
       logger.debug('body: %j', body);

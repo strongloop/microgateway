@@ -1,16 +1,16 @@
 'use strict';
 
-let _ = require('lodash');
-let assert = require('assert');
-let supertest = require('supertest');
-let microgw = require('../lib/microgw');
-let backend = require('./support/invoke-server');
-let apimServer = require('./support/mock-apim-server/apim-server');
+var _ = require('lodash');
+var assert = require('assert');
+var supertest = require('supertest');
+var microgw = require('../lib/microgw');
+var backend = require('./support/invoke-server');
+var apimServer = require('./support/mock-apim-server/apim-server');
 
 describe('invokePolicy', function() {
 
-  let request, datastoreRequest;
-  before((done) => {
+  var request, datastoreRequest;
+  before(function(done)  {
     //Use production instead of CONFIG_DIR: reading from apim instead of laptop
     process.env.NODE_ENV = 'production';
 
@@ -23,28 +23,28 @@ describe('invokePolicy', function() {
             process.env.APIMANAGER,
             process.env.APIMANAGER_PORT,
             __dirname + '/definitions/invoke')
-        .then(() => microgw.start(3000))
-        .then(() => backend.start(8889))
-        .then(() => { 
-          request = supertest('http://localhost:3000');
-          datastoreRequest = supertest('http://localhost:5000');
+        .then(function() { return microgw.start(3000); })
+        .then(function() { return backend.start(8889); })
+        .then(function() {
+            request = supertest('http://localhost:3000');
+            datastoreRequest = supertest('http://localhost:5000');
         })
         .then(done)
-        .catch((err) => {
+        .catch(function(err) {
             console.error(err);
             done(err);
             });
   });
 
-  after((done) => {
+  after(function(done) {
     delete process.env.NODE_ENV;
     delete process.env.APIMANAGER;
     delete process.env.APIMANAGER_PORT;
     delete process.env.DATASTORE_PORT;
 
     apimServer.stop()
-      .then(() => microgw.stop())
-      .then(() => backend.stop())
+      .then(function() { return microgw.stop(); })
+      .then(function() { return backend.stop(); })
       .then(done, done)
       .catch(done);
   });
