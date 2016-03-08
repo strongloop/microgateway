@@ -5,6 +5,7 @@ var YAML = require('yamljs');
 var constants = require('constants');
 var Crypto = require('crypto');
 var Request = require('request');
+var url = require('url');
 var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:datastore:server:boot:load-model'});
 var sgwapimpull = require('../../apim-pull');
@@ -87,7 +88,7 @@ module.exports = function(app) {
         if (process.env[CONFIGDIR])
           definitionsDir = process.env[CONFIGDIR];
         else {
-          process.env['ROOTCONFIGDIR'] = rootConfigPath;
+          process.env.ROOTCONFIGDIR = rootConfigPath;
           definitionsDir = defaultDefinitionsDir;
         }
         callback();
@@ -257,12 +258,12 @@ function addSignatureHeaders(body, headers, keyId, private_key) {
     headers = {};
   }
 
-  if (!headers['date']) {
-    headers['date'] = (new Date()).toUTCString()
+  if (!headers.date) {
+    headers.date = (new Date()).toUTCString()
   }
 
-  if (!headers['digest']) {
-    headers['digest'] = 'SHA256=' + sha256(body, 'base64');
+  if (!headers.digest) {
+    headers.digest = 'SHA256=' + sha256(body, 'base64');
   }
 
 
@@ -274,7 +275,7 @@ function addSignatureHeaders(body, headers, keyId, private_key) {
     return parts.join("\n");
   };
 
-  headers['authorization'] = 'Signature ' +
+  headers.authorization = 'Signature ' +
     'keyId="' + keyId + '", ' +
     'headers="date digest", ' +
     'algorithm="rsa-sha256", ' +
@@ -342,7 +343,13 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
 
       logger.debug(JSON.stringify(headers, null, 2));
 
-      var apimHandshakeUrl = 'https://' + apimanager.host + ':' + apimanager.port + '/v1/catalogs/' + apimanager.catalog + '/handshake/';
+      var apimHandshakeUrlObj = {
+        protocol: 'https',
+        hostname: apimanager.host,
+        port: apimanager.port,
+        pathname: '/v1/catalogs/' + apimanager.catalog + '/handshake/'
+      }
+      var apimHandshakeUrl = url.format(apimHandshakeUrlObj);
       
       Request({
         url: apimHandshakeUrl,
@@ -423,12 +430,12 @@ function pullFromAPIm(apimanager, uid, cb) {
       };*/
 
       var options = {};
-      options['host'] = apimanager.host;
-      options['port'] = apimanager.port;
-      options['clikey'] = apimanager.clikey;
-      options['clicert'] = apimanager.clicert;
-      options['clientid'] = apimanager.clientid;
-      options['outdir'] = snapdir;
+      options.host = apimanager.host;
+      options.port = apimanager.port;
+      options.clikey = apimanager.clikey;
+      options.clicert = apimanager.clicert;
+      options.clientid = apimanager.clientid;
+      options.outdir = snapdir;
       logger.debug('apimpull start');
       apimpull(options,function(err, response) {
           if (err) {
@@ -568,12 +575,12 @@ function loadConfigFromFS(app, apimanager, models, dir, uid, cb) {
 
 function createProductID(product)
   {
-  return (product.info['name'] + ':' + product.info['version']);
+  return (product.info.name + ':' + product.info.version);
   }
   
 function createAPIID(api)
   {
-  return (api.info['x-ibm-name'] + ':' + api.info['version']);
+  return (api.info['x-ibm-name'] + ':' + api.info.version);
   }
 
 /**
@@ -680,7 +687,7 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
         }
         logger.debug('creating static product and attaching apis: ' + JSON.stringify(entry, null, 4))
 
-        app.models['product'].create(
+        app.models.product.create(
           entry,
           function(err, mymodel) {
             if (err) {

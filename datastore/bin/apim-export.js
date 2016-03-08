@@ -22,16 +22,16 @@ program
   .parse(process.argv);
 
 
-options['host'] = program.args[0];
-options['port'] = program.port;
-options['timeout'] = program.timeout;
-options['srvca'] = program.srvca;
-options['clikey'] = program.key;
-options['clipass'] = program.pass;
-options['clicert'] = program.cert;
-options['outdir'] = program.outdir;
+options.host = program.args[0];
+options.port = program.port;
+options.timeout = program.timeout;
+options.srvca = program.srvca;
+options.clikey = program.key;
+options.clipass = program.pass;
+options.clicert = program.cert;
+options.outdir = program.outdir;
 
-if (options['host'] == null)  
+if (options.host == null)  
 { logger.debug('<host> required'); program.outputHelp(); process.exit(1);}
 if (program.args[1] != null) 
 { logger.debug('specify one host only'); program.outputHelp(); process.exit(1);}
