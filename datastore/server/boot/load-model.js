@@ -5,6 +5,7 @@ var YAML = require('yamljs');
 var constants = require('constants');
 var Crypto = require('crypto');
 var Request = require('request');
+var url = require('url');
 var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:datastore:server:boot:load-model'});
 var sgwapimpull = require('../../apim-pull');
@@ -342,7 +343,13 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
 
       logger.debug(JSON.stringify(headers, null, 2));
 
-      var apimHandshakeUrl = 'https://' + apimanager.host + ':' + apimanager.port + '/v1/catalogs/' + apimanager.catalog + '/handshake/';
+      var apimHandshakeUrlObj = {
+        protocol: 'https',
+        hostname: apimanager.host,
+        port: apimanager.port,
+        pathname: '/v1/catalogs/' + apimanager.catalog + '/handshake/'
+      }
+      var apimHandshakeUrl = url.format(apimHandshakeUrlObj);
       
       Request({
         url: apimHandshakeUrl,

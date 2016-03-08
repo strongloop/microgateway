@@ -1,5 +1,6 @@
 'use strict'
 var request = require('request');
+var url = require('url');
 var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'apiconnect-microgateway:datastore:client'});
 const host = '127.0.0.1'; // data-store's listening interface
@@ -21,8 +22,14 @@ exports.apimGetDefaultCatalog = function(snapshot, orgName) {
       orgNameFilter + ',' +
       defaultOrgFilter + ']}}';
 
-  var queryurl = 'http://' + host + ':' + process.env.DATASTORE_PORT +
-      '/api/catalogs?filter=' + encodeURIComponent(queryfilter);
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/catalogs',
+        query: {filter : queryfilter}
+  };
+  var queryurl = url.format(queryurlObj);
 
   return new Promise((resolve, reject) => {
     request({url: queryurl}, (error, response, body) => {
@@ -59,8 +66,14 @@ exports.grabAPI = function(context, callback) {
       '{"where": { "and":[' +
       snapshotFilter + ',' +
       apiFilter + ']}}';
-  var queryurl = 'http://' + host + ':' + process.env.DATASTORE_PORT +
-      '/api/apis?filter=' + encodeURIComponent(queryfilter);
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/apis',
+        query: {filter : queryfilter}
+  };
+  var queryurl = url.format(queryurlObj);
   var api = {};
 
   request(
@@ -92,8 +105,13 @@ exports.grabAPI = function(context, callback) {
 exports.getCurrentSnapshot = function() {
   logger.debug('getCurrentSnapshot entry');
   // build request to send to data-store
-  const port = process.env.DATASTORE_PORT;
-  const queryurl = `http://${host}:${port}/api/snapshots/current`;
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/snapshots/current'
+  };
+  var queryurl = url.format(queryurlObj);
 
   // send request to optimizedData model from data-store
   // for matching API(s)
@@ -117,8 +135,14 @@ exports.getCurrentSnapshot = function() {
 exports.releaseCurrentSnapshot = function(id) {
   logger.debug('releaseCurrentSnapshot entry');
   // build request to send to data-store
-  const port = process.env['DATASTORE_PORT'];
-  const queryurl = `http://${host}:${port}/api/snapshots/release?id=${id}`;
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/snapshots/release',
+        query: {id : id}
+  };
+  var queryurl = url.format(queryurlObj);
 
   // send request to optimizedData model from data-store
   // for matching API(s)
@@ -146,9 +170,15 @@ exports.getTlsProfile = function(snapshot, tlsProfleName) {
   let snapshotFilter = `{"snapshot-id": "${snapshot }"}`;
   let tlsNameFilter = `{"name": "${tlsProfleName }"}`;
   let queryfilter = `{"where": { "and":[${snapshotFilter}, ${tlsNameFilter}]}}`;
-  const port = process.env['DATASTORE_PORT'];
 
-  let queryurl = `http://${host}:${port}/api/tlsprofiles?filter=${encodeURIComponent(queryfilter)}`;
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/tlsprofiles',
+        query: {filter : queryfilter}
+  };
+  var queryurl = url.format(queryurlObj);
 
   // send request to data-store to get the reqiested TLS Profile
   // for matching API(s)
@@ -175,9 +205,15 @@ exports.getRegistry = function(snapshot, registryName) {
   let snapshotFilter = `{"snapshot-id": "${snapshot }"}`;
   let registryNameFilter = `{"name": "${registryName }"}`;
   let queryfilter = `{"where": { "and":[${snapshotFilter}, ${registryNameFilter}]}}`;
-  const port = process.env['DATASTORE_PORT'];
 
-  let queryurl = `http://${host}:${port}/api/registries?filter=${encodeURIComponent(queryfilter)}`;
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/registries',
+        query: {filter : queryfilter}
+  };
+  var queryurl = url.format(queryurlObj);
 
   // send request to data-store to get the requested Registry Profile
   // for matching API(s)
