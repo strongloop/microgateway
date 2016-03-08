@@ -105,16 +105,13 @@ function _main(props, context, next, logger, tlsProfile) {
     logger.debug('[invoke] auth: %s', options.auth, {});
 
     //readSrc: decide where to read the data
-    var validIdentifier = /^[$A-Z_][0-9A-Z_$]*$/i;
     if (props.input) {
         if (typeof props.input === 'string') {
-            if (validIdentifier.test(props.input)) {
-                if (context[props.input] &&
-                        typeof context[props.input] === 'object') {
-                    logger.info('[invoke] will read data and headers from "%s"',
+            var theIn = context.get(props.input);
+            if (typeof theIn === 'object') {
+                logger.info('[invoke] will read data and headers from "%s"',
                         props.input);
-                    readSrc = context[props.input];
-                }
+                readSrc = theIn;
             }
         }
 
@@ -133,12 +130,12 @@ function _main(props, context, next, logger, tlsProfile) {
     //writeDst: decide where to write the response
     if (props.output) {
         if (typeof props.output === 'string') {
-            if (validIdentifier.test(props.output)) {
-                logger.info('[invoke] the output destination will be set to %s',
-                        props.output);
-                context[props.output] = {};
-                writeDst = context[props.output];
-            }
+            logger.info('[invoke] the output destination will be set to %s',
+                    props.output);
+
+            var theOut = {};
+            context.set(props.output, theOut);
+            writeDst = theOut;
         }
 
         if (!writeDst) {

@@ -114,7 +114,8 @@ function theApplication(req, resp) {
             else {
                 var delay = parseInt(req.headers['x-delay-me']);
                 delay = (isNaN(delay) ? 0 : delay);
-                console.log('Server is going to take %d seconds to process', delay);
+                if (delay > 0)
+                    console.log('Server is going to take %d seconds to process', delay);
 
                 //delay the response a little bit
                 setTimeout(function() {
