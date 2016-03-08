@@ -105,7 +105,6 @@ function _main(props, context, next, logger, tlsProfile) {
     logger.debug('[invoke] auth: %s', options.auth, {});
 
     //readSrc: decide where to read the data
-    var validIdentifier = /^[$A-Z_][0-9A-Z_$]*$/i;
     if (props.input) {
         if (typeof props.input === 'string') {
             var theIn = context.get(props.input);
