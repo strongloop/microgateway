@@ -281,7 +281,7 @@
                                     "set-variable": {
                                        "actions": [
                                           {
-                                             "set": "foo",
+                                             "set": "foo.bar",
                                              "value": {
                                                  "body" : "This is a custom body message for the invoke policy",
                                                  "headers" : {
@@ -296,7 +296,7 @@
                                  {
                                     "invoke": {
                                        "target-url": "http://localhost:8889/$(request.path)",
-                                       "input": "foo"
+                                       "input": "foo.bar"
                                     }
                                  }
                               ]
@@ -312,7 +312,7 @@
                                  {
                                     "invoke": {
                                        "target-url": "http://localhost:8889/testOutput",
-                                       "output": "foo"
+                                       "output": "foo.bar"
                                     }
                                  },
                                  {
@@ -320,7 +320,7 @@
                                        "actions": [
                                           {
                                              "set": "message.body",
-                                             "value": "$(foo.body)"
+                                             "value": "$(foo.bar.body)"
                                           }
                                        ]
                                     }
@@ -330,7 +330,7 @@
                                        "actions": [
                                           {
                                              "set": "message.headers",
-                                             "value": "$(foo.headers)"
+                                             "value": "$(foo.bar.headers)"
                                           }
                                        ]
                                     }
@@ -340,7 +340,7 @@
                                        "actions": [
                                           {
                                              "set": "message.statusCode",
-                                             "value": "$(foo.statusCode)"
+                                             "value": "$(foo.bar.statusCode)"
                                           }
                                        ]
                                     }
@@ -350,7 +350,7 @@
                                        "actions": [
                                           {
                                              "set": "message.reasonPhrase",
-                                             "value": "$(foo.reasonPhrase)"
+                                             "value": "$(foo.bar.reasonPhrase)"
                                           }
                                        ]
                                     }
