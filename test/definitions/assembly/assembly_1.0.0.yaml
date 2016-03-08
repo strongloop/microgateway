@@ -17,7 +17,17 @@ produces:
   - application/json
   - application/xml
 
-paths:
+paths:  # put the paths in alphabetical order
+  /assembly/large-payload:
+    get:
+      parameters:
+        - name: size
+          in: query
+          description: the size of payload to return
+          type: integer
+      responses:
+        '200':
+          description: 200 OK
   /assembly/policy-not-found:
     get:
       summary: expect error when policy is not found
@@ -31,6 +41,21 @@ x-ibm-configuration:
       - operation-switch:
           title: operation-switch
           case:
+            - operations:
+                - path: /assembly/large-payload
+                  verb: get
+              execute:
+                - javascript:
+                    title: write a ~256k data
+                    source: |
+                      var payload = '';
+                      for (var i=0; i<request.parameters.size; i++) {
+                        payload += '#';
+                      };
+                      message.body = {
+                        value: payload
+                      };
+                      message.headers['Content-Type'] = 'application/json';
             - operations:
                 - path: /assembly/policy-not-found
                   verb: get
