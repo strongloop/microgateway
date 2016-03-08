@@ -1,0 +1,39 @@
+info:
+  version: 1.0.0
+  title: assembly
+  x-ibm-name: assembly
+  description: assembly test suite
+
+basePath: /v1
+
+swagger: '2.0'
+
+consumes:
+  - application/json
+  - application/xml
+  - application/x-www-form-urlencoded
+
+produces:
+  - application/json
+  - application/xml
+
+paths:
+  /assembly/policy-not-found:
+    get:
+      summary: expect error when policy is not found
+      responses:
+        '200':
+          description: 200 OK
+
+x-ibm-configuration:
+  assembly:
+    execute:
+      - operation-switch:
+          title: operation-switch
+          case:
+            - operations:
+                - path: /assembly/policy-not-found
+                  verb: get
+              execute:
+                - javascript2:
+                    title: write context variable to message.body
