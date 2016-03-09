@@ -194,4 +194,20 @@ describe('basic auth policy', function() {
     });
   });
 
+  describe('Basic Auth with HTTPS', function () {
+    it('should pass using http with root:Hunter2', function (done) {
+      request
+      .get('/basic/basic-https')
+      .auth('root', 'Hunter2')
+      .expect(200, done);
+    });
+
+    it('should fail using http with root:badpass', function (done) {
+      request
+      .get('/basic/basic-https')
+      .auth('root', 'badpass')
+      .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+    });
+  });
+
 });
