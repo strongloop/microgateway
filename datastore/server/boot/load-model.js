@@ -71,11 +71,16 @@ module.exports = function(app) {
   models.push(new ModelType('optimizedData', 'dummy'));
   models.push(new ModelType('snapshot', 'dummy')); // hack, removed later
 
+  var refreshInterval = 15 * 60 * 1000; // 15 minutes
+  if (process.env.APIMANAGER_REFRESH_INTERVAL) {
+    refreshInterval = process.env.APIMANAGER_REFRESH_INTERVAL;
+  } 
   var apimanager = {
     host: process.env[APIMANAGER],
     port: process.env[APIMANAGER_PORT],
     catalog: process.env[APIMANAGER_CATALOG],
-    handshakeOk: false
+    handshakeOk: false,
+    refresh : refreshInterval
     };
 
   async.series(
@@ -193,7 +198,7 @@ function loadData(app, apimanager, models, currdir) {
 function scheduleLoadData(app, apimanager, models, dir) {
   if (apimanager.host)
     setTimeout(loadData,
-             15 * 1000, // 15 seconds TODO: make configurable
+             apimanager.refresh,
              app,
              apimanager,
              models,
