@@ -449,6 +449,31 @@ describe('preflow and flow-engine integration', function() {
         .expect(500, done);
     });
 
+    describe('should inject X-Powered-By header', function() {
+      var headerName = 'X-Powered-By';
+      var expectedValue = 'IBM API Connect MicroGateway';
+      var payload = { hello: 'world'};
+
+      it('request is processed', function(done) {
+        request
+          .post('/v1/assembly/identity')
+          .type('json')
+          .send(payload)
+          .expect(headerName, expectedValue)
+          .expect(200, payload, done);
+      });
+
+      it('request is rejected', function(done) {
+        
+        request
+          .post('/v1/assembly/identity')
+          .type('json')
+          .send(':' + JSON.stringify(payload))
+          .expect(headerName, expectedValue)
+          .expect(500, done);
+      });
+    });
+
     describe('should be able to send large response payload', function() {
       var payloadSize = [ 256, 1024, 2048, 4096];
       payloadSize.forEach(function(size) {

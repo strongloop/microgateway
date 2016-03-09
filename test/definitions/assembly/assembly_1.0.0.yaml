@@ -10,14 +10,17 @@ swagger: '2.0'
 
 consumes:
   - application/json
-  - application/xml
-  - application/x-www-form-urlencoded
 
 produces:
   - application/json
-  - application/xml
 
 paths:  # put the paths in alphabetical order
+  /assembly/identity:
+    post:
+      summary: copy input and respond in output
+      responses:
+        '200':
+          description: 200 OK
   /assembly/large-payload:
     get:
       parameters:
