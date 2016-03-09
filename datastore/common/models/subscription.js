@@ -10,8 +10,10 @@ module.exports = function(Subscriptions) {
     function(ctx, next) {
       logger.debug('supports isNewInstance?', ctx.isNewInstance !== undefined);
       if (ctx.isNewInstance) {
-        logger.debug('new subscription received: ',
-            JSON.stringify(ctx.instance,null,4));
+        if (logger.debug()) {
+          logger.debug('new subscription received: %s',
+            JSON.stringify(ctx.instance, null, 4));
+        }
         OptimizedData.determineNeededSubscriptionOptimizedEntries(app, ctx);
       }
       next();

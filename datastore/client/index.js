@@ -33,7 +33,7 @@ exports.apimGetDefaultCatalog = function(snapshot, orgName) {
   var queryurl = url.format(queryurlObj);
 
   return new Promise(function(resolve, reject) {
-    request({url: queryurl}, function(error, response, body) {
+    request({url: queryurl, json: true}, function(error, response, body) {
       logger.debug('error: ', error);
       //logger.debug('body: %j', body);
       //logger.debug('response: %j', response);
@@ -41,7 +41,7 @@ exports.apimGetDefaultCatalog = function(snapshot, orgName) {
         reject(error);
         return;
       }
-      var catalogs = JSON.parse(body);
+      var catalogs = body;
       logger.debug('catalog returned: %j', catalogs);
       if (catalogs.length === 1) {
         resolve(catalogs[0].name);
@@ -79,7 +79,8 @@ exports.grabAPI = function(context, callback) {
 
   request(
     {
-      url : queryurl
+      url : queryurl,
+      json: true
     },
     function(error, response, body) {
       logger.debug('error: ', error);
@@ -90,12 +91,7 @@ exports.grabAPI = function(context, callback) {
         logger.debug('grabAPI error exit');
         return;
       }
-      try {
-        api = JSON.parse(body);
-      } catch (e) {
-        callback(e, null);
-        return;
-      }
+      api = body;
       logger.debug('grabAPI request exit');
       callback(null, api[0]); // there should only be one result
     }
@@ -116,7 +112,7 @@ exports.getCurrentSnapshot = function() {
   // send request to optimizedData model from data-store
   // for matching API(s)
   return new Promise(function(resolve, reject) {
-    request({url: queryurl}, function(error, response, body) {
+    request({url: queryurl, json: true}, function(error, response, body) {
       logger.debug('error: ', error);
       //logger.debug('body: %j', body);
       //logger.debug('response: %j', response);
@@ -125,7 +121,7 @@ exports.getCurrentSnapshot = function() {
         reject(error);
         return;
       }
-      var snapshot = JSON.parse(body);
+      var snapshot = body;
       logger.debug('snapshot: ', snapshot.snapshot.id);
       resolve(snapshot.snapshot.id);
     });
@@ -188,7 +184,7 @@ exports.getTlsProfile = function(snapshot, tlsProfleName) {
   // send request to data-store to get the reqiested TLS Profile
   // for matching API(s)
   return new Promise(function(resolve, reject) {
-    request({url: queryurl}, function (error, response, body) {
+    request({url: queryurl, json: true}, function (error, response, body) {
       logger.debug('error: ', error);
       logger.debug('body: %j', body);
       logger.debug('response: %j', response);
@@ -197,7 +193,7 @@ exports.getTlsProfile = function(snapshot, tlsProfleName) {
         reject(error);
         return;
       }
-      resolve(JSON.parse(body));
+      resolve(body);
 
     });
   });
@@ -228,7 +224,7 @@ exports.getRegistry = function(snapshot, registryName) {
   // send request to data-store to get the requested Registry Profile
   // for matching API(s)
   return new Promise(function(resolve, reject) {
-    request({url: queryurl}, function (error, response, body) {
+    request({url: queryurl, json: true}, function (error, response, body) {
       logger.debug('error: ', error);
       logger.debug('body: %j', body);
       logger.debug('response: %j', response);
@@ -237,7 +233,7 @@ exports.getRegistry = function(snapshot, registryName) {
         reject(error);
         return;
       }
-      resolve(JSON.parse(body));
+      resolve(body);
 
     });
   });
