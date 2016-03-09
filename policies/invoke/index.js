@@ -1,4 +1,5 @@
 'use strict';
+var _ = require('lodash');
 var fs = require('fs');
 var url = require('url');
 var assert = require('assert');
@@ -155,36 +156,20 @@ function _main(props, context, next, logger, tlsProfile) {
         writeDst = context.message;
     }
 
-    //copy headers but the original case must be kept
-    options.headers = {};
-
-    //The received request headers are kept in rawHeaders. It is an array but
-    //not an object, ex: [ 'Host', 'localhost:443', 'Content-Length', '21', ...]
-    var rawHdrs = context.message.rawHeaders || [];
+    //clone the readSrc.headers, because some headers need to be excluded
+    options.headers = _.clone(readSrc.headers);
 
     //The headers that should not be copied
     var excludes = ['host','connection','content-length','transfer-encoding'];
 
-    for (var hdrK in readSrc.headers) {
-        var skip = false;
-        for (var h=0; h<excludes.length; h++) {
-            if (excludes[h] === hdrK) {
-                skip = true;
-                break;
-            }
-        }
-
-        if (!skip) {
-            var rawKey = undefined;
-            for (var i=0; i<rawHdrs.length; i+=2) {
-                if (rawHdrs[i].toLowerCase() === hdrK) {
-                    rawKey = rawHdrs[i];
-                    break;
-                }
-            }
-            options.headers[rawKey || hdrK] = readSrc.headers[hdrK];
-        }
-    }
+    Object.getOwnPropertyNames(options.headers).some(function(name) {
+      var index = excludes.indexOf(name.toLowerCase());
+      if (index >= 0) {
+        delete options.headers[name]; // remove the header that shouldn't be sent
+        excludes.splice(index, 1); // remove the header already processed
+      }
+      return (excludes.length === 0); // exit if no more header to exclude
+    });
 
     //prepare the data and dataSz
     data = (readSrc.body === undefined ? '' : readSrc.body);
