@@ -372,7 +372,7 @@ describe('javascript policy', function() {
     });
 
     // bunyan for logging
-    it('should be able to console', function(done) {
+    it('should be able to use bunyan logger', function(done) {
       var context = {request:
       {uri: 'http://localhost/foo'}
       };
