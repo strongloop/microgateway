@@ -85,6 +85,13 @@ describe('Context variables testing with mock apim server', function() {
             'hard-limit': false,
             'value': '1/sec'
           }
+        },
+        internal: {
+          // consumes: undefined
+          id: '564b7b3ae4b0869c782eddae',
+          operation: 'get',
+          // operationId: undefined
+          path: '/estimates/price'
         }
       };
 
@@ -136,6 +143,18 @@ describe('Context variables testing with mock apim server', function() {
             'hard-limit': false,
             'value': '1000/min'
           }
+        },
+        internal: {
+          consumes: [
+            'application/xml',
+            'text/xml',
+            'application/x-www-form-urlencoded',
+            'application/json'
+          ],
+          id: '564b7b44e4b0869c782ede0a',
+          operation: 'get',
+          operationId: 'routes.find',
+          path: '/routes'
         }
       };
 

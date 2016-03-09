@@ -1,5 +1,7 @@
 'use strict';
 
+var _ = require('lodash');
+var assert = require('assert');
 var express = require('express');
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
@@ -441,10 +443,50 @@ describe('preflow and flow-engine integration', function() {
       delete process.env.CONFIG_DIR;
     });
 
-    it('use not-existing policy should return error', function (done) {
+    it('use not-existing policy should return error', function(done) {
+      request
+        .get('/v1/assembly/policy-not-found')
+        .expect(500, done);
+    });
+
+    describe('should inject X-Powered-By header', function() {
+      var headerName = 'X-Powered-By';
+      var expectedValue = 'IBM API Connect MicroGateway';
+      var payload = { hello: 'world'};
+
+      it('request is processed', function(done) {
         request
-          .get('/v1/assembly/policy-not-found')
+          .post('/v1/assembly/identity')
+          .type('json')
+          .send(payload)
+          .expect(headerName, expectedValue)
+          .expect(200, payload, done);
+      });
+
+      it('request is rejected', function(done) {
+        
+        request
+          .post('/v1/assembly/identity')
+          .type('json')
+          .send(':' + JSON.stringify(payload))
+          .expect(headerName, expectedValue)
           .expect(500, done);
+      });
+    });
+
+    describe('should be able to send large response payload', function() {
+      var payloadSize = [ 256, 1024, 2048, 4096];
+      payloadSize.forEach(function(size) {
+        it('' + size + 'kb response payload should work', function(done) {
+          size = size * 1000;
+          request
+            .get('/v1/assembly/large-payload?size='+size)
+            .expect(function(res) {
+              assert.strictEqual(res.body.value.length, size);
+             })
+            .end(done);
+        });
+      });
     });
 
   });  // end of 'test using test/assembly configuration' test block

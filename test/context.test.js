@@ -443,7 +443,15 @@ describe('Context middleware', function() {
         var ctx = req.ctx;
 
         // message.headers should be equal to request.headers
-        assert(_.isEqual(ctx.get('message.headers'),
+        function normalizeMessageHeaders() {
+          var lowerCaseMessageHeaders = {};
+          Object.getOwnPropertyNames(ctx.get('message.headers')).forEach(function(name) {
+            lowerCaseMessageHeaders[name.toLowerCase()] = ctx.get('message.headers')[name];
+          });
+          return lowerCaseMessageHeaders;
+        }
+
+        assert(_.isEqual(normalizeMessageHeaders(),
                          ctx.get('request.headers')));
 
         // set additional headers. Header should be writable
@@ -453,7 +461,7 @@ describe('Context middleware', function() {
         assert.strictEqual(ctx.get('message.headers').foo, 'bar');
 
         // modify message.headers should not change request.header
-        assert(!_.isEqual(ctx.get('message.headers'),
+        assert(!_.isEqual(normalizeMessageHeaders(),
                           ctx.get('request.headers')));
 
         resp.send({
