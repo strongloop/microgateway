@@ -307,7 +307,23 @@ describe('Context variables in laptop experience', function() {
       });
     });
 
-  });
+  }); // end of 'should parse body according to API consumes' test block
+
+  describe('should provide consistent GET response', function() {
+    it('without content-type header', function(done) {
+      request
+        .get('/v1/context?name=request.body')
+        .expect(200, { name: 'request.body', value: (new Buffer(0)).toJSON() }, done);
+    });
+
+    it('with content-type header', function(done) {
+      request
+        .get('/v1/context?name=request.body')
+        .set('content-type', 'application/json')
+        .expect(200, { name: 'request.body', value: (new Buffer(0)).toJSON() }, done);
+    })
+
+  }); // end of 'should provide consistent GET response w/ or w/o content-type header' test block
 
 
 });

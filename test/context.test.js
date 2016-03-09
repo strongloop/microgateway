@@ -388,7 +388,7 @@ describe('Context middleware', function() {
         var ctx = req.ctx;
         resp.send({
           type: typeof ctx.get('request.body'),
-          body: ctx.get('request.body')
+          body: ctx.get('request.body').toString()
         });
       });
       app.use(function(error, req, resp, next) {
@@ -401,7 +401,7 @@ describe('Context middleware', function() {
           .options('/foo')
           .type('text')
           .send('hello world')
-          .expect(200, {type: 'string', body: ''}, done);
+          .expect(200, {type: 'object', body: ''}, done);
       });
 
       ['GET', 'HEAD', 'DELETE'].forEach(function(method) {
@@ -418,25 +418,10 @@ describe('Context middleware', function() {
       });
     }); // end of 'should reject/ignore non-empty payload when needed' test
 
-    describe('should produce request.parameters', function() {
-      var app = loopback();
-      app.use(context());
-      app.use(function(req, resp) {
-        var ctx = req.ctx;
-        resp.send(ctx.request.parameters);
-      });
-
-      it('should parse query parameters', function(done) {
-        request(app)
-          .get('/search-tool?preference=yahoo')
-          .expect(200, { preference: 'yahoo'}, done);
-      });
-    }); // end of 'should produce request.parameters' test
-
   }); // end of 'Request category variables test
 
   describe('Message category variables', function() {
-    describe('should contain headers and body properties', function() {
+    describe('should contain headers properties', function() {
       var app = loopback();
       app.use(context());
       app.use(function(req, resp) {
@@ -464,10 +449,7 @@ describe('Context middleware', function() {
         assert(!_.isEqual(normalizeMessageHeaders(),
                           ctx.get('request.headers')));
 
-        resp.send({
-          type: typeof ctx.get('message.body'),
-          body: ctx.get('message.body')
-        });
+        resp.send('done');
 
       });
 
@@ -476,8 +458,7 @@ describe('Context middleware', function() {
           .get('/foo')
           .set('X-GATEWAY-FOO', 'bar')
           .set('DATE', new Date())
-          .expect(200, {type: 'object', body: {type: 'Buffer', data: []}})
-          .end(done);
+          .expect(200, 'done', done);
       });
 
       it('should work with HTTP POST method w/ JSON data', function(done) {
@@ -486,7 +467,7 @@ describe('Context middleware', function() {
           .post('/foo')
           .set('content-type', 'application/json')
           .send(payload)
-          .expect(200, {type: 'object', body: payload}, done);
+          .expect(200, 'done', done);
       });
 
       it('should work with HTTP POST method w/ TEXT data', function(done) {
@@ -495,7 +476,7 @@ describe('Context middleware', function() {
           .post('/foo')
           .set('content-type', 'text/plain')
           .send(payload)
-          .expect(200, {type: 'string', body: payload}, done);
+          .expect(200, 'done', done);
       });
 
       it('should work with HTTP POST method w/ TEXT data and JSON content-type',
@@ -504,8 +485,8 @@ describe('Context middleware', function() {
            request(app)
              .post('/foo')
              .set('content-type', 'application/json')
-             .send('"' + payload + '"') // the double quote make it a valid JSON
-             .expect(200, {type: 'string', body: payload}, done);
+             .send(payload)
+             .expect(200, 'done', done);
          });
 
       it('should work with HTTP POST method w/ BINARY data', function(done) {
@@ -514,9 +495,7 @@ describe('Context middleware', function() {
           .post('/foo')
           .set('content-type', 'binary/octet-stream')
           .send(payload)
-          .expect(200,
-                  {type: 'object', body: (new Buffer(payload)).toJSON()},
-                  done);
+          .expect(200, 'done', done);
       });
     }); // end of 'should contain headers and body properties' test
 
@@ -533,7 +512,7 @@ describe('Context middleware', function() {
                      'request.content-type',
                      'request.date',
                      'request.authorization',
-                     'request.body',
+                     // 'request.body', request.body is writable till preflow phase set it to read-only
                      'system.datetime',
                      'system.time.hour',
                      'system.time.minute',
@@ -662,8 +641,7 @@ describe('Context middleware', function() {
 
         var result = {};
         result['content-type'] = ctx.get('request.content-type');
-        result['payload-type'] = typeof ctx.get('request.body');
-        result['payload'] = ctx.get('request.body');
+        result['payload'] = ctx.get('request.body').toString();
 
         resp.send(result);
       });
@@ -676,7 +654,6 @@ describe('Context middleware', function() {
         .send(payload)
         .expect(200, {
           'content-type': contentType,
-          'payload-type': 'string',
           payload: payload
         }, done);
     });
@@ -708,44 +685,6 @@ describe('Context middleware', function() {
         .expect(200, 'done', done);
     });
 
-    it('should be able to override request.body parsing', function(done) {
-      var contextOptions = {
-        request: {
-          bodyParser: [
-            {text: ['json', '+json']},
-            {raw: ['*/*']}
-          ]
-        }
-      };
-
-      var app = loopback();
-      app.use(context(contextOptions));
-      app.use(function(req, resp) {
-        var ctx = req.ctx;
-
-        var result = {};
-        result['content-type'] = ctx.get('request.content-type');
-        result['payload-type'] = typeof ctx.get('request.body');
-        result['payload'] = ctx.get('request.body');
-
-        resp.send(result);
-      });
-
-      var payload = {};
-      payload.say = 'hello';
-
-      var contentType = 'application/json';
-      request(app)
-        .post('/foo')
-        .set('content-type', contentType)
-        .send(JSON.stringify(payload))
-        .expect(200, {
-          'content-type': contentType,
-          'payload-type': 'string',
-          payload: JSON.stringify(payload)
-        }, done);
-    });
-
     describe('should be able to override request.body filtering', function() {
       var contextOptions = {
         request: {
@@ -767,7 +706,7 @@ describe('Context middleware', function() {
         debug('get context content');
         var ctx = req.ctx;
         try {
-          assert.strictEqual(ctx.get('request.body'), payload);
+          assert.strictEqual(ctx.get('request.body').toString(), payload);
           resp.status(200).send('done');
         } catch (error) {
           resp.status(500).send(error);
