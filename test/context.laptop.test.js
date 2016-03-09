@@ -80,7 +80,6 @@ describe('Context variables in laptop experience', function() {
       .end(function(err, res) {
         var result = res.body;
         if (_.isString(result)) {
-          console.log('parsing JSON');
           result = JSON.parse(result);
         }
 
@@ -142,7 +141,6 @@ describe('Context variables in laptop experience', function() {
           result = JSON.parse(result);
         }
 
-        console.log('request.parameters result: '+JSON.stringify(result));
         assert.deepEqual(result,
             {param1:'value1',
              param2:8888,
@@ -174,7 +172,6 @@ describe('Context variables in laptop experience', function() {
           result = JSON.parse(result);
         }
 
-        console.log('request.parameters result: '+JSON.stringify(result));
         assert.deepEqual(result,
             {param1:'value1',
              param2:8888,
@@ -198,7 +195,6 @@ describe('Context variables in laptop experience', function() {
           result = JSON.parse(result);
         }
 
-        console.log('request.parameters result: '+JSON.stringify(result));
         assert.deepEqual(result,
             {param1:payload,
              param3:9999,
@@ -221,7 +217,6 @@ describe('Context variables in laptop experience', function() {
           result = JSON.parse(result);
         }
 
-        console.log('request.parameters result: '+JSON.stringify(result));
         assert.deepEqual(result,
             {param1:'value1',
              param2:8888,
