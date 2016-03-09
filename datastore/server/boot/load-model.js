@@ -839,10 +839,10 @@ function expandAPIData(apidoc, dir)
             });
       }
     // fill in catalog properties (one off for now until we have the scope of other vars required)
-    var cataloghost = '127.0.0.1';
+    var cataloghost = 'localhost:' + process.env.PORT;
     var cataloghostvar = '$(catalog.host)'
-    if (process.env[CATALOG_HOST]) {
-      cataloghost= process.env[CATALOG_HOST];
+    if (process.env.CATALOG_HOST) {
+      cataloghost= process.env.CATALOG_HOST;
       }
     apidoc = findAndReplace(apidoc, cataloghostvar, cataloghost);
     }
