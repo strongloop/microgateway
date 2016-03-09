@@ -19,6 +19,7 @@ var CONFIGDIR = environment.CONFIGDIR;
 var KEYNAME = environment.KEYNAME;
 
 var LAPTOP_RATELIMIT = environment.LAPTOP_RATELIMIT;
+var CATALOG_HOST = environment.CATALOG_HOST;
 
 var cliConfig = require('apiconnect-cli-config');
 
@@ -837,6 +838,13 @@ function expandAPIData(apidoc, dir)
             apidoc = findAndReplace(apidoc, propertyvalue, replacementvalue)
             });
       }
+    // fill in catalog properties (one off for now until we have the scope of other vars required)
+    var cataloghost = '127.0.0.1';
+    var cataloghostvar = '$(catalog.host)'
+    if (process.env[CATALOG_HOST]) {
+      cataloghost= process.env[CATALOG_HOST];
+      }
+    apidoc = findAndReplace(apidoc, cataloghostvar, cataloghost);
     }
   return apidoc;
   }
