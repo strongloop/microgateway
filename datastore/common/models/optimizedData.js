@@ -24,10 +24,14 @@ function createProductOptimizedEntry(app, ctx)
   var isWildcard = true;
   cycleThroughPlansInProduct(app, locals, isWildcard, product, ALLPLANS);
   }
-  
+
+function cloneJSON(json) {
+  return JSON.parse(JSON.stringify(json));
+}
+
 function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, productCallback)
   {
-  var plans = JSON.parse(JSON.stringify(product.document.plans));
+  var plans = cloneJSON(product.document.plans);
   async.forEachLimit(Object.getOwnPropertyNames(plans),1,
     function(propname, propCallback)
       {
@@ -261,7 +265,7 @@ function grabAPIs(app, snapshot, product, plan, cb) {
   var apis = [];
   logger.debug('got product: %j', product);
   logger.debug('got plan: %j', plan);
-  var planApis = JSON.parse(JSON.stringify(plan.apis));
+  var planApis = cloneJSON(plan.apis);
   logger.debug('planApis: %j', planApis);
   logger.debug('planApiProps: %j', Object.getOwnPropertyNames(planApis));
 
@@ -305,7 +309,7 @@ function grabAPIs(app, snapshot, product, plan, cb) {
                 logger.debug('found api in db: %j', DBapi);
                 // need to stringify API as we need to add metadata to it
                 // and not changing the underlying model
-                apis.push(JSON.parse(JSON.stringify(DBapi)));
+                apis.push(cloneJSON(DBapi));
                 }
 
           });
@@ -336,7 +340,7 @@ function annotateAPIs(listOfApis, callback) {
       // populate 'document-wo-assembly'
       // Some customers add their own extension to the swagger,
       // so we will make the swagger available in context to customers.
-      var swaggerWithoutAssembly = JSON.parse(JSON.stringify(api.document));
+      var swaggerWithoutAssembly = cloneJSON(api.document);
       delete swaggerWithoutAssembly['x-ibm-configuration'].assembly;
       api['document-wo-assembly'] = swaggerWithoutAssembly;
 
@@ -392,7 +396,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                       operation.operationId);
                     var securityEnabledForMethod =
                       operation.security ? operation.security : apiDocument.security;
-                    logger.debug('securityEnabledForMethod: ' + JSON.stringify(securityEnabledForMethod));
+                    logger.debug('securityEnabledForMethod: %j', securityEnabledForMethod);
 
                     var allowOperation = false;
                     var observedRatelimit = pieces.plan.rateLimit;
@@ -529,7 +533,9 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
           }],
          TODO: "snapshot-id": "string"
         */
-          logger.debug('pieces: ' + JSON.stringify(pieces,null,4));
+          if (logger.debug()) {
+            logger.debug('pieces: %s', JSON.stringify(pieces, null, 4));
+          }
           var newOptimizedDataEntry = {
             'subscription-id': pieces.subscription.id,
             'client-id': credential['client-id'],
