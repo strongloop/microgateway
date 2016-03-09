@@ -19,7 +19,8 @@ options.path = program.path;
 options.method = program.method;
 options.clientid = program.clientid;
 
-
-contextget(options,function(error, response) {
-        logger.debug('context: ' + JSON.stringify(response,null,4));
+contextget(options, function(error, response) {
+  if (logger.debug()) {
+    logger.debug('context: %s', JSON.stringify(response, null, 4));
+  }
 });

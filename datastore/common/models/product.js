@@ -10,8 +10,10 @@ module.exports = function(Products) {
     function(ctx, next) {
       logger.debug('supports isNewInstance?', ctx.isNewInstance !== undefined);
       if (ctx.isNewInstance) {
-        logger.debug('new product received: ',
-            JSON.stringify(ctx.instance,null,4));
+        if (logger.debug()) {
+          logger.debug('new product received: %s',
+            JSON.stringify(ctx.instance, null, 4));
+        }
         OptimizedData.createProductOptimizedEntry(app, ctx);
       }
       next();
