@@ -179,6 +179,7 @@ describe('basic auth policy', function() {
   });
 
   describe('Basic Auth with HTTP', function () {
+
     it('should pass using http with root:Hunter2', function (done) {
       request
       .get('/basic/path-2')
@@ -192,6 +193,16 @@ describe('basic auth policy', function() {
       .auth('root', 'badpass')
       .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
     });
+
+    it('should timeout', function (done) {
+      this.timeout(15000);
+      request
+      .get('/basic/slow-basic-http')
+      .auth('root', 'Hunter2')
+      .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+    });
+
+
   });
 
   describe('Basic Auth with HTTPS', function () {
@@ -208,6 +219,13 @@ describe('basic auth policy', function() {
       .auth('root', 'badpass')
       .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
     });
-  });
 
+    it('should timeout', function (done) {
+      this.timeout(15000);
+      request
+      .get('/basic/slow-basic-https')
+      .auth('root', 'Hunter2')
+      .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+    });
+  });
 });
