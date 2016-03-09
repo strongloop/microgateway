@@ -96,7 +96,8 @@ describe('Context variables in laptop experience', function() {
             'application/xml',
             'application/x-www-form-urlencoded'
           ],
-          operation: 'GET',
+          id: 'context:1.0.0', // TODO: check why the id is in this
+          operation: 'get',
           operationId: 'getInternal',
           parameters: [
             {
