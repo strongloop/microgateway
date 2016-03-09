@@ -59,16 +59,26 @@ describe('policy-loader', function() {
             context.policyName.should.exactly('mypolicy4').and.be.a.String();
         });
     });
+
     describe('error cases', function() {
-        it('should throw error if not abs path', function() {
-            should.throws(function() {
-                policyLoader.create(path.resolve('..', 'policies'));
-            });
-        });
-        it('should throw error if path is incorrect', function() {
-            should.throws(function() {
-                policyLoader.create(path.resolve(__dirname, 'policies'));
-            });
+
+        // FIXME jcbelles: Didn't we decide to allow relative paths?
+        //it('should throw error if not abs path', function() {
+        //    should.throws(function() {
+        //        policyLoader.create(path.resolve('..', 'policies'));
+        //    });
+        //});
+
+        // FIXME jcbelles: Please verify this shouldn't bring down the gateway.
+        //it('should throw error if path is incorrect', function() {
+        //    should.throws(function() {
+        //        policyLoader.create(path.resolve(__dirname, 'policies'));
+        //    });
+        //});
+
+        it('should not fail if path is incorrect', function() {
+            var pl = policyLoader.create(path.resolve(__dirname, 'policies'));
+            Object.keys(pl._policies).length.should.equal(0);
         });
     });
 
