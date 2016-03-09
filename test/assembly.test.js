@@ -454,7 +454,7 @@ describe('preflow and flow-engine integration', function() {
       var expectedValue = 'IBM API Connect MicroGateway';
       var payload = { hello: 'world'};
 
-      it('request is processed', function(done) {
+      it('when request is processed', function(done) {
         request
           .post('/v1/assembly/identity')
           .type('json')
@@ -463,8 +463,7 @@ describe('preflow and flow-engine integration', function() {
           .expect(200, payload, done);
       });
 
-      it('request is rejected', function(done) {
-        
+      it('when request is rejected', function(done) {
         request
           .post('/v1/assembly/identity')
           .type('json')
