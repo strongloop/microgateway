@@ -3,6 +3,7 @@ policy: 1.0.0
 info:
   title: Rate Limiting
   name: rate-limiting
+  version: 1.0.0
   description: Limit the number of API requests
   contact:
     name: IBM API Connect
