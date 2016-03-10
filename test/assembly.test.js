@@ -488,6 +488,36 @@ describe('preflow and flow-engine integration', function() {
       });
     });
 
+    describe('should process large request payloads', function() {
+      var payloadLimit = 4096000;
+      var payloadSize = [ 1024000, 4096000, 4096001, 5120000];
+
+      payloadSize.forEach(function(size) {
+        var testCaseName = (size <= payloadLimit) ? 'accept' : 'reject';
+        testCaseName += ' ' + (size/1000) + 'KB request payload';
+        it(testCaseName, function(done) {
+          var payload = (new Buffer(size).fill('#')).toString();
+          if (size <= payloadLimit) {
+            request
+              .post('/v1/assembly/identity')
+              .type('text')
+              .send(payload)
+              .expect(200, payload, done);
+          } else {
+            request
+              .post('/v1/assembly/identity')
+              .type('text')
+              .send(payload)
+              .expect(function(res) {
+                assert.strictEqual(res.status, 500);
+                // TODO - check the error msg not providing too much detail
+              })
+              .end(done);
+          }
+        });
+      });
+    });
+
   });  // end of 'test using test/assembly configuration' test block
 
 });
