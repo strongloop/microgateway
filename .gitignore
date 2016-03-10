@@ -20,3 +20,5 @@ coverage
 .datastore
 .apiconnect
 test/definitions/policy-loader/token
+!config/default
+config/*

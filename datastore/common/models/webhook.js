@@ -10,8 +10,10 @@ module.exports = function(Webhooks) {
     function(ctx, next) {
       logger.debug('supports isNewInstance?', ctx.isNewInstance !== undefined);
       if (ctx.isNewInstance) {
-        logger.debug('new webhook received: ',
-            JSON.stringify(ctx.instance,null,4));
+        if (logger.debug()) {
+          logger.debug('new webhook received: %s',
+            JSON.stringify(ctx.instance, null, 4));
+        }
       }
       next();
     }

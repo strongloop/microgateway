@@ -157,7 +157,7 @@ function loadData(app, apimanager, models, currdir) {
   async.series(
     [
       function(callback) {
-        logger.debug('apimanager before pullFromAPIm: ' + JSON.stringify(apimanager))
+        logger.debug('apimanager before pullFromAPIm: %j', apimanager);
         if (apimanager.host) {
             // && apimanager.handshakeOk << shouldn't call if handshake failed.. not ready #TODO
           // we have an APIm, handshake succeeded, so try to pull data..
@@ -347,7 +347,9 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
 
       addSignatureHeaders(body, headers, "micro-gw-catalog/"+apimanager.catalog, private_key);
 
-      logger.debug(JSON.stringify(headers, null, 2));
+      if (logger.debug()) {
+        logger.debug(JSON.stringify(headers, null, 2));
+      }
 
       var apimHandshakeUrlObj = {
         protocol: 'https',
@@ -379,7 +381,9 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
         }
 
         var json = decryptAPIMResponse(body, private_key);
-        logger.debug(JSON.stringify(json, null, 2));
+        if (logger.debug()) {
+          logger.debug(JSON.stringify(json, null, 2));
+        }
 
         if (!json.microGateway) {
           return callback(new Error(apimHandshakeUrl + ' response did not contain "microGateway" section'));
@@ -390,11 +394,13 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
         apimanager.clikey = ugw.key;
         apimanager.clientid = ugw.clientID;
 
-        logger.debug('apimanager.clicert: ' + apimanager.clicert);
-        logger.debug('apimanager.clikey: ' + apimanager.clikey);
-        logger.debug('apimanager.clientid: ' + apimanager.clientid);
+        if (logger.debug()) {
+          logger.debug('apimanager.clicert: ' + apimanager.clicert);
+          logger.debug('apimanager.clikey: ' + apimanager.clikey);
+          logger.debug('apimanager.clientid: ' + apimanager.clientid);
 
-        logger.debug('apimanager: ' + JSON.stringify(apimanager, null, 2));
+          logger.debug('apimanager: %s', JSON.stringify(apimanager, null, 2));
+        }
         callback(null, apimanager);
         });
       }],
@@ -742,7 +748,10 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
             }
           }
         }
-        logger.debug('creating static product and attaching apis: ' + JSON.stringify(entry, null, 4))
+        if (logger.debug()) {
+          logger.debug('creating static product and attaching apis: %s',
+            JSON.stringify(entry, null, 4));
+        }
 
         app.models.product.create(
           entry,
