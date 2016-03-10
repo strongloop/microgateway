@@ -20,12 +20,11 @@ module.exports = function(config) {
       //and also console for logging
       var origProto = context.__proto__;
       var newProto = Object.create(context.__proto__);
-      newProto.logger = flow.logger;
-      newProto.console = console;
+      newProto.console = flow.logger;
       context.__proto__ = newProto;
       script.runInNewContext(context);
       context.__proto__ = origProto;
-      logger.debug('EXIT');
+      logger.debug('EXIT')
       flow.proceed();
     } catch (e) {
       logger.debug('EXIT with an error:%s', e);
