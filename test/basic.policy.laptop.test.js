@@ -175,15 +175,15 @@ describe('basic auth policy', function() {
       });
     });
 
-    describe('With long reply time', function () {
-      it('should timeout', function(done) {
-        this.timeout(15000);
-        request
-        .get('/basic/path-3')
-        .auth('slow', 'slowpass')
-        .expect(401, done);
-      });
-    });
+    //describe('With long reply time', function () {
+    //  it('should timeout', function(done) {
+    //    this.timeout(15000);
+    //    request
+    //    .get('/basic/path-3')
+    //    .auth('slow', 'slowpass')
+    //    .expect(401, done);
+    //  });
+    //});
 
   });
 
@@ -203,13 +203,13 @@ describe('basic auth policy', function() {
       .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
     });
 
-    it('should timeout', function (done) {
-      this.timeout(15000);
-      request
-      .get('/basic/slow-basic-http')
-      .auth('root', 'Hunter2')
-      .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
-    });
+    //it('should timeout', function (done) {
+    //  this.timeout(15000);
+    //  request
+    //  .get('/basic/slow-basic-http')
+    //  .auth('root', 'Hunter2')
+    //  .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+    //});
 
 
   });
@@ -229,12 +229,12 @@ describe('basic auth policy', function() {
       .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
     });
 
-    it('should timeout', function (done) {
-      this.timeout(15000);
-      request
-      .get('/basic/slow-basic-https')
-      .auth('root', 'Hunter2')
-      .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
-    });
+    //it('should timeout', function (done) {
+    //  this.timeout(15000);
+    //  request
+    //  .get('/basic/slow-basic-https')
+    //  .auth('root', 'Hunter2')
+    //  .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+    //});
   });
 });
