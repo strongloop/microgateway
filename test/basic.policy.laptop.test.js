@@ -150,7 +150,6 @@ describe('basic auth policy', function() {
     });
 
     describe('ComposeUPN', function () {
-
       it('should pass with user1:c@pstone123', function (done) {
         request
         .get('/basic/compose-upn')
@@ -173,6 +172,16 @@ describe('basic auth policy', function() {
         .put('/basic/path-1')
         .auth('root', 'Hunter2')
         .expect(200, done);
+      });
+    });
+
+    describe('With long reply time', function () {
+      it('should timeout', function(done) {
+        this.timeout(15000);
+        request
+        .get('/basic/path-3')
+        .auth('slow', 'slowpass')
+        .expect(401, done);
       });
     });
 
