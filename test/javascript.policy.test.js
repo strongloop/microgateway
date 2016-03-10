@@ -347,7 +347,7 @@ describe('javascript policy', function() {
       javascriptPolicy({source: code}, context, flow);
     });
 
-    // console for logging
+    // access to console
     it('should be able to console', function(done) {
       var context = {request:
                           {uri: 'http://localhost/foo'}
@@ -368,6 +368,30 @@ describe('javascript policy', function() {
                 level: 'debug'
             })
         };
+      javascriptPolicy({source: code}, context, flow);
+    });
+
+    // bunyan for logging
+    it('should be able to use bunyan logger', function(done) {
+      var context = {request:
+      {uri: 'http://localhost/foo'}
+      };
+      var code = "logger.error(request.uri); logger.info('this is a test:%s', 'foo');";
+
+      var flow = {
+        'proceed': function() {
+          done();
+        },
+        'fail': function(error) {
+          throw new Error('failed');
+        },
+        'logger': bunyan.createLogger(
+          {
+            name:'flow-engine',
+            stream: process.stdout,
+            level: 'debug'
+          })
+      };
       javascriptPolicy({source: code}, context, flow);
     });
   });
