@@ -8,7 +8,7 @@ var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
 var should = require('should');
 
-describe('throw policy', function() {
+describe('javascript policy', function() {
 
   var request;
   before(function(done){
