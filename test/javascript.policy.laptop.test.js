@@ -36,13 +36,13 @@ describe('javascript policy', function() {
   it('compile error', function(done) {
     request
       .get('/javascript/compileError')
-      .expect(200, /SyntaxError: Unexpected identifier/, done);
+      .expect(200, /^SyntaxError: .*Unexpected identifier$/, done);
   });
 
   it('runtime error', function(done) {
     request
       .get('/javascript/runtimeError')
-      .expect(200, /TypeError: Cannot read property 'price'/, done);
+      .expect(200, /^TypeError: .*Cannot read property/, done);
   });
 
   it('throw native to get a JavaScriptError', function(done) {
