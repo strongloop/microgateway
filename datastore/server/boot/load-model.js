@@ -30,6 +30,7 @@ var definitionsDir = defaultDefinitionsDir;
 var gatewayMain = __dirname + '/../../../';
 var keyFile = gatewayMain + KEYNAME;
 var version ='1.0.0';
+var https = false;
 
 /**
  * Creates a model type 
@@ -502,7 +503,7 @@ function loadConfig(app, apimanager, models, currdir, snapdir, uid, cb) {
               cb(err);
               return;
             }
-            process.send({LOADED: true});
+            process.send({LOADED: true, 'https': https});
             // only update pointer to latest configuration
             // when latest configuration successful loaded
             if (snapdir === dirToLoad) {
@@ -859,6 +860,12 @@ function expandAPIData(apidoc, dir)
       cataloghost= process.env.CATALOG_HOST;
       }
     apidoc = findAndReplace(apidoc, cataloghostvar, cataloghost);
+    }
+    // determine if micro gateway should start w/ HTTPS or not
+    // based on presence of 'https' in schemes
+    if (!https) {
+      if (apidoc.schemes && apidoc.schemes.indexOf('https') > -1)
+        https = true;
     }
   return apidoc;
   }

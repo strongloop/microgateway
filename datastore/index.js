@@ -36,7 +36,7 @@ exports.start = function(fork) {
         }
         if (msg.LOADED) {
           child.removeAllListeners('message');
-          resolve();
+          resolve(msg.https);
         }
       });
 
