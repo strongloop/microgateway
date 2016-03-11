@@ -19,7 +19,7 @@ describe('Error middleware', function() {
     app.use(errhandler());
     request(app)
       .get('/')
-      .expect(500, {name: "GatewayError", message: "Internal Server Error", value: "Error on purpose"}, done);
+      .expect(500, {name: "GatewayError", message: "Internal Server Error"}, done);
   });
 
   it ('should return error message', function(done) {

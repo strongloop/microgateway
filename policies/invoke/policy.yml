@@ -71,3 +71,9 @@ properties:
       label: Output variable
       description: The name of the variable where the invoke result is saved
       type: string
+  required:
+    - target-url
+  throw:
+    - PropertyError
+    - ConnectionError
+

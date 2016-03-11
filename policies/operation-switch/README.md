@@ -12,36 +12,21 @@ See the [policy.yml](policy.yml)
 #### Examples
 
 ```
-paths:
-  /order:
-    get:
-      responses:
-        '200':
-          description: 200 OK
-    post:
-      operationId: createOrder
-      responses:
-        '200':
-          description: 200 OK
-
-x-ibm-configuration:
-  assembly:
-    execute:
-      - operation-switch:
-          case:
-            - operations:
-                - verb: GET
-                  path: /order
-              execute:
-                - set-variable:
-                    actions:
-                      - set: message.body
-                        value: Retrieve orders
-            - operations:
-                - createOrder
-              execute:
-                - set-variable:
-                    actions:
-                      - set: message.body
-                        value: A new order is created
+- operation-switch:
+    case:
+      - operations:
+          - verb: GET
+            path: /order
+        execute:
+          - set-variable:
+              actions:
+                - set: message.body
+                  value: Retrieve orders
+      - operations:
+          - createOrder
+        execute:
+          - set-variable:
+              actions:
+                - set: message.body
+                  value: A new order is created
 ```
