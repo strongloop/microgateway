@@ -381,6 +381,11 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                              apiDocument.basePath.substr(0, apiDocument.basePath.length-1) : 
                              apiDocument.basePath;
 
+          // remove the trailing /
+          apiDocument.basePath = apiDocument.basePath[apiDocument.basePath.length-1] === '/' ? 
+                             apiDocument.basePath.substr(0, apiDocument.basePath.length-1) : 
+                             apiDocument.basePath;
+                             
           var pathsProp = apiDocument.paths;
           logger.debug('pathsProp ' +
                 Object.getOwnPropertyNames(pathsProp));
