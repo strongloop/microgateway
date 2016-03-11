@@ -59,8 +59,8 @@ module.exports = function(config) {
       return;
     }
     //need to wrap the code snippet into a function first
-    var script = new vm.Script('(function() {' + props.source + '})()');
     try {
+      var script = new vm.Script('(function() {' + props.source + '})()');
       //use context as this to run the wrapped function
       //and also console for logging
       var origProto = context.__proto__;
@@ -76,7 +76,7 @@ module.exports = function(config) {
       if ( e.name ) {
         flow.fail(e);
       } else {
-        flow.fail({name: 'JavaScriptError', value: '' + e});
+        flow.fail({name: 'JavaScriptError', message: '' + e});
       }
     }
   };
