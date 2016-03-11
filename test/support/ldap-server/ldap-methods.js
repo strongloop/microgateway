@@ -55,6 +55,14 @@ module.exports = function (server, authreq) {
       return next();
     });
 
+    server.bind('cn=slow,ou=myorg,ou=com', function(req, res, next) {
+      setTimeout(function () {
+        if (req.dn.toString() !== 'cn=slow,ou=myorg,ou=com' || req.credentials !== 'slowpass')
+          return next(new ldap.InvalidCredentialsError());
+        res.end();
+        next();
+      }, 12000);
+    });
 
     server.search('ou=myorg,ou=com', authorize, function (req, res, next) {
       _.forEach(users, function (user) {

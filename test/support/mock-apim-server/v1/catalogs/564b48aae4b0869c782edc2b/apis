@@ -1814,6 +1814,21 @@
                         "url": "http://localhost:8889/auth"
                     }
                 },
+                "slow-basic-http": {
+                    "type": "basic",
+                    "description": "",
+                    "x-ibm-authentication-url": {
+                        "url": "http://localhost:8889/slowauth"
+                    }
+                },
+                "slow-basic-https": {
+                    "type": "basic",
+                    "description": "",
+                    "x-ibm-authentication-url": {
+                        "url": "https://localhost:61801/slowauth",
+                        "tls-profile": "new-tls-profile-1"
+                    }
+                },
                 "basic-https": {
                     "type": "basic",
                     "description": "",
@@ -1930,6 +1945,34 @@
                         "security": [
                             {
                                 "basic-https": []
+                            }
+                        ]
+                    }
+                },
+                "/slow-basic-http": {
+                    "get": {
+                        "responses": {
+                            "200": {
+                                "description": "200 OK"
+                            }
+                        },
+                        "security": [
+                            {
+                                "slow-basic-http": []
+                            }
+                        ]
+                    }
+                },
+                "/slow-basic-https": {
+                    "get": {
+                        "responses": {
+                            "200": {
+                                "description": "200 OK"
+                            }
+                        },
+                        "security": [
+                            {
+                                "slow-basic-https": []
                             }
                         ]
                     }

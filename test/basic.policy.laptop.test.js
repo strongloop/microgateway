@@ -150,7 +150,6 @@ describe('basic auth policy', function() {
     });
 
     describe('ComposeUPN', function () {
-
       it('should pass with user1:c@pstone123', function (done) {
         request
         .get('/basic/compose-upn')
@@ -176,9 +175,20 @@ describe('basic auth policy', function() {
       });
     });
 
+    //describe('With long reply time', function () {
+    //  it('should timeout', function(done) {
+    //    this.timeout(15000);
+    //    request
+    //    .get('/basic/path-3')
+    //    .auth('slow', 'slowpass')
+    //    .expect(401, done);
+    //  });
+    //});
+
   });
 
   describe('Basic Auth with HTTP', function () {
+
     it('should pass using http with root:Hunter2', function (done) {
       request
       .get('/basic/path-2')
@@ -192,6 +202,16 @@ describe('basic auth policy', function() {
       .auth('root', 'badpass')
       .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
     });
+
+    //it('should timeout', function (done) {
+    //  this.timeout(15000);
+    //  request
+    //  .get('/basic/slow-basic-http')
+    //  .auth('root', 'Hunter2')
+    //  .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+    //});
+
+
   });
 
   describe('Basic Auth with HTTPS', function () {
@@ -208,6 +228,13 @@ describe('basic auth policy', function() {
       .auth('root', 'badpass')
       .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
     });
-  });
 
+    //it('should timeout', function (done) {
+    //  this.timeout(15000);
+    //  request
+    //  .get('/basic/slow-basic-https')
+    //  .auth('root', 'Hunter2')
+    //  .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+    //});
+  });
 });
