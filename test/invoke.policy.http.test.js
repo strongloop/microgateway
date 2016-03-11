@@ -93,7 +93,7 @@ describe('invokePolicy', function() {
     request
       .get('/invoke/dynHost')
       .set('X-TEST-HOSTNAME', 'cannot.be.valid.com')
-      .expect(299, /'connection error' Error: getaddrinfo ENOTFOUND/, done);
+      .expect(299, /'ConnectionError' Error: getaddrinfo ENOTFOUND/, done);
   });
 
   //the invoke policy receives a 500 error from the server
@@ -166,7 +166,7 @@ describe('invokePolicy', function() {
     request
       .get('/invoke/timeout5Sec')
       .set('X-DELAY-ME', '7')
-      .expect(299, /Invoke policy timeout/, done);
+      .expect(299, /The invoke policy is timeouted./, done);
   });
 
   /////////////////////// HTTPS servers ///////////////////////

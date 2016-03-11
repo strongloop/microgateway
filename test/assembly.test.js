@@ -509,8 +509,12 @@ describe('preflow and flow-engine integration', function() {
               .type('text')
               .send(payload)
               .expect(function(res) {
-                assert.strictEqual(res.status, 500);
-                // TODO - check the error msg not providing too much detail
+                assert.strictEqual(res.status, 413);
+
+                // check if error has been masked (not expose to much from server)
+                delete res.body.name;
+                delete res.body.message;
+                assert(_.isEmpty(res.body));
               })
               .end(done);
           }

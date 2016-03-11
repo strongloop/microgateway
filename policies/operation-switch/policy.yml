@@ -11,8 +11,6 @@ info:
     email: steve-product-manager@ibm.com
 properties:
   type: "object"
-  required:
-    - case
   properties:
     title:
       type: string
@@ -47,4 +45,6 @@ properties:
             minItems: 1
             items:
               $ref: '#/definitions/assembly-policy'
+  required:
+    - case
 
