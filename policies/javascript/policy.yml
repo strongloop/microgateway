@@ -24,3 +24,5 @@ properties:
       type: string
   required:
     - source
+  throw:
+    - JavaScriptError

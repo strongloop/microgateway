@@ -13,11 +13,14 @@ See the `policy.yml`
 See the `policy.yml`
 
 #### Examples
-invoke:
-  target-url: https://foo.com/order?id=123
-  timeout: 30
-  verb: GET
-  username: dude
-  password: secret
-  tls-profile: MySSLProfile
+- invoke:
+    target-url: https://foo.com/order?id=123
+    timeout: 30
+    verb: GET
+    username: dude
+    password: secret
+    tls-profile: MySSLProfile
+
+#### Throw
+The `invoke` may throw `PropertyError` for a bad configuration and `ConnectionError` for connection issues like timeout.
 
