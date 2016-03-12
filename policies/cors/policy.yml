@@ -3,7 +3,7 @@ policy: 2.0.0
 info:
   title: CORS
   name: cors
-  version: 1.0
+  version: 1.0.0
   description: |
     The CORS policy controls the response headers returned by the gateway
     when OPTIONS method is invoked on a path that does not have an explictly

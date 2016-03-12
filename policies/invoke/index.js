@@ -32,7 +32,7 @@ function _main(props, context, next, logger, tlsProfile) {
     var useChunk = false;
     var timeout = 60;
     var compression = false;
-    var error = { name: 'property error' };
+    var error = { name: 'PropertyError' };
     var data, dataSz = 0;
 
     if (typeof props['target-url'] === 'string')
@@ -41,8 +41,7 @@ function _main(props, context, next, logger, tlsProfile) {
     //target-url
     if (!options || !options.hostname || !options.protocol ||
             (options.protocol !== 'http:' && options.protocol !== 'https:')) {
-        error.value = 'Invalid target-url: "' + props['target-url']  + '"';
-        error.message = error.value;
+        error.message = 'Invalid target-url: "' + props['target-url']  + '"';
         next(error);
         return;
     }
@@ -61,8 +60,7 @@ function _main(props, context, next, logger, tlsProfile) {
     if (verb !== 'POST' && verb !== 'GET' && verb !== 'PUT' &&
         verb !== 'DELETE' && verb !== 'OPTIONS' && verb !== 'HEAD' &&
         verb !== 'PATCH') {
-        error.value = 'Invalid verb: "' + props.verb + '"';
-        error.message = error.value;
+        error.message = 'Invalid verb: "' + props.verb + '"';
         next(error);
         return;
     }
@@ -72,8 +70,7 @@ function _main(props, context, next, logger, tlsProfile) {
 
     //http-version: 1.1
     if (props['http-version'] && props['http-version'] !== '1.1') {
-        error.value = 'Invalid http-version: "' + props['http-version'] + '"';
-        error.message = error.value;
+        error.message = 'Invalid http-version: "' + props['http-version'] + '"';
         next(error);
         return;
     }
@@ -119,8 +116,7 @@ function _main(props, context, next, logger, tlsProfile) {
         if (!readSrc) {
             logger.error('Cannot read data or headers from the input ' + 
                     'property "%s"', props.input);
-            error.value = 'Invalid input: "' + props.input + '"';
-            error.message = error.value;
+            error.message = 'Invalid input: "' + props.input + '"';
             next(error);
             return;
         }
@@ -142,8 +138,7 @@ function _main(props, context, next, logger, tlsProfile) {
         if (!writeDst) {
             logger.error('The output property "%s" is not a valid javascript ' +
                     'identifier.', props.output);
-            error.value = 'Invalid output: "' + props.output + '"';
-            error.message = error.value;
+            error.message = 'Invalid output: "' + props.output + '"';
             next(error);
             return;
         }
@@ -315,8 +310,7 @@ function _main(props, context, next, logger, tlsProfile) {
         });
     }
     catch (err) {
-        error.name = 'connection error';
-        error.value = err.toString();
+        error.name = 'ConnectionError';
         error.message = err.toString();
 
         next(error);
@@ -327,9 +321,8 @@ function _main(props, context, next, logger, tlsProfile) {
     request.setTimeout(timeout * 1000, function() {
         logger.error('[invoke] The invoke policy is timeouted.');
 
-        error.name = 'connection error';
-        error.value = 'Invoke policy timeout';
-        error.message = error.value;
+        error.name = 'ConnectionError';
+        error.message = 'The invoke policy is timeouted.';
 
         next(error);
         request.abort();
@@ -339,8 +332,7 @@ function _main(props, context, next, logger, tlsProfile) {
     request.on('error', function(err) {
         logger.error('[invoke] request failed: %s', err);
 
-        error.name = 'connection error';
-        error.value = err.toString();
+        error.name = 'ConnectionError';
         error.message = err.toString();
 
         next(error);
@@ -387,8 +379,7 @@ function invoke(props, context, flow) {
 
     if (!props || typeof props !== 'object') {
         var error = {
-            name: 'property error',
-            value: 'Invalid property object',
+            name: 'PropertyError',
             message: 'Invalid property object'
         };
         _next(error);
@@ -412,8 +403,7 @@ function invoke(props, context, flow) {
                 if (!tlsProfile) {
                     logger.error('[invoke] cannot find the TLS profile "%s"', profile);
                     var error = {
-                        name: 'property error',
-                        value: 'Cannot find the TLS profile object',
+                        name: 'PropertyError',
                         message: 'Cannot find the TLS profile "' + profile + '"',
                     };
 
@@ -427,8 +417,7 @@ function invoke(props, context, flow) {
                 logger.error('[invoke] error w/ retrieving TLS profile: %s', e);
 
                 var error = {
-                    name: 'property error',
-                    value: e.toString(),
+                    name: 'PropertyError',
                     message: e.toString(),
                 };
                 _next(error);

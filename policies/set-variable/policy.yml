@@ -3,7 +3,7 @@ policy: 1.0.0
 info:
   title: Set Variable
   name: apim.setvariable
-  version: "1"
+  version: 1.0.0
   description: Sets Variables in the runtime
   appliesTo:
     - API
@@ -16,38 +16,40 @@ attach:
   - rest
   - soap
 
-properties: 
+properties:
   $schema: "http://json-schema.org/draft-04/schema#"
   title: "Set, Add or Clear a runtime variable"
   description: "Set, Add or Clear a runtime variable"
   type: object
-  properties: 
+  properties:
     setVariable:
       label: "Set Variable"
       description: "Set, Add or Clear a runtime variable"
       type: array
-      items: 
+      items:
         type: object
-        properties: 
-          action: 
+        properties:
+          action:
             default: Set
             description: Action
-            enum: 
+            enum:
               - Add
               - Set
               - Clear
             label: Action
             type: string
-          name: 
+          name:
             description: "Variable Name"
             label: Name
             type: string
-          value: 
+          value:
             description: "Variable Value"
             label: Value
             type: string
-        required: 
+        required:
           - action
           - name
-  required: 
-    - message
+  required:
+    - setVaraiable
+  throw:
+    - PropertyError

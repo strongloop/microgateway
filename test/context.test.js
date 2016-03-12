@@ -411,9 +411,14 @@ describe('Context middleware', function() {
             .set('X-METHOD-NAME', method)
             .type('text')
             .send('hello world')
-            .expect(500, 
-                    method === 'HEAD' ? '' : { name: "PopulateContextError", message: 'Invalid ' + method + ' request with payload'},
-                    done);
+            .expect(function(res) {
+              assert.strictEqual(res.status, 500);
+              // verify the error is rewritten
+              delete res.body.name;
+              delete res.body.message;
+              assert(_.isEmpty(res.body));
+            })
+            .end(done);
         });
       });
     }); // end of 'should reject/ignore non-empty payload when needed' test

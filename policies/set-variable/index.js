@@ -7,10 +7,13 @@ module.exports = function(config) {
 
     var hasError = props.actions.some(function(action) {
         if (action.hasOwnProperty('set')) {
-            logger.debug('set ' + action.set + '=' + action.value);
+            logger.debug('set "%s" to %j', action.set, action.value);
+
             context.set(action.set, action.value);
-        } else if (action.hasOwnProperty('add')) {
-            logger.debug('add ' + action.add + '=' + action.value);
+        }
+        else if (action.hasOwnProperty('add')) {
+            logger.debug('add "%s" to %j', action.add, action.value);
+
             var value = context.get(action.add);
             if (_.isNil(value))
                 value = _.concat([], action.value);
@@ -18,22 +21,28 @@ module.exports = function(config) {
                 value = _.concat(value, action.value);
             else
                 value = _.concat([], value, action.value);
+
             context.set(action.add, value);
-        } else if (action.hasOwnProperty('clear')) {
-            logger.debug('clear ' + action.clear);
+        }
+        else if (action.hasOwnProperty('clear')) {
+            logger.debug('clear the "%s"', action.clear);
+
             context.set(action.clear, '');
-        } else {
+        }
+        else {
+            logger.error('Action is not one of set, add, and clear.');
+
             var error = {
-                name: 'SetVariableError',
-                value: action,
-                message: 
-                    'Action not provided in set-variable policy, ' +
-                    'valid actions: set, add, and clear.',
+                name: 'PropertyError',
+                message:
+                    'Action is not one of set, add, and clear.'
             };
             flow.fail(error);
+
             return true;
         }
     });
+
     if (!hasError)
         flow.proceed();
   };

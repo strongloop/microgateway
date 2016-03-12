@@ -22,6 +22,24 @@ app.get('/auth', function(req, resp) {
   }
 });
 
+app.get('/slowauth', function(req, resp) {
+  var results = ah.parse(req.get('authorization')).values;
+  var auth = results.length === 1 ? results[0] : null;
+  setTimeout(function() {
+    if (auth && auth.scheme == 'Basic') {
+      var t = (new Buffer(auth.token, 'base64')).toString('utf-8');
+      var user = t.split(':');
+      if (user[0] === 'root' && user[1] === 'Hunter2') {
+        resp.sendStatus(200);
+      } else {
+        resp.sendStatus(401);
+      }
+    } else {
+      resp.sendStatus(401);
+    }
+  }, 12000);
+});
+
 app.get('/*', function(req, resp) {
   resp.send(req.url);
 });
