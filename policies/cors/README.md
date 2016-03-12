@@ -2,8 +2,8 @@
 
 #### Overview
 The CORS policy controls the response headers returned by the gateway
-when HEAD method is invoked on a path that does not have an explictly
-defined HEAD operation.
+when OPTIONS method is invoked on a path that does not have an explictly
+defined OPTIONS operation.
 
 #### Properties
 * allow-credentials: true | false (optional; default: false)
