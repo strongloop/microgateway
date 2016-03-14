@@ -63,5 +63,11 @@ describe('javascript policy', function() {
       .expect(200, /foo: this is a dummy message/, done);
   });
 
+  it('no param resolving', function(done) {
+    request
+      .get('/javascript/no-param-resolving')
+      .set('X-VALUE', 'foo')
+      .expect(200, '$(request.headers.x-value): this is a dummy message', done);
+  });
 });
 
