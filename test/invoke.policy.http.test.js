@@ -68,6 +68,56 @@ describe('invokePolicy', function() {
       });
   });
 
+  //This testcase is to verify the invoke policy will urlencode the form data
+  //before sending them to the api server
+  it('form-urlencoded-1', function(done) {
+    this.timeout(10000);
+
+  //POST application/x-www-form-urlencoded
+    request
+      .post('/invoke/encode')
+      .type('form')
+      .send({ foo: 'hello' })
+      .send({ bar: 123 })
+      .send({ baz: ['qux', 'quux' ]})
+      .expect(/z-method: POST/)
+      .expect(/z-content-type: application\/x-www-form-urlencoded/)
+      .expect(200, /body: foo=hello&bar=123&baz%5B0%5D=qux&baz%5B1%5D=quux/)
+                        //foo=hello&bar=123&baz[0]=qux&baz[1]=quux
+      .end(function(err, res) {
+          done(err);
+      });
+  });
+
+  //This testcase is to verify the invoke policy will parse the urlencoded data
+  //after receiving them from the api server
+  it('form-urlencoded-2', function(done) {
+    this.timeout(10000);
+
+    request
+      .get('/invoke/decode')
+      .expect('Content-Type', 'application/x-www-form-urlencoded')
+      .expect(200, /Found the parameter 'baz'=qux,quux in the message.body/)
+      .end(function(err, res) {
+          done(err);
+      });
+  });
+
+  //This testcase is to verify the post-flow should urlencode the message.body
+  //when the content-type is x-www-form-urlencoded
+  it('post-flow-should-urlencode-the-form-data', function(done) {
+    this.timeout(10000);
+
+    request
+      .get('/invoke/decode')
+      .set('X-TEST-POSTFLOW', 'yes')
+      .expect('Content-Type', 'application/x-www-form-urlencoded')
+      .expect(200, /^foo=bar&baz%5B0%5D=qux&baz%5B1%5D=quux&corge=$/)
+      .end(function(err, res) {
+          done(err);
+      });
+  });
+
   it('get', function(done) {
     this.timeout(10000);
 
@@ -393,6 +443,7 @@ describe('invokePolicy', function() {
       .send(data)
       .expect(/z-method: POST/)
       .expect(/z-secret-1: test 123/)
+      .expect(/z-secret-2: hello amigo/)
       .expect(200, /body: This is a custom body message/, done);
   });
 
