@@ -167,6 +167,8 @@ describe('Context variables in laptop experience', function() {
       .send({param2: 8888})
       .send({param1: 'value1'})
       .end(function(err, res) {
+        assert(err === null || err === undefined);
+
         var result = res.body;
         if (_.isString(result)) {
           result = JSON.parse(result);

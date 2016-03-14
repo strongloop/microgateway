@@ -241,7 +241,7 @@ x-ibm-configuration:
                 - set-variable:
                     title: set-content-type
                     actions:
-                      - set: message.headers.content-type
+                      - set: message.headers.Content-Type
                         value: application/json
 
 parameters:
