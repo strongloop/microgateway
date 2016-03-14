@@ -5,6 +5,7 @@ var fs = require('fs');
 var zlib = require('zlib');
 var http = require('http');
 var https = require('https');
+var qs = require('qs');
 var ah = require('auth-header');
 
 function theApplication(req, resp) {
@@ -22,6 +23,14 @@ function theApplication(req, resp) {
         if (req.url === '/500') {
             resp.writeHead(500);
             resp.write('This is a test for 500 error');
+            resp.end();
+            return;
+        }
+        else if (req.url === '/form-urlencoded') {
+            var postData = qs.stringify({ foo: 'bar', baz: ['qux', 'quux'], corge: '' });
+            resp.writeHead(200, { 'Content-Type': 'application/x-www-form-urlencoded',
+                                  'Content-Length': postData.length });
+            resp.write(postData);
             resp.end();
             return;
         }

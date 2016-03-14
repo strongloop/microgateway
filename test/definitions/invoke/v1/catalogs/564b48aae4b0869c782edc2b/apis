@@ -41,6 +41,24 @@
                   }
                }
             },
+            "/encode": {
+               "post": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/decode": {
+               "get": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
             "/dynHost": {
                "get": {
                   "responses": {
@@ -151,12 +169,48 @@
                                  {
                                     "path": "/basic",
                                     "verb": "GET"
+                                 },
+                                 {
+                                    "path": "/encode",
+                                    "verb": "POST"
                                  }
                               ],
                               "execute": [
                                  {
                                     "invoke": {
                                        "target-url": "http://localhost:8889/$(request.path)"
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/decode",
+                                    "verb": "GET"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://localhost:8889/form-urlencoded"
+                                    }
+                                 },
+                                 {
+                                    "if": {
+                                       "condition": "request.headers['x-test-postflow'] !== 'yes'",
+                                       "execute": [
+                                          {
+                                             "set-variable": {
+                                                "actions": [
+                                                   {
+                                                      "set": "message.body",
+                                                      "value": "Found the parameter 'baz'=$(message.body.baz) in the message.body"
+                                                   }
+                                                ]
+                                             }
+                                          }
+                                       ]
                                     }
                                  }
                               ]
@@ -321,33 +375,15 @@
                                           {
                                              "set": "message.body",
                                              "value": "$(foo.bar.body)"
-                                          }
-                                       ]
-                                    }
-                                 },
-                                 {
-                                    "set-variable": {
-                                       "actions": [
+                                          },
                                           {
                                              "set": "message.headers",
                                              "value": "$(foo.bar.headers)"
-                                          }
-                                       ]
-                                    }
-                                 },
-                                 {
-                                    "set-variable": {
-                                       "actions": [
+                                          },
                                           {
                                              "set": "message.statusCode",
                                              "value": "$(foo.bar.statusCode)"
-                                          }
-                                       ]
-                                    }
-                                 },
-                                 {
-                                    "set-variable": {
-                                       "actions": [
+                                          },
                                           {
                                              "set": "message.reasonPhrase",
                                              "value": "$(foo.bar.reasonPhrase)"
@@ -377,13 +413,7 @@
                                           {
                                              "set": "message.body",
                                              "value": "This is a very long message, longer than the foo.body. Just to test the mismatch Content-Length"
-                                          }
-                                       ]
-                                    }
-                                 },
-                                 {
-                                    "set-variable": {
-                                       "actions": [
+                                          },
                                           {
                                              "set": "message.headers",
                                              "value": "$(foo.headers)"
@@ -432,13 +462,7 @@
                                  {
                                     "set": "message.body",
                                     "value": "'$(error.name)' $(error.message)"
-                                 }
-                              ]
-                           }
-                        },
-                        {
-                           "set-variable": {
-                              "actions": [
+                                 },
                                  {
                                     "set": "message.statusCode",
                                     "value": 299

@@ -2,7 +2,7 @@
 var _ = require('lodash');
 var fs = require('fs');
 var url = require('url');
-var assert = require('assert');
+var qs = require('qs');
 var zlib = require('zlib');
 var dsc = require('../../datastore/client');
 
@@ -75,11 +75,6 @@ function _main(props, context, next, logger, tlsProfile) {
         return;
     }
 
-    //chunked-upload
-    if (props['chunked-upload'] && props['chunked-upload'] !== 'false')
-        useChunk = true;
-    logger.debug('[invoke] useChunk: %s', useChunk);
-
     //timeout: between 1 to 86400 seconds
     if (!isNaN(parseInt(props.timeout))) {
         var tmp = parseInt(props.timeout);
@@ -91,11 +86,6 @@ function _main(props, context, next, logger, tlsProfile) {
             timeout = tmp;
     }
     logger.debug('[invoke] timeout: %s seconds', timeout);
-
-    //compression
-    if (props.compression === true || props.compression === 'true')
-        compression = true;
-    logger.debug('[invoke] compression: %s', compression);
 
     //authentication
     if (props.username && props.password)
@@ -157,24 +147,51 @@ function _main(props, context, next, logger, tlsProfile) {
     //The headers that should not be copied
     var excludes = ['host','connection','content-length','transfer-encoding'];
 
-    Object.getOwnPropertyNames(options.headers).some(function(name) {
-      var index = excludes.indexOf(name.toLowerCase());
-      if (index >= 0) {
-        delete options.headers[name]; // remove the header that shouldn't be sent
-        excludes.splice(index, 1); // remove the header already processed
-      }
-      return (excludes.length === 0); // exit if no more header to exclude
-    });
+    //test if the content-type is urlencoded
+    var isFormUrlEncoded;
+
+    for (var hn in options.headers) {
+        var target = hn.toLowerCase();
+        if (target === 'content-type' &&
+                options.headers[hn] === 'application/x-www-form-urlencoded')
+            isFormUrlEncoded = true;
+
+        var index = excludes.indexOf(target);
+        if (index >= 0) {
+            // remove the header that shouldn't be sent
+            delete options.headers[hn];
+            // remove the header already processed
+            excludes.splice(index, 1);
+        }
+
+        //early exit
+        if (excludes.length === 0 && isFormUrlEncoded)
+            break;
+    }
 
     //prepare the data and dataSz
     data = (readSrc.body === undefined ? '' : readSrc.body);
     if (!Buffer.isBuffer(data) && typeof data !== 'string') {
-        if (typeof data === 'object')
-            data = JSON.stringify(data);
+        if (typeof data === 'object') {
+            if (isFormUrlEncoded)
+                data = qs.stringify(data);
+            else
+                data = JSON.stringify(data);
+        }
         else
             data = String(data);
     }
     dataSz = data.length;
+
+    //chunked-upload
+    if (props['chunked-upload'] && props['chunked-upload'] !== 'false')
+        useChunk = true;
+    logger.debug('[invoke] useChunk: %s', useChunk);
+
+    //compression
+    if (props.compression === true || props.compression === 'true')
+        compression = true;
+    logger.debug('[invoke] compression: %s', compression);
 
     //Compress the data or not
     if (compression)
@@ -282,17 +299,25 @@ function _main(props, context, next, logger, tlsProfile) {
                 //Decide whether the body should be a Buffer or JSON object.
                 //If the content-type says it is a JSON object, try to parse it.
                 var tmp = Buffer.concat(chunks);
-                var ctype = response.headers['content-type'];
-                if (ctype && ctype.toLowerCase().indexOf('json') !== -1) {
-                    try {
-                        tmp = JSON.parse(tmp);
+                var cEncode = response.headers['content-encoding']; //ex: gzip
+                var cType = response.headers['content-type'];
+
+                if (!cEncode) {
+                    if (cType === 'application/x-www-form-urlencoded') {
+                        tmp = qs.parse(tmp.toString());
                     }
-                    catch(e) {
-                        logger.warn('Failed parse the body (%s) as JSON: %s. ' +
-                            'Leave it as a Buffer object', ctype, e);
+                    else if (cType &&
+                        cType.toLowerCase().indexOf('json') !== -1) {
+                        try {
+                            tmp = JSON.parse(tmp);
+                        }
+                        catch(e) {
+                            logger.warn('Failed parse the body (%s) as JSON: %s. ' +
+                                'Leave it as a Buffer object', cType, e);
+                        }
                     }
+                    writeDst.body = tmp;
                 }
-                writeDst.body = tmp;
 
                 //Let Express itself to decide the final transfer-encoding
                 var discard = [ 'transfer-encoding' ];
