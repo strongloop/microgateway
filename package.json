@@ -68,6 +68,7 @@
     "multer": "^1.1.0",
     "redis": "^2.4.2",
     "osenv": "^0.1.3",
+    "qs": "^6.1.0",
     "request": "^2.69.0",
     "rolling-rate-limiter": "^0.1.2",
     "type-is": "^1.6.11",
