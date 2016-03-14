@@ -38,7 +38,7 @@ describe('javascript policy', function() {
                       myval: 1
                      };
       var code = "request.uri = 'http://localhost/bar';" +
-        "myval = 'myvalue';";
+        "myval = 'myvalue';//add comment line";
 
       var flow = {
           'proceed': function() {

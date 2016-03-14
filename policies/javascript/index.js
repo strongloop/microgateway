@@ -60,7 +60,7 @@ module.exports = function(config) {
     }
     //need to wrap the code snippet into a function first
     try {
-      var script = new vm.Script('(function() {' + props.source + '})()');
+      var script = new vm.Script('(function() {' + props.source + '\n})()');
       //use context as this to run the wrapped function
       //and also console for logging
       var origProto = context.__proto__;
