@@ -50,7 +50,7 @@ function consoleProxy (log) {
 }
 
 module.exports = function(config) {
-  return function(props, context, flow) {
+  var javascriptPolicyHandler = function(props, context, flow) {
     var logger = flow.logger;
     logger.debug('ENTER javascript policy');
 
@@ -80,4 +80,7 @@ module.exports = function(config) {
       }
     }
   };
+  //disable param resolving
+  javascriptPolicyHandler.skipParamResolving = true;
+  return javascriptPolicyHandler;
 };

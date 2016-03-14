@@ -25,6 +25,11 @@ paths:
       responses:
         '200':
           description: 200 OK
+  /no-param-resolving:
+    get:
+      responses:
+        '200':
+          description: 200 OK
 x-ibm-configuration:
   assembly:
     execute:
@@ -54,9 +59,18 @@ x-ibm-configuration:
                 - javascript:
                     title: throw a string
                     source: |
-                      throw '$(request.headers.x-value)';
+                      throw request.headers['x-value'];
             - operations:
                 - path: /throwErrorObject
+                  verb: get
+              execute:
+                - javascript:
+                    title: throw an error object
+                    source: |
+                      throw { name: request.headers['x-value'],
+                              message: 'this is a dummy message' };
+            - operations:
+                - path: /no-param-resolving
                   verb: get
               execute:
                 - javascript:
