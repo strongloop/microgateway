@@ -316,8 +316,8 @@ function _main(props, context, next, logger, tlsProfile) {
                                 'Leave it as a Buffer object', cType, e);
                         }
                     }
-                    writeDst.body = tmp;
                 }
+                writeDst.body = tmp;
 
                 //Let Express itself to decide the final transfer-encoding
                 var discard = [ 'transfer-encoding' ];
