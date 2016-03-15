@@ -66,7 +66,7 @@ exports.start = function(fork) {
       process.send = function(msg) {
         if (msg.LOADED) {
           process.send = function() {};
-          resolve();
+          resolve(msg.https);
         }
       };
       server = require('./server/server.js');
