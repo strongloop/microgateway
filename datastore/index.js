@@ -35,7 +35,11 @@ exports.start = function(fork) {
           process.env.DATASTORE_PORT = msg.DATASTORE_PORT;
         }
         if (msg.LOADED) {
+          process.env.LOADED = true;
+        }
+        if (process.env.LOADED && process.env.DATASTORE_PORT) {
           child.removeAllListeners('message');
+          delete process.env.LOADED;
           resolve(msg.https);
         }
       });
