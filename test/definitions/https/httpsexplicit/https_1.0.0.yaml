@@ -1,12 +1,12 @@
 info:
   version: 1.0.0
-  title: ratelimit
-  x-ibm-name: ratelimit
-  description: ratelimit test suite
-basePath: /ratelimit
+  title: https
+  x-ibm-name: https
+  description: https test suite
+basePath: /https
 swagger: '2.0'
 paths:
-  /ratelimit:
+  /https:
     get:
       responses:
         '200':
@@ -18,4 +18,4 @@ x-ibm-configuration:
           title: invoke
           target-url: 'http://localhost:8889/'
 schemes:
-  - http
+  - https

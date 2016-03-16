@@ -113,3 +113,5 @@ x-ibm-configuration:
                       - set: message.statusCode
                         value: 500
 
+schemes:
+  - http

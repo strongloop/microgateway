@@ -864,8 +864,13 @@ function expandAPIData(apidoc, dir)
     // determine if micro gateway should start w/ HTTPS or not
     // based on presence of 'https' in schemes
     if (!https) {
-      if (apidoc.schemes && apidoc.schemes.indexOf('https') > -1)
+      if (apidoc.schemes) {
+        if (apidoc.schemes.indexOf('https') > -1) {
+          https = true;
+        }
+      } else {
         https = true;
+      }
     }
   return apidoc;
   }

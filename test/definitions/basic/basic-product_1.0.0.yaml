@@ -11,3 +11,5 @@ plans:
     title: Default
     apis:
       basic: {}
+schemes:
+  - http
