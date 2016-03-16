@@ -23,20 +23,30 @@ exports.start = function(fork) {
       });
 
       child.on('restart', function() {
-        logger.error('datastore restarting, count=' + child.times);
+        logger.debug('datastore restarting, count=' + child.times);
       });
 
       child.on('exit', function() {
-        logger.error('datastore exited');
+        logger.debug('datastore exited');
       });
 
+      var dataStorePort, https, loaded;
       child.on('message', function(msg) {
-        if (msg.DATASTORE_PORT) {
-          process.env.DATASTORE_PORT = msg.DATASTORE_PORT;
+        if (msg.DATASTORE_PORT != null) {
+          dataStorePort = msg.DATASTORE_PORT;
         }
         if (msg.LOADED) {
+          loaded = true;
+        }
+        if (msg.https != null) {
+          https = msg.https;
+        }
+        // waiting for both events, seen scenario where
+        // they come out of order..
+        if (loaded && dataStorePort) {
           child.removeAllListeners('message');
-          resolve(msg.https);
+          process.env.DATASTORE_PORT = dataStorePort;
+          resolve(https);
         }
       });
 
@@ -56,7 +66,7 @@ exports.start = function(fork) {
       process.send = function(msg) {
         if (msg.LOADED) {
           process.send = function() {};
-          resolve();
+          resolve(msg.https);
         }
       };
       server = require('./server/server.js');

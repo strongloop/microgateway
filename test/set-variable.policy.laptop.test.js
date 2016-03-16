@@ -58,7 +58,9 @@ describe('set-variable policy', function() {
       .post('/set-variable/set-variable')
       .set('set-variable-case', 'clear')
       .set('to-be-deleted', 'test-value')
-      .expect('to-be-deleted', '')
+      .expect(function(res) {
+        if (res.headers['to-be-deleted']) return 'context variable not deleted';
+      })
       .expect(200, done);
   });
 
