@@ -58,9 +58,11 @@ exports.start = function(fork) {
         process.stdout.write(data);
       });
 
-      child.start();
+      child.on('disconnect', function() {
+        process.exit(2);
+      });
 
-      process.on('SIGTERM', sigtermHandler);
+      child.start();
 
     } else {
       process.send = function(msg) {
@@ -83,8 +85,6 @@ exports.stop = function() {
         resolve();
       });
       child.stop();
-
-      process.removeListener('SIGTERM', sigtermHandler);
     }
     if (server) {
       server.close(function() {
