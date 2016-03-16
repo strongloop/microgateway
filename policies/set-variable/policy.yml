@@ -36,8 +36,7 @@ properties:
       type: "array"
       items:
         oneOf:
-          -
-            type: "object"
+          - type: "object"
             additionalProperties: false
             required:
               - "set"
@@ -51,16 +50,11 @@ properties:
                 label: Variable value
                 description: The value that the variable will be set to
                 oneOf:
-                  -
-                    type: "string"
-                  -
-                    type: "number"
-                  -
-                    type: "boolean"
-                  -
-                    type: "integer"
-          -
-            type: "object"
+                  - type: "string"
+                  - type: "number"
+                  - type: "boolean"
+                  - type: "integer"
+          - type: "object"
             additionalProperties: false
             required:
               - "add"
@@ -74,16 +68,11 @@ properties:
                 label: Variable value
                 description: Value for the variable that will be added
                 oneOf:
-                  -
-                    type: "string"
-                  -
-                    type: "number"
-                  -
-                    type: "boolean"
-                  -
-                    type: "integer"
-          -
-            type: "object"
+                  - type: "string"
+                  - type: "number"
+                  - type: "boolean"
+                  - type: "integer"
+          - type: "object"
             additionalProperties: false
             required:
               - "clear"
