@@ -8,6 +8,8 @@ var request = require('supertest');
 
 var context = require('../lib/context');
 
+var API_PATH_HEADER = 'X-API-PATH';
+
 describe('Context middleware', function() {
 
   describe('Request category variables', function() {
@@ -15,6 +17,9 @@ describe('Context middleware', function() {
     app.use(context());
     app.use(function(req, resp) {
       var ctx = req.ctx;
+
+      ctx.set('api.document.basePath', '');
+      ctx.set('_.api.path', req.get(API_PATH_HEADER));
 
       var result = {
         verb:           ctx.get('request.verb'),
@@ -54,7 +59,8 @@ describe('Context middleware', function() {
                            'content-length',
                            'content-type',
                            'host',
-                           'user-agent'
+                           'user-agent',
+                           API_PATH_HEADER.toLowerCase()
                          ];
       removeHeader.forEach(function(value) {
         delete headers[value];
@@ -67,13 +73,14 @@ describe('Context middleware', function() {
       var expect = {
         verb: 'GET',
         uri: '/',
-        path: '',
+        path: '/',
         'content-type': undefined,
         authorization: undefined,
         headers: {}
       };
       request(app)
         .get('/')
+        .set(API_PATH_HEADER, '/')
         .expect(function(res) {
           verifyResponse(res, expect);
         })
@@ -84,13 +91,14 @@ describe('Context middleware', function() {
       var expect = {
         verb: 'GET',
         uri: '/x/y/z',
-        path: 'x/y/z',
+        path: '/x/y/z',
         'content-type': undefined,
         authorization: undefined,
         headers: {}
       };
       request(app)
         .get('/x/y/z')
+        .set(API_PATH_HEADER, '/x/y/z')
         .expect(function(res) {
           verifyResponse(res, expect);
         })
@@ -101,13 +109,14 @@ describe('Context middleware', function() {
       var expect = {
         verb: 'GET',
         uri: '/foo/bar?param1=1&param2=2',
-        path: 'foo/bar',
+        path: '/foo/bar',
         'content-type': undefined,
         authorization: undefined,
         headers: {}
       };
       request(app)
         .get('/foo/bar?param1=1&param2=2')
+        .set(API_PATH_HEADER, '/foo/bar')
         .expect(function(res) {
           verifyResponse(res, expect);
         })
@@ -118,7 +127,7 @@ describe('Context middleware', function() {
       var expect = {
         verb: 'GET',
         uri: '/foo/bar?param1=1&param2=2',
-        path: 'foo/bar',
+        path: '/foo/bar',
         'content-type': undefined,
         authorization: undefined,
         headers: {
@@ -128,6 +137,7 @@ describe('Context middleware', function() {
       request(app)
         .get('/foo/bar?param1=1&param2=2')
         .set(expect.headers)
+        .set(API_PATH_HEADER, '/foo/bar')
         .expect(function(res) {
           verifyResponse(res, expect);
         })
@@ -138,13 +148,14 @@ describe('Context middleware', function() {
       var expect = {
         verb: 'POST',
         uri: '/foo',
-        path: 'foo',
+        path: '/foo',
         'content-type': 'application/json',
         authorization: undefined,
         headers: {}
       };
       request(app)
         .post('/foo')
+        .set(API_PATH_HEADER, '/foo')
         .send({message: 'Hello World'})
         .expect(function(res) {
           verifyResponse(res, expect);
@@ -249,55 +260,81 @@ describe('Context middleware', function() {
 
     describe('should produce req.path according to api.basepath', function() {
       var apiBasePath;
-      var requestedPath;
-      var expectedPath;
+      var expectedRequestPath;
       var myapp = loopback();
       myapp.use(context());
       myapp.use(function(req, resp) {
         var ctx = req.ctx;
 
         // set the API basepath
-        ctx.set('api.basepath', apiBasePath);
+        ctx.set('api.document.basePath', apiBasePath);
+        ctx.set('_.api.path', req.get(API_PATH_HEADER));
         try {
-          // the expected path should not include the preceding `/`
-          expectedPath = requestedPath.substr(1);
-          assert.strictEqual(ctx.get('request.path'), expectedPath);
+          assert.strictEqual(ctx.get('request.path'), expectedRequestPath);
           resp.send('done');
         } catch (error) {
-          resp.send(error);
+          resp.status(500).send(error);
         }
       });
 
-      it('should work with URL w/o query params', function(done) {
-        apiBasePath = '/foo';
-        requestedPath = '/foo/bar';
+      /**
+       * @parameter basepath: the API basepath
+       * @parameter requstPath: the URI to send
+       * @parameter expect: the expected $(request.path) value
+       * @parameter done: the mocha test callback
+       */
+      function sendRequest(basepath, apiPath, requestPath, expect, done) {
+        apiBasePath = basepath;
+        expectedRequestPath = expect;
         request(myapp)
-          .get(requestedPath)
+          .get(requestPath)
+          .set(API_PATH_HEADER, apiPath)
           .expect(200, 'done', done);
-      });
+      }
 
-      it('should work with URL w/ query params', function(done) {
-        apiBasePath = '/foo';
-        requestedPath = '/foo/bar';
-        request(myapp)
-          .get(requestedPath + '?name=hello')
-          .expect(200, 'done', done);
-      });
+      var testData = [
+        // basePath is undefined in the swagger
+        { base: undefined, apiPath: '/a/b', request: '/a/b', expect: '/a/b'},
 
-      it('should work when api.basepath not exist', function(done) {
-        apiBasePath = undefined;
-        requestedPath = '/foo/bar';
-        request(myapp)
-          .get(requestedPath)
-          .expect(200, 'done', done);
+        // basePath is '' in the swagger
+        { base: '', apiPath: '/foo', request: '/foo', expect: '/foo'},
+        { base: '', apiPath: '/foo/bar', request: '/foo/bar', expect: '/foo/bar'},
+
+        // basePath is '/' in the swagger
+        { base: '/', apiPath: '/foo', request: '/foo',      expect: '/foo'},
+        { base: '/', apiPath: '/foo/bar', request: '/foo/bar',  expect: '/foo/bar'},
+        { base: '/', apiPath: '/foo/bar', request: '/foo/bar?name=hello',  expect: '/foo/bar'},
+
+        // basePath is '/foo' in the swagger (one level)
+        { base: '/foo', apiPath: '/',     request: '/foo',      expect: '/foo'},
+        { base: '/foo', apiPath: '/',     request: '/foo/',     expect: '/foo/'},
+        { base: '/foo', apiPath: '/bar',  request: '/foo/bar',  expect: '/foo/bar'},
+        { base: '/foo', apiPath: '/bar/', request: '/foo/bar/', expect: '/foo/bar/'},
+        { base: '/foo', apiPath: '/bar',  request: '/foo/bar?=hello', expect: '/foo/bar'},
+
+        // basePath is '/v1/test' in the swagger (two levels)
+        { base: '/v1/test', apiPath: '/foo', request: '/v1/test/foo', expect: '/v1/test/foo'},
+
+        // basePath does not start with '/' is invalid
+
+        // basePath ends with '/'
+        { base: '/v1/test/', apiPath: '/foo', request: '/v1/test/foo', expect: '/v1/test/foo'}
+      ];
+
+      testData.forEach(function(data) {
+        it('$(request.path) should be "' + data.expect + 
+           '" when basepath=' + data.base +
+           ' and request URI=' + data.request, function(done) {
+          sendRequest(data.base, data.apiPath, data.request, data.expect, done);
+        });
       });
 
       it('should work when api.basepath mismatch originalUrl', function(done) {
         apiBasePath = 'foot';
-        requestedPath = '/foo/bar';
         request(myapp)
-          .get(requestedPath)
-          .expect(200, 'done', done);
+          .get('/foo/bar')
+          .set(API_PATH_HEADER, '/bar')
+          .expect(500, done);
       });
     });
 
@@ -351,7 +388,7 @@ describe('Context middleware', function() {
         var ctx = req.ctx;
         resp.send({
           type: typeof ctx.get('request.body'),
-          body: ctx.get('request.body')
+          body: ctx.get('request.body').toString()
         });
       });
       app.use(function(error, req, resp, next) {
@@ -364,7 +401,7 @@ describe('Context middleware', function() {
           .options('/foo')
           .type('text')
           .send('hello world')
-          .expect(200, {type: 'string', body: ''}, done);
+          .expect(200, {type: 'object', body: ''}, done);
       });
 
       ['GET', 'HEAD', 'DELETE'].forEach(function(method) {
@@ -374,37 +411,37 @@ describe('Context middleware', function() {
             .set('X-METHOD-NAME', method)
             .type('text')
             .send('hello world')
-            .expect(500, done);
+            .expect(function(res) {
+              assert.strictEqual(res.status, 500);
+              // verify the error is rewritten
+              delete res.body.name;
+              delete res.body.message;
+              assert(_.isEmpty(res.body));
+            })
+            .end(done);
         });
       });
     }); // end of 'should reject/ignore non-empty payload when needed' test
 
-    describe('should produce request.parameters', function() {
-      var app = loopback();
-      app.use(context());
-      app.use(function(req, resp) {
-        var ctx = req.ctx;
-        resp.send(ctx.request.parameters);
-      });
-
-      it('should parse query parameters', function(done) {
-        request(app)
-          .get('/search-tool?preference=yahoo')
-          .expect(200, { preference: 'yahoo'}, done);
-      });
-    }); // end of 'should produce request.parameters' test
-
   }); // end of 'Request category variables test
 
   describe('Message category variables', function() {
-    describe('should contain headers and body properties', function() {
+    describe('should contain headers properties', function() {
       var app = loopback();
       app.use(context());
       app.use(function(req, resp) {
         var ctx = req.ctx;
 
         // message.headers should be equal to request.headers
-        assert(_.isEqual(ctx.get('message.headers'),
+        function normalizeMessageHeaders() {
+          var lowerCaseMessageHeaders = {};
+          Object.getOwnPropertyNames(ctx.get('message.headers')).forEach(function(name) {
+            lowerCaseMessageHeaders[name.toLowerCase()] = ctx.get('message.headers')[name];
+          });
+          return lowerCaseMessageHeaders;
+        }
+
+        assert(_.isEqual(normalizeMessageHeaders(),
                          ctx.get('request.headers')));
 
         // set additional headers. Header should be writable
@@ -414,13 +451,10 @@ describe('Context middleware', function() {
         assert.strictEqual(ctx.get('message.headers').foo, 'bar');
 
         // modify message.headers should not change request.header
-        assert(!_.isEqual(ctx.get('message.headers'),
+        assert(!_.isEqual(normalizeMessageHeaders(),
                           ctx.get('request.headers')));
 
-        resp.send({
-          type: typeof ctx.get('message.body'),
-          body: ctx.get('message.body')
-        });
+        resp.send('done');
 
       });
 
@@ -429,8 +463,7 @@ describe('Context middleware', function() {
           .get('/foo')
           .set('X-GATEWAY-FOO', 'bar')
           .set('DATE', new Date())
-          .expect(200, {type: 'object', body: {type: 'Buffer', data: []}})
-          .end(done);
+          .expect(200, 'done', done);
       });
 
       it('should work with HTTP POST method w/ JSON data', function(done) {
@@ -439,7 +472,7 @@ describe('Context middleware', function() {
           .post('/foo')
           .set('content-type', 'application/json')
           .send(payload)
-          .expect(200, {type: 'object', body: payload}, done);
+          .expect(200, 'done', done);
       });
 
       it('should work with HTTP POST method w/ TEXT data', function(done) {
@@ -448,7 +481,7 @@ describe('Context middleware', function() {
           .post('/foo')
           .set('content-type', 'text/plain')
           .send(payload)
-          .expect(200, {type: 'string', body: payload}, done);
+          .expect(200, 'done', done);
       });
 
       it('should work with HTTP POST method w/ TEXT data and JSON content-type',
@@ -457,8 +490,8 @@ describe('Context middleware', function() {
            request(app)
              .post('/foo')
              .set('content-type', 'application/json')
-             .send('"' + payload + '"') // the double quote make it a valid JSON
-             .expect(200, {type: 'string', body: payload}, done);
+             .send(payload)
+             .expect(200, 'done', done);
          });
 
       it('should work with HTTP POST method w/ BINARY data', function(done) {
@@ -467,9 +500,7 @@ describe('Context middleware', function() {
           .post('/foo')
           .set('content-type', 'binary/octet-stream')
           .send(payload)
-          .expect(200,
-                  {type: 'object', body: (new Buffer(payload)).toJSON()},
-                  done);
+          .expect(200, 'done', done);
       });
     }); // end of 'should contain headers and body properties' test
 
@@ -486,7 +517,7 @@ describe('Context middleware', function() {
                      'request.content-type',
                      'request.date',
                      'request.authorization',
-                     'request.body',
+                     // 'request.body', request.body is writable till preflow phase set it to read-only
                      'system.datetime',
                      'system.time.hour',
                      'system.time.minute',
@@ -567,9 +598,9 @@ describe('Context middleware', function() {
       ctxTimezoneStr = ctxTimezoneStr.substring(1);
       ctxTimezoneStr.split(':').forEach(function(value, index) {
         if (index === 0) {
-          ctxTimezoneOffset += 60 * Number.parseInt(value);
+          ctxTimezoneOffset += 60 * parseInt(value);
         } else {
-          ctxTimezoneOffset += Number.parseInt(value);
+          ctxTimezoneOffset += parseInt(value);
         }
       });
       ctxTimezoneOffset = isBehindGMT ? ctxTimezoneOffset : -ctxTimezoneOffset;
@@ -615,8 +646,7 @@ describe('Context middleware', function() {
 
         var result = {};
         result['content-type'] = ctx.get('request.content-type');
-        result['payload-type'] = typeof ctx.get('request.body');
-        result['payload'] = ctx.get('request.body');
+        result['payload'] = ctx.get('request.body').toString();
 
         resp.send(result);
       });
@@ -629,7 +659,6 @@ describe('Context middleware', function() {
         .send(payload)
         .expect(200, {
           'content-type': contentType,
-          'payload-type': 'string',
           payload: payload
         }, done);
     });
@@ -661,44 +690,6 @@ describe('Context middleware', function() {
         .expect(200, 'done', done);
     });
 
-    it('should be able to override request.body parsing', function(done) {
-      var contextOptions = {
-        request: {
-          bodyParser: [
-            {text: ['json', '+json']},
-            {raw: ['*/*']}
-          ]
-        }
-      };
-
-      var app = loopback();
-      app.use(context(contextOptions));
-      app.use(function(req, resp) {
-        var ctx = req.ctx;
-
-        var result = {};
-        result['content-type'] = ctx.get('request.content-type');
-        result['payload-type'] = typeof ctx.get('request.body');
-        result['payload'] = ctx.get('request.body');
-
-        resp.send(result);
-      });
-
-      var payload = {};
-      payload.say = 'hello';
-
-      var contentType = 'application/json';
-      request(app)
-        .post('/foo')
-        .set('content-type', contentType)
-        .send(JSON.stringify(payload))
-        .expect(200, {
-          'content-type': contentType,
-          'payload-type': 'string',
-          payload: JSON.stringify(payload)
-        }, done);
-    });
-
     describe('should be able to override request.body filtering', function() {
       var contextOptions = {
         request: {
@@ -720,7 +711,7 @@ describe('Context middleware', function() {
         debug('get context content');
         var ctx = req.ctx;
         try {
-          assert.strictEqual(ctx.get('request.body'), payload);
+          assert.strictEqual(ctx.get('request.body').toString(), payload);
           resp.status(200).send('done');
         } catch (error) {
           resp.status(500).send(error);

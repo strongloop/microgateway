@@ -1,31 +1,31 @@
 'use strict';
 
-let mg = require('../lib/microgw');
-let supertest = require('supertest');
+var mg = require('../lib/microgw');
+var supertest = require('supertest');
 
-let request;
+var request;
 
 describe('switchPolicyTesting', function() {
-  before((done) => {
+  before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/operation-switch';
     process.env.NODE_ENV = 'production';
     mg.start(3000)
-      .then(() => {
+      .then(function() {
         request = supertest('http://localhost:3000');
       })
       .then(done)
-      .catch((err) => {
+      .catch(function(err) {
         console.error(err);
         done(err);
       });
   });
 
-  after((done) => {
-    delete process.env.CONFIG_DIR;
-    delete process.env.NODE_ENV;
+  after(function(done) {
     mg.stop()
       .then(done, done)
       .catch(done);
+    delete process.env.CONFIG_DIR;
+    delete process.env.NODE_ENV;
   });
 
   it('switchOnVerbAndPath', switchOnVerbAndPath);

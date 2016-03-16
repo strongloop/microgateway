@@ -1,20 +1,19 @@
 'use strict';
-var debug = require('debug')('policy:invoke');
+var _ = require('lodash');
 var fs = require('fs');
 var url = require('url');
-var assert = require('assert');
+var qs = require('qs');
 var zlib = require('zlib');
 var dsc = require('../../datastore/client');
 
-//TODO: move this file to lib/ or util/?
 //one-time effort: read the cipher table into memory
 var cipherTable;
 try {
     //the mapping table of TLS to OpenSSL ciphersuites
-    cipherTable = require(__dirname + '/cipherSuites.json');
+    cipherTable = require(__dirname + '/../../lib/cipher-suites.json');
 }
 catch (err) {
-    console.error('Warning! Cannot read the cipher table for invoke policy. %s',
+    logger.error('Warning! Cannot read the cipher table for invoke policy. %s',
             err);
     cipherTable = {};
 }
@@ -24,22 +23,17 @@ catch (err) {
  * Do the real work of the invoke policy: read the property and decide the
  * parameters, establish the connection after everything is ready.
  */
-function _main(props, context, next, tlsProfile) {
-    var logger = context.get('logger');
-
+function _main(props, context, next, logger, tlsProfile) {
     //the default settings and error object
+    var readSrc, writeDst;
     var options;
     var isSecured;
     var verb;
     var useChunk = false;
     var timeout = 60;
     var compression = false;
-    var error = { name: 'property error' };
+    var error = { name: 'PropertyError' };
     var data, dataSz = 0;
-
-    //TODO: support the input and output property
-    //TODO: check context.request and context.message
-    assert(context.request && context.message);
 
     if (typeof props['target-url'] === 'string')
         options = url.parse(props['target-url']);
@@ -47,8 +41,7 @@ function _main(props, context, next, tlsProfile) {
     //target-url
     if (!options || !options.hostname || !options.protocol ||
             (options.protocol !== 'http:' && options.protocol !== 'https:')) {
-        error.value = 'Invalid target-url: "' + props['target-url']  + '"';
-        error.message = error.value;
+        error.message = 'Invalid target-url: "' + props['target-url']  + '"';
         next(error);
         return;
     }
@@ -62,12 +55,12 @@ function _main(props, context, next, tlsProfile) {
     logger.info('[invoke] url: %s', options.href);
 
     //verb: default to request.verb
-    verb = props.verb ? String(props.verb).toUpperCase() : context.request.verb;
+    verb = props.verb ? String(props.verb).toUpperCase() :
+            (context.request ? context.request.verb.toUpperCase() : undefined);
     if (verb !== 'POST' && verb !== 'GET' && verb !== 'PUT' &&
         verb !== 'DELETE' && verb !== 'OPTIONS' && verb !== 'HEAD' &&
         verb !== 'PATCH') {
-        error.value = 'Invalid verb: "' + props.verb + '"';
-        error.message = error.value;
+        error.message = 'Invalid verb: "' + props.verb + '"';
         next(error);
         return;
     }
@@ -77,16 +70,10 @@ function _main(props, context, next, tlsProfile) {
 
     //http-version: 1.1
     if (props['http-version'] && props['http-version'] !== '1.1') {
-        error.value = 'Invalid http-version: "' + props['http-version'] + '"';
-        error.message = error.value;
+        error.message = 'Invalid http-version: "' + props['http-version'] + '"';
         next(error);
         return;
     }
-
-    //chunked-upload
-    if (props['chunked-upload'] && props['chunked-upload'] !== 'false')
-        useChunk = true;
-    logger.debug('[invoke] useChunk: %s', useChunk);
 
     //timeout: between 1 to 86400 seconds
     if (!isNaN(parseInt(props.timeout))) {
@@ -100,37 +87,111 @@ function _main(props, context, next, tlsProfile) {
     }
     logger.debug('[invoke] timeout: %s seconds', timeout);
 
-    //compression
-    if (props.compression === true || props.compression === 'true')
-        compression = true;
-    logger.debug('[invoke] compression: %s', compression);
-
     //authentication
     if (props.username && props.password)
         options.auth = props.username + ':' + props.password;
     logger.debug('[invoke] auth: %s', options.auth, {});
 
-    //TODO: do we need the context.message.rawHeaders?
-    //copy headers
-    options.headers = {};
-    for (var i in context.message.headers)
-        options.headers[i] = context.message.headers[i];
-    delete options.headers.host;
-    delete options.headers.connection;
-    delete options.headers['content-length'];
-    delete options.headers['content-encoding'];
-    delete options.headers['transfer-encoding'];
+    //readSrc: decide where to read the data
+    if (props.input) {
+        if (typeof props.input === 'string') {
+            var theIn = context.get(props.input);
+            if (typeof theIn === 'object') {
+                logger.info('[invoke] will read data and headers from "%s"',
+                        props.input);
+                readSrc = theIn;
+            }
+        }
+
+        if (!readSrc) {
+            logger.error('Cannot read data or headers from the input ' + 
+                    'property "%s"', props.input);
+            error.message = 'Invalid input: "' + props.input + '"';
+            next(error);
+            return;
+        }
+    }
+    else
+        readSrc = context.message;
+
+    //writeDst: decide where to write the response
+    if (props.output) {
+        if (typeof props.output === 'string') {
+            logger.info('[invoke] the output destination will be set to %s',
+                    props.output);
+
+            var theOut = {};
+            context.set(props.output, theOut);
+            writeDst = theOut;
+        }
+
+        if (!writeDst) {
+            logger.error('The output property "%s" is not a valid javascript ' +
+                    'identifier.', props.output);
+            error.message = 'Invalid output: "' + props.output + '"';
+            next(error);
+            return;
+        }
+    }
+    else {
+        if (context.message === undefined)
+            //In fact, this should never happen
+            context.message = {};
+
+        writeDst = context.message;
+    }
+
+    //clone the readSrc.headers, because some headers need to be excluded
+    options.headers = _.clone(readSrc.headers);
+
+    //The headers that should not be copied
+    var excludes = ['host','connection','content-length','transfer-encoding'];
+
+    //test if the content-type is urlencoded
+    var isFormUrlEncoded;
+
+    for (var hn in options.headers) {
+        var target = hn.toLowerCase();
+        if (target === 'content-type' &&
+                options.headers[hn] === 'application/x-www-form-urlencoded')
+            isFormUrlEncoded = true;
+
+        var index = excludes.indexOf(target);
+        if (index >= 0) {
+            // remove the header that shouldn't be sent
+            delete options.headers[hn];
+            // remove the header already processed
+            excludes.splice(index, 1);
+        }
+
+        //early exit
+        if (excludes.length === 0 && isFormUrlEncoded)
+            break;
+    }
 
     //prepare the data and dataSz
-    data = context.message.body;
-    assert(data);
+    data = (readSrc.body === undefined ? '' : readSrc.body);
     if (!Buffer.isBuffer(data) && typeof data !== 'string') {
-        if (typeof data === 'object')
-            data = JSON.stringify(data);
+        if (typeof data === 'object') {
+            if (isFormUrlEncoded)
+                data = qs.stringify(data);
+            else
+                data = JSON.stringify(data);
+        }
         else
             data = String(data);
     }
     dataSz = data.length;
+
+    //chunked-upload
+    if (props['chunked-upload'] && props['chunked-upload'] !== 'false')
+        useChunk = true;
+    logger.debug('[invoke] useChunk: %s', useChunk);
+
+    //compression
+    if (props.compression === true || props.compression === 'true')
+        compression = true;
+    logger.debug('[invoke] compression: %s', compression);
 
     //Compress the data or not
     if (compression)
@@ -215,35 +276,66 @@ function _main(props, context, next, tlsProfile) {
     try {
         request = http.request(options, function(response) {
             //read the response
-            var target = context.message;
-
-            //TODO: rename the reasonPhrase
-            target.statusCode = response.statusCode;
-            target.reasonPhrase = response.reasonPhrase;
+            writeDst.statusCode = response.statusCode;
+            writeDst.reasonPhrase = response.reasonPhrase;
             logger.info('[invoke] response is received: %d, %s',
-                target.statusCode, target.reasonPhrase);
+                writeDst.statusCode, writeDst.reasonPhrase);
+            writeDst.headers = {};
 
-            target.headers = {};
-            var rhrs = response.rawHeaders;
+            //note: there is no response.rawHeaders for node v0.10.43
+            var rhrs = response.rawHeaders || response.headers;
             for (var i = 0; i < rhrs.length; i+=2) {
-                target.headers[rhrs[i]] = rhrs[i+1];
+                writeDst.headers[rhrs[i]] = rhrs[i+1];
             }
 
-            target.body = [];
-            response.on('data', function(chunk) {
-                target.body += chunk;
+            var chunks = [];
+            response.on('data', function(data) {
+                chunks.push(data);
             });
 
-            //TODO: convert the target.body to JSON
             response.on('end', function() {
                 logger.info('[invoke] done');
+
+                //Decide whether the body should be a Buffer or JSON object.
+                //If the content-type says it is a JSON object, try to parse it.
+                var tmp = Buffer.concat(chunks);
+                var cEncode = response.headers['content-encoding']; //ex: gzip
+                var cType = response.headers['content-type'];
+
+                if (!cEncode) {
+                    if (cType === 'application/x-www-form-urlencoded') {
+                        tmp = qs.parse(tmp.toString());
+                    }
+                    else if (cType &&
+                        cType.toLowerCase().indexOf('json') !== -1) {
+                        try {
+                            tmp = JSON.parse(tmp);
+                        }
+                        catch(e) {
+                            logger.warn('Failed parse the body (%s) as JSON: %s. ' +
+                                'Leave it as a Buffer object', cType, e);
+                        }
+                    }
+                }
+                writeDst.body = tmp;
+
+                //Let Express itself to decide the final transfer-encoding
+                var discard = [ 'transfer-encoding' ];
+                for (var m in discard) {
+                    var tbd = discard[m];
+                    for (var n in writeDst.headers) {
+                        if (n.toLowerCase() === tbd) {
+                            delete writeDst.headers[n];
+                            break;
+                        }
+                    }
+                }
                 next();
             });
         });
     }
     catch (err) {
-        error.name = 'connection error';
-        error.value = err.toString();
+        error.name = 'ConnectionError';
         error.message = err.toString();
 
         next(error);
@@ -254,9 +346,8 @@ function _main(props, context, next, tlsProfile) {
     request.setTimeout(timeout * 1000, function() {
         logger.error('[invoke] The invoke policy is timeouted.');
 
-        error.name = 'connection error';
-        error.value = 'Invoke policy timeout';
-        error.message = error.value;
+        error.name = 'ConnectionError';
+        error.message = 'The invoke policy is timeouted.';
 
         next(error);
         request.abort();
@@ -266,8 +357,7 @@ function _main(props, context, next, tlsProfile) {
     request.on('error', function(err) {
         logger.error('[invoke] request failed: %s', err);
 
-        error.name = 'connection error';
-        error.value = err.toString();
+        error.name = 'ConnectionError';
         error.message = err.toString();
 
         next(error);
@@ -297,21 +387,24 @@ function _main(props, context, next, tlsProfile) {
  * The entry point of the invoke policy.
  * Read the TLS profile first and do the real work then.
  */
-function invoke(props, context, next) {
-    var logger = context.get('logger');
+function invoke(props, context, flow) {
+    var logger = flow.logger;
 
     var isDone = false;
     function _next(v) {
         if (!isDone) {
             isDone = true;
-            next(v);
+            if(v) {
+                flow.fail(v);
+            } else {
+                flow.proceed();
+            }
         }
     }
 
     if (!props || typeof props !== 'object') {
         var error = {
-            name: 'property error',
-            value: 'Invalid property object',
+            name: 'PropertyError',
             message: 'Invalid property object'
         };
         _next(error);
@@ -322,7 +415,7 @@ function invoke(props, context, next) {
     var profile = props['tls-profile'];
     var tlsProfile;
     if (!profile || typeof profile !== 'string' || profile.length === 0) {
-        _main(props, context, _next);
+        _main(props, context, _next, logger);
     }
     else {
         logger.debug('[invoke] reading the TLS profile "%s"', profile);
@@ -335,8 +428,7 @@ function invoke(props, context, next) {
                 if (!tlsProfile) {
                     logger.error('[invoke] cannot find the TLS profile "%s"', profile);
                     var error = {
-                        name: 'property error',
-                        value: 'Cannot find the TLS profile object',
+                        name: 'PropertyError',
                         message: 'Cannot find the TLS profile "' + profile + '"',
                     };
 
@@ -344,14 +436,13 @@ function invoke(props, context, next) {
                     return;
                 }
                 else
-                    _main(props, context, _next, tlsProfile);
+                    _main(props, context, _next, logger, tlsProfile);
             },
             function(e) {
                 logger.error('[invoke] error w/ retrieving TLS profile: %s', e);
 
                 var error = {
-                    name: 'property error',
-                    value: e.toString(),
+                    name: 'PropertyError',
                     message: e.toString(),
                 };
                 _next(error);

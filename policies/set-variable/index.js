@@ -1,25 +1,49 @@
 'use strict';
-var debug = require('debug')('policy:set-variable');
+var _ = require('lodash');
 
 module.exports = function(config) {
-  return function(props, context, next) {
-    props.actions.forEach(function(action) {
+  return function(props, context, flow) {
+    var logger = flow.logger;
+
+    var hasError = props.actions.some(function(action) {
         if (action.hasOwnProperty('set')) {
+            logger.debug('set "%s" to %j', action.set, action.value);
+
             context.set(action.set, action.value);
-        } else if (action.hasOwnProperty('add')) {
-            // TODO: behavior need to be confirmed
-            //       append on an array or concat to string?
-        } else if (action.hasOwnProperty('clear')) {
+        }
+        else if (action.hasOwnProperty('add')) {
+            logger.debug('add "%s" to %j', action.add, action.value);
+
+            var value = context.get(action.add);
+            if (_.isNil(value))
+                value = _.concat([], action.value);
+            else if (_.isArray(value))
+                value = _.concat(value, action.value);
+            else
+                value = _.concat([], value, action.value);
+
+            context.set(action.add, value);
+        }
+        else if (action.hasOwnProperty('clear')) {
+            logger.debug('clear the "%s"', action.clear);
+
             context.set(action.clear, '');
-        } else {
+        }
+        else {
+            logger.error('Action is not one of set, add, and clear.');
+
             var error = {
-                'name': 'property error',
-                'value': 'action not provided',
-                'message': 'Valid actions: set, add, and clear.'
+                name: 'PropertyError',
+                message:
+                    'Action is not one of set, add, and clear.'
             };
-            next(error);
+            flow.fail(error);
+
+            return true;
         }
     });
-    next();
+
+    if (!hasError)
+        flow.proceed();
   };
 };

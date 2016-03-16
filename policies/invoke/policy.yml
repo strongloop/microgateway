@@ -3,6 +3,7 @@ policy: 1.1.0
 info:
   title: Invoke
   name: apim-invoke
+  version: 1.0.0
   description: Invoke policy for the IBM API Connect
   contact:
     name: IBM API Mesh Samples
@@ -20,9 +21,9 @@ properties:
         - POST
         - PUT
         - DELETE
-        - OPTIONS
-        - HEAD
         - PATCH
+        - HEAD
+        - OPTIONS
       default: $(request.verb)
     target-url:
       label: "Target URL"
@@ -66,3 +67,13 @@ properties:
       label: Password
       description: Basic Authentication password
       type: string
+    output:
+      label: Output variable
+      description: The name of the variable where the invoke result is saved
+      type: string
+  required:
+    - target-url
+  throw:
+    - PropertyError
+    - ConnectionError
+

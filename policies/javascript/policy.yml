@@ -3,7 +3,7 @@ policy: 1.0.0
 info:
   title: JavaScript
   name: javascript
-  version: 1.0
+  version: 1.0.0
   description: JavaScript Policy
   contact:
     name: IBM API Management
@@ -24,3 +24,5 @@ properties:
       type: string
   required:
     - source
+  throw:
+    - JavaScriptError

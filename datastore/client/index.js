@@ -1,7 +1,10 @@
 'use strict'
+var Promise = require('bluebird');
 var request = require('request');
-var debug = require('debug')('micro-gateway:datastore:client');
-const host = '127.0.0.1'; // data-store's listening interface
+var url = require('url');
+var logger = require('apiconnect-cli-logger/logger.js')
+               .child({loc: 'apiconnect-microgateway:datastore:client'});
+var host = '127.0.0.1'; // data-store's listening interface
 
 /**
  * Finds the default catalog/environment for a specific provider
@@ -20,20 +23,26 @@ exports.apimGetDefaultCatalog = function(snapshot, orgName) {
       orgNameFilter + ',' +
       defaultOrgFilter + ']}}';
 
-  var queryurl = 'http://' + host + ':' + process.env['DATASTORE_PORT'] +
-      '/api/catalogs?filter=' + encodeURIComponent(queryfilter);
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/catalogs',
+        query: {filter : queryfilter}
+  };
+  var queryurl = url.format(queryurlObj);
 
-  return new Promise((resolve, reject) => {
-    request({url: queryurl}, (error, response, body) => {
-      debug('error: ', error);
-      //debug('body: %j', body);
-      //debug('response: %j', response);
+  return new Promise(function(resolve, reject) {
+    request({url: queryurl, json: true}, function(error, response, body) {
+      logger.debug('error: ', error);
+      //logger.debug('body: %j', body);
+      //logger.debug('response: %j', response);
       if (error) {
-        reject(Error(error));
+        reject(error);
         return;
       }
-      var catalogs = JSON.parse(body);
-      debug('catalog returned: %j', catalogs);
+      var catalogs = body;
+      logger.debug('catalog returned: %j', catalogs);
       if (catalogs.length === 1) {
         resolve(catalogs[0].name);
       } else {
@@ -51,146 +60,180 @@ exports.apimGetDefaultCatalog = function(snapshot, orgName) {
  *                              or output context
  */
 exports.grabAPI = function(context, callback) {
-  debug('grabAPI entry');
-  var snapshotFilter = '{"snapshot-id": "' + context.context.snapshot + '"}';
-  var apiFilter = '{"id": "' + context.context.api.id + '"}';
+  logger.debug('grabAPI entry');
+  var snapshotFilter = '{"snapshot-id": "' + context.snapshot + '"}';
+  var apiFilter = '{"id": "' + context.api.id + '"}';
   var queryfilter =
       '{"where": { "and":[' +
       snapshotFilter + ',' +
       apiFilter + ']}}';
-  var queryurl = 'http://' + host + ':' + process.env['DATASTORE_PORT'] +
-      '/api/apis?filter=' + encodeURIComponent(queryfilter);
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/apis',
+        query: {filter : queryfilter}
+  };
+  var queryurl = url.format(queryurlObj);
   var api = {};
 
   request(
     {
-      url : queryurl
+      url : queryurl,
+      json: true
     },
     function(error, response, body) {
-      debug('error: ', error);
-      // debug('body: %j' , body);
-      // debug('response: %j' , response);
+      logger.debug('error: ', error);
+      // logger.debug('body: %j' , body);
+      // logger.debug('response: %j' , response);
       if (error) {
         callback(error);
-        debug('grabAPI error exit');
+        logger.debug('grabAPI error exit');
         return;
       }
-      try {
-        api = JSON.parse(body);
-      } catch (e) {
-        callback(e, null);
-        return;
-      }
-      debug('grabAPI request exit');
+      api = body;
+      logger.debug('grabAPI request exit');
       callback(null, api[0]); // there should only be one result
     }
   );
-  debug('grabAPI exit');
+  logger.debug('grabAPI exit');
 }
 
 exports.getCurrentSnapshot = function() {
-  debug('getCurrentSnapshot entry');
+  logger.debug('getCurrentSnapshot entry');
   // build request to send to data-store
-  const port = process.env['DATASTORE_PORT'];
-  const queryurl = `http://${host}:${port}/api/snapshots/current`;
-
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/snapshots/current'
+  };
+  var queryurl = url.format(queryurlObj);
   // send request to optimizedData model from data-store
   // for matching API(s)
-  return new Promise((resolve, reject) => {
-    request({url: queryurl}, (error, response, body) => {
-      debug('error: ', error);
-      //debug('body: %j', body);
-      //debug('response: %j', response);
+  return new Promise(function(resolve, reject) {
+    request({url: queryurl, json: true}, function(error, response, body) {
+      logger.debug('error: ', error);
+      //logger.debug('body: %j', body);
+      //logger.debug('response: %j', response);
       // exit early on error
       if (error) {
-        reject(new Error(error));
+        reject(error);
         return;
       }
-      var snapshot = JSON.parse(body);
-      debug('snapshot: ', snapshot.snapshot.id);
+      var snapshot = body;
+      logger.debug('snapshot: ', snapshot.snapshot.id);
       resolve(snapshot.snapshot.id);
     });
   });
 }
 
 exports.releaseCurrentSnapshot = function(id) {
-  debug('releaseCurrentSnapshot entry');
+  logger.debug('releaseCurrentSnapshot entry');
   // build request to send to data-store
-  const port = process.env['DATASTORE_PORT'];
-  const queryurl = `http://${host}:${port}/api/snapshots/release?id=${id}`;
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/snapshots/release',
+        query: {id : id}
+  };
+  var queryurl = url.format(queryurlObj);
 
   // send request to optimizedData model from data-store
   // for matching API(s)
-  return new Promise((resolve, reject) => {
-    request({url: queryurl}, (error, response, body) => {
-      debug('error: ', error);
-      debug('body: %j', body);
-      debug('response: %j', response);
+  return new Promise(function(resolve, reject) {
+    request({url: queryurl}, function(error, response, body) {
+      logger.debug('error: ', error);
+      logger.debug('body: %j', body);
+      logger.debug('response: %j', response);
       // exit early on error
       if (error) {
-        debug('releaseCurrentSnapshot error');
-        reject(new Error(error));
+        logger.debug('releaseCurrentSnapshot error');
+        reject(error);
         return;
       }
-      debug('releaseCurrentSnapshot exit');
+      logger.debug('releaseCurrentSnapshot exit');
       resolve(id);
     });
   });
 }
 
 exports.getTlsProfile = function(snapshot, tlsProfleName) {
-  debug('getTlsProfile entry snapshot:' + snapshot +
+  logger.debug('getTlsProfile entry snapshot:' + snapshot +
                               '\n tlsProfleName:' + tlsProfleName );
   // build request to send to data-store
-  let snapshotFilter = `{"snapshot-id": "${snapshot }"}`;
-  let tlsNameFilter = `{"name": "${tlsProfleName }"}`;
-  let queryfilter = `{"where": { "and":[${snapshotFilter}, ${tlsNameFilter}]}}`;
-  const port = process.env['DATASTORE_PORT'];
+  var queryfilter = JSON.stringify({
+    where: {
+      and: [
+        { 'snapshot-id': snapshot},
+        { name: tlsProfleName}
+      ]
+    }
+  });
 
-  let queryurl = `http://${host}:${port}/api/tlsprofiles?filter=${encodeURIComponent(queryfilter)}`;
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/tlsprofiles',
+        query: {filter : queryfilter}
+  };
+  var queryurl = url.format(queryurlObj);
 
   // send request to data-store to get the reqiested TLS Profile
   // for matching API(s)
-  return new Promise((resolve, reject) => {
-    request({url: queryurl}, function (error, response, body) {
-      debug('error: ', error);
-      debug('body: %j', body);
-      debug('response: %j', response);
+  return new Promise(function(resolve, reject) {
+    request({url: queryurl, json: true}, function (error, response, body) {
+      logger.debug('error: ', error);
+      logger.debug('body: %j', body);
+      logger.debug('response: %j', response);
       // exit early on error
       if (error) {
-        reject(new Error(error));
+        reject(error);
         return;
       }
-      resolve(JSON.parse(body));
+      resolve(body);
 
     });
   });
 }
 
 exports.getRegistry = function(snapshot, registryName) {
-  debug('getRegistry entry snapshot:' + snapshot +
+  logger.debug('getRegistry entry snapshot:' + snapshot +
                               '\n registryName:' + registryName );
   // build request to send to data-store
-  let snapshotFilter = `{"snapshot-id": "${snapshot }"}`;
-  let registryNameFilter = `{"name": "${registryName }"}`;
-  let queryfilter = `{"where": { "and":[${snapshotFilter}, ${registryNameFilter}]}}`;
-  const port = process.env['DATASTORE_PORT'];
+  var queryfilter = JSON.stringify({
+    where: {
+      and: [
+        { 'snapshot-id': snapshot},
+        { name: registryName}
+      ]
+    }
+  });
 
-  let queryurl = `http://${host}:${port}/api/registries?filter=${encodeURIComponent(queryfilter)}`;
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/registries',
+        query: {filter : queryfilter}
+  };
+  var queryurl = url.format(queryurlObj);
 
   // send request to data-store to get the requested Registry Profile
   // for matching API(s)
-  return new Promise((resolve, reject) => {
-    request({url: queryurl}, function (error, response, body) {
-      debug('error: ', error);
-      debug('body: %j', body);
-      debug('response: %j', response);
+  return new Promise(function(resolve, reject) {
+    request({url: queryurl, json: true}, function (error, response, body) {
+      logger.debug('error: ', error);
+      logger.debug('body: %j', body);
+      logger.debug('response: %j', response);
       // exit early on error
       if (error) {
-        reject(new Error(error));
+        reject(error);
         return;
       }
-      resolve(JSON.parse(body));
+      resolve(body);
 
     });
   });

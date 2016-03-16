@@ -1,0 +1,33 @@
+info:
+  version: 1.0.0
+  title: throw
+  x-ibm-name: throw
+  description: throw
+basePath: /throw
+swagger: '2.0'
+paths:
+  /basic:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+x-ibm-configuration:
+  assembly:
+    execute:
+      - throw:
+          name: $(request.headers.x-foo-id)
+          message: 'Throw the x-foo-id on purpose'
+    catch:
+      - errors:
+          - foo
+        execute:
+          - set-variable:
+              actions:
+                - set: message.body
+                  value: "Caught $(error.name): $(error.message)"
+      - default:
+          - set-variable:
+              actions:
+                - set: message.body
+                  value: The unknown error is handled
+

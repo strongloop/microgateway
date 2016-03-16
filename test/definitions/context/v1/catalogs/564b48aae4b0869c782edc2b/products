@@ -1,0 +1,233 @@
+[{
+  "id": "564b7b3ae4b0869c782eddaf",
+  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
+  "state": "published",
+  "visibility": {
+    "view": {
+      "enabled": true,
+      "type": "public",
+      "tags": [],
+      "orgs": []
+    },
+    "subscribe": {
+      "enabled": true,
+      "type": "authenticated",
+      "tags": [],
+      "orgs": []
+    }
+  },
+  "organization": {
+    "id": "564b48a9e4b0869c782edc24",
+    "name": "apim",
+    "title": "Climb On"
+  },
+  "catalog": {
+    "id": "564b48aae4b0869c782edc2b",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+    "name": "sb",
+    "title": "Sandbox",
+    "sandbox": true,
+    "default": false
+  },
+  "document": {
+    "product": "1.0.0",
+    "info": {
+      "name": "uber",
+      "title": "Uber Product",
+      "version": "1.0.0"
+    },
+    "visibility": {
+      "view": {
+        "enabled": true,
+        "type": "public",
+        "tags": [],
+        "orgs": []
+      },
+      "subscribe": {
+        "enabled": true,
+        "type": "authenticated",
+        "tags": [],
+        "orgs": []
+      }
+    },
+    "apis": 
+      {
+      "uber-api": {"name": "uber-api:1.0.0"}
+      },
+    "plans": {
+      "gold": {
+        "title": "Gold Plan",
+        "rate-limit": {
+          "hard-limit": false,
+          "value": "1/sec"
+        },
+        "apis": {
+          "uber-api": {}
+        }
+      }
+    }
+  }
+},{
+  "id": "564b7b44e4b0869c782ede0b",
+  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b44e4b0869c782ede0b",
+  "state": "published",
+  "visibility": {
+    "view": {
+      "enabled": true,
+      "type": "public",
+      "tags": [],
+      "orgs": []
+    },
+    "subscribe": {
+      "enabled": true,
+      "type": "authenticated",
+      "tags": [],
+      "orgs": []
+    }
+  },
+  "organization": {
+    "id": "564b48a9e4b0869c782edc24",
+    "name": "apim",
+    "title": "Climb On"
+  },
+  "catalog": {
+    "id": "564b48aae4b0869c782edc2b",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+    "name": "sb",
+    "title": "Sandbox",
+    "sandbox": true,
+    "default": false
+  },
+  "document": {
+    "product": "1.0.0",
+    "info": {
+      "name": "apim",
+      "version": "1.0.0",
+      "title": "ClimbOn",
+      "contact": {
+        "name": "George O Jungle",
+        "email": "george.o.jungle@apim.com",
+        "url": "http://www.apim.com"
+      },
+      "license": {
+        "name": "Free for all climbers",
+        "url": "http://www.apim.com/user-agreement"
+      },
+      "termsOfService": "Thy shalt not weigh more than thy fridge."
+    },
+    "visibility": {
+      "view": {
+        "enabled": true,
+        "type": "public",
+        "tags": [],
+        "orgs": []
+      },
+      "subscribe": {
+        "enabled": true,
+        "type": "custom",
+        "tags": ["tag1", "tag2"],
+        "orgs": ["Consumer-Org-1", "Consumer-Org-2"]
+      }
+    },
+    "apis":
+      { 
+      "ascents": {"name": "ascents:1.0.0"},
+      "forecasts": {"name": "forecasts:1.0.0"},
+      "routes": {"name": "routes:1.0.0"}
+       },
+    "plans": {
+      "trial": {
+        "title": "Trial Climb On",
+        "description": "blah blah",
+        "approval": false,
+        "rate-limit": {
+          "hard-limit": true,
+          "value": "60/hour"
+        },
+        "apis": 
+          {
+          "ascents": {}
+          }
+      },
+      "silver": {
+        "title": "Silver Climb On",
+        "description": "blah blah",
+        "approval": true,
+        "rate-limit": {
+          "hard-limit": false,
+          "value": "100/min"
+        },
+        "apis": 
+          {
+          "ascents": {},
+          "forecasts": {}
+          }
+      },
+      "gold": {
+        "title": "Gold Climb On",
+        "description": "blah blah",
+        "approval": true,
+        "rate-limit": {
+          "hard-limit": false,
+          "value": "1000/min"
+        },
+        "apis": 
+          {
+          "ascents": {},
+          "forecasts": {},
+          "routes": {}
+          }
+      }
+    }
+  }
+},{
+  "id": "564b7b44e4b0869c782ede12",
+  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b44e4b0869c782ede12",
+  "state": "published",
+  "visibility": {
+    "view": {
+      "enabled": true,
+      "type": "public",
+      "tags": [],
+      "orgs": []
+    },
+    "subscribe": {
+      "enabled": true,
+      "type": "authenticated",
+      "tags": [],
+      "orgs": []
+    }
+  },
+  "organization": {
+    "id": "564b48a9e4b0869c782edc24",
+    "name": "apim",
+    "title": "Climb On"
+  },
+  "catalog": {
+    "id": "564b48aae4b0869c782edc2b",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+    "name": "sb",
+    "title": "Sandbox",
+    "sandbox": true,
+    "default": false
+  },
+  "document": {
+    "product": "1.0.0",
+    "info": {
+      "name": "basic-product",
+      "title": "basic-product",
+      "version": "1.0.0"
+    },
+    "apis": {
+      "basic": {"name": "basic:1.0.0"}
+    },
+    "plans": {
+      "Default": {
+        "title": "Default",
+        "apis": {
+            "basic": {}
+        }
+      }
+    }
+  }
+}]

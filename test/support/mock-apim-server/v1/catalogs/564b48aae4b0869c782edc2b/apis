@@ -1791,11 +1791,50 @@
                         "url": "ldap://localhost:1636"
                     }
                 },
+                "basic-ldap-compose-upn-no-group-auth": {
+                    "type": "basic",
+                    "description": "Compose UPN Examples: Microsoft Active Directory without Authorization Group",
+                    "x-ibm-authentication-registry": "basic-ldap-compose-upn-no-group-auth",
+                    "x-ibm-authentication-url": {
+                        "url": "ldap://localhost:1389"
+                    }
+                },
+                "compose-upn": {
+                    "type": "basic",
+                    "description": "Compose UPN Examples: Microsoft Active Directory without Authorization Group",
+                    "x-ibm-authentication-registry": "compose-upn",
+                    "x-ibm-authentication-url": {
+                        "url": "ldap://9.23.27.8:389"
+                    }
+                },
                 "basic-http": {
                     "type": "basic",
                     "description": "",
                     "x-ibm-authentication-url": {
                         "url": "http://localhost:8889/auth"
+                    }
+                },
+                "slow-basic-http": {
+                    "type": "basic",
+                    "description": "",
+                    "x-ibm-authentication-url": {
+                        "url": "http://localhost:8889/slowauth"
+                    }
+                },
+                "slow-basic-https": {
+                    "type": "basic",
+                    "description": "",
+                    "x-ibm-authentication-url": {
+                        "url": "https://localhost:61801/slowauth",
+                        "tls-profile": "new-tls-profile-1"
+                    }
+                },
+                "basic-https": {
+                    "type": "basic",
+                    "description": "",
+                    "x-ibm-authentication-url": {
+                        "url": "https://localhost:61801/auth",
+                        "tls-profile": "new-tls-profile-1"
                     }
                 }
             },
@@ -1867,8 +1906,79 @@
                             }
                         ]
                     }
+                },
+                "/basic-ldap-compose-upn-no-group-auth": {
+                    "get": {
+                        "responses": {
+                            "200": {
+                                "description": "200 OK"
+                            }
+                        },
+                        "security": [
+                            {
+                                "basic-ldap-compose-upn-no-group-auth": []
+                            }
+                        ]
+                    }
+                },
+                "/compose-upn": {
+                    "get": {
+                        "responses": {
+                            "200": {
+                                "description": "200 OK"
+                            }
+                        },
+                        "security": [
+                            {
+                                "compose-upn": []
+                            }
+                        ]
+                    }
+                },
+                "/basic-https": {
+                    "get": {
+                        "responses": {
+                            "200": {
+                                "description": "200 OK"
+                            }
+                        },
+                        "security": [
+                            {
+                                "basic-https": []
+                            }
+                        ]
+                    }
+                },
+                "/slow-basic-http": {
+                    "get": {
+                        "responses": {
+                            "200": {
+                                "description": "200 OK"
+                            }
+                        },
+                        "security": [
+                            {
+                                "slow-basic-http": []
+                            }
+                        ]
+                    }
+                },
+                "/slow-basic-https": {
+                    "get": {
+                        "responses": {
+                            "200": {
+                                "description": "200 OK"
+                            }
+                        },
+                        "security": [
+                            {
+                                "slow-basic-https": []
+                            }
+                        ]
+                    }
                 }
             },
+
             "x-ibm-configuration": {
                 "assembly": {
                     "execute": [

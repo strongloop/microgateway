@@ -5,24 +5,32 @@ var YAML = require('yamljs');
 var constants = require('constants');
 var Crypto = require('crypto');
 var Request = require('request');
-var debug = require('debug')('micro-gateway:data-store');
+var url = require('url');
+var logger = require('apiconnect-cli-logger/logger.js')
+               .child({loc: 'apiconnect-microgateway:datastore:server:boot:load-model'});
 var sgwapimpull = require('../../apim-pull');
 var apimpull = sgwapimpull.pull;
+var apimdecrypt = sgwapimpull.decrypt;
 var environment = require('../../../utils/environment');
 var APIMANAGER = environment.APIMANAGER;
 var APIMANAGER_PORT = environment.APIMANAGER_PORT;
 var APIMANAGER_CATALOG = environment.APIMANAGER_CATALOG;
 var CONFIGDIR = environment.CONFIGDIR;
+var KEYNAME = environment.KEYNAME;
 
 var LAPTOP_RATELIMIT = environment.LAPTOP_RATELIMIT;
+var CATALOG_HOST = environment.CATALOG_HOST;
+
+var cliConfig = require('apiconnect-cli-config');
 
 var rootConfigPath = __dirname + '/../../../config/';
 var defaultDefinitionsDir = rootConfigPath + 'default';
 var definitionsDir = defaultDefinitionsDir;
 
-var keyDir = __dirname + '/../../../';
-var keyFile = keyDir + 'id_rsa';
+var gatewayMain = __dirname + '/../../../';
+var keyFile = gatewayMain + KEYNAME;
 var version ='1.0.0';
+var https = false;
 
 /**
  * Creates a model type 
@@ -64,11 +72,16 @@ module.exports = function(app) {
   models.push(new ModelType('optimizedData', 'dummy'));
   models.push(new ModelType('snapshot', 'dummy')); // hack, removed later
 
+  var refreshInterval = 15 * 60 * 1000; // 15 minutes
+  if (process.env.APIMANAGER_REFRESH_INTERVAL) {
+    refreshInterval = process.env.APIMANAGER_REFRESH_INTERVAL;
+  } 
   var apimanager = {
     host: process.env[APIMANAGER],
     port: process.env[APIMANAGER_PORT],
     catalog: process.env[APIMANAGER_CATALOG],
-    handshakeOk: false
+    handshakeOk: false,
+    refresh : refreshInterval
     };
 
   async.series(
@@ -82,7 +95,7 @@ module.exports = function(app) {
         if (process.env[CONFIGDIR])
           definitionsDir = process.env[CONFIGDIR];
         else {
-          process.env['ROOTCONFIGDIR'] = rootConfigPath;
+          process.env.ROOTCONFIGDIR = rootConfigPath;
           definitionsDir = defaultDefinitionsDir;
         }
         callback();
@@ -96,23 +109,27 @@ module.exports = function(app) {
           }
        );
       },
-      function(callback) {
-        // load key..
-        var private_key = '';
-        try {
-          private_key = fs.readFileSync(keyFile,'utf8');
-        } catch(e) {
-          console.log('Can not load key: %s Error: %s', keyFile, e);
+      function (callback) {
+        if (!apimanager.host || apimanager.handshakeOk) {
+          //if we don't have the APIM contact info, or we already done the handshake, bail out
+          return callback();
         }
 
-        if (apimanager.host && apimanager.handshakeOk === false && private_key) {
-        // we have an APIm, and a key so try to handshake with it.. 
-          handshakeWithAPIm(app, apimanager, function(err, handshakeApimanager) {
-            apimanager = handshakeApimanager;
-            callback(); // should return the error.. not ready #TODO
-            })
-          }
-        else { callback();}       
+        // load key..
+        var private_key = null;
+        try {
+          private_key = fs.readFileSync(keyFile, 'utf8');
+        } catch (e) {
+          //don't proceed with the handshake, since we could not read the private key
+          logger.debug('Can not load key: %s Error: %s', keyFile, e);
+          return callback();
+        }
+
+        // we have an APIm, and a key so try to handshake with it..
+        handshakeWithAPIm(app, apimanager, private_key, function (err, handshakeApimanager) {
+          apimanager = handshakeApimanager;
+          callback(); // should return the error.. not ready #TODO
+        });
       }
     ],
     // load the data into the models
@@ -141,10 +158,10 @@ function loadData(app, apimanager, models, currdir) {
   async.series(
     [
       function(callback) {
-        debug('apimanager before pullFromAPIm: ' + JSON.stringify(apimanager))
-        if (apimanager.host) { 
+        logger.debug('apimanager before pullFromAPIm: %j', apimanager);
+        if (apimanager.host) {
             // && apimanager.handshakeOk << shouldn't call if handshake failed.. not ready #TODO
-        // we have an APIm, handshake succeeded, so try to pull data.. 
+          // we have an APIm, handshake succeeded, so try to pull data..
           pullFromAPIm(apimanager, snapshotID, function(err, dir) {
             snapdir = dir;
             callback();
@@ -182,7 +199,7 @@ function loadData(app, apimanager, models, currdir) {
 function scheduleLoadData(app, apimanager, models, dir) {
   if (apimanager.host)
     setTimeout(loadData,
-             15 * 1000, // 15 seconds TODO: make configurable
+             apimanager.refresh,
              app,
              apimanager,
              models,
@@ -198,7 +215,7 @@ function scheduleLoadData(app, apimanager, models, dir) {
  *                        successful completion
  */
 function stageModels(app, models, cb) {
-  debug('stageModels entry');
+  logger.debug('stageModels entry');
   async.forEach(models,
     function(model, callback) {
       app.dataSources.db.automigrate(
@@ -209,11 +226,105 @@ function stageModels(app, models, cb) {
       );
     },
     function(err) {
-      debug('stageModels exit');
+      logger.debug('stageModels exit');
       cb(err);
     }
   );
 }
+/**
+ * Compute the signature headers "date", "digest", and "authorization" headers
+ * according to IETF I-D draft-cavage-http-signatures-05 using rsa-sha256 algorithm
+ *
+ * If the `date` header already exists in the input, it's used as-is
+ * If the `digest` header already exists in the input, it's used as-is (which means that body is ignored)
+ *
+ *
+ * @param body (String): Message body (ignored if there is already a digest header)
+ * @param headers (Object): Contains the existing list of headers
+ * @param keyId (String): Identifier for the private key, ends up in the "keyId" param of the authorization header
+ * @param private_key (String): RSA Private key to be used for the signature
+ * @returns {*}
+ */
+
+
+function addSignatureHeaders(body, headers, keyId, private_key) {
+  var sign = function (str, private_key) {
+    var sign = Crypto.createSign('RSA-SHA256');
+    sign.update(str);
+    return sign.sign(private_key, 'base64');
+  };
+
+  var sha256 = function (str, encoding) {
+    var bodyStr = JSON.stringify(str);
+    var hash = Crypto.createHash('sha256');
+    hash.update(bodyStr);
+    return hash.digest(encoding);
+  };
+
+  if (!headers) {
+    headers = {};
+  }
+
+  if (!headers.date) {
+    headers.date = (new Date()).toUTCString()
+  }
+
+  if (!headers.digest) {
+    headers.digest = 'SHA256=' + sha256(body, 'base64');
+  }
+
+
+  var combine = function (names, headers) {
+    var parts = [];
+    names.forEach(function (e) {
+      parts.push(e + ": " + headers[e]);
+    });
+    return parts.join("\n");
+  };
+
+  headers.authorization = 'Signature ' +
+    'keyId="' + keyId + '", ' +
+    'headers="date digest", ' +
+    'algorithm="rsa-sha256", ' +
+    'signature="' + sign(combine(['date', 'digest'], headers), private_key) + '"';
+
+  return headers;
+}
+
+
+/**
+ * This function decrypts and parses an encrypted response body sent by APIM
+ * The body must be in the following format:
+ *
+ * {
+ *   "key": "base64(encrypted_with_public_key(aes_256_symmetric_key))"
+ *   "cipher": "base64(encrypted_with_aes_256_key(json_payload_as_string))"
+ * }
+ *
+ *
+ * @param body
+ * @param public_key
+ *
+ */
+function decryptAPIMResponse(body, private_key) {
+  var key = Crypto.privateDecrypt(
+    {
+      key: private_key,
+      padding: constants.RSA_PKCS1_PADDING
+    },
+    new Buffer(body.key, 'base64')
+  );
+
+  var iv = new Buffer(16);
+  iv.fill(0);
+  var decipher = Crypto.createDecipheriv('aes-256-cbc', key, iv);
+  var plainText = decipher.update(body.cipher, 'base64', 'utf8');
+  plainText += decipher.final('utf8');
+
+  return JSON.parse(plainText);
+}
+
+
 /**
  * Attempt to handshake from APIm server
  * @param {???} app - loopback application
@@ -221,76 +332,82 @@ function stageModels(app, models, cb) {
  * @param {callback} cb - callback that handles error or path to
  *                        snapshot directory
  */
-function handshakeWithAPIm(app, apimanager, cb) {
-  debug('handshakeWithAPIm entry');
+function handshakeWithAPIm(app, apimanager, private_key, cb) {
+  logger.debug('handshakeWithAPIm entry');
   
   async.series([
     function(callback) {
-      // send version encrypted using public key
 
-      var encryptedVersion = Crypto.privateEncrypt(private_key, new Buffer(version,'ascii'));
-      var body = {
-        gatewayVersion: encryptedVersion
+      var body = JSON.stringify({
+        gatewayVersion: version
+      });
+
+      var headers = {
+        'content-type': 'application/json'
+      };
+
+      addSignatureHeaders(body, headers, "micro-gw-catalog/"+apimanager.catalog, private_key);
+
+      if (logger.debug()) {
+        logger.debug(JSON.stringify(headers, null, 2));
       }
-      debug('EncryptedBody:' + JSON.stringify(body));
-          
-      var apimHandshakeUrl = 'https://' + apimanager.host + ':' + apimanager.port + '/v1/catalogs/' + apimanager.catalog + '/handshake/';
+
+      var apimHandshakeUrlObj = {
+        protocol: 'https',
+        hostname: apimanager.host,
+        port: apimanager.port,
+        pathname: '/v1/catalogs/' + apimanager.catalog + '/handshake/'
+      }
+      var apimHandshakeUrl = url.format(apimHandshakeUrlObj);
       
       Request({
         url: apimHandshakeUrl,
         method: 'POST',
         json: body,
-        headers: {
-          'content-type': 'application/json'
+        headers: headers,
+        agentOptions: {
+          rejectUnauthorized: false //FIXME: need to eventually remove this
           }
         },       
       function(err, res, body) {
         if (err) {
-          debug('Failed to communicate with %s: %s ', apimHandshakeUrl, err);
-          callback(err);
+          logger.debug('Failed to communicate with %s: %s ', apimHandshakeUrl, err);
+          return callback(err);
         }
-        else {
-          debug('statusCode: ' + res.statusCode);          
-          if (res.statusCode === 200) {
-            var algorithm = 'AES-256-CBC';
-            var IV = '0000000000000000';
-            debug('body: ' + JSON.stringify(res.body));
-            var password = Crypto.privateDecrypt(private_key, new Buffer(res.body.Key));
-            debug('password: ' + password);
-            var decipher = Crypto.createDecipheriv(algorithm, password, IV);
-            var decrypted = decipher.update(res.body.cipher, 'base64', 'utf8');
-            decrypted += decipher.final('utf8');
-            debug('decrypted: ' + decrypted);
-            var jsonDecrypted = JSON.parse(decrypted);
-            
-            debug('jsonDecrypted: ' + JSON.stringify(jsonDecrypted));
-            
-            apimanager.clicert = jsonDecrypted.managerCert;
-            apimanager.clikey = jsonDecrypted.managerKey;
-            apimanager.clientid = jsonDecrypted.clientID;
-            
-            debug('apimanager.clicert: ' + apimanager.clicert);
-            debug('apimanager.clikey: ' + apimanager.clikey);
-            debug('apimanager.clientid: ' + apimanager.clientid);
 
-            debug('apimanager: ' + JSON.stringify(apimanager));          
-            callback(null, apimanager);
-            }
-          else {
-            var error = new Error(apimHandshakeUrl +
-                            ' failed with: ' +
-                            res.statusCode);
-            callback(error);
-            }
-          }
+        logger.debug('statusCode: ' + res.statusCode);
+        if (res.statusCode !== 200) {
+          logger.debug(apimHandshakeUrl + ' failed with: ' + res.statusCode);
+          return callback(new Error(apimHandshakeUrl + ' failed with: ' + res.statusCode));
+        }
+
+        var json = decryptAPIMResponse(body, private_key);
+        if (logger.debug()) {
+          logger.debug(JSON.stringify(json, null, 2));
+        }
+
+        if (!json.microGateway) {
+          return callback(new Error(apimHandshakeUrl + ' response did not contain "microGateway" section'));
+        }
+
+        var ugw = json.microGateway;
+        apimanager.clicert = ugw.cert;
+        apimanager.clikey = ugw.key;
+        apimanager.clientid = ugw.clientID;
+
+        if (logger.debug()) {
+          logger.debug('apimanager.clicert: ' + apimanager.clicert);
+          logger.debug('apimanager.clikey: ' + apimanager.clikey);
+          logger.debug('apimanager.clientid: ' + apimanager.clientid);
+
+          logger.debug('apimanager: %s', JSON.stringify(apimanager, null, 2));
+        }
+        callback(null, apimanager);
         });
       }],
     function(err) {
-      if (err)
-        apimanager.handshakeOk = false;
-      else
-        apimanager.handshakeOk = true;
-      debug('handshakeWithAPIm exit');
+      apimanager.handshakeOk = !err;
+      logger.debug('handshakeWithAPIm exit');
       cb(err, apimanager);
     });
   }
@@ -303,14 +420,14 @@ function handshakeWithAPIm(app, apimanager, cb) {
  *                        snapshot directory
  */
 function pullFromAPIm(apimanager, uid, cb) {
-  debug('pullFromAPIm entry');
+  logger.debug('pullFromAPIm entry');
   // Have an APIm, grab latest if we can..
   var snapdir =  rootConfigPath +
                   uid +
                   '/';
   fs.mkdir(snapdir, function(err) {
       if (err) {
-        debug('pullFromAPIm exit(1)');
+        logger.debug('pullFromAPIm exit(1)');
         cb(null, '');
         return;
       }
@@ -326,28 +443,28 @@ function pullFromAPIm(apimanager, uid, cb) {
       };*/
 
       var options = {};
-      options['host'] = apimanager.host;
-      options['port'] = apimanager.port;
-      options['clikey'] = apimanager.clikey;
-      options['clicert'] = apimanager.clicert;
-      options['clientid'] = apimanager.clientid;
-      options['outdir'] = snapdir;
-      debug('apimpull start');
+      options.host = apimanager.host;
+      options.port = apimanager.port;
+      options.clikey = apimanager.clikey;
+      options.clicert = apimanager.clicert;
+      options.clientid = apimanager.clientid;
+      options.outdir = snapdir;
+      logger.debug('apimpull start');
       apimpull(options,function(err, response) {
           if (err) {
-            console.error(err);
+            logger.error(err);
             try {
               fs.rmdirSync(snapdir);
             } catch(e) {
-              console.error(e);
+              logger.error(e);
               //continue
             }
             snapdir = '';
             // falling through
             // try loading from local files
           }
-          debug(response);
-          debug('pullFromAPIm exit(2)');
+          logger.debug(response);
+          logger.debug('pullFromAPIm exit(2)');
           cb(null, snapdir);
         }
       );
@@ -366,15 +483,15 @@ function pullFromAPIm(apimanager, uid, cb) {
  * @param {callback} cb - callback that handles error or successful completion
  */
 function loadConfig(app, apimanager, models, currdir, snapdir, uid, cb) {
-  debug('loadConfig entry');
+  logger.debug('loadConfig entry');
 
   var dirToLoad = (snapdir === '') ?
                     (currdir + '/') :
                     snapdir;
   loadConfigFromFS(app, apimanager, models, dirToLoad, uid, function(err) {
       if (err) {
-        console.error(err);
-        debug('loadConfig error(1)');
+        logger.error(err);
+        logger.debug('loadConfig error(1)');
         cb(err);
         return;
       }
@@ -382,17 +499,17 @@ function loadConfig(app, apimanager, models, currdir, snapdir, uid, cb) {
         // update current snapshot pointer
         updateSnapshot(app, uid, function(err) {
             if (err) {
-              debug('loadConfig error(2)');
+              logger.debug('loadConfig error(2)');
               cb(err);
               return;
             }
-            process.send({LOADED: true});
+            process.send({LOADED: true, 'https': https});
             // only update pointer to latest configuration
             // when latest configuration successful loaded
             if (snapdir === dirToLoad) {
                 process.env[CONFIGDIR] = snapdir;
             }
-            debug('loadConfig exit');
+            logger.debug('loadConfig exit');
             cb();
           }
         );
@@ -410,85 +527,124 @@ function loadConfig(app, apimanager, models, currdir, snapdir, uid, cb) {
  * @param {callback} cb - callback that handles error or successful completion
  */
 function loadConfigFromFS(app, apimanager, models, dir, uid, cb) {
-  var files;
-  debug('loadConfigFromFS entry');
-  try {
-    files = fs.readdirSync(dir);
-  } catch (e) {
-    debug('loadConfigFromFS error');
-    cb(e);
-    return;
-  }
-  var YAMLfiles = [];
-  debug('files: ', files);
-  var jsonFile = new RegExp(/.*\.json$/);
-  var yamlFile = new RegExp(/(.*\.yaml$)|(.*\.yml$)/);
-
   // clear out existing files from model structure
   models.forEach(
     function(model) {
       model.files = [];
     }
   );
-
-  // correlate files with appropriate model
-  files.forEach(
-    function(file) {
-      debug('file match jsonFile: ', file.match(jsonFile));
-      debug('file match yamlFile: ', file.match(yamlFile));
-      // apim pull scenario (only json, no yaml)
-      if (apimanager.host && file.match(jsonFile)) {
-        for(var i = 0; i < models.length; i++) {
-          if(file.indexOf(models[i].prefix) > -1) {
-            debug('%s file: %s', models[i].name, file);
-            models[i].files.push(file);
-            break;
+    
+  if (apimanager.host) {
+    var files;
+    logger.debug('loadConfigFromFS entry');
+    try {
+      files = fs.readdirSync(dir);
+    } catch (e) {
+      logger.debug('loadConfigFromFS error');
+      cb(e);
+      return;
+    }
+    
+    logger.debug('files: ', files);
+    var jsonFile = new RegExp(/.*\.json$/);
+    // correlate files with appropriate model
+    files.forEach(
+      function(file) {
+        logger.debug('file match jsonFile: ', file.match(jsonFile));
+        // apim pull scenario (only json, no yaml)
+        if (apimanager.host && file.match(jsonFile)) {
+          for(var i = 0; i < models.length; i++) {
+            if(file.indexOf(models[i].prefix) > -1) {
+              logger.debug('%s file: %s', models[i].name, file);
+              models[i].files.push(file);
+              break;
+            }
           }
         }
       }
-      // laptop experience scenario (only yaml, no json)
-      // might want to support json for laptop as well
-      else if (file.match(yamlFile)) {
-        YAMLfiles.push(file);
-      }
-    }
-  );
-  
-  if (apimanager.host) {
+    );
     // populate data-store models with the file contents
     populateModelsWithAPImData(app, models, dir, uid, cb);
   }
   else {
-    populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb);
+    var YAMLfiles = [];
+    logger.debug('dir: ' + dir )
+    cliConfig.loadProject(dir).then(function(artifacts) { 
+      logger.debug('%j', artifacts); 
+      artifacts.forEach(
+        function(artifact)
+          {
+          if (artifact.type === 'swagger')
+            {
+            YAMLfiles.push(artifact.filePath)
+            }
+          }
+        )
+        // populate data-store models with the file contents
+        populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb);
+    });
   }
 }
 
 function createProductID(product)
   {
-  return (product.info['name'] + ':' + product.info['version']);
+  return (product.info.name + ':' + product.info.version);
   }
   
 function createAPIID(api)
   {
-  return (api.info['x-ibm-name'] + ':' + api.info['version']);
+  return (api.info['x-ibm-name'] + ':' + api.info.version);
   }
 
 /**
  * Populates data-store models with persisted content
  * @param {???} app - loopback application
- * @param {Array} YAMLfiles - list of yaml files to process
+ * @param {Array} YAMLfiles - list of yaml files to process (should only be swagger)
  * @param {string} dir - path to directory containing persisted data to load
  * @param {callback} cb - callback that handles error or successful completion
  */
 function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
-  debug('populateModelsWithLocalData entry');
+  logger.debug('populateModelsWithLocalData entry');
   var apis = {};
+  var subscriptions = [
+            {
+            'organization': {
+              'id': 'defaultOrgID',
+              'name': 'defaultOrgName',
+              'title': 'defaultOrgTitle'
+            },
+            'catalog': {
+              'id': 'defaultCatalogID',
+              'name': 'defaultCatalogName',
+              'title': 'defaultCatalogTitle'
+            },
+            'id': 'defaultSubsID',
+            'application': {
+              'id': 'defaultAppID',
+              'title': 'defaultAppTitle',
+              'oauth-redirection-uri': 'https://localhost',
+              'app-credentials': [{
+                'client-id': 'default',
+                'client-secret': 'CRexOpCRkV1UtjNvRZCVOczkUrNmGyHzhkGKJXiDswo='
+              }]
+            },
+            'developer-organization': {
+              'id': 'defaultOrgID',
+              'name': 'defaultOrgName',
+              'title': 'defaultOrgTitle'
+            },
+            'plan-registration': {
+              'id': 'ALLPLANS'
+                }
+            }
+            ];
+  var catalog = subscriptions[0].catalog;
+  catalog.organization = subscriptions[0].organization;
   async.series([
     function(seriesCallback) {
       async.forEach(YAMLfiles,
-          function(typefile, fileCallback) {
-            var file = path.join(dir, typefile);
-            debug('Loading data from %s', file);
+          function(file, fileCallback) {
+            logger.debug('Loading data from %s', file);
             var readfile;
             try {
               // read the content of the files into memory
@@ -499,30 +655,11 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
               fileCallback(e);
               return;
             }
-            // convert to json.. determine model
-            
-            // Product=
-            // product: 1.0.0
-            // info:
-            //  name: climb-on
-            //  title: Climb On
-            //  version: 1.0.0
-      
-            // API=
-            //  swagger: '2.0'
-            //  info:
-            //    x-ibm-name: route
-            //    title: Route
-            //    version: 1.0.0
-            
-            debug('readfile %s', JSON.stringify(readfile));
-            debug('Product %s', readfile.product);
-            debug('Swagger %s', readfile.swagger);
             var model = {};
             var entry = {};
             // looks like a product
             if (readfile.product) {
-              console.log('product found: skipping')
+              logger.debug('product found: skipping')
             }
             // looks like an API
             if (readfile.swagger) {
@@ -540,11 +677,11 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
                 entry,
                 function(err, mymodel) {
                   if (err) {
-                    console.error(err);
+                    logger.error(err);
                     fileCallback(err);
                     return;
                   }
-                  debug('%s created: %j',
+                  logger.debug('%s created: %j',
                         model.name,
                         mymodel);
                   fileCallback();
@@ -559,11 +696,28 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
       ); 
       seriesCallback();
     },
+    function(seriesCallback) {
+        catalog['snapshot-id'] = uid;
+        app.models['catalog'].create(
+          catalog,
+          function(err, mymodel) {
+            if (err) {
+              logger.error(err);
+              seriesCallback(err);
+              return;
+            }
+            logger.debug('%s created: %j',
+                  'catalog',
+                  mymodel);
+          seriesCallback();
+          }
+        );
+    },
     // create product with all the apis defined
     function(seriesCallback) {
         var entry = {};
-        // no catalog
-        entry.catalog = {};
+        // add catalog
+        entry.catalog = catalog;
         entry['snapshot-id'] = uid;
         var rateLimit = '100/hour';
         if (process.env[LAPTOP_RATELIMIT])
@@ -595,17 +749,20 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
             }
           }
         }
-        debug('creating static product and attaching apis: ' + JSON.stringify(entry, null, 4))
+        if (logger.debug()) {
+          logger.debug('creating static product and attaching apis: %s',
+            JSON.stringify(entry, null, 4));
+        }
 
-        app.models['product'].create(
+        app.models.product.create(
           entry,
           function(err, mymodel) {
             if (err) {
-              console.error(err);
+              logger.error(err);
               seriesCallback(err);
               return;
             }
-            debug('%s created: %j',
+            logger.debug('%s created: %j',
                   'product',
                   mymodel);
           seriesCallback();
@@ -614,24 +771,6 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
       },
     // Hardcode default subscription for all plans
     function(seriesCallback) {
-      var subscriptions = [
-            {
-            'catalog': {},
-            'id': 'test subscription',
-            'application': {
-              'id': 'app name',
-              'oauth-redirection-uri': 'https://localhost',
-              'app-credentials': [{
-                'client-id': 'default',
-                'client-secret': 'CRexOpCRkV1UtjNvRZCVOczkUrNmGyHzhkGKJXiDswo='
-              }]
-            },
-            'plan-registration': {
-              'id': 'ALLPLANS'
-                }
-            }
-            ];
-
         async.forEach(subscriptions,
           function(subscription, subsCallback) 
             {
@@ -641,11 +780,11 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
               subscription,
               function(err, mymodel) {
                 if (err) {
-                  console.error(err);
+                  logger.error(err);
                   subsCallback(err);
                   return;
                 }
-                debug('%s created: %j',
+                logger.debug('%s created: %j',
                       modelname,
                       mymodel);
                 subsCallback();
@@ -667,7 +806,7 @@ function findAndReplace(object, value, replacevalue){
       findAndReplace(object[x], value, replacevalue);
     }
     if(typeof object[x] === 'string' && object[x].indexOf(value) > -1){ 
-      debug('found variable to replace: ' + value + ' with ' + replacevalue);
+      logger.debug('found variable to replace: ' + value + ' with ' + replacevalue);
       object[x] = object[x].replace(value, replacevalue);
     }
   }
@@ -693,9 +832,9 @@ function expandAPIData(apidoc, dir)
       Object.getOwnPropertyNames(apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties).forEach(
         function (property) 
           {
-          debug('property: ' + property);
+          logger.debug('property: ' + property);
           var propertyvalue = '$(' + property + ')';
-          debug('propertyvalue: ' + propertyvalue);
+          logger.debug('propertyvalue: ' + propertyvalue);
           var replacementvalue;
           // is it an environment var?? $(envVar)
           var regEx = /\$\((.*)\)/;
@@ -703,7 +842,7 @@ function expandAPIData(apidoc, dir)
           var envvar = matches[1];
           if (envvar) {
             if (!process.env[envvar]) {
-              debug('Environment Variable not set for :' + envvar);
+              logger.debug('Environment Variable not set for :' + envvar);
               }
             replacementvalue = process.env[envvar];
             }
@@ -714,6 +853,19 @@ function expandAPIData(apidoc, dir)
             apidoc = findAndReplace(apidoc, propertyvalue, replacementvalue)
             });
       }
+    // fill in catalog properties (one off for now until we have the scope of other vars required)
+    var cataloghost = 'localhost:' + process.env.PORT;
+    var cataloghostvar = '$(catalog.host)'
+    if (process.env.CATALOG_HOST) {
+      cataloghost= process.env.CATALOG_HOST;
+      }
+    apidoc = findAndReplace(apidoc, cataloghostvar, cataloghost);
+    }
+    // determine if micro gateway should start w/ HTTPS or not
+    // based on presence of 'https' in schemes
+    if (!https) {
+      if (apidoc.schemes && apidoc.schemes.indexOf('https') > -1)
+        https = true;
     }
   return apidoc;
   }
@@ -728,7 +880,7 @@ function loadAPIsFromYAML(listOfAPIs, dir)
     try {
       api = YAML.load(apiFile);
     } catch(e) {
-      debug('Load failed of: ', apiFile);
+      logger.debug('Load failed of: ', apiFile);
       api = YAML.load(apiFile+'.yaml');
     }
     //scope data down
@@ -750,23 +902,23 @@ function loadAPIsFromYAML(listOfAPIs, dir)
  * @param {callback} cb - callback that handles error or successful completion
  */
 function populateModelsWithAPImData(app, models, dir, uid, cb) {
-  debug('populateModelsWithAPImData entry');
+  logger.debug('populateModelsWithAPImData entry');
   async.forEach(models,
     function(model, modelCallback) {
       async.forEach(model.files,
         function(typefile, fileCallback) {
           var file = path.join(dir, typefile);
-          debug('Loading data from %s', file);
+          logger.debug('Loading data from %s', file);
           var readfile;
           try {
             // read the content of the files into memory
             // and parse as JSON
-            readfile = JSON.parse(fs.readFileSync(file));
+            readfile = JSON.parse(apimdecrypt(fs.readFileSync(file)));
           } catch(e) {
             fileCallback(e);
             return;
           }
-          debug('filecontents: ', readfile);
+          logger.debug('filecontents: ', readfile);
           // inject 'snapshot-id' property
           readfile.forEach(
             function(obj) {
@@ -778,11 +930,11 @@ function populateModelsWithAPImData(app, models, dir, uid, cb) {
             readfile,
             function(err, mymodel) {
               if (err) {
-                console.error(err);
+                logger.error(err);
                 fileCallback(err);
                 return;
               }
-              debug('%s created: %j',
+              logger.debug('%s created: %j',
                     model.name,
                     mymodel);
               fileCallback();
@@ -795,7 +947,7 @@ function populateModelsWithAPImData(app, models, dir, uid, cb) {
       );
     },
     function(err) {
-      debug('populateModelsWithAPImData exit');
+      logger.debug('populateModelsWithAPImData exit');
       cb(err);
     }
   ); 
@@ -808,7 +960,7 @@ function populateModelsWithAPImData(app, models, dir, uid, cb) {
  * @param {callback} cb - callback that handles error or successful completion
  */
 function populateSnapshot(app, uid, cb) {
-  debug('populateSnapshot entry');
+  logger.debug('populateSnapshot entry');
 
   app.models.snapshot.create(
     {
@@ -818,11 +970,11 @@ function populateSnapshot(app, uid, cb) {
     },
     function(err, mymodel) {
       if (err) {
-        debug('populateSnapshot error');
+        logger.debug('populateSnapshot error');
         cb(err);
         return;
       }
-      debug('populateSnapshot exit: %j', mymodel);
+      logger.debug('populateSnapshot exit: %j', mymodel);
       cb();
     }
   );
@@ -835,7 +987,7 @@ function populateSnapshot(app, uid, cb) {
  * @param {callback} cb - callback that handles error or successful completion
  */
 function updateSnapshot(app, uid, cb) {
-  debug('updateSnapshot entry');
+  logger.debug('updateSnapshot entry');
 
   app.models.snapshot.findOne(
     {
@@ -857,7 +1009,7 @@ function updateSnapshot(app, uid, cb) {
           }
         );
         app.models.snapshot.release(instance.id, function(err) {
-            if (err) console.error(err);
+            if (err) logger.error(err);
           }
         );
       }
@@ -865,7 +1017,7 @@ function updateSnapshot(app, uid, cb) {
   );
   app.models.snapshot.findById(uid, function(err, instance) {
       if (err) {
-        debug('updateSnapshot error(1)');
+        logger.debug('updateSnapshot error(1)');
         cb(err);
         return;
       }
@@ -876,11 +1028,11 @@ function updateSnapshot(app, uid, cb) {
         },
         function(err, instance) {
           if (err) {
-            debug('updateSnapshot error(2)');
+            logger.debug('updateSnapshot error(2)');
             cb(err);
             return;
           }
-          debug('updateSnapshot exit');
+          logger.debug('updateSnapshot exit');
           cb();
         }
       );

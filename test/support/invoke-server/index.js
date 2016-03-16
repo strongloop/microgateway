@@ -1,9 +1,11 @@
 'use strict';
 
+var Promise = require('bluebird');
 var fs = require('fs');
 var zlib = require('zlib');
 var http = require('http');
 var https = require('https');
+var qs = require('qs');
 var ah = require('auth-header');
 
 function theApplication(req, resp) {
@@ -17,6 +19,41 @@ function theApplication(req, resp) {
     });
 
     req.on('end', function() {
+        //special cases
+        if (req.url === '/500') {
+            resp.writeHead(500);
+            resp.write('This is a test for 500 error');
+            resp.end();
+            return;
+        }
+        else if (req.url === '/form-urlencoded') {
+            var postData = qs.stringify({ foo: 'bar', baz: ['qux', 'quux'], corge: '' });
+            resp.writeHead(200, { 'Content-Type': 'application/x-www-form-urlencoded',
+                                  'Content-Length': postData.length });
+            resp.write(postData);
+            resp.end();
+            return;
+        }
+        else if (req.url === '/json') {
+            resp.writeHead(200, { 'Content-Type': 'application/json' });
+            resp.write('{ "qty": 150, "price": 23 }');
+            resp.end();
+            return;
+        }
+        else if (req.url === '/testOutput') {
+            resp.writeHead(202, { 'X-TOKEN-ID': 'foo' });
+            resp.write('You are accepted');
+            resp.end();
+            return;
+        }
+        else if (req.url === '/noChunks') {
+            resp.writeHead(200, { 'Content-Length': 7 });
+            resp.write('1234567');
+            resp.end();
+            return;
+        }
+
+        //general cases
         try {
             //authenticate first
             var authHdr = req.headers.authorization;
@@ -37,12 +74,14 @@ function theApplication(req, resp) {
                     else {
                         resp.writeHead(401);
                         resp.write('Not Authorized');
+                        resp.end();
                         return;
                     }
                 }
                 else {
                     resp.writeHead(401);
                     resp.write('Not Authorized');
+                    resp.end();
                     return;
                 }
             }
@@ -60,6 +99,11 @@ function theApplication(req, resp) {
             data += 'z-content-type: ' + req.headers['content-type'] + '\n';
             data += 'z-content-encoding: ' + encoding + '\n';
             data += 'z-transfer-encoding: ' + req.headers['transfer-encoding'] + '\n';
+            if (req.headers['x-secret-msg1'])
+                data += 'z-secret-1: ' + req.headers['x-secret-msg1'] + '\n';
+            if (req.headers['x-secret-msg2'])
+                data += 'z-secret-2: ' + req.headers['x-secret-msg2'] + '\n';
+
 
             //uncompress the request body
             if (encoding === 'gzip') {
@@ -79,7 +123,8 @@ function theApplication(req, resp) {
             else {
                 var delay = parseInt(req.headers['x-delay-me']);
                 delay = (isNaN(delay) ? 0 : delay);
-                console.log('Server is going to take %d seconds to process', delay);
+                if (delay > 0)
+                    console.log('Server is going to take %d seconds to process', delay);
 
                 //delay the response a little bit
                 setTimeout(function() {

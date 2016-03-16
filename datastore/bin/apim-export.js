@@ -1,6 +1,8 @@
 #! /usr/bin/env node
 
 
+var logger = require('apiconnect-cli-logger/logger.js')
+               .child({loc: 'apiconnect-microgateway:datastore:apim-export'});
 var sgwapimpull = require('../apim-pull'),
     program = require('commander'),
     apimpull = sgwapimpull.pull;
@@ -20,25 +22,25 @@ program
   .parse(process.argv);
 
 
-options['host'] = program.args[0];
-options['port'] = program.port;
-options['timeout'] = program.timeout;
-options['srvca'] = program.srvca;
-options['clikey'] = program.key;
-options['clipass'] = program.pass;
-options['clicert'] = program.cert;
-options['outdir'] = program.outdir;
+options.host = program.args[0];
+options.port = program.port;
+options.timeout = program.timeout;
+options.srvca = program.srvca;
+options.clikey = program.key;
+options.clipass = program.pass;
+options.clicert = program.cert;
+options.outdir = program.outdir;
 
-if (options['host'] == null)  
-{ console.log('<host> required'); program.outputHelp(); process.exit(1);}
+if (options.host == null)  
+{ logger.debug('<host> required'); program.outputHelp(); process.exit(1);}
 if (program.args[1] != null) 
-{ console.log('specify one host only'); program.outputHelp(); process.exit(1);}
+{ logger.debug('specify one host only'); program.outputHelp(); process.exit(1);}
 
 apimpull(options,function(err, response) {
         if (err) {
-            console.error(err);
+            logger.error(err);
         }
-        console.log(response);
+        logger.debug(response);
 });
 
 

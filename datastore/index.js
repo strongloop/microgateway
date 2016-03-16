@@ -1,11 +1,19 @@
 'use strict'
 
-let forever = require('forever-monitor');
+var Promise = require('bluebird');
+var logger = require('apiconnect-cli-logger/logger.js')
+               .child({loc: 'apiconnect-microgateway:datastore'});
+var forever = require('forever-monitor');
 
-let child;
-let server;
+var child;
+var server;
+var sigtermHandler = function() {
+                       child.kill(true);
+                       process.exit(0);
+                     };
+
 exports.start = function(fork) {
-  return new Promise((resolve, reject) => {
+  return new Promise(function(resolve, reject) {
     if (fork) {
       child = new (forever.Monitor)('./datastore/server/server.js', {
         max: 10,
@@ -15,20 +23,30 @@ exports.start = function(fork) {
       });
 
       child.on('restart', function() {
-        console.error('datastore restarting, count=' + child.times);
+        logger.debug('datastore restarting, count=' + child.times);
       });
 
       child.on('exit', function() {
-        console.error('datastore exited');
+        logger.debug('datastore exited');
       });
 
+      var dataStorePort, https, loaded;
       child.on('message', function(msg) {
-        if (msg.DATASTORE_PORT) {
-          process.env.DATASTORE_PORT = msg.DATASTORE_PORT;
+        if (msg.DATASTORE_PORT != null) {
+          dataStorePort = msg.DATASTORE_PORT;
         }
         if (msg.LOADED) {
+          loaded = true;
+        }
+        if (msg.https != null) {
+          https = msg.https;
+        }
+        // waiting for both events, seen scenario where
+        // they come out of order..
+        if (loaded && dataStorePort) {
           child.removeAllListeners('message');
-          resolve();
+          process.env.DATASTORE_PORT = dataStorePort;
+          resolve(https);
         }
       });
 
@@ -42,16 +60,13 @@ exports.start = function(fork) {
 
       child.start();
 
-      process.on('SIGTERM', function() {
-        child.kill(true);
-        process.exit(0);
-      });
+      process.on('SIGTERM', sigtermHandler);
 
     } else {
       process.send = function(msg) {
         if (msg.LOADED) {
-          process.send = () => {};
-          resolve();
+          process.send = function() {};
+          resolve(msg.https);
         }
       };
       server = require('./server/server.js');
@@ -61,13 +76,19 @@ exports.start = function(fork) {
 };
 
 exports.stop = function() {
-  return new Promise((resolve, reject) => {
+  return new Promise(function(resolve, reject) {
     if (child) {
+      child.on('exit', function() {
+        child = undefined; // reset child
+        resolve();
+      });
       child.stop();
-      resolve();
+
+      process.removeListener('SIGTERM', sigtermHandler);
     }
     if (server) {
-      server.close(() => {
+      server.close(function() {
+        server = undefined; // reset server
         resolve();
       });
     }

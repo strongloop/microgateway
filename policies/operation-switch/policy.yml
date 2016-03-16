@@ -3,6 +3,7 @@ policy: 1.1.0
 info:
   title: Operation-Switch
   name: apim-operation-switch
+  version: 1.0.0
   description: Operation-Switch policy for the IBM API Connect
   contact:
     name: IBM API Mesh Samples
@@ -10,8 +11,6 @@ info:
     email: steve-product-manager@ibm.com
 properties:
   type: "object"
-  required:
-    - case
   properties:
     title:
       type: string
@@ -46,4 +45,6 @@ properties:
             minItems: 1
             items:
               $ref: '#/definitions/assembly-policy'
+  required:
+    - case
 

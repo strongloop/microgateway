@@ -1,29 +1,86 @@
 'use strict';
-const vm    = require('vm');
-const _     = require('lodash');
-const debug = require('debug')('policy:javascript');
+var vm    = require('vm');
+var _     = require('lodash');
+var logger = require('apiconnect-cli-logger/logger.js')
+               .child({loc: 'apiconnect-microgateway:policies:javascript'});
+
+function consoleProxy (log) {
+  // Create a console API proxy around Bunyan-based flow logger
+
+  /*
+   logger.fatal()
+   logger.error()
+   logger.warn()
+   logger.info()
+   logger.debug()
+   logger.trace()
+   */
+
+  function fatal () {
+    log.fatal.apply(log, arguments);
+  }
+
+  function error () {
+    log.error.apply(log, arguments);
+  }
+
+  function warn () {
+    log.warn.apply(log, arguments);
+  }
+
+  function info () {
+    log.info.apply(log, arguments);
+  }
+
+  function debug () {
+    log.debug.apply(log, arguments);
+  }
+
+  function trace () {
+    log.debug.apply(log, arguments);
+  }
+
+  return {
+    log: info,
+    info: info,
+    error: error,
+    warn: warn,
+    trace: trace
+  };
+}
 
 module.exports = function(config) {
-  return function(props, context, next) {
-    debug('ENTER JavaScript');
+  var javascriptPolicyHandler = function(props, context, flow) {
+    var logger = flow.logger;
+    logger.debug('ENTER javascript policy');
+
     if (_.isUndefined(props.source) || !_.isString(props.source)) {
-      next({name:'JavaScriptError', value: 'Invalid JavaScript code'});
+      flow.fail({name:'JavaScriptError', value: 'Invalid JavaScript code'});
       return;
     }
     //need to wrap the code snippet into a function first
-    var script = new vm.Script('() => {' + props.source + '}()');
     try {
+      var script = new vm.Script('(function() {' + props.source + '\n})()');
       //use context as this to run the wrapped function
+      //and also console for logging
+      var origProto = context.__proto__;
+      var newProto = Object.create(context.__proto__);
+      newProto.console = consoleProxy(flow.logger);
+      context.__proto__ = newProto;
       script.runInNewContext(context);
-      debug('EXIT');
-      next();
+      context.__proto__ = origProto;
+      logger.debug('EXIT');
+      flow.proceed();
     } catch (e) {
-      debug('EXIT with an error:%s', e);
+      logger.debug('EXIT with an error:%s', e);
       if ( e.name ) {
-        next(e);
+        flow.fail(e);
       } else {
-        next({name: 'JavaScriptError', value: '' + e});
+        flow.fail({name: 'JavaScriptError', message: '' + e});
       }
     }
   };
+  //disable param resolving
+  javascriptPolicyHandler.skipParamResolving = true;
+  return javascriptPolicyHandler;
 };

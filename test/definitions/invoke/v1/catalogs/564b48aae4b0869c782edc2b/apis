@@ -32,6 +32,49 @@
                         "description": "200 OK"
                      }
                   }
+               },
+               "head": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/encode": {
+               "post": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/decode": {
+               "get": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/dynHost": {
+               "get": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/test500Error": {
+               "get": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
                }
             },
             "/testTLS": {
@@ -80,7 +123,25 @@
                }
             },
             "/testOutput": {
-               "post": {
+               "get": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/testContentLength": {
+               "get": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/testJSON": {
+               "get": {
                   "responses": {
                      "200": {
                         "description": "200 OK"
@@ -103,13 +164,83 @@
                                  },
                                  {
                                     "path": "/basic",
+                                    "verb": "HEAD"
+                                 },
+                                 {
+                                    "path": "/basic",
                                     "verb": "GET"
+                                 },
+                                 {
+                                    "path": "/encode",
+                                    "verb": "POST"
                                  }
                               ],
                               "execute": [
                                  {
                                     "invoke": {
                                        "target-url": "http://localhost:8889/$(request.path)"
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/decode",
+                                    "verb": "GET"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://localhost:8889/form-urlencoded"
+                                    }
+                                 },
+                                 {
+                                    "if": {
+                                       "condition": "request.headers['x-test-postflow'] !== 'yes'",
+                                       "execute": [
+                                          {
+                                             "set-variable": {
+                                                "actions": [
+                                                   {
+                                                      "set": "message.body",
+                                                      "value": "Found the parameter 'baz'=$(message.body.baz) in the message.body"
+                                                   }
+                                                ]
+                                             }
+                                          }
+                                       ]
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/dynHost",
+                                    "verb": "GET"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://$(request.headers.x-test-hostname):8889/$(request.path)"
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/test500Error",
+                                    "verb": "GET"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://localhost:8889/500"
                                     }
                                  }
                               ]
@@ -204,19 +335,13 @@
                                     "set-variable": {
                                        "actions": [
                                           {
-                                             "set": "foo.body",
-                                             "value": "This is the custom request body"
-                                          }
-                                       ]
-                                    }
-                                 },
-                                 {
-                                    "set-variable": {
-                                       "actions": [
-                                          {
-                                             "set": "foo.headers",
+                                             "set": "foo.bar",
                                              "value": {
-                                                "X-FOO-HDR": "the custom header"
+                                                 "body" : "This is a custom body message for the invoke policy",
+                                                 "headers" : {
+                                                     "X-SECRET-MSG1": "test 123",
+                                                     "X-SECRET-MSG2": "hello amigo"
+                                                 }
                                              }
                                           }
                                        ]
@@ -225,7 +350,7 @@
                                  {
                                     "invoke": {
                                        "target-url": "http://localhost:8889/$(request.path)",
-                                       "timeout": 5
+                                       "input": "foo.bar"
                                     }
                                  }
                               ]
@@ -234,14 +359,51 @@
                               "operations": [
                                  {
                                     "path": "/testOutput",
-                                    "verb": "POST"
+                                    "verb": "GET"
                                  }
                               ],
                               "execute": [
                                  {
                                     "invoke": {
-                                       "target-url": "http://localhost:8889/$(request.path)",
-                                       "timeout": 5,
+                                       "target-url": "http://localhost:8889/testOutput",
+                                       "output": "foo.bar"
+                                    }
+                                 },
+                                 {
+                                    "set-variable": {
+                                       "actions": [
+                                          {
+                                             "set": "message.body",
+                                             "value": "$(foo.bar.body)"
+                                          },
+                                          {
+                                             "set": "message.headers",
+                                             "value": "$(foo.bar.headers)"
+                                          },
+                                          {
+                                             "set": "message.statusCode",
+                                             "value": "$(foo.bar.statusCode)"
+                                          },
+                                          {
+                                             "set": "message.reasonPhrase",
+                                             "value": "$(foo.bar.reasonPhrase)"
+                                          }
+                                       ]
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/testContentLength",
+                                    "verb": "GET"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://localhost:8889/noChunks",
                                        "output": "foo"
                                     }
                                  },
@@ -249,8 +411,38 @@
                                     "set-variable": {
                                        "actions": [
                                           {
-                                             "set": "foo",
-                                             "value": "message"
+                                             "set": "message.body",
+                                             "value": "This is a very long message, longer than the foo.body. Just to test the mismatch Content-Length"
+                                          },
+                                          {
+                                             "set": "message.headers",
+                                             "value": "$(foo.headers)"
+                                          }
+                                       ]
+                                    }
+                                 }
+                             ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/testJSON",
+                                    "verb": "GET"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://localhost:8889/json",
+                                       "output": "foo"
+                                    }
+                                 },
+                                 {
+                                    "set-variable": {
+                                       "actions": [
+                                          {
+                                             "set": "message.body",
+                                             "value": "The quantity is $(foo.body.qty) and the price is $(foo.body.price)"
                                           }
                                        ]
                                     }
@@ -269,14 +461,8 @@
                               "actions": [
                                  {
                                     "set": "message.body",
-                                    "value": "$(error.message)"
-                                 }
-                              ]
-                           }
-                        },
-                        {
-                           "set-variable": {
-                              "actions": [
+                                    "value": "'$(error.name)' $(error.message)"
+                                 },
                                  {
                                     "set": "message.statusCode",
                                     "value": 299
