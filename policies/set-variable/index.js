@@ -27,7 +27,7 @@ module.exports = function(config) {
         else if (action.hasOwnProperty('clear')) {
             logger.debug('clear the "%s"', action.clear);
 
-            context.set(action.clear, '');
+            context.del(action.clear);
         }
         else {
             logger.error('Action is not one of set, add, and clear.');
