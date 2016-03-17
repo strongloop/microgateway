@@ -88,4 +88,5 @@ x-ibm-configuration:
               actions:
                 - set: message.body
                   value: "$(error.name): $(error.message)"
-
+schemes:
+  - http
