@@ -74,5 +74,6 @@
     "rolling-rate-limiter": "^0.1.2",
     "type-is": "^1.6.11",
     "yamljs": "^0.2.4"
-  }
+  },
+  "APIConnectGateway": "1.0.0"
 }

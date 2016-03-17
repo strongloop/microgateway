@@ -18,3 +18,5 @@ x-ibm-configuration:
           target-url: 'http://localhost:8889/'
   cors:
     enabled: true
+schemes:
+  - http

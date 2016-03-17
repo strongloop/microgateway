@@ -2,7 +2,7 @@ language: node_js
 node_js:
 - '0.12'
 - '4'
-- '5'
+- '5.8'
 before_install:
 - npm config set registry=http://apim-ci1.rtp.raleigh.ibm.com:4873/
 

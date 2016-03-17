@@ -257,3 +257,6 @@ parameters:
     description: X-PARAM-REF-2
     type: boolean
     required: false
+
+schemes:
+  - http
