@@ -1,0 +1,21 @@
+language: node_js
+node_js:
+- '0.12'
+- '4'
+- '5.8'
+before_install:
+- npm config set registry=http://apim-ci1.rtp.raleigh.ibm.com:4873/
+
+# env:
+#   global:
+#     secure: OxFSv9JKJlxyiACsI0KEzsu1lP10wjt07ZtmtlT5/i2rfSTUMK+1euUUR8Dy7jklyIvZ8AkOl1B7peeWfAyfe6EP3cbeWX/0ZgAxe0vzSu2l0K+A6B4UXc6CM+NJ4KZ7LvMquDwu8g1nRRQt23HZxZssW8/gXipEAxrBIcY+iZg=
+# before_deploy:
+# - npm config set registry=http://apimdev1136.hursley.ibm.com:55502
+# - npm config set //apimdev1136.hursley.ibm.com:55502/:_authToken=$NPM_TOKEN
+# - npm install -g strong-tools
+# deploy:
+#   provider: script
+#   script: slt-stage
+#   on:
+#     branch: master
+#     node: '4'

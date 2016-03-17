@@ -42,7 +42,7 @@ describe('Error middleware', function() {
     app.use(context());
     app.use(function(req, resp, next) {
       req.ctx.set('error.statusCode', 777);
-      req.ctx.set('error.statusMessage', 'Not Allowed');
+      req.ctx.set('error.reasonPhrase', 'Not Allowed');
       next('error');
     });
     app.use(errhandler());

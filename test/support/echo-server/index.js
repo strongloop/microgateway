@@ -37,7 +37,7 @@ app.get('/slowauth', function(req, resp) {
     } else {
       resp.sendStatus(401);
     }
-  }, 12000);
+  }, 125000);
 });
 
 app.get('/*', function(req, resp) {
