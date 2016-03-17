@@ -204,7 +204,7 @@ describe('basic auth policy', function() {
     });
 
     //it('should timeout', function (done) {
-    //  this.timeout(15000);
+    //  this.timeout(150000);
     //  request
     //  .get('/basic/slow-basic-http')
     //  .auth('root', 'Hunter2')
