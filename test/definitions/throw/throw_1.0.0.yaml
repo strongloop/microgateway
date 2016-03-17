@@ -31,3 +31,5 @@ x-ibm-configuration:
                 - set: message.body
                   value: The unknown error is handled
 
+schemes:
+  - http

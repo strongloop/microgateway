@@ -1,12 +1,11 @@
 info:
   version: 1.0.0
-  title: ratelimit
-  x-ibm-name: ratelimit
-  description: ratelimit test suite
-basePath: /ratelimit
+  title: cors-default
+  x-ibm-name: cors-default
+basePath: /cors-default
 swagger: '2.0'
 paths:
-  /ratelimit:
+  /path-cors:
     get:
       responses:
         '200':

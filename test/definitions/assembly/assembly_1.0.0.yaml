@@ -65,3 +65,6 @@ x-ibm-configuration:
               execute:
                 - javascript2:
                     title: write context variable to message.body
+
+schemes:
+  - http
