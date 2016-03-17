@@ -503,6 +503,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             Object.getOwnPropertyNames(defaultApiProperties).forEach(
               function(propertyName){
                 if (pieces.catalog.name &&
+                    ibmSwaggerExtension.catalogs &&
                     ibmSwaggerExtension.catalogs[pieces.catalog.name] &&
                     ibmSwaggerExtension.catalogs[pieces.catalog.name].properties[propertyName]) {
                   apiProperties[propertyName] = ibmSwaggerExtension.catalogs[pieces.catalog.name].properties[propertyName];
