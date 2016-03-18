@@ -36,8 +36,15 @@ describe('throw policy', function() {
   it('throw-and-catch', function(done) {
     request
       .get('/throw/basic')
-      .set('X-FOO-ID', 'foo')
-      .expect(200, /Caught foo: Throw the x-foo-id on purpose/, done);
+      .set('X-ERROR-ID', 'foo')
+      .expect(200, /Caught the foo error: Throw on purpose/, done);
+  });
+
+  it('throw-without-catch', function(done) {
+    request
+      .get('/throw/basic')
+      .set('X-ERROR-ID', 'bar')
+      .expect(500, /{"name":"bar","message":"Throw on purpose"}/, done);
   });
 
 });

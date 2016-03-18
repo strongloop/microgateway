@@ -276,10 +276,12 @@ function _main(props, context, next, logger, tlsProfile) {
     try {
         request = http.request(options, function(response) {
             //read the response
-            writeDst.statusCode = response.statusCode;
-            writeDst.reasonPhrase = response.reasonPhrase;
+            writeDst.status = {
+                code: response.statusCode,
+                reason: response.reasonPhrase
+            };
             logger.info('[invoke] response is received: %d, %s',
-                writeDst.statusCode, writeDst.reasonPhrase);
+                writeDst.status.code, writeDst.status.reason);
             writeDst.headers = {};
 
             //note: there is no response.rawHeaders for node v0.10.43

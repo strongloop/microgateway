@@ -41,8 +41,8 @@ describe('Error middleware', function() {
     var app = express();
     app.use(context());
     app.use(function(req, resp, next) {
-      req.ctx.set('error.statusCode', 777);
-      req.ctx.set('error.reasonPhrase', 'Not Allowed');
+      req.ctx.set('error.status.code', 777);
+      req.ctx.set('error.status.reason', 'Not Allowed');
       next('error');
     });
     app.use(errhandler());
