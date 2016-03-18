@@ -1,0 +1,27 @@
+info:
+  version: 1.0.0
+  title: cors-options
+  x-ibm-name: cors-options
+basePath: /cors-options
+swagger: '2.0'
+paths:
+  /path-cors:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+  /path-cors:
+    options:
+      responses:
+        '200':
+          description: 200 OK
+x-ibm-configuration:
+  assembly:
+    execute:
+      - invoke:
+          title: invoke
+          target-url: 'http://localhost:8889/'
+  cors:
+    enabled: true
+schemes:
+  - http

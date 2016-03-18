@@ -63,6 +63,13 @@ describe('javascript policy', function() {
       .expect(200, /foo: this is a dummy message/, done);
   });
 
+  it('throw and catch a custom error object', function(done) {
+    request
+      .get('/javascript/throwErrorObject')
+      .set('X-VALUE', 'bar')
+      .expect(200, /Catch the bar error!/, done);
+  });
+
   it('no param resolving', function(done) {
     request
       .get('/javascript/no-param-resolving')

@@ -2,15 +2,15 @@ policy: 1.0.0
 
 info:
   title: Set Variable
-  name: apim.setvariable
+  name: set-variable
   version: 1.0.0
   description: Sets Variables in the runtime
   appliesTo:
     - API
   contact:
-    name: Steve Product Manager
-    url: http://developer.acme.com/contacturl
-    email: steve-product-manager@someemailservice.com
+    name: IBM API Management
+    url: http://www.ibm.com/apimanagement
+    email: ibmapi@us.ibm.com
 
 attach:
   - rest
@@ -18,38 +18,68 @@ attach:
 
 properties:
   $schema: "http://json-schema.org/draft-04/schema#"
-  title: "Set, Add or Clear a runtime variable"
-  description: "Set, Add or Clear a runtime variable"
-  type: object
-  properties:
-    setVariable:
-      label: "Set Variable"
-      description: "Set, Add or Clear a runtime variable"
-      type: array
-      items:
-        type: object
-        properties:
-          action:
-            default: Set
-            description: Action
-            enum:
-              - Add
-              - Set
-              - Clear
-            label: Action
-            type: string
-          name:
-            description: "Variable Name"
-            label: Name
-            type: string
-          value:
-            description: "Variable Value"
-            label: Value
-            type: string
-        required:
-          - action
-          - name
+  title: Set, Add or Clear a runtime variable
+  description: Set, Add or Clear a runtime variable
+  type: "object"
   required:
-    - setVaraiable
+    - "actions"
+  properties:
+    title:
+      label: Policy title 
+      description: Short but descriptive name for this policy
+      type: "string"
+    description:
+      label: Policy description
+      description: Longer and descriptive name for this policy
+      type: "string"
+    actions:
+      type: "array"
+      items:
+        oneOf:
+          - type: "object"
+            additionalProperties: false
+            required:
+              - "set"
+              - "value"
+            properties:
+              set:
+                label: Variable name
+                description: The name of the variable that will be set
+                type: "string"
+              value:
+                label: Variable value
+                description: The value that the variable will be set to
+                oneOf:
+                  - type: "string"
+                  - type: "number"
+                  - type: "boolean"
+                  - type: "integer"
+          - type: "object"
+            additionalProperties: false
+            required:
+              - "add"
+              - "value"
+            properties:
+              add:
+                label: Variable name
+                description: The name of the variable that will be added
+                type: "string"
+              value:
+                label: Variable value
+                description: Value for the variable that will be added
+                oneOf:
+                  - type: "string"
+                  - type: "number"
+                  - type: "boolean"
+                  - type: "integer"
+          - type: "object"
+            additionalProperties: false
+            required:
+              - "clear"
+            properties:
+              clear:
+                label: Variable name
+                description: The name of the variable that will be cleared
+                type: "string"
   throw:
     - PropertyError

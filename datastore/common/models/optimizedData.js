@@ -341,7 +341,8 @@ function annotateAPIs(listOfApis, callback) {
       // Some customers add their own extension to the swagger,
       // so we will make the swagger available in context to customers.
       var swaggerWithoutAssembly = cloneJSON(api.document);
-      delete swaggerWithoutAssembly['x-ibm-configuration'].assembly;
+      if (swaggerWithoutAssembly['x-ibm-configuration'])
+        delete swaggerWithoutAssembly['x-ibm-configuration'].assembly;
       api['document-wo-assembly'] = swaggerWithoutAssembly;
 
       // populate 'document-resolved'
@@ -503,6 +504,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             Object.getOwnPropertyNames(defaultApiProperties).forEach(
               function(propertyName){
                 if (pieces.catalog.name &&
+                    ibmSwaggerExtension.catalogs &&
                     ibmSwaggerExtension.catalogs[pieces.catalog.name] &&
                     ibmSwaggerExtension.catalogs[pieces.catalog.name].properties[propertyName]) {
                   apiProperties[propertyName] = ibmSwaggerExtension.catalogs[pieces.catalog.name].properties[propertyName];

@@ -30,7 +30,7 @@ exports.start = function(fork) {
         logger.debug('datastore exited');
       });
 
-      var dataStorePort, https, loaded;
+      var dataStorePort, https = false, loaded = false;
       child.on('message', function(msg) {
         if (msg.DATASTORE_PORT != null) {
           dataStorePort = msg.DATASTORE_PORT;
@@ -66,9 +66,14 @@ exports.start = function(fork) {
 
     } else {
       process.send = function(msg) {
+        var https = false;
+        if (msg.https != null) {
+          https = msg.https;
+        }
+
         if (msg.LOADED) {
           process.send = function() {};
-          resolve(msg.https);
+          resolve(https);
         }
       };
       server = require('./server/server.js');

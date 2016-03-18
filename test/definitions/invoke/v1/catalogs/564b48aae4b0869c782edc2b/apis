@@ -381,12 +381,12 @@
                                              "value": "$(foo.bar.headers)"
                                           },
                                           {
-                                             "set": "message.statusCode",
-                                             "value": "$(foo.bar.statusCode)"
+                                             "set": "message.status.code",
+                                             "value": "$(foo.bar.status.code)"
                                           },
                                           {
-                                             "set": "message.reasonPhrase",
-                                             "value": "$(foo.bar.reasonPhrase)"
+                                             "set": "message.status.reason",
+                                             "value": "$(foo.bar.status.reason)"
                                           }
                                        ]
                                     }
@@ -464,7 +464,7 @@
                                     "value": "'$(error.name)' $(error.message)"
                                  },
                                  {
-                                    "set": "message.statusCode",
+                                    "set": "message.status.code",
                                     "value": 299
                                  }
                               ]

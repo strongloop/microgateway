@@ -1,0 +1,22 @@
+info:
+  version: 1.0.0
+  title: httpandhttps
+  x-ibm-name: httpandhttps
+  description: https test suite
+basePath: /httpandhttps
+swagger: '2.0'
+paths:
+  /httpandhttps:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+x-ibm-configuration:
+  assembly:
+    execute:
+      - invoke:
+          title: invoke
+          target-url: 'http://localhost:8889/'
+schemes:
+  - https
+  - http

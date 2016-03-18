@@ -17,3 +17,5 @@ x-ibm-configuration:
       - invoke:
           title: invoke
           target-url: 'http://localhost:8889/'
+schemes:
+  - http

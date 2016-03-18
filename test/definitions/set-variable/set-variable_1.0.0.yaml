@@ -43,4 +43,20 @@ x-ibm-configuration:
       - invoke:
           title: invoke
           target-url: $(target-url)
+      - if:
+          condition: "'$(request.headers.custom-status-code)'"
+          execute:
+            - set-variable:
+                actions:
+                  - set: message.status.code
+                    value: $(request.headers.custom-status-code)
+      - if:
+          condition: "'$(request.headers.custom-status-reason)'"
+          execute:
+            - set-variable:
+                actions:
+                  - set: message.status.reason
+                    value: $(request.headers.custom-status-reason)
 
+schemes:
+  - http
