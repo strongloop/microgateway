@@ -48,7 +48,7 @@ x-ibm-configuration:
               value: Initial value
       - set-variable:
           actions:
-            - set: message.statusCode
+            - set: message.status.code
               value: 500
       - operation-switch:
           case:
@@ -58,7 +58,7 @@ x-ibm-configuration:
               execute:
                 - set-variable:
                     actions:
-                      - set: message.statusCode
+                      - set: message.status.code
                         value: 200
                 - set-variable:
                     actions:
@@ -70,7 +70,7 @@ x-ibm-configuration:
               execute:
                 - set-variable:
                     actions:
-                      - set: message.statusCode
+                      - set: message.status.code
                         value: 200
                 - set-variable:
                     actions:
@@ -82,7 +82,7 @@ x-ibm-configuration:
               execute:
                 - set-variable:
                     actions:
-                      - set: message.statusCode
+                      - set: message.status.code
                         value: 200
                 - set-variable:
                     actions:
@@ -94,7 +94,7 @@ x-ibm-configuration:
               execute:
                 - set-variable:
                     actions:
-                      - set: message.statusCode
+                      - set: message.status.code
                         value: 200
                 - set-variable:
                     actions:
@@ -110,7 +110,7 @@ x-ibm-configuration:
                         value: Deleting orders is not allowed
                 - set-variable:
                     actions:
-                      - set: message.statusCode
+                      - set: message.status.code
                         value: 500
 
 schemes:
