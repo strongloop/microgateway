@@ -64,5 +64,36 @@ describe('set-variable policy', function() {
       .expect(200, done);
   });
 
+  it('should able to set custom status code', function(done) {
+    request
+      .post('/set-variable/set-variable')
+      .set('set-variable-case', 'set')
+      .set('custom-status-code', 666)
+      .expect(666, done);
+  });
+
+  it('should able to set custom status reason', function(done) {
+    request
+      .post('/set-variable/set-variable')
+      .set('set-variable-case', 'set')
+      .set('custom-status-reason', 'Foobar')
+      .expect(function(res, done) {
+        if (res.res.statusMessage !== 'Foobar') throw new Error("status reason should be 'Foobar'");
+      })
+      .expect(200, done);
+  });
+
+  it('should able to set custom status code and reason', function(done) {
+    request
+      .post('/set-variable/set-variable')
+      .set('set-variable-case', 'set')
+      .set('custom-status-code', '303')
+      .set('custom-status-reason', 'Foobar')
+      .expect(function(res, done) {
+        if (res.res.statusMessage !== 'Foobar') throw new Error("status reason should be 'Foobar'");
+      })
+      .expect(303, done);
+  });
+
 });
 
