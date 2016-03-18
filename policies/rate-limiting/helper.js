@@ -8,7 +8,7 @@ exports.handleResponse =
     if (remaining < 0 && reject) {
       var resMsg = setupHeaders();
       var err = new Error('Rate limit exceeded');
-      err.statusCode = 429;
+      err.status = { code: 429 };
       err.name = 'RateLimitExceeded';
       context.error = err;
       logger.debug('Rate limit exceeded: %j', err);
