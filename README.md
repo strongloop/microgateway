@@ -4,7 +4,7 @@ collection of components providing solutions for API creation, deployment,
 lifecycle management, monitization, and enforcement. The micro gateway is
 fundamentally a proxy securing and forwarding requests to a back end API.
 It was created using StrongLoop technology and a series of middleware
-components. The package is customize to work with the apiconnect 
+components. The package is customized to work with the apiconnect 
 infrastructure that automatically communicates with the micro gateway to
 dynamically load APIs, Products, and Plans so that APIs are secured and
 processed in a seamless fashion.
