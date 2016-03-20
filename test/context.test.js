@@ -30,6 +30,8 @@ describe('Context middleware', function() {
         verb:           ctx.get('request.verb'),
         uri:            ctx.get('request.uri'),
         path:           ctx.get('request.path'),
+        search:         ctx.get('request.search'),
+        querystring:    ctx.get('request.querystring'),
         headers:        ctx.get('request.headers'),
         'content-type': ctx.get('request.content-type'),
         authorization:  ctx.get('request.authorization')
@@ -39,6 +41,8 @@ describe('Context middleware', function() {
       assert.strictEqual(ctx.request.verb, ctx.get('request.verb'));
       assert.strictEqual(ctx.request.uri, ctx.get('request.uri'));
       assert.strictEqual(ctx.request.path, ctx.get('request.path'));
+      assert.strictEqual(ctx.request.search, ctx.get('request.search'));
+      assert.strictEqual(ctx.request.querystring, ctx.get('request.querystring'));
       assert(_.isEqual(ctx.request.headers, ctx.get('request.headers')));
       assert.strictEqual(ctx.request['content-type'],
                          ctx.get('request.content-type'));
@@ -50,8 +54,8 @@ describe('Context middleware', function() {
     });
 
     function verifyResponse(res, expected) {
-      var variables = ['verb', 'uri', 'path', 'content-type',
-                        'authorization'];
+      var variables = ['verb', 'uri', 'path', 'search', 'querystring',
+                        'content-type', 'authorization'];
       variables.forEach(function(value) {
         assert.strictEqual(res.body[value], expected[value],
                            'request.' + value);
@@ -79,6 +83,8 @@ describe('Context middleware', function() {
         verb: 'GET',
         uri: '/',
         path: '/',
+        search: '',
+        querystring: '',
         'content-type': undefined,
         authorization: undefined,
         headers: {}
@@ -97,6 +103,8 @@ describe('Context middleware', function() {
         verb: 'GET',
         uri: '/x/y/z',
         path: '/x/y/z',
+        search: '',
+        querystring: '',
         'content-type': undefined,
         authorization: undefined,
         headers: {}
@@ -115,6 +123,8 @@ describe('Context middleware', function() {
         verb: 'GET',
         uri: '/foo/bar?param1=1&param2=2',
         path: '/foo/bar',
+        search: '?param1=1&param2=2',
+        querystring: 'param1=1&param2=2',
         'content-type': undefined,
         authorization: undefined,
         headers: {}
@@ -133,6 +143,8 @@ describe('Context middleware', function() {
         verb: 'GET',
         uri: '/foo/bar?param1=1&param2=2',
         path: '/foo/bar',
+        search: '?param1=1&param2=2',
+        querystring: 'param1=1&param2=2',
         'content-type': undefined,
         authorization: undefined,
         headers: {
@@ -149,17 +161,19 @@ describe('Context middleware', function() {
         .end(done);
     });
 
-    it('should support "HTTP POST /foo"', function(done) {
+    it('should support "HTTP POST /foo?x=1"', function(done) {
       var expect = {
         verb: 'POST',
-        uri: '/foo',
+        uri: '/foo?x=1',
         path: '/foo',
+        search: '?x=1',
+        querystring: 'x=1',
         'content-type': 'application/json',
         authorization: undefined,
         headers: {}
       };
       request(app)
-        .post('/foo')
+        .post('/foo?x=1')
         .set(API_PATH_HEADER, '/foo')
         .send({message: 'Hello World'})
         .expect(function(res) {
