@@ -22,7 +22,7 @@ The data store could contain sensitive information 'in the clear' so access to t
 - APIMANAGER_CATALOG : Catalog that the Micro Gateway is responsible for servicing. (on-premises only)
 - APIMANAGER_PORT : Port to connect to the API Connect management server on. (on-premises only)
 - APIMANAGER_REFRESH_INTERVAL : Interval in milliseconds (defaults to 15 minutes) on how long to wait before fetching updated artifacts from the API Connect management server (on-premises only)
-- CONFIGDIR :
+- CONFIG_DIR :
   Directory of Swagger to load. (On-premises and laptop, this is used for initial load. On-premises loads into ./config for subsequent loads.)
 - DATASTORE_PORT : Port for the data store to listen for requests on.
   By default, the data store binds to port 0, causing an ephemeral port listen
