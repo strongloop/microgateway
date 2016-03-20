@@ -383,11 +383,6 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
           // use JSON-ref resolved document if available
           var apiDocument = api['document-resolved'] || api.document;
 
-          // remove the trailing /
-          apiDocument.basePath = apiDocument.basePath[apiDocument.basePath.length-1] === '/' ? 
-                             apiDocument.basePath.substr(0, apiDocument.basePath.length-1) : 
-                             apiDocument.basePath;
-                             
           var pathsProp = apiDocument.paths;
           logger.debug('pathsProp ' +
                 Object.getOwnPropertyNames(pathsProp));
@@ -616,6 +611,16 @@ function makePathRegex(basePath, apiPath) {
   logger.debug('path: ', path);
   var braceBegin = -1;
   var braceEnd = -1;
+
+  // remove the trailing /
+  if (basePath) {
+    basePath = basePath[basePath.length-1] === '/' ? 
+                       basePath.substr(0, basePath.length-1) : 
+                       basePath;
+  } else {
+    basePath = '';
+  }
+
   do {
     braceBegin = path.indexOf('{');
     if (braceBegin >= 0) {
@@ -624,7 +629,11 @@ function makePathRegex(basePath, apiPath) {
       path = path.replace(variablePath, ".+");
     }
   } while (braceBegin >= 0);
-  path = '^' + basePath + path + '$';
+  if (apiPath === '/') {
+    path = '^' + basePath + '$';
+  } else {
+    path = '^' + basePath + path + '$';
+  }
   logger.debug('path after: ', path);
   return path;
 }
