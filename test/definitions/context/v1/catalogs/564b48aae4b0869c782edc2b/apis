@@ -387,7 +387,7 @@
                 "assembly": {
                     "execute": [{
                     "javascript": {
-                            "source": "message.body = {\n  api: get('api'),\n  client: get('client'),\n  env: get('env'),\n  plan: get('plan'),\n  internal: {consumes: _.api.consumes, id: _.api.id, operation: _.api.operation, operationId: _.api.operationId, path: _.api.path}\n};set('message.headers.content-type','application/json');\n"
+                       "source": "try {\n  message.body = {\n    api: get('api'),\n    client: get('client'),\n    env: get('env'),\n    plan: get('plan'),\n    request: {\n      path: get('request.path'),\n      querystring: get('request.querystring'),\n      search: get('request.search'),\n      uri: get('request.uri')\n    },\n    internal: {\n      consumes: _.api.consumes,\n      id: _.api.id,\n      operation: _.api.operation,\n      operationId: _.api.operationId,\n      path: _.api.path\n    }\n  };\n  set('message.headers.Content-Type','application/json');\n\n} catch (error) {\n  console.error('error when running JavaScript'+ error);\n  throw error;\n}\n"
                             }
                                 }]
                 },
@@ -759,7 +759,7 @@
                 "assembly": {
                     "execute": [{
                         "javascript": {
-                            "source": "message.body = {\n  api: get('api'),\n  client: get('client'),\n  env: get('env'),\n  plan: get('plan'),\n  internal: {consumes: _.api.consumes, id: _.api.id, operation: _.api.operation, operationId: _.api.operationId, path: _.api.path}\n};set('message.headers.content-type','application/json');\n"
+                           "source": "try {\n  message.body = {\n    api: get('api'),\n    client: get('client'),\n    env: get('env'),\n    plan: get('plan'),\n    request: {\n      path: get('request.path'),\n      querystring: get('request.querystring'),\n      search: get('request.search'),\n      uri: get('request.uri')\n    },\n    internal: {\n      consumes: _.api.consumes,\n      id: _.api.id,\n      operation: _.api.operation,\n      operationId: _.api.operationId,\n      path: _.api.path\n    }\n  };\n  set('message.headers.Content-Type','application/json');\n\n} catch (error) {\n  console.error('error when running JavaScript '+ error);\n  throw error;\n}\n"
                                 }
                                 }]
                 },
@@ -1107,7 +1107,7 @@
                 "assembly": {
                     "execute": [{
                         "javascript": {
-                            "source": "message.body = {\n  api: get('api'),\n  client: get('client'),\n  env: get('env'),\n  plan: get('plan'),\n  internal: {consumes: _.api.consumes, id: _.api.id, operation: _.api.operation, operationId: _.api.operationId, path: _.api.path}\n};set('message.headers.content-type','application/json');\n"
+                           "source": "try {\n  message.body = {\n    api: get('api'),\n    client: get('client'),\n    env: get('env'),\n    plan: get('plan'),\n    request: {\n      path: get('request.path'),\n      querystring: get('request.querystring'),\n      search: get('request.search'),\n      uri: get('request.uri')\n    },\n    internal: {\n      consumes: _.api.consumes,\n      id: _.api.id,\n      operation: _.api.operation,\n      operationId: _.api.operationId,\n      path: _.api.path\n    }\n  };\n  set('message.headers.Content-Type','application/json');\n\n} catch (error) {\n  console.error('error when running JavaScript '+ error);\n  throw error;\n}\n"
                                 }
                                 }]
                 },
@@ -1734,7 +1734,7 @@
         "assembly": {
                     "execute": [{
                         "javascript": {
-                            "source": "message.body = {\n  api: get('api'),\n  client: get('client'),\n  env: get('env'),\n  plan: get('plan'),\n  internal: {consumes: _.api.consumes, id: _.api.id, operation: _.api.operation, operationId: _.api.operationId, path: _.api.path}\n};set('message.headers.content-type','application/json');\n"
+                           "source": "try {\n  message.body = {\n    api: get('api'),\n    client: get('client'),\n    env: get('env'),\n    plan: get('plan'),\n    request: {\n      path: get('request.path'),\n      querystring: get('request.querystring'),\n      search: get('request.search'),\n      uri: get('request.uri')\n    },\n    internal: {\n      consumes: _.api.consumes,\n      id: _.api.id,\n      operation: _.api.operation,\n      operationId: _.api.operationId,\n      path: _.api.path\n    }\n  };\n  set('message.headers.Content-Type','application/json');\n\n} catch (error) {\n  console.error('error when running JavaScript '+ error);\n  throw error;\n}\n"
                                 }
                                 }]
                 },
@@ -1885,7 +1885,7 @@
                     "execute": [
                         {
                             "javascript": {
-                            "source": "message.body = {\n  api: get('api'),\n  client: get('client'),\n  env: get('env'),\n  plan: get('plan'),\n  internal: {consumes: _.api.consumes, id: _.api.id, operation: _.api.operation, operationId: _.api.operationId, path: _.api.path}\n};set('message.headers.content-type','application/json');\n"
+                               "source": "try {\n  message.body = {\n    api: get('api'),\n    client: get('client'),\n    env: get('env'),\n    plan: get('plan'),\n    request: {\n      path: get('request.path'),\n      querystring: get('request.querystring'),\n      search: get('request.search'),\n      uri: get('request.uri')\n    },\n    internal: {\n      consumes: _.api.consumes,\n      id: _.api.id,\n      operation: _.api.operation,\n      operationId: _.api.operationId,\n      path: _.api.path\n    }\n  };\n  set('message.headers.Content-Type','application/json');\n\n} catch (error) {\n  console.error('error when running JavaScript '+ error);\n  throw error;\n}\n"
                             }
                         }
                     ]
