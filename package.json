@@ -1,6 +1,6 @@
 {
   "name": "apiconnect-microgateway",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "API Connect MicroGateway",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "test": "mocha -t 600000"
   },
   "engines": {
-    "node": ">=0.10.43" 
+    "node": ">=0.10.43"
   },
   "repository": {
     "type": "git",
