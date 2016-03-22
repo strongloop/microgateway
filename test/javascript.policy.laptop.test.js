@@ -1,3 +1,8 @@
+// Copyright IBM Corp. 2016. All Rights Reserved.
+// Node module: apiconnect-microgateway
+// US Government Users Restricted Rights - Use, duplication or disclosure
+// restricted by GSA ADP Schedule Contract with IBM Corp.
+
 'use strict';
 
 var fs = require('fs');
@@ -61,6 +66,13 @@ describe('javascript policy', function() {
       .get('/javascript/throwErrorObject')
       .set('X-VALUE', 'foo')
       .expect(200, /foo: this is a dummy message/, done);
+  });
+
+  it('throw and catch a custom error object', function(done) {
+    request
+      .get('/javascript/throwErrorObject')
+      .set('X-VALUE', 'bar')
+      .expect(200, /Catch the bar error!/, done);
   });
 
   it('no param resolving', function(done) {

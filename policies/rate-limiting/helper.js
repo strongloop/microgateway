@@ -1,3 +1,8 @@
+// Copyright IBM Corp. 2016. All Rights Reserved.
+// Node module: apiconnect-microgateway
+// US Government Users Restricted Rights - Use, duplication or disclosure
+// restricted by GSA ADP Schedule Contract with IBM Corp.
+
 'use strict';
 
 var logger = require('apiconnect-cli-logger/logger.js')
@@ -8,7 +13,7 @@ exports.handleResponse =
     if (remaining < 0 && reject) {
       var resMsg = setupHeaders();
       var err = new Error('Rate limit exceeded');
-      err.statusCode = 429;
+      err.status = { code: 429 };
       err.name = 'RateLimitExceeded';
       context.error = err;
       logger.debug('Rate limit exceeded: %j', err);

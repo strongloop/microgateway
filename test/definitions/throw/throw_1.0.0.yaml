@@ -15,8 +15,8 @@ x-ibm-configuration:
   assembly:
     execute:
       - throw:
-          name: $(request.headers.x-foo-id)
-          message: 'Throw the x-foo-id on purpose'
+          name: $(request.headers.x-error-id)
+          message: 'Throw on purpose'
     catch:
       - errors:
           - foo
@@ -24,12 +24,7 @@ x-ibm-configuration:
           - set-variable:
               actions:
                 - set: message.body
-                  value: "Caught $(error.name): $(error.message)"
-      - default:
-          - set-variable:
-              actions:
-                - set: message.body
-                  value: The unknown error is handled
+                  value: "Caught the foo error: $(error.message)"
 
 schemes:
   - http

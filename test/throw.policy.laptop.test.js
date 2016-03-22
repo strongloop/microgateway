@@ -1,3 +1,8 @@
+// Copyright IBM Corp. 2016. All Rights Reserved.
+// Node module: apiconnect-microgateway
+// US Government Users Restricted Rights - Use, duplication or disclosure
+// restricted by GSA ADP Schedule Contract with IBM Corp.
+
 'use strict';
 
 var fs = require('fs');
@@ -36,8 +41,15 @@ describe('throw policy', function() {
   it('throw-and-catch', function(done) {
     request
       .get('/throw/basic')
-      .set('X-FOO-ID', 'foo')
-      .expect(200, /Caught foo: Throw the x-foo-id on purpose/, done);
+      .set('X-ERROR-ID', 'foo')
+      .expect(200, /Caught the foo error: Throw on purpose/, done);
+  });
+
+  it('throw-without-catch', function(done) {
+    request
+      .get('/throw/basic')
+      .set('X-ERROR-ID', 'bar')
+      .expect(500, /{"name":"bar","message":"Throw on purpose"}/, done);
   });
 
 });

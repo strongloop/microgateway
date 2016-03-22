@@ -1,3 +1,8 @@
+// Copyright IBM Corp. 2016. All Rights Reserved.
+// Node module: apiconnect-microgateway
+// US Government Users Restricted Rights - Use, duplication or disclosure
+// restricted by GSA ADP Schedule Contract with IBM Corp.
+
 'use strict';
 
 var _ = require('lodash');
@@ -41,8 +46,8 @@ describe('Error middleware', function() {
     var app = express();
     app.use(context());
     app.use(function(req, resp, next) {
-      req.ctx.set('error.statusCode', 777);
-      req.ctx.set('error.reasonPhrase', 'Not Allowed');
+      req.ctx.set('error.status.code', 777);
+      req.ctx.set('error.status.reason', 'Not Allowed');
       next('error');
     });
     app.use(errhandler());

@@ -1,3 +1,8 @@
+// Copyright IBM Corp. 2016. All Rights Reserved.
+// Node module: apiconnect-microgateway
+// US Government Users Restricted Rights - Use, duplication or disclosure
+// restricted by GSA ADP Schedule Contract with IBM Corp.
+
 'use strict';
 
 var fs = require('fs');
@@ -62,6 +67,37 @@ describe('set-variable policy', function() {
         if (res.headers['to-be-deleted']) return 'context variable not deleted';
       })
       .expect(200, done);
+  });
+
+  it('should able to set custom status code', function(done) {
+    request
+      .post('/set-variable/set-variable')
+      .set('set-variable-case', 'set')
+      .set('custom-status-code', 666)
+      .expect(666, done);
+  });
+
+  it('should able to set custom status reason', function(done) {
+    request
+      .post('/set-variable/set-variable')
+      .set('set-variable-case', 'set')
+      .set('custom-status-reason', 'Foobar')
+      .expect(function(res, done) {
+        if (res.res.statusMessage !== 'Foobar') throw new Error("status reason should be 'Foobar'");
+      })
+      .expect(200, done);
+  });
+
+  it('should able to set custom status code and reason', function(done) {
+    request
+      .post('/set-variable/set-variable')
+      .set('set-variable-case', 'set')
+      .set('custom-status-code', '303')
+      .set('custom-status-reason', 'Foobar')
+      .expect(function(res, done) {
+        if (res.res.statusMessage !== 'Foobar') throw new Error("status reason should be 'Foobar'");
+      })
+      .expect(303, done);
   });
 
 });
