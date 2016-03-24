@@ -75,8 +75,8 @@
   "devDependencies": {
     "bunyan": "^1.7.1",
     "debug": "^2.2.0",
-    "eslint": "^1.x",
-    "eslint-config-apiconnect": "^1.x",
+    "eslint": "^2.x",
+    "eslint-config-apiconnect": "^2.x",
     "jscs": "^2.9.0",
     "mkdirp": "^0.5.1",
     "mocha": "^2.4.5",
