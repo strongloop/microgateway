@@ -1,6 +1,6 @@
 {
   "name": "apiconnect-microgateway",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "API Connect MicroGateway",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "test": "mocha -t 600000"
   },
   "engines": {
-    "node": ">=0.10.43" 
+    "node": ">=0.10.43"
   },
   "repository": {
     "type": "git",
@@ -38,8 +38,8 @@
     "supertest": "^1.1.0"
   },
   "dependencies": {
-    "apiconnect-cli-config": "^1.0.18",
-    "apiconnect-cli-logger": "^1.0.4",
+    "apiconnect-cli-config": "^1.x",
+    "apiconnect-cli-logger": "^1.x",
     "async": "^1.5.2",
     "auth-header": "^0.2.2",
     "basic-auth": "^1.0.3",

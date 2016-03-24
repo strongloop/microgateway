@@ -1,8 +1,14 @@
+// Copyright IBM Corp. 2016. All Rights Reserved.
+// Node module: apiconnect-microgateway
+// US Government Users Restricted Rights - Use, duplication or disclosure
+// restricted by GSA ADP Schedule Contract with IBM Corp.
+
 'use strict';
 var RateLimiter = require('rolling-rate-limiter');
 var redis = require('redis');
 var handleResponse = require('./helper').handleResponse;
-var debug = require('debug')('policy:rate-limiting');
+var logger = require('apiconnect-cli-logger/logger.js')
+  .child({loc: 'apiconnect-microgateway:policies:rate-limiting:redis'});
 
 module.exports = function(options) {
   options = options || {};
@@ -26,7 +32,7 @@ module.exports = function(options) {
   return function(props, context, flow) {
 
     var key = options.getKey(context);
-    debug('Key: %s', key);
+    logger.debug('Key: %s', key);
     if (!key) {
       return flow.proceed();
     }

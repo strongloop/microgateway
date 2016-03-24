@@ -1,32 +1,26 @@
-# micro-gw
+# apiconnect-microgateway
+The apiconnect-microgateway is the enforcement component of the apiconnect
+collection of components providing solutions for API creation, deployment,
+lifecycle management, monitization, and enforcement. The micro gateway is
+fundamentally a proxy, securing and forwarding requests to a back end API.
 
-[![Build Status](https://apim-jenkins3.hursley.ibm.com/buildStatus/icon?job=apiconnect-microgateway)](https://apim-jenkins3.hursley.ibm.com/job/apiconnect-microgateway)
+It was created using StrongLoop technology and a series of middleware
+components. The package is customized to work with the apiconnect 
+infrastructure that automatically communicates with the micro gateway to
+dynamically load APIs, Products, and Plans so that APIs are secured and
+processed in a seamless fashion.
 
-API Mesh MicroGateway
+# Installation
+In the apiconnect laptop experience, the microgateway is automatically
+downloaded and setup by the laptop run and start functions. You do not
+need to manually download and install it.
 
-This in an attempt to cleanup the strong-gateway codebase. To
-only include the code and test cases relevant to Q1 policy content.
+If you would like to use apiconnect-microgateway as a standalone gateway,
+use `npm -i apiconnect-microgateway` to install it. To start the gateway,
+use `node .`. 
 
-We can migrate the outstanding work that will be merging from feature
-branches into strong-gateway here, or the reverse direction. Whatever
-works for folks.
-
-Ultimately either this repo or strong-gateway repo will disappear.
-
-#### Run
-```
-node .
-```
-or
-```
-npm test
-```
-#### Notes
-I’ve updated the datastore so it can run in the same process for testing/non-production purposes. 
-
-export NODE_ENV=production  to enable the parent-child process configuration
-
-Here is an example using node-inspector to test with mocha
-```
-node-debug ./node_modules/.bin/_mocha -t 99999999 test/assembly.test.js
-```
+## Configuration
+By default, the gateway look up the configuration from `config/default`
+directory. The configuration includes the APIs, Products, and Plans metadata.
+You can define an alternative configuration directory via providing the
+`CONFIG_DIR` environment variable.
