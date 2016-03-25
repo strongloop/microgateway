@@ -10,6 +10,7 @@ var assert = require('assert');
 var debug = require('debug')('context-test');
 var loopback = require('loopback');
 var request = require('supertest');
+var urlParser = require('url');
 
 var context = require('../lib/context');
 
@@ -54,12 +55,19 @@ describe('Context middleware', function() {
     });
 
     function verifyResponse(res, expected) {
-      var variables = ['verb', 'uri', 'path', 'search', 'querystring',
+      var variables = ['verb', 'path', 'search', 'querystring',
                         'content-type', 'authorization'];
       variables.forEach(function(value) {
         assert.strictEqual(res.body[value], expected[value],
                            'request.' + value);
       });
+
+      // verify the uri
+      var url = urlParser.parse(res.body.uri);
+      assert.ok(url.protocol, 'should have protocol');
+      assert.ok(url.hostname, 'should have hostname');
+      assert.strictEqual(url.search? url.pathname + url.search : url.pathname,
+                         expected.uri);
 
       // remove the headers not in testing scope
       var headers = res.body.headers;
