@@ -1,0 +1,4 @@
+{
+  "pfx" : "./server.pfx",
+  "passphrase" : "./pfx-password.json:mypassword"
+}

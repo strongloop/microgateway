@@ -454,6 +454,18 @@ describe('preflow and flow-engine integration', function() {
         .expect(500, done);
     });
 
+    it('empty basepath should be successful', function(done) {
+      request
+        .get('/yosemite')
+        .expect(200, done);
+    });
+
+    it('root path should be successful', function(done) {
+      request
+        .get('/v2')
+        .expect(200, done);
+    });
+
     describe('should inject X-Powered-By header', function() {
       var headerName = 'X-Powered-By';
       var expectedValue = 'IBM API Connect MicroGateway';
