@@ -1,0 +1,29 @@
+swagger: '2.0'
+info:
+  x-ibm-name: climbingweather
+  title: Climbing Weather
+  version: 2.0.0
+schemes:
+  - http
+host: $(catalog.host)
+
+consumes:
+  - application/json
+produces:
+  - application/json
+x-ibm-configuration:
+  testable: true
+  enforced: true
+  cors:
+    enabled: true
+  gateway: micro-gateway
+  assembly:
+    execute:
+      - invoke:
+          target-url: 'http://api.climbingweather.com/api/area/daily/518?apiKey=c9db14bf581e6eab4fceaac87b9125ef&days=2'
+paths:
+  /yosemite:
+    get:
+      responses:
+        '200':
+          description: Success
