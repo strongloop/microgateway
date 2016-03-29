@@ -1,0 +1,4 @@
+{
+"pfx" : "../../serverIdentity.pfx",
+"passphrase" : "../../join.json:keystorePassword"
+}
