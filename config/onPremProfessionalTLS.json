@@ -1,4 +1,4 @@
 {
-"pfx" : "../serverIdentity.pfx",
-"passphrase" : "../join.json:keystorePassword"
+"pfx" : "../../serverIdentity.pfx",
+"passphrase" : "../../join.json:keystorePassword"
 }
