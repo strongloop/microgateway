@@ -3,7 +3,9 @@
 // US Government Users Restricted Rights - Use, duplication or disclosure
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
-var ENV_IGNORE = '#';
+var path = require('path');
+var YAML = require('yamljs');
+
 var env = {
   NODE_ENV: 'production',
   APIMANAGER: '127.0.0.1',
@@ -14,10 +16,9 @@ var env = {
 };
 
 try {
-  var envjson = require('./env.json');
+  var envjson = YAML.load(path.join(__dirname, '/env.yaml'));
   Object.keys(envjson).forEach(function (k) {
-    if (k.indexOf(ENV_IGNORE) === -1)
-      env[k] = envjson[k];
+    env[k] = envjson[k];
   });
 }
 catch (e) {
