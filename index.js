@@ -8,7 +8,6 @@ var YAML = require('yamljs');
 
 var env = {
   NODE_ENV: 'production',
-  APIMANAGER: '127.0.0.1',
   APIMANAGER_CATALOG: '',
   APIMANAGER_PORT: 0,
   APIMANAGER_REFRESH_INTERVAL: 15 * 1000 * 60,
@@ -26,7 +25,9 @@ catch (e) {
 }
 
 Object.keys(env).forEach(function (k) {
-  process.env[k] = env[k];
+  // Don't override env variables that were set explicitly
+  if (typeof process.env[k] === 'undefined')
+    process.env[k] = env[k];
 });
 
 // Should we do any extra sanity checks here?
