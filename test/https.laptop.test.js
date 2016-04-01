@@ -13,11 +13,61 @@ var yaml = require('yamljs');
 
 var mg = require('../lib/microgw');
 
+describe('HTTP and HTTPS in separate files', function() {
+
+  var request, httprequest;
+  before(function(done) {
+    process.env.CONFIG_DIR = __dirname + '/definitions/https/combined1';
+    process.env.NODE_ENV = 'production';
+    done();
+  });
+
+  after(function(done) {
+    delete process.env.CONFIG_DIR;
+    delete process.env.NODE_ENV;
+    done();
+  });
+
+  it('should expect failure to load', function(done) {
+    mg.start(3000)
+      .catch(function(err) {
+        assert(true);
+        done();
+      });
+  });
+
+});
+
+describe('HTTP and HTTPS in same file', function() {
+
+  var request, httprequest;
+  before(function(done) {
+    process.env.CONFIG_DIR = __dirname + '/definitions/https/combined2';
+    process.env.NODE_ENV = 'production';
+    done();
+  });
+
+  after(function(done) {
+    delete process.env.CONFIG_DIR;
+    delete process.env.NODE_ENV;
+    done();
+  });
+
+  it('should expect failure to load', function(done) {
+    mg.start(3000)
+      .catch(function(err) {
+        assert(true);
+        done();
+      });
+  });
+
+});
+
 describe('HTTPS in laptop experience w/ env var', function() {
 
   var request, httprequest;
   before(function(done) {
-    process.env.CONFIG_DIR = __dirname + '/definitions/https/combined';
+    process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
     process.env.NODE_ENV = 'production';
     process.env.TLS_SERVER_CONFIG = __dirname + '/support/https/tlsconfig.json'
     mg.start(3000)
@@ -65,7 +115,7 @@ describe('HTTPS in laptop experience w/ pfx', function() {
 
   var request, httprequest;
   before(function(done) {
-    process.env.CONFIG_DIR = __dirname + '/definitions/https/combined';
+    process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
     process.env.NODE_ENV = 'production';
     process.env.TLS_SERVER_CONFIG = __dirname + '/support/https/tlsconfig-pfx.json'
     mg.start(3000)
@@ -113,7 +163,7 @@ describe('HTTPS in laptop experience w/ default TLS', function() {
 
   var request, httprequest;
   before(function(done) {
-    process.env.CONFIG_DIR = __dirname + '/definitions/https/combined';
+    process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
     process.env.NODE_ENV = 'production';
     mg.start(3000)
       .then(function() {

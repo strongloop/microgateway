@@ -35,7 +35,7 @@ var definitionsDir = defaultDefinitionsDir;
 var gatewayMain = __dirname + '/../../../';
 var keyFile = gatewayMain + KEYNAME;
 var version ='1.0.0';
-var https = false;
+var mixedProtocols = http = https = false;
 
 /**
  * Creates a model type 
@@ -508,7 +508,11 @@ function loadConfig(app, apimanager, models, currdir, snapdir, uid, cb) {
               cb(err);
               return;
             }
-            process.send({LOADED: true, 'https': https});
+            if (mixedProtocols) {
+              process.send({LOADED:false});
+            } else {
+              process.send({LOADED: true, 'https': https});
+            }
             // only update pointer to latest configuration
             // when latest configuration successful loaded
             if (snapdir === dirToLoad) {
@@ -868,14 +872,21 @@ function expandAPIData(apidoc, dir)
     }
     // determine if micro gateway should start w/ HTTPS or not
     // based on presence of 'https' in schemes
-    if (!https) {
+    if (!https || !http) {
       if (apidoc.schemes) {
         if (apidoc.schemes.indexOf('https') > -1) {
           https = true;
         }
+        if (apidoc.schemes.indexOf('http') > -1) {
+          http = true;
+        }
       } else {
         https = true;
       }
+    }
+    if (http && https) {
+      logger.error('Both HTTP and HTTPS schemes detected; Gateway only supports a single protocol at a time');
+      mixedProtocols = true;
     }
   return apidoc;
   }
