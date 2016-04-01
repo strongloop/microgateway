@@ -115,8 +115,8 @@ module.exports = function(app) {
        );
       },
       function (callback) {
-        if (!apimanager.host || apimanager.handshakeOk) {
-          //if we don't have the APIM contact info, or we already done the handshake, bail out
+        if (!apimanager.host) {
+          //if we don't have the APIM contact info, bail out
           return callback();
         }
 
@@ -126,14 +126,15 @@ module.exports = function(app) {
           private_key = fs.readFileSync(keyFile, 'utf8');
         } catch (e) {
           //don't proceed with the handshake, since we could not read the private key
-          logger.debug('Can not load key: %s Error: %s', keyFile, e);
-          return callback();
+          logger.warn('Can not load key: %s Error: %s', keyFile, e);
+          return callback(); // TODO: treat as error
+          //don't treat as error currently because UT depends on this
         }
 
         // we have an APIm, and a key so try to handshake with it..
-        handshakeWithAPIm(app, apimanager, private_key, function (err, handshakeApimanager) {
-          apimanager = handshakeApimanager;
-          callback(); // should return the error.. not ready #TODO
+        handshakeWithAPIm(app, apimanager, private_key, function (err) {
+          callback(); // TODO: treat as error
+          //don't treat as error currently because UT depends on this
         });
       }
     ],
@@ -166,9 +167,10 @@ function loadData(app, apimanager, models, currdir) {
         logger.debug('apimanager before pullFromAPIm: %j', apimanager);
         if (apimanager.host) {
             // && apimanager.handshakeOk << shouldn't call if handshake failed.. not ready #TODO
+            // don't look for successful handshake currently because UT depends on this
           // we have an APIm, handshake succeeded, so try to pull data..
           pullFromAPIm(apimanager, snapshotID, function(err, dir) {
-            snapdir = dir;
+            snapdir = dir; // even in case of error, we need to try loading from the file system
             callback();
           });
         }
@@ -271,7 +273,7 @@ function addSignatureHeaders(body, headers, keyId, private_key) {
   }
 
   if (!headers.date) {
-    headers.date = (new Date()).toUTCString()
+    headers.date = (new Date()).toUTCString();
   }
 
   if (!headers.digest) {
@@ -333,9 +335,9 @@ function decryptAPIMResponse(body, private_key) {
 /**
  * Attempt to handshake from APIm server
  * @param {???} app - loopback application
- * @param {Object} config - configuration pointing to APIm server
- * @param {callback} cb - callback that handles error or path to
- *                        snapshot directory
+ * @param {Object} apimanager - configuration pointing to APIm server
+ * @param {string} privatekey - private key to be used for handshake
+ * @param {callback} cb - callback that handles error
  */
 function handshakeWithAPIm(app, apimanager, private_key, cb) {
   logger.debug('handshakeWithAPIm entry');
@@ -376,13 +378,13 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
         },       
       function(err, res, body) {
         if (err) {
-          logger.debug('Failed to communicate with %s: %s ', apimHandshakeUrl, err);
+          logger.error('Failed to communicate with %s: %s ', apimHandshakeUrl, err);
           return callback(err);
         }
 
         logger.debug('statusCode: ' + res.statusCode);
         if (res.statusCode !== 200) {
-          logger.debug(apimHandshakeUrl + ' failed with: ' + res.statusCode);
+          logger.error(apimHandshakeUrl + ' failed with: ' + res.statusCode);
           return callback(new Error(apimHandshakeUrl + ' failed with: ' + res.statusCode));
         }
 
@@ -401,19 +403,21 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
         apimanager.clientid = ugw.clientID;
 
         if (logger.debug()) {
-          logger.debug('apimanager.clicert: ' + apimanager.clicert);
-          logger.debug('apimanager.clikey: ' + apimanager.clikey);
-          logger.debug('apimanager.clientid: ' + apimanager.clientid);
-
           logger.debug('apimanager: %s', JSON.stringify(apimanager, null, 2));
         }
-        callback(null, apimanager);
+        callback(null);
         });
       }],
     function(err) {
-      apimanager.handshakeOk = !err;
+      if (err) {
+        apimanager.handshakeOk = false;
+        logger.error('Unsuccessful handshake with API Connect server');
+      } else {
+        apimanager.handshakeOk = true;
+        logger.info('Successful handshake with API Connect server');
+      }
       logger.debug('handshakeWithAPIm exit');
-      cb(err, apimanager);
+      cb(err);
     });
   }
 
@@ -432,6 +436,7 @@ function pullFromAPIm(apimanager, uid, cb) {
                   '/';
   fs.mkdir(snapdir, function(err) {
       if (err) {
+        logger.warn('Failed to create snapshot directory');
         logger.debug('pullFromAPIm exit(1)');
         cb(null, '');
         return;
@@ -441,8 +446,8 @@ function pullFromAPIm(apimanager, uid, cb) {
         host : host of APIm
         port : port of APIm
         timeout : opts.timeout * 1000 || 30 * 1000,
-        clikey : opts.clikey ? fs.readFileSync(key) : null,
-        clicert : opts.clicert ? fs.readFileSync(cert)  : null,
+        clikey : opts.clikey ? opts.clikey : null,
+        clicert : opts.clicert ? opts.clicert  : null,
         clientid : opts.clientid || '1111-1111',
         outdir : opts.outdir || 'apim'
       };*/
@@ -467,6 +472,8 @@ function pullFromAPIm(apimanager, uid, cb) {
             snapdir = '';
             // falling through
             // try loading from local files
+          } else {
+            logger.info('Successfully pulled snapshot from API Connect server');
           }
           logger.debug(response);
           logger.debug('pullFromAPIm exit(2)');
@@ -511,6 +518,7 @@ function loadConfig(app, apimanager, models, currdir, snapdir, uid, cb) {
             if (mixedProtocols) {
               process.send({LOADED:false});
             } else {
+              logger.info('Successfully loaded configuration');
               process.send({LOADED: true, 'https': https});
             }
             // only update pointer to latest configuration
@@ -549,7 +557,7 @@ function loadConfigFromFS(app, apimanager, models, dir, uid, cb) {
     try {
       files = fs.readdirSync(dir);
     } catch (e) {
-      logger.debug('loadConfigFromFS error');
+      logger.error('Failed to read directory: ', dir);
       cb(e);
       return;
     }
@@ -560,8 +568,7 @@ function loadConfigFromFS(app, apimanager, models, dir, uid, cb) {
     files.forEach(
       function(file) {
         logger.debug('file match jsonFile: ', file.match(jsonFile));
-        // apim pull scenario (only json, no yaml)
-        if (apimanager.host && file.match(jsonFile)) {
+        if (file.match(jsonFile)) {
           for(var i = 0; i < models.length; i++) {
             if(file.indexOf(models[i].prefix) > -1) {
               logger.debug('%s file: %s', models[i].name, file);
@@ -951,7 +958,6 @@ function populateModelsWithAPImData(app, models, dir, uid, cb) {
             readfile,
             function(err, mymodel) {
               if (err) {
-                logger.error(err);
                 fileCallback(err);
                 return;
               }
