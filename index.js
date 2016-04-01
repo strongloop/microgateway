@@ -4,4 +4,4 @@
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 if (process.env.NODE_ENV === undefined)
   process.env.NODE_ENV = 'production';
-require('./lib/microgw.js').start();
+require('./lib/microgw.js').start(process.env.PORT);
