@@ -40,7 +40,11 @@ exports.start = function(fork) {
         if (msg.DATASTORE_PORT != null) {
           dataStorePort = msg.DATASTORE_PORT;
         }
-        if (msg.LOADED) {
+        if (msg.LOADED != null) {
+          if(!msg.LOADED) {
+            reject(Error('failed to load datastore'));
+            return;
+          }
           loaded = true;
         }
         if (msg.https != null) {
@@ -71,14 +75,18 @@ exports.start = function(fork) {
 
     } else {
       process.send = function(msg) {
-        var https = false;
+        var https = false, loaded = false;
         if (msg.https != null) {
           https = msg.https;
         }
 
-        if (msg.LOADED) {
+        if (msg.LOADED != null) {
           process.send = function() {};
-          resolve(https);
+          if (!msg.LOADED) {
+            reject(Error('failed to load datastore'));
+          } else {
+            resolve(https);
+          }
         }
       };
       server = require('./server/server.js');
