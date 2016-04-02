@@ -950,8 +950,8 @@ function populateModelsWithAPImData(app, models, dir, uid, cb) {
               obj['snapshot-id'] = uid;
 
               // looks like an API
-              if (readfile.swagger) {
-                checkHttps(readfile);
+              if (obj.document && obj.document.swagger) {
+                checkHttps(obj.document);
               }
             }
           );
