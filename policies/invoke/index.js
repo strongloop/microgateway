@@ -260,7 +260,8 @@ function _main(props, context, next, logger, tlsProfile) {
                             tlsProfile.protocols[j]);
                     break;
                 }
-                break;
+                if (options.secureProtocol)
+                  break;
             }
         }
 
