@@ -219,7 +219,7 @@ function _main(props, context, next, logger, tlsProfile) {
 
         //cert
         for (var c in tlsProfile.certs) {
-            if (tlsProfile.certs[c]['cert-type'] === 'CLIENT') {
+            if (tlsProfile.certs[c]['cert-type'] === 'PUBLIC') {
                 options.cert = tlsProfile.certs[c].cert;
                 break;
             }
@@ -228,7 +228,7 @@ function _main(props, context, next, logger, tlsProfile) {
         //ca list
         options.ca = [];
         for (var p in tlsProfile.certs) {
-            if (tlsProfile.certs[p]['cert-type'] === 'PUBLIC') {
+            if (tlsProfile.certs[p]['cert-type'] === 'CLIENT') {
                 logger.debug('[invoke] uses the ca: %s',
                         tlsProfile.certs[p].name);
                 options.ca.push(tlsProfile.certs[p].cert);
