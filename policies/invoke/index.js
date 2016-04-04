@@ -212,8 +212,10 @@ function _main(props, context, next, logger, tlsProfile) {
 
     //setup the HTTPs settings
     var http = isSecured ? require('https') : require('http');
-    if (isSecured && tlsProfile) {
-        options.agent = false;
+    if (isSecured) {
+      options.agent = false; // do we really want to set this?  no conn pooling
+      options.rejectUnauthorized = false;
+      if (tlsProfile) {
         //key
         options.key = tlsProfile['private-key'];
 
@@ -235,7 +237,7 @@ function _main(props, context, next, logger, tlsProfile) {
 
             }
         }
-        options.rejectUnauthorized = false;
+
         if (options.ca.length > 0 || tlsProfile['mutual-auth']) {
             options.rejectUnauthorized = true;
             logger.debug('[invoke] rejectUnauthorized = true');
@@ -269,7 +271,7 @@ function _main(props, context, next, logger, tlsProfile) {
             for (var k=0; k<tlsProfile.ciphers.length; k++) {
                 var cipher = cipherTable[tlsProfile.ciphers[k]];
                 if (cipher) {
-		    logger.warn("[invoke] using cipher: %s", cipher);
+                    logger.debug("[invoke] using cipher: %s", cipher);
                     ciphers.push(cipher);
                    }
                 else
@@ -278,6 +280,7 @@ function _main(props, context, next, logger, tlsProfile) {
             }
             options.ciphers = ciphers.join(':');
         }
+      }
     }
 
     //write the request
