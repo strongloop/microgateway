@@ -229,15 +229,17 @@ function _main(props, context, next, logger, tlsProfile) {
         options.ca = [];
         for (var p in tlsProfile.certs) {
             if (tlsProfile.certs[p]['cert-type'] === 'CLIENT') {
-                logger.debug('[invoke] uses the ca: %s',
+                logger.debug('[invoke] uses the ca.name: %s',
                         tlsProfile.certs[p].name);
                 options.ca.push(tlsProfile.certs[p].cert);
+
             }
         }
-
-        if (options.ca.length > 0 || tlsProfile['mutual-auth'])
+        options.rejectUnauthorized = false;
+        if (options.ca.length > 0 || tlsProfile['mutual-auth']) {
             options.rejectUnauthorized = true;
-
+            logger.debug('[invoke] rejectUnauthorized = true');
+            }
         //secureProtocol
         if (tlsProfile.protocols && Array.isArray(tlsProfile.protocols)) {
             for (var j=0; j<tlsProfile.protocols.length; j++) {
@@ -266,8 +268,10 @@ function _main(props, context, next, logger, tlsProfile) {
             options.honorCipherOrder = true;
             for (var k=0; k<tlsProfile.ciphers.length; k++) {
                 var cipher = cipherTable[tlsProfile.ciphers[k]];
-                if (cipher)
+                if (cipher) {
+		    logger.warn("[invoke] using cipher: %s", cipher);
                     ciphers.push(cipher);
+                   }
                 else
                     logger.warn("[invoke] unknown cipher: %s",
                             tlsProfile.ciphers[k]);
