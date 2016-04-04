@@ -16,7 +16,7 @@ describe('Context variables in laptop experience', function() {
 
   var request;
   before(function(done) {
-    process.env.CONFIG_DIR = __dirname + '/definitions/context';
+    process.env.CONFIG_DIR = __dirname + '/definitions/context/https';
     process.env.NODE_ENV = 'production';
     process.env.TLS_SERVER_CONFIG = __dirname + '/support/https/tlsconfig.json'
     mg.start(3000)
