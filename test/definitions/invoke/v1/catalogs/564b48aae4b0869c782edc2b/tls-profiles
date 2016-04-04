@@ -79,6 +79,7 @@
             "public": false,
             "ciphers": [],
             "protocols": [
+                  "SSLv3",
                   "TLSv12"
             ],
             "certs": [
