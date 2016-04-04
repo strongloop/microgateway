@@ -421,7 +421,7 @@
               }
             }
           },
-          "schemes": ["https"],
+          "schemes": ["http"],
           "securityDefinitions": {
             "oauthImplicit": {
               "type": "oauth2",
@@ -892,7 +892,7 @@
               }
             }
           },
-          "schemes": ["https"],
+          "schemes": ["http"],
           "securityDefinitions": {
             "oauthImplicit": {
               "type": "oauth2",
@@ -1218,7 +1218,7 @@
             }
           }
         },
-        "schemes": ["https"],
+        "schemes": ["http"],
         "securityDefinitions": {
           "apikeyHeader": {
             "type": "apiKey",
@@ -1732,7 +1732,7 @@
             "additionalProperties": false
           }
         },
-        "schemes": ["https"],
+        "schemes": ["http"],
         "tags": [{
           "name": "User"
         }, {
@@ -2220,7 +2220,7 @@
               }
             }
           },
-          "schemes": ["https"],
+          "schemes": ["http"],
           "securityDefinitions": {
             "oauthImplicit": {
               "type": "oauth2",
@@ -2546,7 +2546,7 @@
             }
           }
         },
-        "schemes": ["https"],
+        "schemes": ["http"],
         "securityDefinitions": {
           "apikeyHeader": {
             "type": "apiKey",
