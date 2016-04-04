@@ -1,0 +1,262 @@
+info:
+  version: 1.0.0
+  title: context
+  x-ibm-name: context
+  description: context test suite
+
+basePath: /v1
+
+swagger: '2.0'
+
+consumes:
+  - application/json
+  - application/xml
+  - application/x-www-form-urlencoded
+
+produces:
+  - application/json
+  - application/xml
+
+paths:
+  /context:
+    get:
+      summary: get a context variable value
+      parameters:
+        - name: name
+          in: query
+          description: the context name
+          type: string
+      responses:
+        '200':
+          description: 200 OK
+  /context/api:
+    get:
+      summary: get API context variable value
+      responses:
+        '200':
+          description: 200 OK
+  /context/body-parse:
+    post:
+      summary: verify request.body data type is correct
+      responses:
+        '200':
+          description: 200 OK
+  /context/internal:
+    get:
+      summary: get interal context variable value
+      operationId: getInternal
+      parameters:
+        - name: param1
+          in: query
+          description: parameter 1
+          type: string
+        - name: param2
+          in: header
+          description: parameter 2
+          type: integer
+      responses:
+        '200':
+          description: 200 OK
+  /context/request/parameters/{param4}/{param3}:
+    parameters:
+      - name: param3
+        in: path
+        description: parameter 3
+        type: integer
+        required: true
+      - name: param4
+        in: header
+        description: parameter 4
+        type: integer
+        required: true
+      - $ref: '#/parameters/ParamRef1'
+    get:
+      summary: get request parameter value
+      operationId: getParameters
+      parameters:
+        - name: param1
+          in: query
+          description: parameter 1
+          type: string
+          required: true
+        - name: param2
+          in: query
+          description: parameter 2
+          type: integer
+          required: true
+        - name: param4              # overwrite param4 definition
+          in: path
+          description: parameter 4
+          type: string
+          required: true
+        - name: X-foo
+          in: header
+          description: X-foo
+          type: string
+          required: true
+        - name: paramBoolean
+          in: query
+          description: parameter Bool
+          type: boolean
+          required: true
+        - name: X-paramArray
+          in: header
+          description: parameter Array
+          type: array
+          items:
+            type: integer
+            format: int64
+          collectionFormat: ssv
+          required: true
+        - name: queryArray
+          in: query
+          description: parameter Array in query
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
+          required: true
+        - name: X-expireDate
+          in: header
+          description: parameter expire date
+          type: dateTime
+        - name: param6
+          in: query
+          description: parameter 6 reuqired but not existed
+          type: string
+          required: true
+        - name: X-param7
+          in: header
+          description: parameter 7 is an object
+          type: object
+        - $ref: '#/parameters/ParamRef2'
+      responses:
+        '200':
+          description: 200 OK
+    post:
+      summary: post request parameter value
+      operationId: postParameters
+      parameters:
+        - name: param1
+          in: formData
+          description: parameter 1
+          type: string
+          required: true
+        - name: param2
+          in: formData
+          description: parameter 2
+          type: integer
+          required: true
+      responses:
+        '200':
+          description: 200 OK
+    put:
+      summary: put request parameter value
+      operationId: putParameters
+      parameters:
+        - name: param1
+          in: body
+          description: parameter 1
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 200 OK
+
+x-ibm-configuration:
+  properties:
+    foo: default_foo
+  catalogs:
+    local:
+      properties:
+        foo: local_foo
+  assembly:
+    execute:
+      - operation-switch:
+          title: operation-switch
+          case:
+            - operations:
+                - path: /context
+                  verb: get
+              execute:
+                - javascript:
+                    title: write context variable to message.body
+                    source: |
+                      var name = request.parameters.name;
+                      message.body = {
+                        name: name,
+                        value: get(name)
+                      };
+                - set-variable:
+                    title: set-content-type
+                    actions:
+                      - set: message.headers.content-type
+                        value: application/json
+            - operations:
+                - path: /context/api
+                  verb: get
+              execute:
+                - set-variable:
+                    title: set-variable
+                    actions:
+                      - set: message.body
+                        value: $(api)
+                - set-variable:
+                    title: set-content-type
+                    actions:
+                      - set: message.headers.content-type
+                        value: application/json
+            - operations:
+                - path: /context/body-parse
+                  verb: post
+              execute:
+                - javascript:
+                    title: write context variable to message.body
+                    source: |
+                      message.body = JSON.stringify(request.body);
+                      message.headers['content-type'] = 'text/plain';
+            - operations:
+                - getInternal
+              execute:
+                - set-variable:
+                    title: set-variable
+                    actions:
+                      - set: message.body
+                        value: $(_.api)
+                - set-variable:
+                    title: set-content-type
+                    actions:
+                      - set: message.headers.content-type
+                        value: application/json
+            - operations:
+                - getParameters
+                - postParameters
+                - putParameters
+              execute:
+                - set-variable:
+                    title: set-variable
+                    actions:
+                      - set: message.body
+                        value: $(request.parameters)
+                - set-variable:
+                    title: set-content-type
+                    actions:
+                      - set: message.headers.Content-Type
+                        value: application/json
+
+parameters:
+  ParamRef1:
+    name: paramRef1
+    in: query
+    description: paramRef1
+    type: string
+    required: false
+  ParamRef2:
+    name: X-PARAM-REF-2
+    in: header
+    description: X-PARAM-REF-2
+    type: boolean
+    required: false
+
+schemes:
+  - https
