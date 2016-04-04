@@ -241,7 +241,7 @@ function _main(props, context, next, logger, tlsProfile) {
         if (options.ca.length > 0 || tlsProfile['mutual-auth']) {
             options.rejectUnauthorized = true;
             logger.debug('[invoke] rejectUnauthorized = true');
-            }
+        }
         //secureProtocol
         if (tlsProfile.protocols && Array.isArray(tlsProfile.protocols)) {
             for (var j=0; j<tlsProfile.protocols.length; j++) {
@@ -273,7 +273,7 @@ function _main(props, context, next, logger, tlsProfile) {
                 if (cipher) {
                     logger.debug("[invoke] using cipher: %s", cipher);
                     ciphers.push(cipher);
-                   }
+                }
                 else
                     logger.warn("[invoke] unknown cipher: %s",
                             tlsProfile.ciphers[k]);
