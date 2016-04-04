@@ -17,6 +17,9 @@
          "securityDefinitions": null,
          "basePath": "/invoke",
          "swagger": "2.0",
+         "schemes": [
+                "http"
+            ],
          "paths": {
             "/basic": {
                "post": {
