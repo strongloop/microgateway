@@ -231,7 +231,7 @@ function _main(props, context, next, logger, tlsProfile) {
             if (tlsProfile.certs[p]['cert-type'] === 'PUBLIC') {
                 logger.debug('[invoke] uses the ca: %s',
                         tlsProfile.certs[p].name);
-                options.ca = tlsProfile.certs[p].cert;
+                options.ca.push(tlsProfile.certs[p].cert);
             }
         }
 
