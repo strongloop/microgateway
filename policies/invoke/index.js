@@ -212,14 +212,16 @@ function _main(props, context, next, logger, tlsProfile) {
 
     //setup the HTTPs settings
     var http = isSecured ? require('https') : require('http');
-    if (isSecured && tlsProfile) {
-        options.agent = false;
+    if (isSecured) {
+      options.agent = false; // do we really want to set this?  no conn pooling
+      options.rejectUnauthorized = false;
+      if (tlsProfile) {
         //key
         options.key = tlsProfile['private-key'];
 
         //cert
         for (var c in tlsProfile.certs) {
-            if (tlsProfile.certs[c]['cert-type'] === 'CLIENT') {
+            if (tlsProfile.certs[c]['cert-type'] === 'PUBLIC') {
                 options.cert = tlsProfile.certs[c].cert;
                 break;
             }
@@ -228,16 +230,18 @@ function _main(props, context, next, logger, tlsProfile) {
         //ca list
         options.ca = [];
         for (var p in tlsProfile.certs) {
-            if (tlsProfile.certs[p]['cert-type'] === 'PUBLIC') {
-                logger.debug('[invoke] uses the ca: %s',
+            if (tlsProfile.certs[p]['cert-type'] === 'CLIENT') {
+                logger.debug('[invoke] uses the ca.name: %s',
                         tlsProfile.certs[p].name);
-                options.ca = tlsProfile.certs[p].cert;
+                options.ca.push(tlsProfile.certs[p].cert);
+
             }
         }
 
-        if (options.ca.length > 0 || tlsProfile['mutual-auth'])
+        if (options.ca.length > 0 || tlsProfile['mutual-auth']) {
             options.rejectUnauthorized = true;
-
+            logger.debug('[invoke] rejectUnauthorized = true');
+        }
         //secureProtocol
         if (tlsProfile.protocols && Array.isArray(tlsProfile.protocols)) {
             for (var j=0; j<tlsProfile.protocols.length; j++) {
@@ -256,7 +260,8 @@ function _main(props, context, next, logger, tlsProfile) {
                             tlsProfile.protocols[j]);
                     break;
                 }
-                break;
+                if (options.secureProtocol)
+                  break;
             }
         }
 
@@ -266,14 +271,17 @@ function _main(props, context, next, logger, tlsProfile) {
             options.honorCipherOrder = true;
             for (var k=0; k<tlsProfile.ciphers.length; k++) {
                 var cipher = cipherTable[tlsProfile.ciphers[k]];
-                if (cipher)
+                if (cipher) {
+                    logger.debug("[invoke] using cipher: %s", cipher);
                     ciphers.push(cipher);
+                }
                 else
                     logger.warn("[invoke] unknown cipher: %s",
                             tlsProfile.ciphers[k]);
             }
             options.ciphers = ciphers.join(':');
         }
+      }
     }
 
     //write the request
