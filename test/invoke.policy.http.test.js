@@ -236,8 +236,7 @@ describe('invokePolicy', function() {
   /////////////////////////////////////////////////////////////
 
   //This is to test if client can skip the validation of server's certificate.
-  //By default, no. To allow it, put the following line in the invoke/index.js.
-  //process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  //By default, yes (to be consistent with edge gateway)
   it('https-basic', function(done) {
     this.timeout(10000);
 
@@ -245,7 +244,7 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8890')
       .set('X-TLS-PROFILE', 'tls-profile-simple')
-      .expect(299, /unable to verify the first certificate/, done);
+      .expect(200, done);
   });
 
   //Use the certificate of Sarah's Root CA to authenticate the Sarah. OK
