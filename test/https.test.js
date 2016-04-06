@@ -14,9 +14,8 @@ var apimServer = require('./support/mock-apim-server/apim-server');
 
 var mg = require('../lib/microgw');
 
-describe('HTTP and HTTPS in separate files', function() {
+describe('HTTP and HTTPS in onprem in separate files', function() {
 
-  var request, httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/combined1';
     process.env.NODE_ENV = 'production';
@@ -52,20 +51,33 @@ describe('HTTP and HTTPS in separate files', function() {
   });
 
 });
-/*
-describe('HTTP and HTTPS in same file', function() {
 
-  var request, httprequest;
+describe('HTTP and HTTPS in onprem in same file', function() {
+
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/combined2';
     process.env.NODE_ENV = 'production';
-    done();
+    process.env.APIMANAGER = '127.0.0.1';
+    process.env.APIMANAGER_PORT = 8081;
+    apimServer.start(
+            process.env.APIMANAGER,
+            process.env.APIMANAGER_PORT,
+            process.env.CONFIG_DIR)
+        .then(done)
+        .catch(function(err) {
+            console.error(err);
+            done(err);
+            });
   });
 
   after(function(done) {
     delete process.env.CONFIG_DIR;
     delete process.env.NODE_ENV;
-    done();
+    delete process.env.APIMANAGER;
+    delete process.env.APIMAMANGER_PORT;
+    apimServer.stop()
+      .then(done, done)
+      .catch(done);
   });
 
   it('should expect failure to load', function(done) {
@@ -78,14 +90,22 @@ describe('HTTP and HTTPS in same file', function() {
 
 });
 
-describe('HTTPS in laptop experience w/ env var', function() {
+describe('HTTPS in onprem w/ env var', function() {
 
   var request, httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
     process.env.NODE_ENV = 'production';
     process.env.TLS_SERVER_CONFIG = __dirname + '/support/https/tlsconfig.json'
-    mg.start(3000)
+    process.env.APIMANAGER = '127.0.0.1';
+    process.env.APIMANAGER_PORT = 8081;
+    apimServer.start(
+            process.env.APIMANAGER,
+            process.env.APIMANAGER_PORT,
+            process.env.CONFIG_DIR)
+      .then(function() {
+        return mg.start(3000);
+      })
       .then(function() {
         return echo.start(8889);
       })
@@ -102,12 +122,15 @@ describe('HTTPS in laptop experience w/ env var', function() {
 
   after(function(done) {
     mg.stop()
+      .then(function() { return apimServer.stop(); })
       .then(function() { return echo.stop(); })
       .then(done, done)
       .catch(done);
     delete process.env.CONFIG_DIR;
     delete process.env.NODE_ENV;
     delete process.env.TLS_SERVER_CONFIG;
+    delete process.env.APIMANAGER;
+    delete process.env.APIMAMANGER_PORT;
   });
 
   it('should expect success', function(done) {
@@ -126,14 +149,22 @@ describe('HTTPS in laptop experience w/ env var', function() {
 
 });
 
-describe('HTTPS in laptop experience w/ pfx', function() {
+describe('HTTPS in onprem w/ pfx', function() {
 
   var request, httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
     process.env.NODE_ENV = 'production';
     process.env.TLS_SERVER_CONFIG = __dirname + '/support/https/tlsconfig-pfx.json'
-    mg.start(3000)
+    process.env.APIMANAGER = '127.0.0.1';
+    process.env.APIMANAGER_PORT = 8081;
+    apimServer.start(
+            process.env.APIMANAGER,
+            process.env.APIMANAGER_PORT,
+            process.env.CONFIG_DIR)
+      .then(function() {
+        return mg.start(3000);
+      })
       .then(function() {
         return echo.start(8889);
       })
@@ -150,12 +181,15 @@ describe('HTTPS in laptop experience w/ pfx', function() {
 
   after(function(done) {
     mg.stop()
+      .then(function() { return apimServer.stop(); })
       .then(function() { return echo.stop(); })
       .then(done, done)
       .catch(done);
     delete process.env.CONFIG_DIR;
     delete process.env.NODE_ENV;
     delete process.env.TLS_SERVER_CONFIG;
+    delete process.env.APIMANAGER;
+    delete process.env.APIMAMANGER_PORT;
   });
 
   it('should expect success', function(done) {
@@ -174,13 +208,21 @@ describe('HTTPS in laptop experience w/ pfx', function() {
 
 });
 
-describe('HTTPS in laptop experience w/ default TLS', function() {
+describe('HTTPS in onprem w/ default TLS', function() {
 
   var request, httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
     process.env.NODE_ENV = 'production';
-    mg.start(3000)
+    process.env.APIMANAGER = '127.0.0.1';
+    process.env.APIMANAGER_PORT = 8081;
+    apimServer.start(
+            process.env.APIMANAGER,
+            process.env.APIMANAGER_PORT,
+            process.env.CONFIG_DIR)
+      .then(function() {
+        return mg.start(3000);
+      })
       .then(function() {
         return echo.start(8889);
       })
@@ -197,11 +239,14 @@ describe('HTTPS in laptop experience w/ default TLS', function() {
 
   after(function(done) {
     mg.stop()
+      .then(function() { return apimServer.stop(); })
       .then(function() { return echo.stop(); })
       .then(done, done)
       .catch(done);
     delete process.env.CONFIG_DIR;
     delete process.env.NODE_ENV;
+    delete process.env.APIMANAGER;
+    delete process.env.APIMAMANGER_PORT;
   });
 
   it('should expect success', function(done) {
@@ -220,13 +265,21 @@ describe('HTTPS in laptop experience w/ default TLS', function() {
 
 });
 
-describe('HTTP in laptop experience when HTTPS not specified', function() {
+describe('HTTP in onprem when HTTPS not specified', function() {
 
   var request, httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/http';
     process.env.NODE_ENV = 'production';
-    mg.start(3000)
+    process.env.APIMANAGER = '127.0.0.1';
+    process.env.APIMANAGER_PORT = 8081;
+    apimServer.start(
+            process.env.APIMANAGER,
+            process.env.APIMANAGER_PORT,
+            process.env.CONFIG_DIR)
+      .then(function() {
+        return mg.start(3000);
+      })
       .then(function() {
         return echo.start(8889);
       })
@@ -242,11 +295,14 @@ describe('HTTP in laptop experience when HTTPS not specified', function() {
 
   after(function(done) {
     mg.stop()
+      .then(function() { return apimServer.stop(); })
       .then(function() { return echo.stop(); })
       .then(done, done)
       .catch(done);
     delete process.env.CONFIG_DIR;
     delete process.env.NODE_ENV;
+    delete process.env.APIMANAGER;
+    delete process.env.APIMAMANGER_PORT;
   });
 
   it('should expect success', function(done) {
@@ -257,13 +313,21 @@ describe('HTTP in laptop experience when HTTPS not specified', function() {
 
 });
 
-describe('HTTPS in laptop experience when HTTPS explicitly specified', function() {
+describe('HTTPS in onprem when HTTPS explicitly specified', function() {
 
   var request, httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
     process.env.NODE_ENV = 'production';
-    mg.start(3000)
+    process.env.APIMANAGER = '127.0.0.1';
+    process.env.APIMANAGER_PORT = 8081;
+    apimServer.start(
+            process.env.APIMANAGER,
+            process.env.APIMANAGER_PORT,
+            process.env.CONFIG_DIR)
+      .then(function() {
+        return mg.start(3000);
+      })
       .then(function() {
         return echo.start(8889);
       })
@@ -280,11 +344,14 @@ describe('HTTPS in laptop experience when HTTPS explicitly specified', function(
 
   after(function(done) {
     mg.stop()
+      .then(function() { return apimServer.stop(); })
       .then(function() { return echo.stop(); })
       .then(done, done)
       .catch(done);
     delete process.env.CONFIG_DIR;
     delete process.env.NODE_ENV;
+    delete process.env.APIMANAGER;
+    delete process.env.APIMAMANGER_PORT;
   });
 
   it('should expect success', function(done) {
@@ -303,13 +370,21 @@ describe('HTTPS in laptop experience when HTTPS explicitly specified', function(
 
 });
 
-describe('HTTPS in laptop experience when schemes not specified', function() {
+describe('HTTPS in onprem when schemes not specified', function() {
 
   var request, httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
     process.env.NODE_ENV = 'production';
-    mg.start(3000)
+    process.env.APIMANAGER = '127.0.0.1';
+    process.env.APIMANAGER_PORT = 8081;
+    apimServer.start(
+            process.env.APIMANAGER,
+            process.env.APIMANAGER_PORT,
+            process.env.CONFIG_DIR)
+      .then(function() {
+        return mg.start(3000);
+      })
       .then(function() {
         return echo.start(8889);
       })
@@ -326,11 +401,172 @@ describe('HTTPS in laptop experience when schemes not specified', function() {
 
   after(function(done) {
     mg.stop()
+      .then(function() { return apimServer.stop(); })
       .then(function() { return echo.stop(); })
       .then(done, done)
       .catch(done);
     delete process.env.CONFIG_DIR;
     delete process.env.NODE_ENV;
+    delete process.env.APIMANAGER;
+    delete process.env.APIMAMANGER_PORT;
+  });
+
+  it('should expect success', function(done) {
+    request
+      .get('/https/https')
+      .expect(200, done);
+  });
+  it('should expect failure', function(done) {
+    httprequest
+      .get('/http/http')
+      .end(function(err, res) {
+        if (err) return done(); // expect error
+        done(new Error('expect error'));
+      });
+  });
+
+});
+
+/*  NEED ROOT ACCESS
+describe('HTTP no port specified in onprem when HTTPS not specified', function() {
+
+  var request, httprequest;
+  before(function(done) {
+    process.env.CONFIG_DIR = __dirname + '/definitions/https/http';
+    process.env.NODE_ENV = 'production';
+    process.env.APIMANAGER = '127.0.0.1';
+    process.env.APIMANAGER_PORT = 8081;
+    apimServer.start(
+            process.env.APIMANAGER,
+            process.env.APIMANAGER_PORT,
+            process.env.CONFIG_DIR)
+      .then(function() {
+        return mg.start();
+      })
+      .then(function() {
+        return echo.start(8889);
+      })
+      .then(function() {
+        httprequest = supertest('http://localhost:80');
+      })
+      .then(done)
+      .catch(function(err) {
+        console.error(err);
+        done(err);
+      });
+  });
+
+  after(function(done) {
+    mg.stop()
+      .then(function() { return apimServer.stop(); })
+      .then(function() { return echo.stop(); })
+      .then(done, done)
+      .catch(done);
+    delete process.env.CONFIG_DIR;
+    delete process.env.NODE_ENV;
+    delete process.env.APIMANAGER;
+    delete process.env.APIMAMANGER_PORT;
+  });
+
+  it('should expect success', function(done) {
+    httprequest
+      .get('/http/http')
+      .expect(200, done);
+  });
+
+});
+*/
+
+describe('HTTP port in ENV in onprem when HTTPS not specified', function() {
+
+  var request, httprequest;
+  before(function(done) {
+    process.env.CONFIG_DIR = __dirname + '/definitions/https/http';
+    process.env.NODE_ENV = 'production';
+    process.env.PORT = 3000;
+    process.env.APIMANAGER = '127.0.0.1';
+    process.env.APIMANAGER_PORT = 8081;
+    apimServer.start(
+            process.env.APIMANAGER,
+            process.env.APIMANAGER_PORT,
+            process.env.CONFIG_DIR)
+      .then(function() {
+        return mg.start();
+      })
+      .then(function() {
+        return echo.start(8889);
+      })
+      .then(function() {
+        httprequest = supertest('http://localhost:3000');
+      })
+      .then(done)
+      .catch(function(err) {
+        console.error(err);
+        done(err);
+      });
+  });
+
+  after(function(done) {
+    mg.stop()
+      .then(function() { return apimServer.stop(); })
+      .then(function() { return echo.stop(); })
+      .then(done, done)
+      .catch(done);
+    delete process.env.CONFIG_DIR;
+    delete process.env.NODE_ENV;
+    delete process.env.PORT;
+    delete process.env.APIMANAGER;
+    delete process.env.APIMAMANGER_PORT;
+  });
+
+  it('should expect success', function(done) {
+    httprequest
+      .get('/http/http')
+      .expect(200, done);
+  });
+
+});
+
+/*  NEED ROOT ACCESS
+describe('HTTPS no port specified in onprem when HTTPS explicitly specified', function() {
+
+  var request, httprequest;
+  before(function(done) {
+    process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
+    process.env.NODE_ENV = 'production';
+    process.env.APIMANAGER = '127.0.0.1';
+    process.env.APIMANAGER_PORT = 8081;
+    apimServer.start(
+            process.env.APIMANAGER,
+            process.env.APIMANAGER_PORT,
+            process.env.CONFIG_DIR)
+      .then(function() {
+        return mg.start();
+      })
+      .then(function() {
+        return echo.start(8889);
+      })
+      .then(function() {
+        request = supertest(mg.app);
+        httprequest = supertest('http://localhost:443');
+      })
+      .then(done)
+      .catch(function(err) {
+        console.error(err);
+        done(err);
+      });
+  });
+
+  after(function(done) {
+    mg.stop()
+      .then(function() { return apimServer.stop(); })
+      .then(function() { return echo.stop(); })
+      .then(done, done)
+      .catch(done);
+    delete process.env.CONFIG_DIR;
+    delete process.env.NODE_ENV;
+    delete process.env.APIMANAGER;
+    delete process.env.APIMAMANGER_PORT;
   });
 
   it('should expect success', function(done) {
@@ -349,3 +585,62 @@ describe('HTTPS in laptop experience when schemes not specified', function() {
 
 });
 */
+
+describe('HTTPS port in ENV in onprem when HTTPS explicitly specified', function() {
+
+  var request, httprequest;
+  before(function(done) {
+    process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
+    process.env.NODE_ENV = 'production';
+    process.env.PORT = 3000;
+    process.env.APIMANAGER = '127.0.0.1';
+    process.env.APIMANAGER_PORT = 8081;
+    apimServer.start(
+            process.env.APIMANAGER,
+            process.env.APIMANAGER_PORT,
+            process.env.CONFIG_DIR)
+      .then(function() {
+        return mg.start();
+      })
+      .then(function() {
+        return echo.start(8889);
+      })
+      .then(function() {
+        request = supertest(mg.app);
+        httprequest = supertest('http://localhost:3000');
+      })
+      .then(done)
+      .catch(function(err) {
+        console.error(err);
+        done(err);
+      });
+  });
+
+  after(function(done) {
+    mg.stop()
+      .then(function() { return apimServer.stop(); })
+      .then(function() { return echo.stop(); })
+      .then(done, done)
+      .catch(done);
+    delete process.env.CONFIG_DIR;
+    delete process.env.NODE_ENV;
+    delete process.env.PORT;
+    delete process.env.APIMANAGER;
+    delete process.env.APIMAMANGER_PORT;
+  });
+
+  it('should expect success', function(done) {
+    request
+      .get('/https/https')
+      .expect(200, done);
+  });
+  it('should expect failure', function(done) {
+    httprequest
+      .get('/http/http')
+      .end(function(err, res) {
+        if (err) return done(); // expect error
+        done(new Error('expect error'));
+      });
+  });
+
+});

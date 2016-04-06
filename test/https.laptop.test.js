@@ -333,3 +333,177 @@ describe('HTTPS in laptop experience when schemes not specified', function() {
   });
 
 });
+
+/*  NEED ROOT ACCESS
+describe('HTTP no port specified in laptop experience when HTTPS not specified', function() {
+
+  var request, httprequest;
+  before(function(done) {
+    process.env.CONFIG_DIR = __dirname + '/definitions/https/http';
+    process.env.NODE_ENV = 'production';
+    mg.start()
+      .then(function() {
+        return echo.start(8889);
+      })
+      .then(function() {
+        httprequest = supertest('http://localhost:80');
+      })
+      .then(done)
+      .catch(function(err) {
+        console.error(err);
+        done(err);
+      });
+  });
+
+  after(function(done) {
+    mg.stop()
+      .then(function() { return echo.stop(); })
+      .then(done, done)
+      .catch(done);
+    delete process.env.CONFIG_DIR;
+    delete process.env.NODE_ENV;
+  });
+
+  it('should expect success', function(done) {
+    httprequest
+      .get('/http/http')
+      .expect(200, done);
+  });
+
+});
+*/
+
+describe('HTTP port in ENV in laptop experience when HTTPS not specified', function() {
+
+  var request, httprequest;
+  before(function(done) {
+    process.env.CONFIG_DIR = __dirname + '/definitions/https/http';
+    process.env.NODE_ENV = 'production';
+    process.env.PORT = 3000;
+    mg.start()
+      .then(function() {
+        return echo.start(8889);
+      })
+      .then(function() {
+        httprequest = supertest('http://localhost:3000');
+      })
+      .then(done)
+      .catch(function(err) {
+        console.error(err);
+        done(err);
+      });
+  });
+
+  after(function(done) {
+    mg.stop()
+      .then(function() { return echo.stop(); })
+      .then(done, done)
+      .catch(done);
+    delete process.env.CONFIG_DIR;
+    delete process.env.NODE_ENV;
+    delete process.env.PORT;
+  });
+
+  it('should expect success', function(done) {
+    httprequest
+      .get('/http/http')
+      .expect(200, done);
+  });
+
+});
+
+/*  NEED ROOT ACCESS
+describe('HTTPS no port specified in laptop experience when HTTPS explicitly specified', function() {
+
+  var request, httprequest;
+  before(function(done) {
+    process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
+    process.env.NODE_ENV = 'production';
+    mg.start()
+      .then(function() {
+        return echo.start(8889);
+      })
+      .then(function() {
+        request = supertest(mg.app);
+        httprequest = supertest('http://localhost:443');
+      })
+      .then(done)
+      .catch(function(err) {
+        console.error(err);
+        done(err);
+      });
+  });
+
+  after(function(done) {
+    mg.stop()
+      .then(function() { return echo.stop(); })
+      .then(done, done)
+      .catch(done);
+    delete process.env.CONFIG_DIR;
+    delete process.env.NODE_ENV;
+  });
+
+  it('should expect success', function(done) {
+    request
+      .get('/https/https')
+      .expect(200, done);
+  });
+  it('should expect failure', function(done) {
+    httprequest
+      .get('/http/http')
+      .end(function(err, res) {
+        if (err) return done(); // expect error
+        done(new Error('expect error'));
+      });
+  });
+
+});
+*/
+
+describe('HTTPS port in ENV in laptop experience when HTTPS explicitly specified', function() {
+
+  var request, httprequest;
+  before(function(done) {
+    process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
+    process.env.NODE_ENV = 'production';
+    process.env.PORT = 3000;
+    mg.start()
+      .then(function() {
+        return echo.start(8889);
+      })
+      .then(function() {
+        request = supertest(mg.app);
+        httprequest = supertest('http://localhost:3000');
+      })
+      .then(done)
+      .catch(function(err) {
+        console.error(err);
+        done(err);
+      });
+  });
+
+  after(function(done) {
+    mg.stop()
+      .then(function() { return echo.stop(); })
+      .then(done, done)
+      .catch(done);
+    delete process.env.CONFIG_DIR;
+    delete process.env.NODE_ENV;
+    delete process.env.PORT;
+  });
+
+  it('should expect success', function(done) {
+    request
+      .get('/https/https')
+      .expect(200, done);
+  });
+  it('should expect failure', function(done) {
+    httprequest
+      .get('/http/http')
+      .end(function(err, res) {
+        if (err) return done(); // expect error
+        done(new Error('expect error'));
+      });
+  });
+
+});
