@@ -71,14 +71,11 @@ function ModelType(name, prefix, endp) {
  * @api public
  */
 function apimpull (opts, cb) {
-  var key = opts.clikey || 'key.pem';
-  var cert = opts.clicert || 'cert.pem';
-  var srvca = opts.srvca || 'ca.pem';
   var options = {
     host : opts.host || '127.0.0.1',
     port : opts.port || 443, // assume SSL
     timeout : opts.timeout * 1000 || 30 * 1000,
-    srvca : opts.srvca ? fs.readFileSync(srvca) : null,
+    srvca : opts.srvca ? opts.srvca : null,
     clikey : opts.clikey ? opts.clikey : null,
     clipass : opts.clipass,
     clicert : opts.clicert ? opts.clicert  : null,
