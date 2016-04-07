@@ -829,6 +829,27 @@ function findAndReplace(object, value, replacevalue){
   return object;
 }
 
+function checkHttps(apidoc) {
+  // determine if micro gateway should start w/ HTTPS or not
+  // based on presence of 'https' in schemes
+  if (!https || !http) {
+    if (apidoc.schemes) {
+      if (apidoc.schemes.indexOf('https') > -1) {
+        https = true;
+      }
+      if (apidoc.schemes.indexOf('http') > -1) {
+        http = true;
+      }
+    } else {
+      https = true;
+    }
+  }
+  if (http && https) {
+    logger.error('Both HTTP and HTTPS schemes detected; Gateway only supports a single protocol at a time');
+    mixedProtocols = true;
+  }
+}
+
 function expandAPIData(apidoc, dir)
   {
   if (apidoc['x-ibm-configuration'])
@@ -877,24 +898,7 @@ function expandAPIData(apidoc, dir)
       }
     apidoc = findAndReplace(apidoc, cataloghostvar, cataloghost);
     }
-    // determine if micro gateway should start w/ HTTPS or not
-    // based on presence of 'https' in schemes
-    if (!https || !http) {
-      if (apidoc.schemes) {
-        if (apidoc.schemes.indexOf('https') > -1) {
-          https = true;
-        }
-        if (apidoc.schemes.indexOf('http') > -1) {
-          http = true;
-        }
-      } else {
-        https = true;
-      }
-    }
-    if (http && https) {
-      logger.error('Both HTTP and HTTPS schemes detected; Gateway only supports a single protocol at a time');
-      mixedProtocols = true;
-    }
+  checkHttps(apidoc);
   return apidoc;
   }
 function loadAPIsFromYAML(listOfAPIs, dir)
@@ -951,6 +955,11 @@ function populateModelsWithAPImData(app, models, dir, uid, cb) {
           readfile.forEach(
             function(obj) {
               obj['snapshot-id'] = uid;
+
+              // looks like an API
+              if (obj.document && obj.document.swagger) {
+                checkHttps(obj.document);
+              }
             }
           );
 

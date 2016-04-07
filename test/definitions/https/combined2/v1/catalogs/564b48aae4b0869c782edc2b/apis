@@ -1,0 +1,57 @@
+[
+    {
+        "catalog": {
+            "default": false,
+            "id": "564b48aae4b0869c782edc2b",
+            "name": "sb",
+            "sandbox": true,
+            "title": "Sandbox",
+            "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+        },
+        "document": {
+          "info": {
+            "version": "1.0.0",
+            "title": "httpandhttps",
+            "x-ibm-name": "httpandhttps",
+            "description": "https test suite"
+          },
+          "basePath": "/httpandhttps",
+          "swagger": "2.0",
+          "paths": {
+            "/httpandhttps": {
+              "get": {
+                "responses": {
+                  "200": {
+                    "description": "200 OK"
+                  }
+                }
+              }
+            }
+          },
+          "x-ibm-configuration": {
+            "assembly": {
+              "execute": [
+                {
+                  "invoke": {
+                    "title": "invoke",
+                    "target-url": "http://localhost:8889/"
+                  }
+                }
+              ]
+            }
+          },
+          "schemes": [
+            "https",
+            "http"
+          ]
+        },
+        "id": "564b7b3ae4b0869c782eddae",
+        "organization": {
+            "id": "564b48a9e4b0869c782edc24",
+            "name": "apim",
+            "title": "Climb On"
+        },
+        "state": "running",
+        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+    }
+]

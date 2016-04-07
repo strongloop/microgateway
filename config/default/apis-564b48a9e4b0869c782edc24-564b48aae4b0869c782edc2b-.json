@@ -380,7 +380,7 @@
                 "application/json"
             ],
             "schemes": [
-                "https"
+                "http"
             ],
             "swagger": "2.0",
             "x-ibm-configuration": {
@@ -755,7 +755,7 @@
                 "application/json"
             ],
             "schemes": [
-                "https"
+                "http"
             ],
             "security": [
                 {
@@ -1160,7 +1160,7 @@
                 "application/json"
             ],
             "schemes": [
-                "https"
+                "http"
             ],
             "security": [
                 {
@@ -1956,7 +1956,7 @@
                 "application/json"
             ],
             "schemes": [
-                "https"
+                "http"
             ],
             "security": [
                 {

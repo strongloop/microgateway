@@ -1,0 +1,73 @@
+[
+   {
+      "id": "564b7b3ae4b0869c782eddaf",
+      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
+      "state": "published",
+      "visibility": {
+         "view": {
+            "enabled": true,
+            "type": "public",
+            "tags": [],
+            "orgs": []
+         },
+         "subscribe": {
+            "enabled": true,
+            "type": "authenticated",
+            "tags": [],
+            "orgs": []
+         }
+      },
+      "organization": {
+         "id": "564b48a9e4b0869c782edc24",
+         "name": "apim",
+         "title": "Climb On"
+      },
+      "catalog": {
+         "id": "564b48aae4b0869c782edc2b",
+         "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+         "name": "sb",
+         "title": "Sandbox",
+         "sandbox": true,
+         "default": false
+      },
+      "document": {
+         "product": "1.0.0",
+         "info": {
+            "name": "uber",
+            "title": "Uber Product",
+            "version": "1.0.0"
+         },
+         "visibility": {
+            "view": {
+               "enabled": true,
+               "type": "public",
+               "tags": [],
+               "orgs": []
+            },
+            "subscribe": {
+               "enabled": true,
+               "type": "authenticated",
+               "tags": [],
+               "orgs": []
+            }
+         },
+         "apis": {
+            "httpandhttps": {
+               "name": "httpandhttps:1.0.0"
+            }
+         },
+         "plans": {
+            "gold": {
+               "title": "Gold Plan",
+               "rate-limit": {
+                  "hard-limit": false,
+                  "value": "1/sec"
+               },
+               "apis": {
+                  "httpandhttps": {}
+               }
+            }
+         }
+      }
+   }
+]
