@@ -40,6 +40,7 @@ describe('data-store', function() {
     delete process.env.DATASTORE_PORT;
     delete process.env.APIMANAGER_PORT;
     delete process.env.APIMANAGER;
+    delete process.env.APIMANAGER_REFRESH_INTERVAL;
     delete process.env.NODE_ENV;
     microgw.stop()
       .then(function() { echo.stop(); } )

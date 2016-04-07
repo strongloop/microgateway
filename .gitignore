@@ -20,3 +20,4 @@ coverage
 .datastore
 .apiconnect
 test/definitions/policy-loader/token
+env.yaml
