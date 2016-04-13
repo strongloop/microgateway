@@ -3,35 +3,36 @@
 // US Government Users Restricted Rights - Use, duplication or disclosure
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
+/*eslint-env node, mocha*/
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var express = require('express');
-var supertest = require('supertest');
-var echo = require('./support/echo-server');
-var apimServer = require('./support/mock-apim-server2/apim-server');
-var should = require('should');
-var Promise = require('bluebird');
+var supertest  = require('supertest');
+var microgw;
+var backend    = require('./support/invoke-server');
+var apimServer = require('./support/mock-apim-server/apim-server');
+var analytics  = require('./support/analytics-server');
 
-describe('analytics', function() {
+describe('analytics + invoke policy', function() {
 
   var request;
-  var mg;
-  before(function (done) {
-    process.env.CONFIG_DIR = __dirname + '/definitions/set-variable';
+  before(function(done)  {
+    //Use production instead of CONFIG_DIR: reading from apim instead of laptop
     process.env.NODE_ENV = 'production';
-    process.env.APIMMANAGER = 'localhost';
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+    //The apim server and datastore
+    process.env.APIMANAGER = '127.0.0.1';
+    process.env.APIMANAGER_PORT = 8081;
+    process.env.DATASTORE_PORT = 5000;
     delete require.cache[require.resolve('../lib/microgw')];
-    mg = require('../lib/microgw');
-    mg.start(3000)
-    .then(function() {
-      return echo.start(8889);
-    })
-    .then(function() {
-        return apimServer.start('localhost', 9443);
-    })
+    microgw = require('../lib/microgw');
+    
+    apimServer.start(
+            process.env.APIMANAGER,
+            process.env.APIMANAGER_PORT,
+            __dirname + '/definitions/invoke')
+    .then(function() { return backend.start(8889); })
+    .then(function() { return analytics.start(9443); })
+    .then(function() { return microgw.start(3000); })
     .then(function() {
       request = supertest('http://localhost:3000');
     })
@@ -40,56 +41,104 @@ describe('analytics', function() {
       console.error(err);
       done(err);
     });
-
   });
 
-  after(function (done) {
-    return mg.stop()
-      .then(function() {
-        return new Promise(function(resolve, reject) {
-          setTimeout(function() {
-            resolve();
-          }, 5000);
-        });
-      })
-      .then(function() { return echo.stop(); })
-      .then(function() { return apimServer.stop(); })
-      .then(function() {
-        delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
-        delete process.env.CONFIG_DIR;
-        delete process.env.NODE_ENV;
-        delete process.env.APIMMANAGER;
-      })
-      .then(done, done)
-      .catch(done);
+  after(function(done) {
+    delete process.env.NODE_ENV;
+    delete process.env.APIMANAGER;
+    delete process.env.APIMANAGER_PORT;
+    delete process.env.DATASTORE_PORT;
+
+    apimServer.stop()
+    .then(function() { return microgw.stop(); })
+    .then(function() { return backend.stop(); })
+    .then(function() { return analytics.stop(); })
+    .then(done, done)
+    .catch(done);
   });
 
-  it('should set a simple string to a variable', function(done) {
+  var data = { msg: 'Hello world' };
+
+  //invoke policy to post a request
+  it('single record', function(done) {
+    this.timeout(10000);
+
+    //pass the done cb to analytics moc server
+    analytics.setOneTimeDoneCB(function (event) {
+      //may check the payload if needed
+      event = event || '';
+      var records = event.trim().split("\n").filter(function(item) {
+        if (item && item.length === 0) {
+          return false;
+        }
+        return true;
+      });
+      done(records.length === 2 ? 
+        undefined : new Error('record number mismatched'));
+    });
+
     request
-      .post('/set-variable/set-variable')
-      .set('set-variable-case', 'set')
-      .expect('X-Test-Set-Variable', 'value1')
-      .expect(200, done);
+      .post('/invoke/basic')
+      .send(data)
+      .expect(200, /z-url: \/\/invoke\/basic/)
+      .end(function(err) {
+        if (err) {
+          //no need to wait for the analytics moc server
+          done(err);
+        }
+      });
   });
+  
+  it('multiple records', function(done) {
+    this.timeout(10000);
 
-  it('should able to append on existing context variable', function(done) {
+    //pass the done cb to analytics moc server
+    analytics.setOneTimeDoneCB(function (event) {
+      //may check the payload if needed
+      event = event || '';
+      var records = event.trim().split("\n").filter(function(item) {
+        if (item && item.length === 0) {
+          return false;
+        }
+        return true;
+      });
+      done(records.length >= 3 ? 
+        undefined : new Error('record number mismatched'));
+    });
+
+    //send multiple requests below
+    //suppose it should send multiple apievent records to x2020
     request
-      .post('/set-variable/set-variable')
-      .set('set-variable-case', 'set-and-add')
-      .expect('X-Test-Set-Variable', 'value1, value2')
-      .expect(200, done);
-  });
-
-  it('should able to clear existing context variable', function(done) {
+      .post('/invoke/basic')
+      .send(data)
+      .expect(200, /z-url: \/\/invoke\/basic/)
+      .end(function(err) {
+        if (err) {
+          //no need to wait for the analytics moc server
+          done(err);
+        }
+      });
+      
     request
-      .post('/set-variable/set-variable')
-      .set('set-variable-case', 'clear')
-      .set('to-be-deleted', 'test-value')
-      .expect(function(res) {
-        if (res.headers['to-be-deleted']) return 'context variable not deleted';
-      })
-      .expect(200, done);
+      .post('/invoke/basic')
+      .send(data)
+      .expect(200, /z-url: \/\/invoke\/basic/)
+      .end(function(err) {
+        if (err) {
+          //no need to wait for the analytics moc server
+          done(err);
+        }
+      });
+      
+    request
+      .post('/invoke/basic')
+      .send(data)
+      .expect(200, /z-url: \/\/invoke\/basic/)
+      .end(function(err) {
+        if (err) {
+          //no need to wait for the analytics moc server
+          done(err);
+        }
+      });
   });
-
 });
-
