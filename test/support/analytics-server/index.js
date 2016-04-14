@@ -31,15 +31,15 @@ app.post('/x2020/v1/events/_bulk', rawParser, function(req, res, next) {
   next();
 });
 
-var defaultTLS = utils.getTLSConfigSync();
-
-options.requestCert = true;
-options.rejectUnauthorized = true;
-options.ca = [defaultTLS.cert];
 
 var server;
 exports.start = function(port) {
   return new Promise(function(resolve) {
+    var defaultTLS = utils.getTLSConfigSync();
+    options.requestCert = true;
+    options.rejectUnauthorized = true;
+    options.ca = [defaultTLS.cert];
+
     server = https.createServer(options, app).listen(port, function() {
       logger.debug('moc server started on port:', port);
       resolve();
