@@ -165,7 +165,10 @@ paths:
 
 x-ibm-configuration:
   properties:
-    foo: default_foo
+    foo:
+     value: default_foo
+     description: none
+     encoded: false
   catalogs:
     local:
       properties:
