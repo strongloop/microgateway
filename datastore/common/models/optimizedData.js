@@ -509,7 +509,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                     ibmSwaggerExtension.catalogs[pieces.catalog.name].properties[propertyName]) {
                   apiProperties[propertyName] = ibmSwaggerExtension.catalogs[pieces.catalog.name].properties[propertyName];
                 } else {
-                  apiProperties[propertyName] = defaultApiProperties[propertyName];
+                  apiProperties[propertyName] = defaultApiProperties[propertyName].value;
                 }
               }
             );
