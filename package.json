@@ -1,6 +1,6 @@
 {
   "name": "apiconnect-microgateway",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "API Connect MicroGateway",
   "main": "index.js",
   "scripts": {
