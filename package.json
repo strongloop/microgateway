@@ -1,6 +1,6 @@
 {
-  "name": "apiconnect-microgateway",
-  "version": "1.0.3",
+  "name": "microgateway",
+  "version": "1.0.4",
   "description": "API Connect MicroGateway",
   "main": "index.js",
   "scripts": {
@@ -9,19 +9,21 @@
     "test": "mocha -t 600000"
   },
   "engines": {
-    "node": ">=0.10.43"
+    "node": ">=0.12.0"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.ibm.com:apimesh/apiconnect-microgateway.git"
+    "url": "git@github.ibm.com:apimesh/microgateway.git"
   },
   "keywords": [
     "ibm",
     "api",
     "connect",
     "apiconnect",
+    "microgateway",
     "gateway",
     "microservices",
+    "secure",
     "enforce"
   ],
   "author": "IBM Gateway Team",
