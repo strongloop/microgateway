@@ -49,7 +49,7 @@ function cleanup () {
 
   return dsc.getCurrentSnapshot()
     .then(function(id) {
-      ssdir = path.resolve(__dirname, '../config', id);
+      ssdir = path.resolve(__dirname, path.dirname(process.env.CONFIG_DIR), id);
       return readdir(ssdir);
     })
     .then(function(files) {
