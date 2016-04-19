@@ -244,6 +244,16 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8890')
       .set('X-TLS-PROFILE', 'tls-profile-simple')
+      .expect(/body/)
+      .expect(200, done);
+  });
+
+  it('https-without-tlsprofile', function(done) {
+    this.timeout(10000);
+
+    request
+      .get('/invoke/testTLS')
+      .set('X-HTTPS-PORT', '8890')
       .expect(200, done);
   });
 
@@ -306,45 +316,43 @@ describe('invokePolicy', function() {
       .expect(299, /Error: write EPROTO/, done);
   });
 
-  //cipher mapping table for each TLS versions:
-  //https://www.openssl.org/docs/manmaster/apps/ciphers.html#CIPHER_LIST_FORMAT
-  //both of server and client support the cipher 'TLS_RSA_WITH_3DES_EDE_CBC_SHA'
-  it('use-cipher-TLS_RSA_WITH_3DES_EDE_CBC_SHA', function(done) {
-    this.timeout(10000);
-
-    request
-      .get('/invoke/testTLS')
-      .set('X-HTTPS-PORT', '8892')
-      .set('X-TLS-PROFILE', 'use-cipher-TLS_RSA_WITH_3DES_EDE_CBC_SHA')
-      .expect(200, done);
-  });
-
-  //client requires a cipher which is disalloed by server
-  //The EPROTO error is due to the "!ECDHE-RSA-AES128-SHA256" in server side.
-  //The cipher is available but is not allowed.
-  it('use-cipher-TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256', function(done) {
-    this.timeout(10000);
-
-    request
-      .get('/invoke/testTLS')
-      .set('X-HTTPS-PORT', '8893')
-      .set('X-TLS-PROFILE', 'use-cipher-TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256')
-      .expect(299, /Error: write EPROTO/, done);
-  });
-
-  /*
-  Disable the PSK cipher
-  //'no ciphers available' or 'write EPROTO'?
-  it('use-cipher-PSK_WITH_CAMELLIA_128_CBC_SHA256', function(done) {
-    this.timeout(10000);
-
-    request
-      .get('/invoke/testTLS')
-      .set('X-HTTPS-PORT', '8893')
-      .set('X-TLS-PROFILE', 'use-cipher-PSK_WITH_CAMELLIA_128_CBC_SHA256')
-      .expect(299, /SSL23_CLIENT_HELLO:no ciphers available/, done);
-  });
-  */
+  ////cipher mapping table for each TLS versions:
+  ////https://www.openssl.org/docs/manmaster/apps/ciphers.html#CIPHER_LIST_FORMAT
+  ////both of server and client support the cipher 'TLS_RSA_WITH_3DES_EDE_CBC_SHA'
+  //it('use-cipher-TLS_RSA_WITH_3DES_EDE_CBC_SHA', function(done) {
+  //  this.timeout(10000);
+  //
+  //  request
+  //    .get('/invoke/testTLS')
+  //    .set('X-HTTPS-PORT', '8892')
+  //    .set('X-TLS-PROFILE', 'use-cipher-TLS_RSA_WITH_3DES_EDE_CBC_SHA')
+  //    .expect(200, done);
+  //});
+  //
+  ////client requires a cipher which is disalloed by server
+  ////The EPROTO error is due to the "!ECDHE-RSA-AES128-SHA256" in server side.
+  ////The cipher is available but is not allowed.
+  //it('use-cipher-TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256', function(done) {
+  //  this.timeout(10000);
+  //
+  //  request
+  //    .get('/invoke/testTLS')
+  //    .set('X-HTTPS-PORT', '8893')
+  //    .set('X-TLS-PROFILE', 'use-cipher-TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256')
+  //    .expect(299, /Error: write EPROTO/, done);
+  //});
+  //
+  ////client requires the PSK cipher that is not available at server
+  ////'no ciphers available'
+  //it('use-cipher-PSK_WITH_CAMELLIA_128_CBC_SHA256', function(done) {
+  //  this.timeout(10000);
+  //
+  //  request
+  //    .get('/invoke/testTLS')
+  //    .set('X-HTTPS-PORT', '8893')
+  //    .set('X-TLS-PROFILE', 'use-cipher-PSK_WITH_CAMELLIA_128_CBC_SHA256')
+  //    .expect(299, /SSL23_CLIENT_HELLO:no ciphers available/, done);
+  //});
 
   //The client expects the server to be Sarah and uses the CA 'root' for auth.
   //However, the server is Sandy who should be authenticated using 'root2'.
