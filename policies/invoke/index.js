@@ -11,17 +11,17 @@ var qs = require('qs');
 var zlib = require('zlib');
 var dsc = require('../../datastore/client');
 
-//one-time effort: read the cipher table into memory
-var cipherTable;
-try {
-    //the mapping table of TLS to OpenSSL ciphersuites
-    cipherTable = require(__dirname + '/../../lib/cipher-suites.json');
-}
-catch (err) {
-    logger.error('Warning! Cannot read the cipher table for invoke policy. %s',
-            err);
-    cipherTable = {};
-}
+////one-time effort: read the cipher table into memory
+//var cipherTable;
+//try {
+//    //the mapping table of TLS to OpenSSL ciphersuites
+//    cipherTable = require(__dirname + '/../../lib/cipher-suites.json');
+//}
+//catch (err) {
+//    logger.error('Warning! Cannot read the cipher table for invoke policy. %s',
+//            err);
+//    cipherTable = {};
+//}
 
 
 /**
@@ -265,22 +265,23 @@ function _main(props, context, next, logger, tlsProfile) {
             }
         }
 
-        //ciphers
-        var ciphers = [];
-        if (tlsProfile.ciphers && Array.isArray(tlsProfile.ciphers)) {
-            options.honorCipherOrder = true;
-            for (var k=0; k<tlsProfile.ciphers.length; k++) {
-                var cipher = cipherTable[tlsProfile.ciphers[k]];
-                if (cipher) {
-                    logger.debug("[invoke] using cipher: %s", cipher);
-                    ciphers.push(cipher);
-                }
-                else
-                    logger.warn("[invoke] unknown cipher: %s",
-                            tlsProfile.ciphers[k]);
-            }
-            options.ciphers = ciphers.join(':');
-        }
+        //use default ciphers
+        options.honorCipherOrder = true;
+        options.ciphers = 'HIGH:MEDIUM:!aNULL:!eNULL:!RC4:@STRENGTH';
+        //var ciphers = [];
+        //if (tlsProfile.ciphers && Array.isArray(tlsProfile.ciphers)) {
+        //    for (var k=0; k<tlsProfile.ciphers.length; k++) {
+        //        var cipher = cipherTable[tlsProfile.ciphers[k]];
+        //        if (cipher) {
+        //            logger.debug("[invoke] using cipher: %s", cipher);
+        //            ciphers.push(cipher);
+        //        }
+        //        else
+        //            logger.warn("[invoke] unknown cipher: %s",
+        //                    tlsProfile.ciphers[k]);
+        //    }
+        //    options.ciphers = ciphers.join(':');
+        //}
       }
     }
 
