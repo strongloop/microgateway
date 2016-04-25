@@ -9,8 +9,60 @@
 var supertest  = require('supertest');
 var microgw;
 var backend    = require('./support/invoke-server');
-var apimServer = require('./support/mock-apim-server/apim-server');
 var analytics  = require('./support/analytics-server');
+var fs         = require('fs');
+var path       = require('path');
+
+var hasCopiedKeys;
+var privKey = path.resolve(__dirname, '..', 'id_rsa');
+var pubKey  = path.resolve(__dirname, '..', 'id_rsa.pub');
+var srcPrivKey = path.resolve(__dirname, 'definitions',
+         'analytics', 'id_rsa');
+var srcPubKey = path.resolve(__dirname, 'definitions',
+        'analytics', 'id_rsa.pub');
+
+
+function copyKeys() {
+  return new Promise(function(resolve, reject) {
+    try {
+      var fsStat1 = fs.statSync(privKey);
+      var fsStat2 = fs.statSync(pubKey);
+      if (fsStat1.isFile() && fsStat2.isFile()) {
+        resolve();
+        hasCopiedKeys = undefined;
+        return;
+      }
+    } catch (e) {}
+    
+    try {
+      //need to copy keys
+      var buf1 = fs.readFileSync(srcPrivKey);
+      var buf2 = fs.readFileSync(srcPubKey);
+      fs.writeFileSync(privKey, buf1);
+      fs.writeFileSync(pubKey, buf2);
+      hasCopiedKeys = 1;
+      resolve();
+    } catch (e) {
+      reject(new Error('unable to prepare keys:' + e));
+    }
+  });
+}
+
+function delKeys() {
+  return new Promise(function(resolve, reject) {
+    if (!hasCopiedKeys) {
+      resolve();
+    } else {
+      try {
+        fs.unlinkSync(privKey);
+        fs.unlinkSync(pubKey);
+        resolve();
+      } catch (e) {
+        reject(new Error('unable to delete keys:' + e));
+      }
+    }
+  });
+}
 
 describe('analytics + invoke policy', function() {
 
@@ -22,23 +74,27 @@ describe('analytics + invoke policy', function() {
     //The apim server and datastore
     process.env.APIMANAGER = '127.0.0.1';
     process.env.APIMANAGER_PORT = 8081;
+    process.env.APIMANAGER_CATALOG = '564b48aae4b0869c782edc2b';
     process.env.DATASTORE_PORT = 5000;
     delete require.cache[require.resolve('../lib/microgw')];
-    microgw = require('../lib/microgw');
     
-    apimServer.start(
-            process.env.APIMANAGER,
+    copyKeys()
+    .then(function() {
+      return analytics.start(
             process.env.APIMANAGER_PORT,
-            __dirname + '/definitions/invoke')
+            __dirname + '/definitions/invoke/v1');
+    })
     .then(function() { return backend.start(8889); })
-    .then(function() { return analytics.start(9443); })
-    .then(function() { return microgw.start(3000); })
+    .then(function() { 
+      microgw = require('../lib/microgw');
+      return microgw.start(3000);
+    })
     .then(function() {
       request = supertest('http://localhost:3000');
     })
     .then(done)
     .catch(function(err) {
-      console.error(err);
+      console.error('preparation failed:', err);
       done(err);
     });
   });
@@ -48,11 +104,12 @@ describe('analytics + invoke policy', function() {
     delete process.env.APIMANAGER;
     delete process.env.APIMANAGER_PORT;
     delete process.env.DATASTORE_PORT;
+    delete process.env.APIMANAGER_CATALOG;
 
-    apimServer.stop()
+    analytics.stop()
     .then(function() { return microgw.stop(); })
     .then(function() { return backend.stop(); })
-    .then(function() { return analytics.stop(); })
+    .then(function() { return delKeys(); })
     .then(done, done)
     .catch(done);
   });
