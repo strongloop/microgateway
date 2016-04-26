@@ -630,9 +630,9 @@ function makePathRegex(basePath, apiPath) {
     }
   } while (braceBegin >= 0);
   if (apiPath === '/') {
-    path = '^' + basePath + '$';
+    path = '^' + basePath + '/?$';
   } else {
-    path = '^' + basePath + path + '$';
+    path = '^' + basePath + path + '/?$';
   }
   logger.debug('path after: ', path);
   return path;
