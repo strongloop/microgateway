@@ -88,26 +88,22 @@ function decryptAPIMResponse(body, private_key) {
     throw new Error('bad handshake response from APIm');
   }
 
-  try {
-    var key = crypto.privateDecrypt(
-      {
-        key: private_key,
-        padding: constants.RSA_PKCS1_PADDING
-      },
-      new Buffer(body.key, 'base64')
-    );
-  
-    var iv = new Buffer(16);
-    iv.fill(0);
-    var decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-    var plainText = decipher.update(body.cipher, 'base64', 'utf8');
-    plainText += decipher.final('utf8');
-  
-    log.debug('handshake response payload:', plainText);
-    return JSON.parse(plainText);
-  } catch (e) {
-    throw e;
-  }
+  var key = crypto.privateDecrypt(
+    {
+      key: private_key,
+      padding: constants.RSA_PKCS1_PADDING
+    },
+    new Buffer(body.key, 'base64')
+  );
+
+  var iv = new Buffer(16);
+  iv.fill(0);
+  var decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+  var plainText = decipher.update(body.cipher, 'base64', 'utf8');
+  plainText += decipher.final('utf8');
+
+  log.debug('handshake response payload:', plainText);
+  return JSON.parse(plainText);
 }
 
 /**
@@ -228,9 +224,8 @@ exports.handshakeWithAPIm = function (apim, privKey, doneCB) {
           var json = decryptAPIMResponse(body, privKey);
 
           if (!json || !json.microGateway) {
-            reject(new Error(
-                targetURL + ' response did not contain "microGateway" section'));
-            return;
+            throw new Error(
+                targetURL + ' response did not contain "microGateway" section');
           }
           //{cert: cert, key:key, clientID:clientID}
           resolve(json.microGateway);
