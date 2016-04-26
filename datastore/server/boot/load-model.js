@@ -29,8 +29,7 @@ var CATALOG_HOST = environment.CATALOG_HOST;
 var cliConfig = require('apiconnect-cli-config');
 
 var rootConfigPath = __dirname + '/../../../config/';
-var defaultDefinitionsDir = rootConfigPath + 'default';
-var definitionsDir = defaultDefinitionsDir;
+var definitionsDir = rootConfigPath + 'default';
 
 var gatewayMain = __dirname + '/../../../';
 var keyFile = gatewayMain + KEYNAME;
@@ -99,10 +98,7 @@ module.exports = function(app) {
         //    if no apimanager specified, dir will be loaded..
         if (process.env[CONFIGDIR])
           definitionsDir = process.env[CONFIGDIR];
-        else {
-          process.env.ROOTCONFIGDIR = rootConfigPath;
-          definitionsDir = defaultDefinitionsDir;
-        }
+        process.env.ROOTCONFIGDIR = path.dirname(definitionsDir);
         callback();
       },
       // stage the models
@@ -160,6 +156,7 @@ module.exports = function(app) {
 function loadData(app, apimanager, models, currdir) {
   var snapdir;
   var snapshotID = getSnapshotID();
+  var populatedSnapshot = false;
   
   async.series(
     [
@@ -184,6 +181,7 @@ function loadData(app, apimanager, models, currdir) {
       },
       // load current config
       function(callback) {
+        populatedSnapshot = true;
         loadConfig(app,
                    apimanager,
                    models,
@@ -194,6 +192,13 @@ function loadData(app, apimanager, models, currdir) {
       }
     ],
     function(err, results) {
+      if (err && populatedSnapshot) {
+        releaseSnapshot(app, snapshotID, function (err) {
+          process.send({LOADED:false});
+        });
+      } else {
+        process.send({LOADED: true, 'https': https});
+      }
       setImmediate(scheduleLoadData,
                    app,
                    apimanager,
@@ -431,7 +436,8 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
 function pullFromAPIm(apimanager, uid, cb) {
   logger.debug('pullFromAPIm entry');
   // Have an APIm, grab latest if we can..
-  var snapdir =  rootConfigPath +
+  var snapdir =  process.env.ROOTCONFIGDIR +
+                  '/' +
                   uid +
                   '/';
   fs.mkdir(snapdir, function(err) {
@@ -507,20 +513,20 @@ function loadConfig(app, apimanager, models, currdir, snapdir, uid, cb) {
         cb(err);
         return;
       }
+      else if (mixedProtocols){
+        logger.debug('loadConfig error(2)');
+        cb(new Error('mixed protocols'));
+        return;
+      }
       else {
         // update current snapshot pointer
         updateSnapshot(app, uid, function(err) {
             if (err) {
-              logger.debug('loadConfig error(2)');
+              logger.debug('loadConfig error(3)');
               cb(err);
               return;
             }
-            if (mixedProtocols) {
-              process.send({LOADED:false});
-            } else {
-              logger.info('Successfully loaded configuration');
-              process.send({LOADED: true, 'https': https});
-            }
+
             // only update pointer to latest configuration
             // when latest configuration successful loaded
             if (snapdir === dirToLoad) {
@@ -1017,6 +1023,23 @@ function populateSnapshot(app, uid, cb) {
 }
 
 /**
+ * Releases reference on snapshot instance in snapshot model
+ * @param {???} app - loopback application
+ * @param {string} uid - snapshot identifier
+ */
+function releaseSnapshot(app, uid, cb) {
+  logger.debug('releaseSnapshot entry');
+
+  app.models.snapshot.release(uid,
+    function(err) {
+      if (err) logger.error(err);
+      logger.debug('releaseSnapshot exit');
+      if (cb) cb(err);
+    }
+  );
+}
+
+/**
  * Updates snapshot instance in snapshot model to reflect 'current'
  * @param {???} app - loopback application
  * @param {string} uid - snapshot identifier
@@ -1044,10 +1067,7 @@ function updateSnapshot(app, uid, cb) {
             }
           }
         );
-        app.models.snapshot.release(instance.id, function(err) {
-            if (err) logger.error(err);
-          }
-        );
+        releaseSnapshot(app, instance.id);
       }
     }
   );
