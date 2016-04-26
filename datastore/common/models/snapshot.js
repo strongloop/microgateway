@@ -28,7 +28,7 @@ module.exports = function(Snapshot) {
           }
         );
         fs.rmrf(
-          process.env.ROOTCONFIGDIR + ctx.instance.id,
+          process.env.ROOTCONFIGDIR + '/' + ctx.instance.id + '/',
           function (err) {
           }
         );
