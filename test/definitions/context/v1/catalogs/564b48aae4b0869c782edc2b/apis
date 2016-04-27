@@ -383,6 +383,12 @@
                 "http"
             ],
             "swagger": "2.0",
+            "x-kaiser-payment-methods": {
+                "methods": [
+                  "creditcard",
+                  "paypal"
+                ]
+            },
             "x-ibm-configuration": {
                 "assembly": {
                     "execute": [{
@@ -755,6 +761,12 @@
                 }
             },
             "swagger": "2.0",
+            "x-kaiser-payment-methods": {
+                "methods": [
+                  "creditcard",
+                  "paypal"
+                ]
+            },
             "x-ibm-configuration": {
                 "assembly": {
                     "execute": [{
@@ -1103,6 +1115,12 @@
                 }
             },
             "swagger": "2.0",
+            "x-kaiser-payment-methods": {
+                "methods": [
+                  "creditcard",
+                  "paypal"
+                ]
+            },
             "x-ibm-configuration": {
                 "assembly": {
                     "execute": [{
@@ -1730,6 +1748,12 @@
                     "name": "routes"
                 }
             ],
+            "x-kaiser-payment-methods": {
+                "methods": [
+                  "creditcard",
+                  "paypal"
+                ]
+            },
             "x-ibm-configuration": {
         "assembly": {
                     "execute": [{
@@ -1882,6 +1906,12 @@
                         ]
                     }
                 }
+            },
+            "x-kaiser-payment-methods": {
+                "methods": [
+                  "creditcard",
+                  "paypal"
+                ]
             },
             "x-ibm-configuration": {
                 "assembly": {

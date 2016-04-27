@@ -163,6 +163,11 @@ paths:
         '200':
           description: 200 OK
 
+x-kaiser-payment-methods:
+  methods:
+    - creditcard
+    - paypal
+
 x-ibm-configuration:
   properties:
     foo:
