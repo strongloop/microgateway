@@ -398,7 +398,7 @@ function invoke(props, context, flow) {
                     writeDst.headers = {};
                     writeDst.status = {
                         code: 500,
-                        reason: "Connection Error" };
+                        reason: "URL Open error" };
 
                     flow.proceed();
                 }
