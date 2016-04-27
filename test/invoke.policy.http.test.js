@@ -224,6 +224,21 @@ describe('invokePolicy', function() {
       .expect(299, /The invoke policy is timeouted./, done);
   });
 
+  it('request-timeouted-w-COE', function(done) {
+    this.timeout(10000);
+
+    //the request timeouted
+    request
+      .get('/invoke/timeout5Sec')
+      .set('X-DELAY-ME', '7')
+      .set('X-COE', 'true')
+      .expect(function(res, done) {
+        if (res.res.statusMessage !== 'COE test')
+            throw new Error("status reason should be 'COE test'");
+      })
+      .expect(200, /^After continue on error$/, done);
+  });
+
   /////////////////////// HTTPS servers ///////////////////////
   //8890: The server is "Sarah", whose CA is root
   //8891: The server is "Sandy", whose CA is root2

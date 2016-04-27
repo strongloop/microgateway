@@ -28,9 +28,9 @@ var dsc = require('../../datastore/client');
  * Do the real work of the invoke policy: read the property and decide the
  * parameters, establish the connection after everything is ready.
  */
-function _main(props, context, next, logger, tlsProfile) {
+function _main(props, context, next, logger, writeDst, tlsProfile) {
     //the default settings and error object
-    var readSrc, writeDst;
+    var readSrc;
     var options;
     var isSecured;
     var verb;
@@ -118,33 +118,6 @@ function _main(props, context, next, logger, tlsProfile) {
     }
     else
         readSrc = context.message;
-
-    //writeDst: decide where to write the response
-    if (props.output) {
-        if (typeof props.output === 'string') {
-            logger.info('[invoke] the output destination will be set to %s',
-                    props.output);
-
-            var theOut = {};
-            context.set(props.output, theOut);
-            writeDst = theOut;
-        }
-
-        if (!writeDst) {
-            logger.error('The output property "%s" is not a valid javascript ' +
-                    'identifier.', props.output);
-            error.message = 'Invalid output: "' + props.output + '"';
-            next(error);
-            return;
-        }
-    }
-    else {
-        if (context.message === undefined)
-            //In fact, this should never happen
-            context.message = {};
-
-        writeDst = context.message;
-    }
 
     //clone the readSrc.headers, because some headers need to be excluded
     options.headers = _.clone(readSrc.headers);
@@ -406,32 +379,71 @@ function _main(props, context, next, logger, tlsProfile) {
 function invoke(props, context, flow) {
     var logger = flow.logger;
 
+    //writeDst: first thing, decide where to write the response
+    if (context.message === undefined)
+        context.message = {}; //In fact, this should never happen
+    var writeDst = context.message;
+
+    //continue on error
+    var isCOE = false;
     var isDone = false;
     function _next(v) {
         if (!isDone) {
             isDone = true;
-            if(v) {
-                flow.fail(v);
+            if (v) {
+                if (isCOE && (v.name !== 'PropertyError')) {
+                    //Continue on error. Do not throw exception.
+                    logger.debug('[invoke] continue on error');
+                    writeDst.body = "";
+                    writeDst.headers = {};
+                    writeDst.status = {
+                        code: 500,
+                        reason: "Connection Error" };
+
+                    flow.proceed();
+                }
+                else {
+                    flow.fail(v);
+                }
             } else {
                 flow.proceed();
             }
         }
     }
 
+    var error = { name: 'PropertyError' };
     if (!props || typeof props !== 'object') {
-        var error = {
-            name: 'PropertyError',
-            message: 'Invalid property object'
-        };
+        error.message = 'Invalid property object';
         _next(error);
         return;
     }
+
+    if (props.output) {
+        if (typeof props.output === 'string') {
+            logger.info('[invoke] the output destination will be set to %s',
+                    props.output);
+
+            var theOut = {};
+            context.set(props.output, theOut);
+            writeDst = theOut;
+        }
+        else {
+            logger.error('[invoke] the output property "%s" is not valid.');
+
+            error.message = 'Invalid output: "' + props.output + '"';
+            _next(error);
+        }
+    }
+
+    if (props['continue-on-error'] === true ||
+        props['continue-on-error'] ==='true')
+        isCOE = true;
 
     var snapshotId = context.get('config-snapshot-id');
     var profile = props['tls-profile'];
     var tlsProfile;
     if (!profile || typeof profile !== 'string' || profile.length === 0) {
-        _main(props, context, _next, logger);
+        _main(props, context, _next, logger, writeDst);
     }
     else {
         logger.debug('[invoke] reading the TLS profile "%s"', profile);
@@ -443,24 +455,18 @@ function invoke(props, context, flow) {
 
                 if (!tlsProfile) {
                     logger.error('[invoke] cannot find the TLS profile "%s"', profile);
-                    var error = {
-                        name: 'PropertyError',
-                        message: 'Cannot find the TLS profile "' + profile + '"',
-                    };
 
+                    error.message = 'Cannot find the TLS profile "' + profile + '"';
                     _next(error);
                     return;
                 }
                 else
-                    _main(props, context, _next, logger, tlsProfile);
+                    _main(props, context, _next, logger, writeDst, tlsProfile);
             },
             function(e) {
                 logger.error('[invoke] error w/ retrieving TLS profile: %s', e);
 
-                var error = {
-                    name: 'PropertyError',
-                    message: e.toString(),
-                };
+                error.message = e.toString();
                 _next(error);
             });
     }
