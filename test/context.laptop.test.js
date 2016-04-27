@@ -327,5 +327,17 @@ describe('Context variables in laptop experience', function() {
 
   }); // end of 'should provide consistent GET response w/ or w/o content-type header' test block
 
+  it('should provide vendor extensions', function(done) {
+    request
+      .get('/v1/context?name=api.document.x-kaiser-payment-methods.methods')
+      .expect(200, {
+          name: 'api.document.x-kaiser-payment-methods.methods',
+          value: [
+            'creditcard',
+            'paypal'
+          ]
+        }, done);
+  });
+
 
 });
