@@ -67,6 +67,7 @@ describe('invokePolicy', function() {
       .expect(/z-method: POST/)
       .expect(/z-content-length: 21/)
       .expect(/z-transfer-encoding: undefined/)
+      .expect(/z-user-agent: APIConnect\/5.0 \(MicroGateway\)/)
       .expect(200, /z-url: \/\/invoke\/basic/)
       .end(function(err, res) {
           done(err);

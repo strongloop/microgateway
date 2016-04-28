@@ -124,6 +124,8 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
 
     //The headers that should not be copied
     var excludes = ['host','connection','content-length','transfer-encoding'];
+    //deal with the user-agent: default, custom, remove, nochange
+    excludes.push('user-agent');
 
     //test if the content-type is urlencoded
     var isFormUrlEncoded;
@@ -146,6 +148,8 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
         if (excludes.length === 0 && isFormUrlEncoded)
             break;
     }
+    //inject the *default* User-Agent
+    options.headers['User-Agent'] = 'APIConnect/5.0 (MicroGateway)';
 
     //prepare the data and dataSz
     data = (readSrc.body === undefined ? '' : readSrc.body);

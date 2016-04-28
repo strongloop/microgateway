@@ -104,6 +104,7 @@ function theApplication(req, resp) {
             data += 'z-content-type: ' + req.headers['content-type'] + '\n';
             data += 'z-content-encoding: ' + encoding + '\n';
             data += 'z-transfer-encoding: ' + req.headers['transfer-encoding'] + '\n';
+            data += 'z-user-agent: ' + req.headers['user-agent'] + '\n';
             if (req.headers['x-secret-msg1'])
                 data += 'z-secret-1: ' + req.headers['x-secret-msg1'] + '\n';
             if (req.headers['x-secret-msg2'])
