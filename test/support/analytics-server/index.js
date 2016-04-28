@@ -18,6 +18,8 @@ var bdParser  = require('body-parser');
 var env       = require('../../../utils/environment');
 var crypto    = require('crypto');
 var constants = require('constants');
+var qs        = require('querystring');
+var url       = require('url');
 
 var doneCB;
 
@@ -32,12 +34,24 @@ exports.start = function(port, definition) {
     //for analytics event publish
     app.post('/x2020/v1/events/_bulk', rawParser, function(req, res, next) {
       logger.debug('got analytics event', req.headers);
-      if (doneCB) {
-        doneCB(req.body.toString());
-        doneCB = undefined;
+      var urlParts = url.parse(req.originalUrl || req.url);
+      var query = qs.parse(urlParts.query);
+      if (query.client_id === 'a-moc-client-id-from-moc-server') {
+        if (doneCB) {
+          doneCB(req.body.toString());
+          doneCB = undefined;
+        }
+        res.status(200);
+        res.end();
+      } else {
+        if (doneCB) {
+          //passing empty string back and fail the validation
+          doneCB('');
+          doneCB = undefined;
+        }
+        res.status(403);
+        res.end();
       }
-      res.status(200);
-      res.end();
       next();
     });
 
