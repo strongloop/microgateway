@@ -486,7 +486,7 @@ describe('preflow and flow-engine integration', function() {
           .type('json')
           .send(':' + JSON.stringify(payload))
           .expect(headerName, expectedValue)
-          .expect(500, done);
+          .expect(400, done);
       });
     });
 

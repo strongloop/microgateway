@@ -349,7 +349,7 @@ describe('Context middleware', function() {
       ];
 
       testData.forEach(function(data) {
-        it('$(request.path) should be "' + data.expect + 
+        it('$(request.path) should be "' + data.expect +
            '" when basepath=' + data.base +
            ' and request URI=' + data.request, function(done) {
           sendRequest(data.base, data.apiPath, data.request, data.expect, done);
