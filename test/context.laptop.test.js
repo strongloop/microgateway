@@ -63,7 +63,7 @@ describe('Context variables in laptop experience', function() {
           //id: 'context:1.0.0',
           //method: 'GET',
           name: 'context',
-          org: {  
+          org: {
             "id": "defaultOrgID",
             "name": "defaultOrgName"
             },
@@ -254,9 +254,9 @@ describe('Context variables in laptop experience', function() {
       });
   });
 
-  describe('should parse body according to API consumes', function() {
+  describe('should parse payload body', function() {
     var http = require('http');
-    function postData(payloadBuff, callback) {
+    function postData(payloadBuff, type, callback) {
       var options = {
         hostname: 'localhost',
         port: 3000,
@@ -266,6 +266,11 @@ describe('Context variables in laptop experience', function() {
           'Content-Length': payloadBuff.length
         }
       };
+
+      if (type) {
+        options.headers['Content-Type'] = type;
+      }
+
       var req = http.request(options, function(res) {
         var responseData = '';
         res.setEncoding('utf8');
@@ -273,7 +278,7 @@ describe('Context variables in laptop experience', function() {
           responseData += chunk;
         });
         res.on('end', function() {
-          callback(undefined, responseData);
+          callback(undefined, res.statusCode, responseData);
         });
       });
 
@@ -285,29 +290,67 @@ describe('Context variables in laptop experience', function() {
       req.end();
     }
 
-    it('parse as JSON', function(done) {
-      var dataString = JSON.stringify({ hello: 'world'}, undefined, 4);
-      var dataInBuffer = new Buffer(dataString);
-      postData(dataInBuffer, function(error, response) {
-        if (error) throw error;
-        // the data that we sent is a beautified JSON containing indent
-        // expect the gateway parse payload as JSON, and stringify w/o indent
-        assert.strictEqual(response, JSON.stringify(JSON.parse(dataString)));
-        done();
+    describe('according to API consumes definition', function() {
+      it('parse as JSON', function(done) {
+        var dataString = JSON.stringify({ hello: 'world'}, undefined, 4);
+        var dataInBuffer = new Buffer(dataString);
+        postData(dataInBuffer, undefined, function(error, status, response) {
+          if (error) throw error;
+          // the data that we sent is a beautified JSON containing indent
+          // expect the gateway parse payload as JSON, and stringify w/o indent
+          assert.strictEqual(response, JSON.stringify(JSON.parse(dataString)));
+          done();
+        });
+      });
+
+      it('parse as String', function(done) {
+        var dataString = '<hello>world</hello>';
+        var dataInBuffer = new Buffer(dataString);
+        postData(dataInBuffer, undefined, function(error, status, response) {
+          if (error) throw error;
+          // expect the gateway JSON.stringify the string,
+          // therefore there should be double quotes
+          assert.strictEqual(response, '"'+dataString+'"');
+          done();
+        });
       });
     });
 
-    it('parse as String', function(done) {
-      var dataString = '<hello>world</hello>';
-      var dataInBuffer = new Buffer(dataString);
-      postData(dataInBuffer, function(error, response) {
-        if (error) throw error;
-        // expect the gateway JSON.stringify the string,
-        // therefore there should be double quotes
-        assert.strictEqual(response, '"'+dataString+'"');
-        done();
+    describe('according to request Content-Type header', function() {
+      it('parse as JSON', function(done) {
+        var dataString = JSON.stringify({ hello: 'world'}, undefined, 4);
+        var dataInBuffer = new Buffer(dataString);
+        postData(dataInBuffer, 'application/json', function(error, status, response) {
+          if (error) throw error;
+          // the data that we sent is a beautified JSON containing indent
+          // expect the gateway parse payload as JSON, and stringify w/o indent
+          assert.strictEqual(response, JSON.stringify(JSON.parse(dataString)));
+          done();
+        });
       });
+
+      it('return 400 when payload and content-type mismatch', function(done) {
+        var dataString = JSON.stringify({ hello: 'world'}, undefined, 4);
+        var dataInBuffer = new Buffer(dataString + ' invalid');
+        postData(dataInBuffer, 'application/json', function(error, status, response) {
+          if (error) throw error;
+          assert.strictEqual(status, 400);
+          done();
+        });
+      });
+
+      it('return 200 when payload is empty', function(done) {
+        var dataInBuffer = new Buffer(0);
+        postData(dataInBuffer, 'application/json', function(error, status, response) {
+          if (error) throw error;
+          assert.strictEqual(status, 200);
+          assert.strictEqual(response, JSON.stringify(dataInBuffer));
+          done();
+        });
+      });
+
     });
+
 
   }); // end of 'should parse body according to API consumes' test block
 

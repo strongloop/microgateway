@@ -321,7 +321,33 @@
                                  {
                                     "invoke": {
                                        "target-url": "http://localhost:8889/$(request.path)",
-                                       "timeout": 5
+                                       "timeout": 5,
+                                       "continue-on-error": "$(request.headers.x-coe)"
+                                    }
+                                 },
+                                 {
+                                    "if": {
+                                       "condition": "request.headers['x-coe'] === 'true'",
+                                       "execute": [
+                                          {
+                                             "set-variable": {
+                                                "actions": [
+                                                   {
+                                                      "set": "message.body",
+                                                      "value": "After continue on error"
+                                                   },
+                                                   {
+                                                      "set": "message.status.code",
+                                                      "value": "200"
+                                                   },
+                                                   {
+                                                      "set": "message.status.reason",
+                                                      "value": "COE test"
+                                                   }
+                                                ]
+                                             }
+                                          }
+                                       ]
                                     }
                                  }
                               ]
