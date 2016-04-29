@@ -20,6 +20,10 @@ exports.handleResponse =
       return flow.fail(err);
     }
 
+    if (remaining < 0 && !reject) {
+      logger.warn('Rate limit (%d) exceeded but not rejected', limit);
+    }
+
     context.subscribe('post-flow', function(event, done) {
       setupHeaders();
       done();
