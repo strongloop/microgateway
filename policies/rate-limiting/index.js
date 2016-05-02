@@ -10,6 +10,7 @@ var tokenBucketLimiter = require('./token-bucket');
 var logger = require('apiconnect-cli-logger/logger.js')
   .child({loc: 'apiconnect-microgateway:policies:rate-limiting'});
 var assert = require('assert');
+var env = require('../../utils/environment');
 
 module.exports = function(options) {
   options = options || {};
@@ -77,6 +78,16 @@ module.exports = function(options) {
   for (var i in options) {
     if (config[i] === undefined) {
       config[i] = options[i];
+    }
+  }
+
+  if (process.env[env.RATELIMIT_REDIS]) {
+    /*
+     The URL of the Redis server.
+     Format: [redis:]//[[user][:password@]][host][:port][/db-number][?db=db-number[&password=bar[&option=value]]]
+     */
+    config.redis = {
+      url: process.env[env.RATELIMIT_REDIS]
     }
   }
 
