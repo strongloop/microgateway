@@ -3,11 +3,11 @@
 // US Government Users Restricted Rights - Use, duplication or disclosure
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
-'use strict'
+'use strict';
 
 var Promise = require('bluebird');
 var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'apiconnect-microgateway:datastore'});
+               .child({loc: 'microgateway:datastore'});
 var forever = require('forever-monitor');
 
 var child;
@@ -103,12 +103,13 @@ exports.stop = function() {
         resolve();
       });
       child.stop();
-    }
-    if (server) {
+    } else if (server) {
       server.close(function() {
         server = undefined; // reset server
         resolve();
       });
+    } else {
+      resolve();
     }
   });
 };

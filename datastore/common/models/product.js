@@ -5,7 +5,7 @@
 
 var app = require('../../server/server');
 var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'apiconnect-microgateway:datastore:models:product'});
+               .child({loc: 'microgateway:datastore:models:product'});
 var OptimizedData = require('./optimizedData.js');
 
 module.exports = function(Products) {

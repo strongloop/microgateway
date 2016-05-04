@@ -38,8 +38,7 @@ module.exports = function (config) {
                         subflow = curr.execute;
                         break;
                     }
-                }
-                else if (typeof expect === 'object') {
+                } else if (typeof expect === 'object') {
                     if (expect.verb.toLowerCase() === actualVerb &&
                             expect.path === actualPath) {
                         subflow = curr.execute;

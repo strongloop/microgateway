@@ -57,7 +57,9 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
             isSecured = true;
         }
     }
-    logger.info('[invoke] url: %s', options.href);
+    if (logger.info()) {
+      logger.info('[invoke] url: %s', maskQueryStringInURL(options.href));
+    }
 
     //verb: default to request.verb
     verb = props.verb ? String(props.verb).toUpperCase() :
@@ -95,7 +97,8 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
     //authentication
     if (props.username && props.password)
         options.auth = props.username + ':' + props.password;
-    logger.debug('[invoke] auth: %s', options.auth, {});
+//    sensitive data
+//    logger.debug('[invoke] auth: %s', options.auth, {});
 
     //readSrc: decide where to read the data
     if (props.input) {
@@ -184,8 +187,8 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
         options.headers['Content-Length'] = dataSz;
         logger.debug('[invoke] content-length = %d', dataSz);
     }
-
-    logger.debug('[invoke] w/ headers: %j', options.headers, {});
+//    sensitive data
+//    logger.debug('[invoke] w/ headers: %j', options.headers, {});
 
     //setup the HTTPs settings
     var http = isSecured ? require('https') : require('http');
@@ -479,3 +482,11 @@ function invoke(props, context, flow) {
 module.exports = function(config) {
     return invoke;
 };
+
+/*
+ * return query string from url
+ */
+function maskQueryStringInURL(url) {
+  url = url || '';
+  return url.replace(/\?.*?$/, '');
+}
