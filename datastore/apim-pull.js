@@ -7,13 +7,13 @@
  * Module dependencies
  */
 var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'apiconnect-microgateway:datastore:apim-pull'});
+               .child({loc: 'microgateway:datastore:apim-pull'});
 var fs = require('fs'),
     request = require('request'),
     async = require('async'),
     extend = require('util')._extend;
     
-var Crypto = require('crypto')
+var Crypto = require('crypto');
     
 var environment = require('../utils/environment');
 var KEYNAME = environment.KEYNAME;
@@ -311,7 +311,7 @@ function getOrCreatePass() {
     // no key, can't crate it..
     if (private_key !== '') {
       var password = Crypto.createHash('sha256').update('apimanager').digest();
-      var encryptedCipher = Crypto.publicEncrypt(private_key, new Buffer(password))
+      var encryptedCipher = Crypto.publicEncrypt(private_key, new Buffer(password));
       // write password to file..
       try {
         fs.writeFileSync(passFile,encryptedCipher);

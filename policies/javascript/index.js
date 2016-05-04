@@ -7,7 +7,7 @@
 var vm    = require('vm');
 var _     = require('lodash');
 var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'apiconnect-microgateway:policies:javascript'});
+               .child({loc: 'microgateway:policies:javascript'});
 
 function consoleProxy (log) {
   // Create a console API proxy around Bunyan-based flow logger

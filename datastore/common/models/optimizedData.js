@@ -6,14 +6,14 @@
 var _ = require('lodash');
 var async = require('async');
 var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'apiconnect-microgateway:datastore:optimizedData'});
+               .child({loc: 'microgateway:datastore:optimizedData'});
 var jsonRefs = require('json-refs');
 
 var ALLPLANS = 'ALLPLANS';
 function createProductOptimizedEntry(app, ctx)
   {
   var locals = {};
-  var product = ctx.instance
+  var product = ctx.instance;
   locals.snapshot = ctx.instance['snapshot-id'];
   locals.subscription = {};  /// no subscription
   // assume we are going to create a wildcard entry...
@@ -71,37 +71,31 @@ function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, pr
     productCallback();
   }
 
-function determineNeededSubscriptionOptimizedEntries(app, ctx)
-  {
+function determineNeededSubscriptionOptimizedEntries(app, ctx) {
   var locals;
   locals = ripCTX(ctx);
-  if (!process.env.APIMANAGER)
-    {
+  if (!process.env.APIMANAGER) {
     var planid = ctx.instance['plan-registration'].id;
-    findPlansToAddSubscriptions(app, locals, planid)
-    }
-  else
-    {
+    findPlansToAddSubscriptions(app, locals, planid);
+  } else {
     //specific subscription from APIm
-    var isWildcard = false
+    var isWildcard = false;
     gatherDataCreateOptimizedEntry(app, locals, isWildcard);
-    }
   }
+}
 
-function findPlansToAddSubscriptions(app, passed, planid)
-  {
+function findPlansToAddSubscriptions(app, passed, planid) {
   var isWildcard = false;
   var locals = passed;
   var productquery = {}; // look at all products
   // find optimized entries to create
   app.models.product.find(productquery, function(err, products) {
     async.forEach(products,
-      function (product, productCallback)
-      {
-      cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, productCallback);
+      function (product, productCallback) {
+        cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, productCallback);
       });
-    });
-  }
+  });
+}
 
 function ripCTX(ctx)
   {
@@ -137,11 +131,13 @@ function ripCTX(ctx)
   }
 
 function getPlanID(product, planname)
-  {
-  logger.debug('product.document.info.name + ":" + product.document.info.version + ":" + planname: ' +
-    JSON.stringify(product.document.info.name + ":" + product.document.info.version + ":" + planname, null, 4));
-  return product.document.info.name + ":" + product.document.info.version + ":" + planname;
+{
+  if (logger.debug()) {
+    logger.debug('product.document.info.name + ":" + product.document.info.version + ":" + planname: ',
+        JSON.stringify(product.document.info.name + ":" + product.document.info.version + ":" + planname, null, 4));
   }
+  return product.document.info.name + ":" + product.document.info.version + ":" + planname;
+}
 
 function gatherDataCreateOptimizedEntry(app, locals, isWildcard, gatherCallback)
   {
@@ -286,16 +282,14 @@ function grabAPIs(app, snapshot, product, plan, cb) {
       if (product.document.apis[api].info) {// standard (not in document)
         logger.debug('info: product.document.apis[api].info');
         info = product.document.apis[api].info;
-        }
-      else
-        {
+      } else {
         // not resolved try to spit the name
         logger.debug('api: %j', api);
         var apiName = product.document.apis[api].name.split(':');
         logger.debug('apiName: %j', apiName);
         logger.debug('info: product.document.apis[api][name]');
-        info = {'x-ibm-name': apiName[0], 'version': apiName[1]}
-        }
+        info = {'x-ibm-name': apiName[0], 'version': apiName[1]};
+      }
 
       logger.debug('info: %j', info);
       app.models.api.find(
@@ -384,13 +378,13 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
           var apiDocument = api['document-resolved'] || api.document;
 
           var pathsProp = apiDocument.paths;
-          logger.debug('pathsProp ' +
+          logger.debug('pathsProp ',
                 Object.getOwnPropertyNames(pathsProp));
           Object.getOwnPropertyNames(pathsProp).forEach(
             function(propname) {
               var method = [];
               if (propname.indexOf('/') > -1) {
-                logger.debug('propname: ' + propname);
+                logger.debug('propname: ', propname);
                 var propnames = apiDocument.paths[propname];
                 Object.getOwnPropertyNames(
                   propnames).forEach(
@@ -415,7 +409,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                     } else {
                       //Look to see if we got an operationID match
                       var operations = pieces.plan.apis[api.document.info['x-ibm-name']].operations;
-                      var loop_index;
+//                      var loop_index;
 
                       operations.forEach(function(planOp) {
                         var opId = planOp.operationId;
@@ -446,14 +440,14 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                       {
                       securityEnabledForMethod.forEach(
                         function(securityReq) {
-                            var securityProps = Object.getOwnPropertyNames(securityReq)
+                            var securityProps = Object.getOwnPropertyNames(securityReq);
                             securityProps.forEach(
                               function(securityProp) {
                                 if (apiDocument.securityDefinitions &&
                                     apiDocument.securityDefinitions[securityProp] &&
                                     apiDocument.securityDefinitions[securityProp].type === 'apiKey')
                                   clientidSecurity = true;
-                                  logger.debug('clientidSecurity: ' + clientidSecurity);
+                                  logger.debug('clientidSecurity: ', clientidSecurity);
                                 });
                         });
                       }

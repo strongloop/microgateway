@@ -12,7 +12,7 @@ var Crypto = require('crypto');
 var Request = require('request');
 var url = require('url');
 var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'apiconnect-microgateway:datastore:server:boot:load-model'});
+               .child({loc: 'microgateway:datastore:server:boot:load-model'});
 var sgwapimpull = require('../../apim-pull');
 var apimpull = sgwapimpull.pull;
 var apimdecrypt = sgwapimpull.decrypt;
@@ -369,7 +369,7 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
         hostname: apimanager.host,
         port: apimanager.port,
         pathname: '/v1/catalogs/' + apimanager.catalog + '/handshake/'
-      }
+      };
       var apimHandshakeUrl = url.format(apimHandshakeUrlObj);
       
       Request({
@@ -389,14 +389,15 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
 
         logger.debug('statusCode: ' + res.statusCode);
         if (res.statusCode !== 200) {
-          logger.error(apimHandshakeUrl + ' failed with: ' + res.statusCode);
+          logger.error(apimHandshakeUrl, ' failed with: ', res.statusCode);
           return callback(new Error(apimHandshakeUrl + ' failed with: ' + res.statusCode));
         }
 
         var json = decryptAPIMResponse(body, private_key);
-        if (logger.debug()) {
-          logger.debug(JSON.stringify(json, null, 2));
-        }
+//        sensitive data
+//        if (logger.debug()) {
+//          logger.debug(JSON.stringify(json, null, 2));
+//        }
 
         if (!json.microGateway) {
           return callback(new Error(apimHandshakeUrl + ' response did not contain "microGateway" section'));
@@ -407,9 +408,10 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
         apimanager.clikey = ugw.key;
         apimanager.clientid = ugw.clientID;
 
-        if (logger.debug()) {
-          logger.debug('apimanager: %s', JSON.stringify(apimanager, null, 2));
-        }
+//        sensitive data
+//        if (logger.debug()) {
+//          logger.debug('apimanager: %s', JSON.stringify(apimanager, null, 2));
+//        }
         callback(null);
         });
       }],
@@ -590,33 +592,28 @@ function loadConfigFromFS(app, apimanager, models, dir, uid, cb) {
   }
   else {
     var YAMLfiles = [];
-    logger.debug('dir: ' + dir )
+    logger.debug('dir: ', dir );
     cliConfig.loadProject(dir).then(function(artifacts) { 
       logger.debug('%j', artifacts); 
       artifacts.forEach(
-        function(artifact)
-          {
-          if (artifact.type === 'swagger')
-            {
-            YAMLfiles.push(artifact.filePath)
-            }
+        function(artifact) {
+          if (artifact.type === 'swagger') {
+            YAMLfiles.push(artifact.filePath);
           }
-        )
-        // populate data-store models with the file contents
-        populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb);
+        });
+      // populate data-store models with the file contents
+      populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb);
     });
   }
 }
 
-function createProductID(product)
-  {
+function createProductID(product) {
   return (product.info.name + ':' + product.info.version);
-  }
+}
   
-function createAPIID(api)
-  {
+function createAPIID(api) {
   return (api.info['x-ibm-name'] + ':' + api.info.version);
-  }
+}
 
 /**
  * Populates data-store models with persisted content
@@ -681,7 +678,7 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
             var entry = {};
             // looks like a product
             if (readfile.product) {
-              logger.debug('product found: skipping')
+              logger.debug('product found: skipping');
             }
             // looks like an API
             if (readfile.swagger) {
@@ -770,7 +767,7 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
               }
             }
           }
-        }
+        };
         if (logger.debug()) {
           logger.debug('creating static product and attaching apis: %s',
             JSON.stringify(entry, null, 4));
@@ -828,7 +825,7 @@ function findAndReplace(object, value, replacevalue){
       findAndReplace(object[x], value, replacevalue);
     }
     if(typeof object[x] === 'string' && object[x].indexOf(value) > -1){ 
-      logger.debug('found variable to replace: ' + value + ' with ' + replacevalue);
+      logger.debug('found variable to replace: ', value, ' with ', replacevalue);
       object[x] = object[x].replace(value, replacevalue);
     }
   }
@@ -875,17 +872,17 @@ function expandAPIData(apidoc, dir)
       Object.getOwnPropertyNames(apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties).forEach(
         function (property) 
           {
-          logger.debug('property: ' + property);
+          logger.debug('property: ', property);
           var propertyvalue = '$(' + property + ')';
-          logger.debug('propertyvalue: ' + propertyvalue);
+          logger.debug('propertyvalue: ', propertyvalue);
           var replacementvalue;
           // is it an environment var?? $(envVar)
           var regEx = /\$\((.*)\)/;
-          var matches = apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties[property].match(regEx)
+          var matches = apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties[property].match(regEx);
           var envvar = matches[1];
           if (envvar) {
             if (!process.env[envvar]) {
-              logger.debug('Environment Variable not set for :' + envvar);
+              logger.debug('Environment Variable not set for :', envvar);
               }
             replacementvalue = process.env[envvar];
             }
@@ -893,12 +890,12 @@ function expandAPIData(apidoc, dir)
           else {
             replacementvalue = apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties[property];
             }
-            apidoc = findAndReplace(apidoc, propertyvalue, replacementvalue)
+            apidoc = findAndReplace(apidoc, propertyvalue, replacementvalue);
             });
       }
     // fill in catalog properties (one off for now until we have the scope of other vars required)
     var cataloghost = 'localhost:' + process.env.PORT;
-    var cataloghostvar = '$(catalog.host)'
+    var cataloghostvar = '$(catalog.host)';
     if (process.env.CATALOG_HOST) {
       cataloghost= process.env.CATALOG_HOST;
       }

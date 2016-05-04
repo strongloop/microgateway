@@ -3,12 +3,12 @@
 // US Government Users Restricted Rights - Use, duplication or disclosure
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
-'use strict'
+'use strict';
 var Promise = require('bluebird');
 var request = require('request');
 var url = require('url');
 var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'apiconnect-microgateway:datastore:client'});
+               .child({loc: 'microgateway:datastore:client'});
 var host = '127.0.0.1'; // data-store's listening interface
 
 /**
@@ -55,7 +55,7 @@ exports.apimGetDefaultCatalog = function(snapshot, orgName) {
       }
     });
   });
-}
+};
 
 /**
  * Adds flow information from API in the context
@@ -102,7 +102,7 @@ exports.grabAPI = function(context, callback) {
     }
   );
   logger.debug('grabAPI exit');
-}
+};
 
 exports.getCurrentSnapshot = function() {
   logger.debug('getCurrentSnapshot entry');
@@ -131,7 +131,7 @@ exports.getCurrentSnapshot = function() {
       resolve(snapshot.snapshot.id);
     });
   });
-}
+};
 
 exports.releaseCurrentSnapshot = function(id) {
   logger.debug('releaseCurrentSnapshot entry');
@@ -162,11 +162,11 @@ exports.releaseCurrentSnapshot = function(id) {
       resolve(id);
     });
   });
-}
+};
 
 exports.getTlsProfile = function(snapshot, tlsProfleName) {
-  logger.debug('getTlsProfile entry snapshot:' + snapshot +
-                              '\n tlsProfleName:' + tlsProfleName );
+  logger.debug('getTlsProfile entry snapshot:', snapshot,
+                              '\n tlsProfleName:', tlsProfleName );
   // build request to send to data-store
   var queryfilter = JSON.stringify({
     where: {
@@ -202,11 +202,11 @@ exports.getTlsProfile = function(snapshot, tlsProfleName) {
 
     });
   });
-}
+};
 
 exports.getRegistry = function(snapshot, registryName) {
-  logger.debug('getRegistry entry snapshot:' + snapshot +
-                              '\n registryName:' + registryName );
+  logger.debug('getRegistry entry snapshot:', snapshot,
+                              '\n registryName:', registryName );
   // build request to send to data-store
   var queryfilter = JSON.stringify({
     where: {
@@ -242,4 +242,4 @@ exports.getRegistry = function(snapshot, registryName) {
 
     });
   });
-}
+};
