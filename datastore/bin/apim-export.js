@@ -5,7 +5,7 @@
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
 var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'apiconnect-microgateway:datastore:apim-export'});
+               .child({loc: 'microgateway:datastore:apim-export'});
 var sgwapimpull = require('../apim-pull'),
     program = require('commander'),
     apimpull = sgwapimpull.pull;

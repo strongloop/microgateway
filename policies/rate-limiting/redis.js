@@ -8,7 +8,7 @@ var RateLimiter = require('rolling-rate-limiter');
 var redis = require('redis');
 var handleResponse = require('./helper').handleResponse;
 var logger = require('apiconnect-cli-logger/logger.js')
-  .child({loc: 'apiconnect-microgateway:policies:rate-limiting:redis'});
+  .child({loc: 'microgateway:policies:rate-limiting:redis'});
 
 module.exports = function(options) {
   options = options || {};

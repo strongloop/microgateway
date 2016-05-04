@@ -8,7 +8,7 @@ var moment = require('moment');
 var redisLimiter = require('./redis');
 var tokenBucketLimiter = require('./token-bucket');
 var logger = require('apiconnect-cli-logger/logger.js')
-  .child({loc: 'apiconnect-microgateway:policies:rate-limiting'});
+  .child({loc: 'microgateway:policies:rate-limiting'});
 var assert = require('assert');
 var env = require('../../utils/environment');
 
@@ -88,7 +88,7 @@ module.exports = function(options) {
      */
     config.redis = {
       url: process.env[env.RATELIMIT_REDIS]
-    }
+    };
   }
 
   if (config.redis) {
