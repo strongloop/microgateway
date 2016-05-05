@@ -12,6 +12,7 @@ var http = require('http');
 var https = require('https');
 var qs = require('qs');
 var ah = require('auth-header');
+var url = require('url');
 
 function theApplication(req, resp) {
     req.on('error', function(e) {
@@ -54,6 +55,26 @@ function theApplication(req, resp) {
         else if (req.url === '/noChunks') {
             resp.writeHead(200, { 'Content-Length': 7 });
             resp.write('1234567');
+            resp.end();
+            return;
+        }
+
+        var query = url.parse(req.url, true).query;
+        if (query.status) {
+            //status code should not negative. Delay for a few seconds and let
+            //the client to run into timeout (or the ConnectionError).
+            if (query.status === '-1') {
+                //delay the response a little bit
+                console.log("Bad parameter. Delaying for seconds...");
+                setTimeout(function() {
+                    resp.writeHead(500);
+                    resp.write("Bad 'status' parameter");
+                    resp.end();
+                }, 7000);
+                return;
+            }
+            resp.writeHead(query.status);
+            resp.write('This is a ' + query.status + ' response.');
             resp.end();
             return;
         }

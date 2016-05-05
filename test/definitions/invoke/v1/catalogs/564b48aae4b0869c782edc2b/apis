@@ -71,7 +71,7 @@
                   }
                }
             },
-            "/test500Error": {
+            "/testStatusCode": {
                "get": {
                   "responses": {
                      "200": {
@@ -144,6 +144,24 @@
                }
             },
             "/testJSON": {
+               "get": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/ignoreAllErrors": {
+               "get": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/stopOnOperationError": {
                "get": {
                   "responses": {
                      "200": {
@@ -230,20 +248,97 @@
                                     "invoke": {
                                        "target-url": "http://$(request.headers.x-test-hostname):8889/$(request.path)"
                                     }
+                                 },
+                                 {
+                                    "set-variable": {
+                                       "actions": [
+                                          {
+                                             "set": "message.status.code",
+                                             "value": 200
+                                          },
+                                          {
+                                             "set": "message.body",
+                                             "value": "Overwrite the invoke response"
+                                          }
+                                       ]
+                                    }
                                  }
                               ]
                            },
                            {
                               "operations": [
                                  {
-                                    "path": "/test500Error",
+                                    "path": "/testStatusCode",
                                     "verb": "GET"
                                  }
                               ],
                               "execute": [
                                  {
                                     "invoke": {
-                                       "target-url": "http://localhost:8889/500"
+                                       "target-url": "http://localhost:8889/?status=$(request.headers.x-code)"
+                                    }
+                                 },
+                                 {
+                                    "set-variable": {
+                                       "actions": [
+                                          {
+                                             "add": "message.headers.x-after-invoke",
+                                             "value": "this is the post-invoke header"
+                                          }
+                                       ]
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/ignoreAllErrors",
+                                    "verb": "GET"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://localhost:8889/?status=$(request.headers.x-code)",
+                                       "timeout": 5,
+                                       "stop-on-error": []
+                                    }
+                                 },
+                                 {
+                                    "set-variable": {
+                                       "actions": [
+                                          {
+                                             "set": "message.body",
+                                             "value": "All errors should be ignored, this must be executed after the invoke."
+                                          }
+                                       ]
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/stopOnOperationError",
+                                    "verb": "GET"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://localhost:8889/?status=$(request.headers.x-code)",
+                                       "stop-on-error": [ "SOAPError", "OperationError" ]
+                                    }
+                                 },
+                                 {
+                                    "set-variable": {
+                                       "actions": [
+                                          {
+                                             "set": "message.body",
+                                             "value": "Only non-operationError can reach here!"
+                                          }
+                                       ]
                                     }
                                  }
                               ]
@@ -321,33 +416,7 @@
                                  {
                                     "invoke": {
                                        "target-url": "http://localhost:8889/$(request.path)",
-                                       "timeout": 5,
-                                       "continue-on-error": "$(request.headers.x-coe)"
-                                    }
-                                 },
-                                 {
-                                    "if": {
-                                       "condition": "request.headers['x-coe'] === 'true'",
-                                       "execute": [
-                                          {
-                                             "set-variable": {
-                                                "actions": [
-                                                   {
-                                                      "set": "message.body",
-                                                      "value": "After continue on error"
-                                                   },
-                                                   {
-                                                      "set": "message.status.code",
-                                                      "value": "200"
-                                                   },
-                                                   {
-                                                      "set": "message.status.reason",
-                                                      "value": "COE test"
-                                                   }
-                                                ]
-                                             }
-                                          }
-                                       ]
+                                       "timeout": 5
                                     }
                                  }
                               ]
@@ -484,13 +553,29 @@
                ],
                "catch": [
                   {
-                     "default": [
+                     "errors": [ "OperationError" ],
+                     "execute": [
                         {
                            "set-variable": {
                               "actions": [
                                  {
                                     "set": "message.body",
-                                    "value": "'$(error.name)' $(error.message)"
+                                    "value": "'$(error.name)' $(error.message) is caught!"
+                                 }
+                              ]
+                           }
+                        }
+                     ]
+                  },
+                  {
+                     "errors": [ "PropertyError" ],
+                     "execute": [
+                        {
+                           "set-variable": {
+                              "actions": [
+                                 {
+                                    "set": "message.body",
+                                    "value": "Unexpect '$(error.name)' $(error.message)"
                                  },
                                  {
                                     "set": "message.status.code",
