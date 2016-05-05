@@ -158,7 +158,7 @@ describe('invokePolicy', function() {
             throw new Error("status reason should be 'URL Open error'");
       })
       .expect(/"name":"ConnectionError"/)
-      .expect(/"Error: getaddrinfo ENOTFOUND cannot.be.valid.com"/,
+      .expect(/getaddrinfo ENOTFOUND cannot.be.valid.com/,
               done);
   });
 
