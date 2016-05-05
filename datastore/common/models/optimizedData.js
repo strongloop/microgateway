@@ -133,7 +133,7 @@ function ripCTX(ctx)
 function getPlanID(product, planname)
 {
   if (logger.debug()) {
-    logger.debug('product.document.info.name + ":" + product.document.info.version + ":" + planname: ',
+    logger.debug(product.document.info.name + ':' + product.document.info.version + ':' + planname + ': ' +
         JSON.stringify(product.document.info.name + ":" + product.document.info.version + ":" + planname, null, 4));
   }
   return product.document.info.name + ":" + product.document.info.version + ":" + planname;
@@ -492,21 +492,23 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
 
           // get API properties that user defined in the swagger
           var ibmSwaggerExtension = apiDocument['x-ibm-configuration'];
-          var defaultApiProperties = ibmSwaggerExtension.properties;
           var apiProperties = {};
-          if (defaultApiProperties) {
-            Object.getOwnPropertyNames(defaultApiProperties).forEach(
-              function(propertyName){
-                if (pieces.catalog.name &&
-                    ibmSwaggerExtension.catalogs &&
-                    ibmSwaggerExtension.catalogs[pieces.catalog.name] &&
-                    ibmSwaggerExtension.catalogs[pieces.catalog.name].properties[propertyName]) {
-                  apiProperties[propertyName] = ibmSwaggerExtension.catalogs[pieces.catalog.name].properties[propertyName];
-                } else {
-                  apiProperties[propertyName] = defaultApiProperties[propertyName].value;
+          if (ibmSwaggerExtension) {
+            var defaultApiProperties = ibmSwaggerExtension.properties;
+            if (defaultApiProperties) {
+              Object.getOwnPropertyNames(defaultApiProperties).forEach(
+                function(propertyName){
+                  if (pieces.catalog.name &&
+                      ibmSwaggerExtension.catalogs &&
+                      ibmSwaggerExtension.catalogs[pieces.catalog.name] &&
+                      ibmSwaggerExtension.catalogs[pieces.catalog.name].properties[propertyName]) {
+                    apiProperties[propertyName] = ibmSwaggerExtension.catalogs[pieces.catalog.name].properties[propertyName];
+                  } else {
+                    apiProperties[propertyName] = defaultApiProperties[propertyName].value;
+                  }
                 }
-              }
-            );
+              );
+            }
           }
 
     /*
@@ -537,6 +539,19 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
           if (logger.debug()) {
             logger.debug('pieces: %s', JSON.stringify(pieces, null, 4));
           }
+          var apiAssembly;
+          var apiType;
+          if (apiDocument['x-ibm-configuration']) {
+            apiAssembly = {
+                assembly: apiDocument['x-ibm-configuration'].assembly
+              };
+            apiType = apiDocument['x-ibm-configuration']['api-type'] || 'REST';
+          } else {
+            apiAssembly = {
+                assembly: {}
+              };
+            apiType = 'REST';
+          }
           var newOptimizedDataEntry = {
             'subscription-id': pieces.subscription.id,
             'client-id': credential['client-id'],
@@ -559,12 +574,10 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'api-id': api.id,
             'api-document': api['document-wo-assembly'],
             'api-document-resolved': api['document-resolved'],
-            'api-assembly': {
-                assembly: apiDocument['x-ibm-configuration'].assembly
-              },
+            'api-assembly': apiAssembly,
             'api-base-path': apiDocument.basePath,
             'api-name': apiDocument.info.title,
-            'api-type': apiDocument['x-ibm-configuration']['api-type'] || 'REST',
+            'api-type': apiType,
             'api-version': apiDocument.info.version,
             'api-properties': apiProperties,
             'api-paths': apiPaths,
