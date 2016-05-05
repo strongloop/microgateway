@@ -274,8 +274,6 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
                 code: response.statusCode,
                 reason: response.reasonPhrase
             };
-            logger.info('[invoke] response is received: %d, %s',
-                writeDst.status.code, writeDst.status.reason);
             writeDst.headers = {};
 
             //note: there is no response.rawHeaders for node v0.10.43
@@ -312,6 +310,7 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
                                 'Leave it as a Buffer object', cType, e);
                         }
                     }
+                    //TODO: parse XML and check SOAPError when applicable?
                 }
                 writeDst.body = tmp;
 
@@ -326,7 +325,20 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
                         }
                     }
                 }
-                next();
+
+                //Only 2xx is considered as a success. Otherwise, an OperationError.
+                if (/^2/.test(String(response.statusCode))) {
+                    logger.info('[invoke] received a %d response', writeDst.status.code);
+                    next();
+                }
+                else {
+                    logger.error('[invoke] OperationError! Received a non-2xx response (code=%d)',
+                            writeDst.status.code);
+
+                    error.name = 'OperationError';
+                    error.message = response.statusCode + ': ' + response.reasonPhrase;
+                    next(error);
+                }
             });
         });
     }
@@ -391,25 +403,34 @@ function invoke(props, context, flow) {
         context.message = {}; //In fact, this should never happen
     var writeDst = context.message;
 
-    //continue on error
-    var isCOE = false;
+    //stop on error, default to the ConnectionError only
+    var stopOnError = [ 'ConnectionError' ];
     var isDone = false;
     function _next(v) {
         if (!isDone) {
             isDone = true;
+
             if (v) {
-                if (isCOE && (v.name !== 'PropertyError')) {
-                    //Continue on error. Do not throw exception.
-                    logger.debug('[invoke] continue on error');
-                    writeDst.body = "";
-                    writeDst.headers = {};
-                    writeDst.status = {
-                        code: 500,
-                        reason: "URL Open error" };
+                if (v.name !== 'PropertyError' &&
+                        stopOnError.indexOf(v.name) === -1) {
+                    //ignore the error. Will continue with the next policy
+                    logger.info('[invoke] ignore the error "%s" and continue', v.name);
+
+                    if (v.name === 'ConnectionError') {
+                        writeDst.status = {
+                            code: 500,
+                            reason: "URL Open error" };
+                    }
 
                     flow.proceed();
-                }
-                else {
+                } else {
+                    //fail with the error
+                    if (v.name === 'ConnectionError') {
+                        v.status = {
+                            code: 500,
+                            reason: "URL Open error" };
+                    }
+
                     flow.fail(v);
                 }
             } else {
@@ -442,9 +463,9 @@ function invoke(props, context, flow) {
         }
     }
 
-    if (props['continue-on-error'] === true ||
-        props['continue-on-error'] ==='true')
-        isCOE = true;
+    if (Array.isArray(props['stop-on-error']))
+        stopOnError = props['stop-on-error'];
+    logger.debug('[invoke] stop-on-error is set to', stopOnError);
 
     var snapshotId = context.get('config-snapshot-id');
     var profile = props['tls-profile'];
