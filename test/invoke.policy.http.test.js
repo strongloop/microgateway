@@ -396,7 +396,7 @@ describe('invokePolicy', function() {
       .set('X-HTTPS-PORT', '8892')
       .set('X-TLS-PROFILE', 'tls-profile-require-tls12')
       .expect(/"name":"ConnectionError"/)
-      .expect(/wrong version number/)
+      .expect(/(wrong version number|write EPROTO)/)
       .expect(500, done);
   });
 
