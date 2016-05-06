@@ -37,8 +37,11 @@ describe('preflow testing', function() {
   it('should pass with "/api/simple" - pathWithNoSlashAtEnd', pathWithNoSlashAtEnd);
   it('should pass with "/api/" - simplePathWithSlashAtEnd', pathWithSlashAtEnd);
   it('should pass with "/api" - simplePathWithNoSlashAtEnd', pathWithNoSlashAtEnd);
-  it('should pass with "/api/doesnotexist/" - doesNotExistPathWtihSlashAtEnd', doesNotExistPathWtihSlashAtEnd);
-  it('should pass with "/api/doesnotexist" - doesNotExistPathWtihNoSlashAtEnd', doesNotExistPathWtihNoSlashAtEnd);
+  it('should pass with "/api/doesnotexist/" - doesNotExistPathWithSlashAtEnd', doesNotExistPathWithSlashAtEnd);
+  it('should pass with "/api/doesnotexist" - doesNotExistPathWithNoSlashAtEnd', doesNotExistPathWithNoSlashAtEnd);
+  it('should pass with "/api/noxibm" - noIBMExtensions', noIBMExtensions);
+  it('should pass with "/api/noassembly" - noAssembly', noAssembly);
+  it('should pass with "/api/noexecute" - noExecute', noExecute);
   
 });
 
@@ -66,14 +69,32 @@ function simplePathWithNoSlashAtEnd(doneCB) {
     .expect(200, doneCB);
 }
 
-function doesNotExistPathWtihSlashAtEnd(doneCB) {
+function doesNotExistPathWithSlashAtEnd(doneCB) {
   request
     .get('/api/doesnotexist/')
     .expect(404, doneCB);
 }
 
-function doesNotExistPathWtihNoSlashAtEnd(doneCB) {
+function doesNotExistPathWithNoSlashAtEnd(doneCB) {
   request
     .get('/api/doesnotexist')
     .expect(404, doneCB);
+}
+
+function noIBMExtensions(doneCB) {
+  request
+    .get('/api/noxibm')
+    .expect(200, doneCB);
+}
+
+function noAssembly(doneCB) {
+  request
+    .get('/api/noassembly')
+    .expect(200, doneCB);
+}
+
+function noExecute(doneCB) {
+  request
+    .get('/api/noexecute')
+    .expect(200, doneCB);
 }
