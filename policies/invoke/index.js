@@ -330,8 +330,7 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
                 if (/^2/.test(String(response.statusCode))) {
                     logger.info('[invoke] received a %d response', writeDst.status.code);
                     next();
-                }
-                else {
+                } else {
                     logger.error('[invoke] OperationError! Received a non-2xx response (code=%d)',
                             writeDst.status.code);
 
