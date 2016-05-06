@@ -1,3 +1,51 @@
+2016-05-05, Version 1.0.5
+=========================
+
+ * Fix testcase for node v4.3 (juangmj)
+
+ * Fix testcase for node v0.12 (juangmj)
+
+ * Replace continue-on-error with stop-on-error for invoke policy (juangmj)
+
+ * avoid to print out sensitive messages in logger. also fix some eslint warnings/errors (yihongwang)
+
+ * Add RATELIMIT_REDIS env var to configure redis (Raymond Feng)
+
+ * Add a warning if rate limit is exceeded but not rejected (Raymond Feng)
+
+ * the invoke policy to inject the default user agent (juangmj)
+
+ * Return 401 when payload is not expected content-type (librah)
+
+ * Change the reason phrase for the invoke policy (juangmj)
+
+ * invoke policy to support continue-on-error (juangmj)
+
+ * Add vendor extensions UT cases (librah)
+
+ * Fix linting error (librah)
+
+ * remove alternate path search that always fails (Thomas Burke)
+
+ * add debug messages (Thomas Burke)
+
+ * ut for #134 (Thomas Burke)
+
+ * add optional terminating / match (Thomas Burke)
+
+ * Invoke to use the default cipher "HIGH:MEDIUM:!aNULL:!eNULL:!RC4:@STRENGTH" (juangmj)
+
+ * Fix invalid json syntax (juangmj)
+
+ * Add ciphers SSL_RSA_WITH_AES_256_CBC_SHA and SSL_RSA_WITH_AES_128_CBC_SHA (juangmj)
+
+ * Rename apiconnect-microgateway to microgateway (Raymond Feng)
+
+ * Cleanup snapshot directories properly (Jon Palgon)
+
+ * Fix API swagger properties parsing error (librah)
+
+
 2016-04-08, Version 1.0.3
 =========================
 
@@ -73,19 +121,15 @@
 
  * UT for empty basepath and root path (Jon Palgon)
 
+ * don't suggest CONFIG_DIR should be used in laptop (Jeremy R. Geddes)
+
+ * typo (Jeremy R. Geddes)
+
  * Updated logging for basic auth (John Bellessa)
 
  * Have child listen for disconnect instead of parent listening for SIGTERM (Jon Palgon)
 
  * Implementing simple optimizedData response cache. See #45 and #189 for details. (John C. Bellessa)
-
-
-2016-03-22, Version show
-========================
-
- * don't suggest CONFIG_DIR should be used in laptop (Jeremy R. Geddes)
-
- * typo (Jeremy R. Geddes)
 
 
 2016-03-21, Version 1.0.2

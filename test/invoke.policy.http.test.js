@@ -142,23 +142,100 @@ describe('invokePolicy', function() {
       .expect(200, /^$/, done);
   });
 
-  //the target-url contains an invalid host name
+  //An invalid host will lead to a ConnectionError. By default, the invoke
+  //policy stops on ConnectionError. A ConnectionError returns with status of
+  //"500: URL Open error".
   it('host-not-found', function(done) {
     this.timeout(10000);
 
     request
       .get('/invoke/dynHost')
       .set('X-TEST-HOSTNAME', 'cannot.be.valid.com')
-      .expect(299, /'ConnectionError' Error: getaddrinfo ENOTFOUND/, done);
+      .expect(function(res, done) {
+        if (res.res.statusCode !== 500)
+            throw new Error("status code should be 500");
+        if (res.res.statusMessage !== 'URL Open error')
+            throw new Error("status reason should be 'URL Open error'");
+      })
+      .expect(/"name":"ConnectionError"/)
+      .expect(/getaddrinfo ENOTFOUND cannot.be.valid.com/,
+              done);
   });
 
-  //the invoke policy receives a 500 error from the server
-  it('test-500-rror', function(done) {
+  //The invoke policy receives a 500 error from the server.
+  //Any non-2xx response is considered as an OperationError.
+  //However, by default, invoke only stops on ConnectionError
+  it('test-500-response-default', function(done) {
     this.timeout(10000);
 
     request
-      .get('/invoke/test500Error')
-      .expect(500, /This is a test for 500 error/, done);
+      .get('/invoke/testStatusCode')
+      .set('X-CODE', '500')
+      .expect('x-after-invoke', 'this is the post-invoke header')
+      .expect(500, /This is a 500 response./, done);
+  });
+
+  //The invoke policy receives a 303 response from the server.
+  //Any non-2xx response is considered as an OperationError.
+  //However, by default, invoke only stops on ConnectionError
+  it('test-303-response-default', function(done) {
+    this.timeout(10000);
+
+    request
+      .get('/invoke/testStatusCode')
+      .set('X-CODE', '303')
+      .expect('x-after-invoke', 'this is the post-invoke header')
+      .expect(303, /This is a 303 response./, done);
+  });
+
+  //The invoke policy receives a 303 response from the server.
+  //The invoke policy stops on OperationError
+  it('test-stop-on-303-response', function(done) {
+    this.timeout(10000);
+
+    request
+      .get('/invoke/stopOnOperationError')
+      .set('X-CODE', '303')
+      .expect(303, /'OperationError' 303: undefined is caught!/, done);
+  });
+
+  //The invoke policy receives a 203 response from the server.
+  //The invoke policy stops on OperationError
+  it('test-stop-on-203-response', function(done) {
+    this.timeout(10000);
+
+    request
+      .get('/invoke/stopOnOperationError')
+      .set('X-CODE', '203')
+      .expect(203, /Only non-operationError can reach here!/, done);
+  });
+
+  it('test-ignore-operation-error', function(done) {
+    this.timeout(10000);
+
+    request
+      .get('/invoke/ignoreAllErrors')
+      .set('X-CODE', '303')
+      .expect(303,
+        /All errors should be ignored, this must be executed after the invoke./,
+              done);
+  });
+
+  it('test-ignore-connection-error', function(done) {
+    this.timeout(10000);
+
+    request
+      .get('/invoke/ignoreAllErrors')
+      .set('X-CODE', '-1')
+      .expect(function(res, done) {
+        if (res.res.statusCode !== 500)
+            throw new Error("status code should be 500");
+        if (res.res.statusMessage !== 'URL Open error')
+            throw new Error("status reason should be 'URL Open error'");
+      })
+      .expect(500,
+        /All errors should be ignored, this must be executed after the invoke./,
+              done);
   });
 
   it('auth-OK', function(done) {
@@ -222,22 +299,9 @@ describe('invokePolicy', function() {
     request
       .get('/invoke/timeout5Sec')
       .set('X-DELAY-ME', '7')
-      .expect(299, /The invoke policy is timeouted./, done);
-  });
-
-  it('request-timeouted-w-COE', function(done) {
-    this.timeout(10000);
-
-    //the request timeouted
-    request
-      .get('/invoke/timeout5Sec')
-      .set('X-DELAY-ME', '7')
-      .set('X-COE', 'true')
-      .expect(function(res, done) {
-        if (res.res.statusMessage !== 'COE test')
-            throw new Error("status reason should be 'COE test'");
-      })
-      .expect(200, /^After continue on error$/, done);
+      .expect(/"name":"ConnectionError"/)
+      .expect(/"message":"The invoke policy is timeouted."/)
+      .expect(500, done);
   });
 
   /////////////////////// HTTPS servers ///////////////////////
@@ -295,7 +359,9 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8890')
       .set('X-TLS-PROFILE', 'tls-profile-serverSarah-2')
-      .expect(299, /unable to verify the first certificate/, done);
+      .expect(/"name":"ConnectionError"/)
+      .expect(/"message":"Error: unable to verify the first certificate"/)
+      .expect(500, done);
   });
 
   it('cannot-find-tls-profile', function(done) {
@@ -305,7 +371,7 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8890')
       .set('X-TLS-PROFILE', 'not-found')
-      .expect(299, /Cannot find the TLS profile "not-found"/, done);
+      .expect(299, /Unexpect \'PropertyError\' Cannot find the TLS profile "not-found"/, done);
   });
 
   //openssl s_client -tls1_2 -CAfile root.crt -connect localhost:port
@@ -329,7 +395,9 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8892')
       .set('X-TLS-PROFILE', 'tls-profile-require-tls12')
-      .expect(299, /Error: write EPROTO/, done);
+      .expect(/"name":"ConnectionError"/)
+      .expect(/(wrong version number|write EPROTO)/)
+      .expect(500, done);
   });
 
   ////cipher mapping table for each TLS versions:
@@ -372,14 +440,16 @@ describe('invokePolicy', function() {
 
   //The client expects the server to be Sarah and uses the CA 'root' for auth.
   //However, the server is Sandy who should be authenticated using 'root2'.
-  it('unpexected-https-server', function(done) {
+  it('unexected-https-server', function(done) {
     this.timeout(10000);
 
     request
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8891')
       .set('X-TLS-PROFILE', 'tls-profile-serverSarah-1')
-      .expect(299, /unable to verify the first certificate/, done);
+      .expect(/"name":"ConnectionError"/)
+      .expect(/"message":"Error: unable to verify the first certificate"/)
+      .expect(500, done);
   });
 
   //'sarah' at 8895 is authenticated by 'root' and uses 'root' to authenticate
@@ -413,7 +483,9 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8895')
       .set('X-TLS-PROFILE', 'tls-profile-sandy-2')
-      .expect(299, /Error: socket hang up/, done);
+      .expect(/"name":"ConnectionError"/)
+      .expect(/"message":"Error: socket hang up"/)
+      .expect(500, done);
   });
 
   //'sarah' at 8896 is authenticated by 'root' and uses 'root2' to authenticate
@@ -436,7 +508,9 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8896')
       .set('X-TLS-PROFILE', 'tls-profile-bob-2')
-      .expect(299, /Error: socket hang up/, done);
+      .expect(/"name":"ConnectionError"/)
+      .expect(/"message":"Error: socket hang up"/)
+      .expect(500, done);
   });
 
   //'sandy' at 8897 is authenticated by 'root2' and uses 'root2' to authenticate
@@ -459,7 +533,9 @@ describe('invokePolicy', function() {
       .get('/invoke/testTLS')
       .set('X-HTTPS-PORT', '8897')
       .set('X-TLS-PROFILE', 'tls-profile-alice-2')
-      .expect(299, /Error: socket hang up/, done);
+      .expect(/"name":"ConnectionError"/)
+      .expect(/"message":"Error: socket hang up"/)
+      .expect(500, done);
   });
 
   //to read the data and headers from somewhere other than the context.message

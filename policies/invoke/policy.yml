@@ -71,9 +71,23 @@ properties:
       label: Output variable
       description: The name of the variable where the invoke result is saved
       type: string
+    stop-on-error:
+      label: Stop on error
+      description: Stop the assembly flow when certain errors happen during the invoke. When it is set to an empty array, all errors are ignored and next policy can continue.
+      default: When it is undefined, it is assumbed to be ['ConnectionError']
+      type: array
+      minItems: 0
+      items:
+        type: string
+        enum:
+          - ConnectionError
+          - OperationError
+          - SOAPError
   required:
     - target-url
   throw:
     - PropertyError
     - ConnectionError
+    - OperationError
+    - SOAPError
 
