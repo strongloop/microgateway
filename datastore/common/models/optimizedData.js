@@ -133,7 +133,7 @@ function ripCTX(ctx)
 function getPlanID(product, planname)
 {
   if (logger.debug()) {
-    logger.debug(product.document.info.name + ':' + product.document.info.version + ':' + planname + ': ' +
+    logger.debug('product.document.info.name + ":" + product.document.info.version + ":" + planname: ',
         JSON.stringify(product.document.info.name + ":" + product.document.info.version + ":" + planname, null, 4));
   }
   return product.document.info.name + ":" + product.document.info.version + ":" + planname;
