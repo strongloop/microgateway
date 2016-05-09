@@ -76,16 +76,17 @@ module.exports = function(app) {
   models.push(new ModelType('optimizedData', 'dummy'));
   models.push(new ModelType('snapshot', 'dummy')); // hack, removed later
 
-  var refreshInterval = 15 * 60 * 1000; // 15 minutes
+  var maxRefreshInterval = 15 * 60 * 1000; // 15 minutes
   if (process.env.APIMANAGER_REFRESH_INTERVAL) {
-    refreshInterval = process.env.APIMANAGER_REFRESH_INTERVAL;
+    maxRefreshInterval = process.env.APIMANAGER_REFRESH_INTERVAL;
   } 
   var apimanager = {
     host: process.env[APIMANAGER],
     port: process.env[APIMANAGER_PORT],
     catalog: process.env[APIMANAGER_CATALOG],
     handshakeOk: false,
-    refresh : refreshInterval
+    startupRefresh : 1000, // 1 second
+    maxRefresh : maxRefreshInterval
     };
 
   async.series(
@@ -193,6 +194,17 @@ function loadData(app, apimanager, models, currdir) {
       }
     ],
     function(err, results) {
+      var interval = apimanager.maxRefresh;
+      // if no error and APIs specified, do not agressively reload config
+      if (!err && apimanager.host && (http || https)) { 
+        apimanager.startupRefresh = interval;
+      } else {
+        if (apimanager.startupRefresh < apimanager.maxRefresh) {
+          // try agressively at first, and slowly back off
+          interval = apimanager.startupRefresh;
+          apimanager.startupRefresh *= 2;
+        }
+      }
       if (err) {
         if (populatedSnapshot) {
           releaseSnapshot(app, snapshotID, function (err) {
@@ -208,6 +220,7 @@ function loadData(app, apimanager, models, currdir) {
       }
       setImmediate(scheduleLoadData,
                    app,
+                   interval,
                    apimanager,
                    models,
                    currdir);
@@ -215,10 +228,10 @@ function loadData(app, apimanager, models, currdir) {
   );
 }
 
-function scheduleLoadData(app, apimanager, models, dir) {
+function scheduleLoadData(app, interval, apimanager, models, dir) {
   if (apimanager.host)
     setTimeout(loadData,
-             apimanager.refresh,
+             interval,
              app,
              apimanager,
              models,
