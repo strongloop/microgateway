@@ -223,3 +223,81 @@ describe('data-store', function() {
   );
 
 });
+
+describe('data-store-retry', function() {
+  var request;
+  var snapshotID, oldSnapshotID;
+  before(function(done) {
+    process.env.DATASTORE_PORT = 5000;
+    process.env.APIMANAGER_PORT = 8890;
+    process.env.APIMANAGER = '127.0.0.1';
+    process.env.APIMANAGER_REFRESH_INTERVAL = 1000; // 1 second
+    process.env.CONFIG_DIR = __dirname + '/definitions/datastore';
+    process.env.NODE_ENV = 'production';
+    done();
+  });
+
+  after(function(done) {
+    delete process.env.DATASTORE_PORT;
+    delete process.env.APIMANAGER_PORT;
+    delete process.env.APIMANAGER;
+    delete process.env.APIMANAGER_REFRESH_INTERVAL;
+    delete process.env.CONFIG_DIR;
+    delete process.env.NODE_ENV;
+    done();
+  });
+
+  it('snapshots should be empty and microgateway should not be started',
+    function(done) {
+      microgw.start(3000)
+        .then(function() {
+          assert(false);
+        })
+        .then(done)
+        .catch(function(err) {
+          done(err);
+        });
+        request = supertest('http://localhost:5000');
+        setTimeout(
+          function() {
+            request
+              .get('/api/snapshots')
+              .expect(200, [])
+              .end(function (err, res) {
+                  microgw.stop()
+                    .then(done, done)
+                    .catch(done);
+                }
+              );  
+          },
+          10000 /* 10s */);
+    }
+  );
+
+  it('snapshots should be empty and microgateway should not be started',
+    function(done) {
+      microgw.start(3000)
+        .then(function() {
+          assert(false);
+        })
+        .then(done)
+        .catch(function(err) {
+          done(err);
+        });
+        request = supertest('http://localhost:5000');
+        setTimeout(
+          function() {
+            request
+              .get('/api/snapshots')
+              .expect(200, [])
+              .end(function (err, res) {
+                  microgw.stop()
+                    .then(done, done)
+                    .catch(done);
+                }
+              );  
+          },
+          10000 /* 10s */);
+    }
+  );
+});
