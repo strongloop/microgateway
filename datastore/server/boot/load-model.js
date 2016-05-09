@@ -173,7 +173,8 @@ function loadData(app, apimanager, models, currdir) {
         }
         else {
           snapdir = '';
-          callback();}
+          callback();
+        }
       },
       // populate snapshot model
       function(callback) {
@@ -192,12 +193,18 @@ function loadData(app, apimanager, models, currdir) {
       }
     ],
     function(err, results) {
-      if (err && populatedSnapshot) {
-        releaseSnapshot(app, snapshotID, function (err) {
+      if (err) {
+        if (populatedSnapshot) {
+          releaseSnapshot(app, snapshotID, function (err) {
+            process.send({LOADED:false});
+          });
+        } else
           process.send({LOADED:false});
-        });
       } else {
-        process.send({LOADED: true, 'https': https});
+        // neither http nor https would be set if there were no APIs
+        // defined; if no APIs defined, let's try again in a while
+        if (!apimanager.host || http || https)
+          process.send({LOADED: true, 'https': https});
       }
       setImmediate(scheduleLoadData,
                    app,
@@ -1009,7 +1016,7 @@ function populateSnapshot(app, uid, cb) {
     },
     function(err, mymodel) {
       if (err) {
-        logger.debug('populateSnapshot error');
+        logger.error('populateSnapshot error');
         cb(err);
         return;
       }

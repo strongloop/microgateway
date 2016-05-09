@@ -1,3 +1,8 @@
+2016-05-10, Version 1.0.6
+=========================
+
+ * Suspend listening for traffic until APIs are specified (Jon Palgon)
+
 2016-05-05, Version 1.0.5
 =========================
 
