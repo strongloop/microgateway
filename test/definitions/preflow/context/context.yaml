@@ -1,0 +1,42 @@
+swagger: '2.0'
+
+info:
+  x-ibm-name: apiconnect-demo
+  version: 1.0.0
+  title: apiconnect-demo
+
+schemes:
+  - http
+
+basePath: /ro-context
+
+x-ibm-configuration:
+  assembly:
+    execute:
+      - javascript:
+          source: |-
+            var name = get('request.headers.x-ro-name');
+            try {
+              set(name, 'new value');
+              throw {name:'ROTextFailedError'};
+            } catch (e) {
+              //expect error
+              if (e.name === 'TypeError') {
+                message.body = {result:'ok'};
+              } else {
+                throw {name:'ROTextFailedError'};
+              }
+            }
+
+paths:
+  /:
+    get:
+      operationId: ro-context
+      responses:
+        '200':
+          description: 200 OK
+
+consumes:
+  - application/json
+produces:
+  - application/json

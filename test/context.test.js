@@ -553,7 +553,8 @@ describe('Context middleware', function() {
                      'system.date.day-of-month',
                      'system.date.month',
                      'system.date.year',
-                     'system.timezone'
+                     'system.timezone',
+                     'system'
                    ];
       var ctx = req.ctx;
 
