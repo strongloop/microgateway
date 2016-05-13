@@ -27,8 +27,6 @@ module.exports = function(options) {
     maxInInterval: limit
   });
 
-  var hardLimit = options.hardLimit;
-
   return function(props, context, flow) {
 
     var key = options.getKey(context);
@@ -36,11 +34,11 @@ module.exports = function(options) {
     if (!key) {
       return flow.proceed();
     }
-    limiter(key, function(err, timeLeft) {
+    limiter(key, function(err, timeLeft, remaining) {
       if (err) {
         return flow.fail(err);
       }
-      var remaining = timeLeft > 0 ? 0 : options.limit;
+      logger.debug('Result: %d %d', timeLeft, remaining);
       handleResponse(limit, remaining, timeLeft, reject, context, flow);
     });
   };

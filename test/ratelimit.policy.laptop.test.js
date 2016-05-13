@@ -12,6 +12,7 @@ var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
 var should = require('should');
+var async = require('async');
 
 describe('ratelimit basic policy', function() {
 
@@ -28,7 +29,6 @@ describe('ratelimit basic policy', function() {
       })
       .then(done)
       .catch(function(err) {
-        console.error(err);
         done(err);
       });
   });
@@ -40,16 +40,41 @@ describe('ratelimit basic policy', function() {
       .catch(done);
     delete process.env.CONFIG_DIR;
     delete process.env.NODE_ENV;
+    // A hacky way to reset rate limiters
+    var limiters = require('../lib/preflow/apim-lookup').rateLimiters;
+    for (var i in limiters) {
+      delete limiters[i];
+    }
   });
 
   it('should expect ratelimit header', function(done) {
     request
       .get('/ratelimit/ratelimit')
       .expect('x-ratelimit-limit', '100')
-      .expect(function(res) {
+      .end(function(err, res) {
+        if (err) return done(err);
         var remaining = Number(res.headers['x-ratelimit-remaining']);
-        remaining.should.lessThan(100);
-      })
-      .expect(200, done);
+        remaining.should.be.lessThan(100);
+        done();
+      });
   });
+
+  it('should expect ratelimit rejection', function(done) {
+    var reject = {};
+    async.timesSeries(100, function(i, done) {
+      request
+        .get('/ratelimit/ratelimit')
+        .end(function(err, res) {
+          if (res.statusCode === 429) {
+            reject = res.body;
+          }
+          done(err);
+        });
+    }, function(err) {
+      reject.should.be.eql(
+        {message: 'Rate limit exceeded', name: 'RateLimitExceeded'});
+      done(err);
+    });
+  });
+
 });
