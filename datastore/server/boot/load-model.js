@@ -11,6 +11,7 @@ var constants = require('constants');
 var Crypto = require('crypto');
 var Request = require('request');
 var url = require('url');
+var checkSecurity = require('./check-security');
 var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'microgateway:datastore:server:boot:load-model'});
 var sgwapimpull = require('../../apim-pull');
@@ -34,7 +35,7 @@ var definitionsDir = rootConfigPath + 'default';
 var gatewayMain = __dirname + '/../../../';
 var keyFile = gatewayMain + KEYNAME;
 var version ='1.0.0';
-var mixedProtocols = http = https = false;
+var mixedProtocols = false, http = false, https = false;
 
 /**
  * Creates a model type 
@@ -682,10 +683,12 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
             }
             // looks like an API
             if (readfile.swagger) {
-              model.name = 'api';
               entry.id = createAPIID(readfile);
               entry.document = expandAPIData(readfile, dir);
-              apis[entry.document.info['x-ibm-name']] = entry.document;
+              if (entry.document) {
+                model.name = 'api';
+                apis[entry.document.info['x-ibm-name']] = entry.document;
+              }
             }
             
             if (model.name) {
@@ -902,6 +905,9 @@ function expandAPIData(apidoc, dir)
     apidoc = findAndReplace(apidoc, cataloghostvar, cataloghost);
     }
   checkHttps(apidoc);
+  if (!checkSecurity(apidoc)) {
+    return null;
+  }
   return apidoc;
   }
 function loadAPIsFromYAML(listOfAPIs, dir)
@@ -955,6 +961,7 @@ function populateModelsWithAPImData(app, models, dir, uid, cb) {
           }
           logger.debug('filecontents: ', readfile);
           // inject 'snapshot-id' property
+          var valid = [];
           readfile.forEach(
             function(obj) {
               obj['snapshot-id'] = uid;
@@ -962,12 +969,17 @@ function populateModelsWithAPImData(app, models, dir, uid, cb) {
               // looks like an API
               if (obj.document && obj.document.swagger) {
                 checkHttps(obj.document);
+                if (checkSecurity(obj.document)) {
+                  valid.push(obj);
+                }
+              } else {
+                valid.push(obj);
               }
             }
           );
 
           app.models[model.name].create(
-            readfile,
+            valid,
             function(err, mymodel) {
               if (err) {
                 fileCallback(err);

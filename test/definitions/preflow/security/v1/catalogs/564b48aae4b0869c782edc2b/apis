@@ -1,0 +1,852 @@
+[
+    {
+        "catalog": {
+            "default": false,
+            "id": "564b48aae4b0869c782edc2b",
+            "name": "sb",
+            "sandbox": true,
+            "title": "Sandbox",
+            "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+        },
+        "document": {
+          "swagger": "2.0",
+          "info": {
+            "x-ibm-name": "separateIds",
+            "version": "1.0.0",
+            "title": "separateIds"
+          },
+          "schemes": [
+            "http"
+          ],
+          "basePath": "/api",
+          "x-ibm-configuration": {
+            "assembly": {
+              "execute": [
+                {
+                  "set-variable": {
+                    "actions": [
+                      {
+                        "set": "message.body",
+                        "value": "Initial value"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "paths": {
+            "/separateIds": {
+              "get": {
+                "operationId": "note.count",
+                "responses": {
+                  "200": {
+                    "description": "200 OK"
+                  }
+                }
+              }
+            }
+          },
+          "security": [
+            {
+              "apikeyHeaderID": []
+            },
+            {
+              "apikeyQueryParameterID": []
+            }
+          ],
+          "securityDefinitions": {
+            "apikeyHeaderID": {
+              "in": "header",
+              "name": "X-IBM-Client-Id",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterID": {
+              "in": "query",
+              "name": "client_id",
+              "type": "apiKey"
+            },
+            "apikeyHeaderSecret": {
+              "in": "header",
+              "name": "X-IBM-Client-Secret",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterSecret": {
+              "in": "query",
+              "name": "client_secret",
+              "type": "apiKey"
+            }
+          }
+        },
+        "id": "564b7b3ae4b0869c782eddae",
+        "organization": {
+            "id": "564b48a9e4b0869c782edc24",
+            "name": "apim",
+            "title": "Climb On"
+        },
+        "state": "running",
+        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+    },
+    {
+        "catalog": {
+            "default": false,
+            "id": "564b48aae4b0869c782edc2b",
+            "name": "sb",
+            "sandbox": true,
+            "title": "Sandbox",
+            "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+        },
+        "document": {
+          "swagger": "2.0",
+          "info": {
+            "x-ibm-name": "joinedIds",
+            "version": "1.0.0",
+            "title": "joinedIds"
+          },
+          "schemes": [
+            "http"
+          ],
+          "basePath": "/api",
+          "x-ibm-configuration": {
+            "assembly": {
+              "execute": [
+                {
+                  "set-variable": {
+                    "actions": [
+                      {
+                        "set": "message.body",
+                        "value": "Initial value"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "paths": {
+            "/joinedIds": {
+              "get": {
+                "operationId": "note.count",
+                "responses": {
+                  "200": {
+                    "description": "200 OK"
+                  }
+                }
+              }
+            }
+          },
+          "security": [
+            {
+              "apikeyHeaderID": [],
+              "apikeyQueryParameterID": []
+            }
+          ],
+          "securityDefinitions": {
+            "apikeyHeaderID": {
+              "in": "header",
+              "name": "X-IBM-Client-Id",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterID": {
+              "in": "query",
+              "name": "client_id",
+              "type": "apiKey"
+            },
+            "apikeyHeaderSecret": {
+              "in": "header",
+              "name": "X-IBM-Client-Secret",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterSecret": {
+              "in": "query",
+              "name": "client_secret",
+              "type": "apiKey"
+            }
+          }
+        },
+        "id": "564b7b3ae4b0869c782eddae",
+        "organization": {
+            "id": "564b48a9e4b0869c782edc24",
+            "name": "apim",
+            "title": "Climb On"
+        },
+        "state": "running",
+        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+    },
+    {
+        "catalog": {
+            "default": false,
+            "id": "564b48aae4b0869c782edc2b",
+            "name": "sb",
+            "sandbox": true,
+            "title": "Sandbox",
+            "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+        },
+        "document": {
+          "swagger": "2.0",
+          "info": {
+            "x-ibm-name": "tooManySchemes",
+            "version": "1.0.0",
+            "title": "tooManySchemes"
+          },
+          "schemes": [
+            "http"
+          ],
+          "basePath": "/api",
+          "x-ibm-configuration": {
+            "assembly": {
+              "execute": [
+                {
+                  "set-variable": {
+                    "actions": [
+                      {
+                        "set": "message.body",
+                        "value": "Initial value"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "paths": {
+            "/tooManySchemes": {
+              "get": {
+                "operationId": "note.count",
+                "responses": {
+                  "200": {
+                    "description": "200 OK"
+                  }
+                }
+              }
+            }
+          },
+          "security": [
+            {
+              "apikeyHeaderID": [],
+              "apikeyQueryParameterID": [],
+              "apikeyQueryParameterOther": []
+            }
+          ],
+          "securityDefinitions": {
+            "apikeyHeaderID": {
+              "in": "header",
+              "name": "X-IBM-Client-Id",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterID": {
+              "in": "query",
+              "name": "client_id",
+              "type": "apiKey"
+            },
+            "apikeyHeaderSecret": {
+              "in": "header",
+              "name": "X-IBM-Client-Secret",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterSecret": {
+              "in": "query",
+              "name": "client_secret",
+              "type": "apiKey"
+            },
+            "apikeyHeaderOther": {
+              "in": "header",
+              "name": "headerOther",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterOther": {
+              "in": "query",
+              "name": "queryOther",
+              "type": "apiKey"
+            }
+          }
+        },
+        "id": "564b7b3ae4b0869c782eddae",
+        "organization": {
+            "id": "564b48a9e4b0869c782edc24",
+            "name": "apim",
+            "title": "Climb On"
+        },
+        "state": "running",
+        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+    },
+    {
+        "catalog": {
+            "default": false,
+            "id": "564b48aae4b0869c782edc2b",
+            "name": "sb",
+            "sandbox": true,
+            "title": "Sandbox",
+            "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+        },
+        "document": {
+          "swagger": "2.0",
+          "info": {
+            "x-ibm-name": "badInType",
+            "version": "1.0.0",
+            "title": "badInType"
+          },
+          "schemes": [
+            "http"
+          ],
+          "basePath": "/api",
+          "x-ibm-configuration": {
+            "assembly": {
+              "execute": [
+                {
+                  "set-variable": {
+                    "actions": [
+                      {
+                        "set": "message.body",
+                        "value": "Initial value"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "paths": {
+            "/badInType": {
+              "get": {
+                "operationId": "note.count",
+                "responses": {
+                  "200": {
+                    "description": "200 OK"
+                  }
+                }
+              }
+            }
+          },
+          "security": [
+            {
+              "apikeyHeaderID": [],
+              "apikeyOther": []
+            }
+          ],
+          "securityDefinitions": {
+            "apikeyHeaderID": {
+              "in": "header",
+              "name": "X-IBM-Client-Id",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterID": {
+              "in": "query",
+              "name": "client_id",
+              "type": "apiKey"
+            },
+            "apikeyHeaderSecret": {
+              "in": "header",
+              "name": "X-IBM-Client-Secret",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterSecret": {
+              "in": "query",
+              "name": "client_secret",
+              "type": "apiKey"
+            },
+            "apikeyHeaderOther": {
+              "in": "header",
+              "name": "headerOther",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterOther": {
+              "in": "query",
+              "name": "queryOther",
+              "type": "apiKey"
+            },
+            "apikeyOther": {
+              "in": "other",
+              "name": "queryOther",
+              "type": "apiKey"
+            }
+          }
+        },
+        "id": "564b7b3ae4b0869c782eddae",
+        "organization": {
+            "id": "564b48a9e4b0869c782edc24",
+            "name": "apim",
+            "title": "Climb On"
+        },
+        "state": "running",
+        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+    },
+    {
+        "catalog": {
+            "default": false,
+            "id": "564b48aae4b0869c782edc2b",
+            "name": "sb",
+            "sandbox": true,
+            "title": "Sandbox",
+            "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+        },
+        "document": {
+          "swagger": "2.0",
+          "info": {
+            "x-ibm-name": "missingSecurityDef",
+            "version": "1.0.0",
+            "title": "missingSecurityDef"
+          },
+          "schemes": [
+            "http"
+          ],
+          "basePath": "/api",
+          "x-ibm-configuration": {
+            "assembly": {
+              "execute": [
+                {
+                  "set-variable": {
+                    "actions": [
+                      {
+                        "set": "message.body",
+                        "value": "Initial value"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "paths": {
+            "/missingSecurityDef": {
+              "get": {
+                "operationId": "note.count",
+                "responses": {
+                  "200": {
+                    "description": "200 OK"
+                  }
+                }
+              }
+            }
+          },
+          "security": [
+            {
+              "apikeyHeaderID": [],
+              "apikeyOther": []
+            }
+          ],
+          "securityDefinitions": {
+            "apikeyHeaderID": {
+              "in": "header",
+              "name": "X-IBM-Client-Id",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterID": {
+              "in": "query",
+              "name": "client_id",
+              "type": "apiKey"
+            },
+            "apikeyHeaderSecret": {
+              "in": "header",
+              "name": "X-IBM-Client-Secret",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterSecret": {
+              "in": "query",
+              "name": "client_secret",
+              "type": "apiKey"
+            },
+            "apikeyHeaderOther": {
+              "in": "header",
+              "name": "headerOther",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterOther": {
+              "in": "query",
+              "name": "queryOther",
+              "type": "apiKey"
+            }
+          }
+        },
+        "id": "564b7b3ae4b0869c782eddae",
+        "organization": {
+            "id": "564b48a9e4b0869c782edc24",
+            "name": "apim",
+            "title": "Climb On"
+        },
+        "state": "running",
+        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+    },
+    {
+        "catalog": {
+            "default": false,
+            "id": "564b48aae4b0869c782edc2b",
+            "name": "sb",
+            "sandbox": true,
+            "title": "Sandbox",
+            "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+        },
+        "document": {
+          "swagger": "2.0",
+          "info": {
+            "x-ibm-name": "missingHeaderID",
+            "version": "1.0.0",
+            "title": "missingHeaderID"
+          },
+          "schemes": [
+            "http"
+          ],
+          "basePath": "/api",
+          "x-ibm-configuration": {
+            "assembly": {
+              "execute": [
+                {
+                  "set-variable": {
+                    "actions": [
+                      {
+                        "set": "message.body",
+                        "value": "Initial value"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "paths": {
+            "/missingHeaderID": {
+              "get": {
+                "operationId": "note.count",
+                "responses": {
+                  "200": {
+                    "description": "200 OK"
+                  }
+                }
+              }
+            }
+          },
+          "security": [
+            {
+              "apikeyHeaderSecret": []
+            }
+          ],
+          "securityDefinitions": {
+            "apikeyHeaderID": {
+              "in": "header",
+              "name": "X-IBM-Client-Id",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterID": {
+              "in": "query",
+              "name": "client_id",
+              "type": "apiKey"
+            },
+            "apikeyHeaderSecret": {
+              "in": "header",
+              "name": "X-IBM-Client-Secret",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterSecret": {
+              "in": "query",
+              "name": "client_secret",
+              "type": "apiKey"
+            },
+            "apikeyHeaderOther": {
+              "in": "header",
+              "name": "headerOther",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterOther": {
+              "in": "query",
+              "name": "queryOther",
+              "type": "apiKey"
+            }
+          }
+        },
+        "id": "564b7b3ae4b0869c782eddae",
+        "organization": {
+            "id": "564b48a9e4b0869c782edc24",
+            "name": "apim",
+            "title": "Climb On"
+        },
+        "state": "running",
+        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+    },
+    {
+        "catalog": {
+            "default": false,
+            "id": "564b48aae4b0869c782edc2b",
+            "name": "sb",
+            "sandbox": true,
+            "title": "Sandbox",
+            "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+        },
+        "document": {
+          "swagger": "2.0",
+          "info": {
+            "x-ibm-name": "missingQueryParameterID",
+            "version": "1.0.0",
+            "title": "missingQueryParameterID"
+          },
+          "schemes": [
+            "http"
+          ],
+          "basePath": "/api",
+          "x-ibm-configuration": {
+            "assembly": {
+              "execute": [
+                {
+                  "set-variable": {
+                    "actions": [
+                      {
+                        "set": "message.body",
+                        "value": "Initial value"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "paths": {
+            "/missingQueryParameterID": {
+              "get": {
+                "operationId": "note.count",
+                "responses": {
+                  "200": {
+                    "description": "200 OK"
+                  }
+                }
+              }
+            }
+          },
+          "security": [
+            {
+              "apikeyQueryParameterSecret": []
+            }
+          ],
+          "securityDefinitions": {
+            "apikeyHeaderID": {
+              "in": "header",
+              "name": "X-IBM-Client-Id",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterID": {
+              "in": "query",
+              "name": "client_id",
+              "type": "apiKey"
+            },
+            "apikeyHeaderSecret": {
+              "in": "header",
+              "name": "X-IBM-Client-Secret",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterSecret": {
+              "in": "query",
+              "name": "client_secret",
+              "type": "apiKey"
+            },
+            "apikeyHeaderOther": {
+              "in": "header",
+              "name": "headerOther",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterOther": {
+              "in": "query",
+              "name": "queryOther",
+              "type": "apiKey"
+            }
+          }
+        },
+        "id": "564b7b3ae4b0869c782eddae",
+        "organization": {
+            "id": "564b48a9e4b0869c782edc24",
+            "name": "apim",
+            "title": "Climb On"
+        },
+        "state": "running",
+        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+    },
+    {
+        "catalog": {
+            "default": false,
+            "id": "564b48aae4b0869c782edc2b",
+            "name": "sb",
+            "sandbox": true,
+            "title": "Sandbox",
+            "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+        },
+        "document": {
+          "swagger": "2.0",
+          "info": {
+            "x-ibm-name": "twoClientIDs",
+            "version": "1.0.0",
+            "title": "twoClientIDs"
+          },
+          "schemes": [
+            "http"
+          ],
+          "basePath": "/api",
+          "x-ibm-configuration": {
+            "assembly": {
+              "execute": [
+                {
+                  "set-variable": {
+                    "actions": [
+                      {
+                        "set": "message.body",
+                        "value": "Initial value"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "paths": {
+            "/twoClientIDs": {
+              "get": {
+                "operationId": "note.count",
+                "responses": {
+                  "200": {
+                    "description": "200 OK"
+                  }
+                }
+              }
+            }
+          },
+          "security": [
+            {
+              "apikeyHeaderID": [],
+              "apikeyQueryParameterID": []
+            }
+          ],
+          "securityDefinitions": {
+            "apikeyHeaderID": {
+              "in": "header",
+              "name": "X-IBM-Client-Id",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterID": {
+              "in": "query",
+              "name": "client_id",
+              "type": "apiKey"
+            },
+            "apikeyHeaderSecret": {
+              "in": "header",
+              "name": "X-IBM-Client-Secret",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterSecret": {
+              "in": "query",
+              "name": "client_secret",
+              "type": "apiKey"
+            },
+            "apikeyHeaderOther": {
+              "in": "header",
+              "name": "headerOther",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterOther": {
+              "in": "query",
+              "name": "queryOther",
+              "type": "apiKey"
+            }
+          }
+        },
+        "id": "564b7b3ae4b0869c782eddae",
+        "organization": {
+            "id": "564b48a9e4b0869c782edc24",
+            "name": "apim",
+            "title": "Climb On"
+        },
+        "state": "running",
+        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+    },
+    {
+        "catalog": {
+            "default": false,
+            "id": "564b48aae4b0869c782edc2b",
+            "name": "sb",
+            "sandbox": true,
+            "title": "Sandbox",
+            "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+        },
+        "document": {
+          "swagger": "2.0",
+          "info": {
+            "x-ibm-name": "twoClientSecrets",
+            "version": "1.0.0",
+            "title": "twoClientSecrets"
+          },
+          "schemes": [
+            "http"
+          ],
+          "basePath": "/api",
+          "x-ibm-configuration": {
+            "assembly": {
+              "execute": [
+                {
+                  "set-variable": {
+                    "actions": [
+                      {
+                        "set": "message.body",
+                        "value": "Initial value"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "paths": {
+            "/twoClientSecrets": {
+              "get": {
+                "operationId": "note.count",
+                "responses": {
+                  "200": {
+                    "description": "200 OK"
+                  }
+                }
+              }
+            }
+          },
+          "security": [
+            {
+              "apikeyHeaderSecret": [],
+              "apikeyQueryParameterSecret": []
+            }
+          ],
+          "securityDefinitions": {
+            "apikeyHeaderID": {
+              "in": "header",
+              "name": "X-IBM-Client-Id",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterID": {
+              "in": "query",
+              "name": "client_id",
+              "type": "apiKey"
+            },
+            "apikeyHeaderSecret": {
+              "in": "header",
+              "name": "X-IBM-Client-Secret",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterSecret": {
+              "in": "query",
+              "name": "client_secret",
+              "type": "apiKey"
+            },
+            "apikeyHeaderOther": {
+              "in": "header",
+              "name": "headerOther",
+              "type": "apiKey"
+            },
+            "apikeyQueryParameterOther": {
+              "in": "query",
+              "name": "queryOther",
+              "type": "apiKey"
+            }
+          }
+        },
+        "id": "564b7b3ae4b0869c782eddae",
+        "organization": {
+            "id": "564b48a9e4b0869c782edc24",
+            "name": "apim",
+            "title": "Climb On"
+        },
+        "state": "running",
+        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+    }
+]
