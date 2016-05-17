@@ -1,0 +1,56 @@
+swagger: '2.0'
+
+info:
+  x-ibm-name: apiconnect-demo
+  version: 1.0.0
+  title: apiconnect-demo
+
+schemes:
+  - http
+
+basePath: /api
+
+x-ibm-configuration:
+  assembly:
+    execute:
+      - set-variable:
+          actions:
+            - set: message.body
+              value: Initial value
+
+paths:
+  /twoClientIDs:
+    get:
+      operationId: note.count
+      responses:
+        '200':
+          description: 200 OK
+
+security:
+- apikeyHeaderID: []
+  apikeyQueryParameterID: []
+securityDefinitions:
+  apikeyHeaderID:
+    in: header
+    name: X-IBM-Client-Id
+    type: apiKey
+  apikeyQueryParameterID:
+    in: query
+    name: client_id
+    type: apiKey
+  apikeyHeaderSecret:
+    in: header
+    name: X-IBM-Client-Secret
+    type: apiKey
+  apikeyQueryParameterSecret:
+    in: query
+    name: client_secret
+    type: apiKey
+  apikeyHeaderOther:
+    in: header
+    name: headerOther
+    type: apiKey
+  apikeyQueryParameterOther:
+    in: query
+    name: queryOther
+    type: apiKey
