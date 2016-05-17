@@ -16,7 +16,7 @@ module.exports = function checkSecurity(apidoc) {
     return true;
   } 
   var securityDefs = apidoc.securityDefinitions;
-  var name = apidoc.info['x-ibm-name'] || 'unnamed';
+  var name = (apidoc.info && apidoc.info['x-ibm-name']) || 'unnamed';
   logger.debug(name + ': checkSecurity securityReqs:', securityReqs);
   logger.debug(name + ': checkSecurity securityDefs:', securityDefs);
   
