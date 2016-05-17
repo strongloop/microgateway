@@ -1,0 +1,22 @@
+swagger: '2.0'
+
+info:
+  x-ibm-name: apiconnect-demo
+  version: 1.0.0
+  title: apiconnect-demo
+
+schemes:
+  - http
+
+basePath: /api
+
+x-ibm-configuration:
+  assembly:
+
+paths:
+  /noexecute:
+    get:
+      operationId: note.count
+      responses:
+        '200':
+          description: 200 OK

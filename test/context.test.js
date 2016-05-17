@@ -549,11 +549,12 @@ describe('Context middleware', function() {
                      'system.time.hour',
                      'system.time.minute',
                      'system.time.seconds',
-                     'system.date.dayOfWeek',
-                     'system.date.dayOfMonth',
+                     'system.date.day-of-week',
+                     'system.date.day-of-month',
                      'system.date.month',
                      'system.date.year',
-                     'system.timezone'
+                     'system.timezone',
+                     'system'
                    ];
       var ctx = req.ctx;
 
@@ -607,7 +608,7 @@ describe('Context middleware', function() {
 
       // 2. Verify system.date and system.time property
       function toDateObject(date, time) {
-        return new Date(date.year, date.month, date.dayOfMonth,
+        return new Date(date.year, date.month, date['day-of-month'],
                         time.hour, time.minute, time.seconds);
       }
 
@@ -639,8 +640,8 @@ describe('Context middleware', function() {
         req.ctx.get('system.time').hasOwnProperty(prop);
       });
 
-      // 5. system.date should contain dayOfWeek, dayOfMonth, month, and year
-      expectedProperties = ['year', 'month', 'dayOfMonth', 'dayOfWeek'];
+      // 5. system.date should contain day-of-week, day-of-month, month, and year
+      expectedProperties = ['year', 'month', 'day-of-month', 'day-of-week'];
       expectedProperties.every(function(prop) {
         req.ctx.get('system.date').hasOwnProperty(prop);
       });
