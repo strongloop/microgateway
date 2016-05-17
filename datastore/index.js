@@ -9,6 +9,7 @@ var Promise = require('bluebird');
 var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'microgateway:datastore'});
 var forever = require('forever-monitor');
+var path = require('path');
 
 var child;
 var server;
@@ -20,7 +21,7 @@ var sigtermHandler = function() {
 exports.start = function(fork) {
   return new Promise(function(resolve, reject) {
     if (fork) {
-      child = new (forever.Monitor)('./datastore/server/server.js', {
+      child = new (forever.Monitor)(path.resolve(__dirname, 'server/server.js'), {
         max: 10,
         args: [],
         fork: true,
