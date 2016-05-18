@@ -1,0 +1,13 @@
+{
+  "name": "OAuthScope",
+  "properties": {
+    "scope": {
+      "type": "string",
+      "id": true,
+      "generated": false
+    },
+    "description": "string",
+    "iconURL": "string",
+    "ttl": "number"
+  }
+}

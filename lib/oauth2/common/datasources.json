@@ -1,0 +1,6 @@
+{
+  "az-db": {
+    "name": "az-db",
+    "connector": "memory"
+  }
+}

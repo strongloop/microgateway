@@ -1,0 +1,53 @@
+{
+  "name": "OAuthAuthorizationCode",
+  "base": "PersistedModel",
+  "properties": {
+    "id": {
+      "type": "string",
+      "id": true,
+      "length": 300,
+      "generated": false
+    },
+    "appId": {
+      "type": "string",
+      "length": 128,
+      "index": true
+    },
+    "userId": {
+      "type": "string",
+      "index": true
+    },
+    "issuedAt": {
+      "type": "date",
+      "index": true
+    },
+    "expiresIn": "number",
+    "expiredAt": {
+      "type": "date",
+      "index": true
+    },
+    "scopes": [ "string" ],
+    "parameters": [
+      {
+        "name": "string",
+        "value": "string"
+      }
+    ],
+    "used": "boolean",
+    "redirectURI": "string",
+    "hash": "string"
+  },
+  "relations": {
+    "application": {
+      "type": "belongsTo",
+      "model": "OAuthClientApplication",
+      "foreignKey": "appId"
+    },
+    "user": {
+      "type": "belongsTo",
+      "model": "User",
+      "foreignKey": "userId"
+    }
+  }
+}
+
