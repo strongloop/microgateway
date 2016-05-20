@@ -9,7 +9,7 @@ var logger = require('apiconnect-cli-logger/logger.js')
   .child({loc: 'microgateway:policies:rate-limiting:helper'});
 
 exports.handleResponse =
-  function(limit, remaining, reset, reject, context, flow) {
+  function(name, limit, remaining, reset, reject, context, flow) {
     if (remaining < 0 && reject) {
 //      var resMsg = setupHeaders();
       var err = new Error('Rate limit exceeded');
@@ -31,6 +31,10 @@ exports.handleResponse =
 
     return flow.proceed();
 
+    function splice(base, pos, insert) {
+      return base.substring(0, position) + insert + base(position);
+    }
+
     function setupHeaders() {
       var resMsg = context.get('message');
       if (!resMsg) {
@@ -42,10 +46,39 @@ exports.handleResponse =
         resMsgHeaders = {};
         resMsg.headers = resMsgHeaders;
       }
-      logger.debug('Limit: %d Remaining: %d Reset: %d', limit, remaining, reset);
-      resMsgHeaders['X-RateLimit-Limit'] = limit;
-      resMsgHeaders['X-RateLimit-Remaining'] = remaining;
-      resMsgHeaders['X-RateLimit-Reset'] = reset;
+      name = name || 'RateLimit';
+      logger.debug('Name %s Limit: %d Remaining: %d Reset: %d', name, limit, remaining, reset);
+      var prefix;
+      if (!resMsgHeaders['X-RateLimit-Limit']) {
+        if (name === 'x-ibm-unnamed-rate-limit') {
+          prefix = '';
+        } else {
+          prefix = 'name=' + name + ',';
+        }
+        // First item in list, "<value>" for single, "name=<name>,<value>" for multi-level
+        resMsgHeaders['X-RateLimit-Limit'] = prefix + limit;
+        resMsgHeaders['X-RateLimit-Remaining'] = prefix + remaining;
+        resMsgHeaders['X-RateLimit-Reset'] = prefix + reset;
+      } else {
+        if (name === 'x-ibm-unnamed-rate-limit') {
+          // Insert single value at beginning: "<value>; "
+          resMsgHeaders['X-RateLimit-Limit'] = splice(resMsgHeaders['X-RateLimit-Limit'],
+                                                      resMsgHeaders['X-RateLimit-Limit'].indexOf('=') + 1,
+                                                      limit + '; ');
+          resMsgHeaders['X-RateLimit-Remaining'] = splice(resMsgHeaders['X-RateLimit-Limit'],
+                                                          resMsgHeaders['X-RateLimit-Limit'].indexOf('=') + 1,
+                                                          remaining + '; ');
+          resMsgHeaders['X-RateLimit-Reset'] = splice(resMsgHeaders['X-RateLimit-Limit'],
+                                                      resMsgHeaders['X-RateLimit-Limit'].indexOf('=') + 1,
+                                                      reset + '; ');
+        } else {
+          // Append multi-level value at end: "; name=<name>,<value>"
+          prefix = '; name=' + name + ',';
+          resMsgHeaders['X-RateLimit-Limit'] += prefix + limit;
+          resMsgHeaders['X-RateLimit-Remaining'] += prefix + remaining;
+          resMsgHeaders['X-RateLimit-Reset'] += prefix + reset;
+        }
+      }
       return resMsg;
     }
   };

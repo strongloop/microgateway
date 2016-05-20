@@ -34,12 +34,14 @@ module.exports = function(options) {
     if (!key) {
       return flow.proceed();
     }
+    var fields = key.split(':');
+    var name = fields[fields.length - 2];
     limiter(key, function(err, timeLeft, remaining) {
       if (err) {
         return flow.fail(err);
       }
       logger.debug('Result: %d %d', timeLeft, remaining);
-      handleResponse(limit, remaining, timeLeft, reject, context, flow);
+      handleResponse(name, limit, remaining, timeLeft, reject, context, flow);
     });
   };
 };

@@ -34,6 +34,17 @@ function cloneJSON(json) {
   return JSON.parse(JSON.stringify(json));
 }
 
+function setRateLimits(rateLimit, rateLimits) {
+  var combined = rateLimits;
+  if (rateLimit) {
+    if (!combined) {
+      combined = {};
+    }
+    combined['x-ibm-unnamed-rate-limit'] = rateLimit;
+  }
+  return combined;
+}
+
 function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, productCallback)
   {
   var plans = cloneJSON(product.document.plans);
@@ -52,8 +63,8 @@ function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, pr
       locals.plan.name = propname;
       locals.plan.id = getPlanID(locals.product, propname);
       locals.plan.version = locals.product.document.info.version;
-      locals.plan.rateLimit =
-        locals.product.document.plans[locals.plan.name]['rate-limit'];
+      locals.plan.rateLimit = setRateLimits(locals.product.document.plans[locals.plan.name]['rate-limit'],
+                                            locals.product.document.plans[locals.plan.name]['rate-limits']);
       // 1. trying to add to a particular plan
       // 2. trying to add to all plans
       //    a. all subscription
@@ -123,8 +134,8 @@ function ripCTX(ctx)
       }
     locals.plan.id = getPlanID(locals.product, locals.plan.name);
     locals.plan.version = locals.product.document.info.version;
-    locals.plan.rateLimit =
-      locals.product.document.plans[locals.plan.name]['rate-limit'];
+    locals.plan.rateLimit = setRateLimits(locals.product.document.plans[locals.plan.name]['rate-limit'],
+                                          locals.product.document.plans[locals.plan.name]['rate-limits']);
     }
   locals.snapshot = ctx.instance['snapshot-id'];
   return locals;
@@ -448,8 +459,9 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                                opPath.toUpperCase() === propname.toUpperCase())) {
                           allowOperation = true;
                           // Look for some operation scoped ratelimit metadata
-                          if (planOp["rate-limit"] !== undefined) {
-                            observedRatelimit=planOp["rate-limit"];
+                          observedRatelimit = setRateLimits(planOp['rate-limit'], planOp['rate-limits']) ||
+                                              pieces.plan.rateLimit;
+                          if (observedRatelimit !== undefined) {
 
                             if (opId) {
                               rateLimitScope = pieces.plan.id+":"+opId;

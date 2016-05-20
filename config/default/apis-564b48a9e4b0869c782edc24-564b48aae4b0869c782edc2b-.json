@@ -749,6 +749,26 @@
                             "Ascent"
                         ]
                     }
+                },
+                "/ratelimit8": {
+                  "get": {
+                    "operationId": "ratelimit8",
+                    "responses": {
+                      "200": {
+                        "description": "200 OK"
+                      }
+                    }
+                  }
+                },
+                "/ratelimit9": {
+                  "get": {
+                    "operationId": "ratelimit9",
+                    "responses": {
+                      "200": {
+                        "description": "200 OK"
+                      }
+                    }
+                  }
                 }
             },
             "produces": [
@@ -1865,6 +1885,46 @@
                 "/ratelimit3": {
                   "get": {
                     "operationId": "ratelimit3",
+                    "responses": {
+                      "200": {
+                        "description": "200 OK"
+                      }
+                    }
+                  }
+                },
+                "/ratelimit4": {
+                  "get": {
+                    "operationId": "ratelimit4",
+                    "responses": {
+                      "200": {
+                        "description": "200 OK"
+                      }
+                    }
+                  }
+                },
+                "/ratelimit5": {
+                  "get": {
+                    "operationId": "ratelimit5",
+                    "responses": {
+                      "200": {
+                        "description": "200 OK"
+                      }
+                    }
+                  }
+                },
+                "/ratelimit6": {
+                  "get": {
+                    "operationId": "ratelimit6",
+                    "responses": {
+                      "200": {
+                        "description": "200 OK"
+                      }
+                    }
+                  }
+                },
+                "/ratelimit7": {
+                  "get": {
+                    "operationId": "ratelimit7",
                     "responses": {
                       "200": {
                         "description": "200 OK"

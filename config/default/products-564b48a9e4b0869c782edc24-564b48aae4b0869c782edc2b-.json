@@ -157,9 +157,29 @@
           "hard-limit": false,
           "value": "100/min"
         },
+        "rate-limits": {
+          "plan-per-10-min": {
+            "value": "100/10minute",
+            "hard-limit": true
+          },
+          "plan-per-hour": {
+            "value": "10/1hour",
+            "hard-limit": true
+          }
+        },
         "apis": 
           {
-          "ascents": {},
+          "ascents": {
+            "operations": [
+              {
+                "operationId": "ratelimit8"
+              },
+              {
+                "path": "/ratelimit9",
+                "operation": "get"
+              }
+            ]
+          },
           "forecasts": {}
           }
       },
@@ -189,6 +209,60 @@
                 "rate-limit": {
                   "value": "3/10minute",
                   "hard-limit": true
+                }
+              },
+              {
+                "operationId": "ratelimit4",
+                "rate-limits": {
+                  "per-10-min": {
+                    "value": "2/10minute",
+                    "hard-limit": true
+                  },
+                  "per-hour": {
+                    "value": "4/1hour",
+                    "hard-limit": true
+                  }
+                }
+              },
+              {
+                "path": "/ratelimit5",
+                "operation": "get",
+                "rate-limits": {
+                  "per-10-min": {
+                    "value": "3/10minute",
+                    "hard-limit": true
+                  },
+                  "per-hour": {
+                    "value": "4/1hour",
+                    "hard-limit": true
+                  }
+                }
+              },
+              {
+                "operationId": "ratelimit6",
+                "rate-limits": {
+                  "per-10-min": {
+                    "value": "10/10minute",
+                    "hard-limit": true
+                  },
+                  "per-hour": {
+                    "value": "2/1hour",
+                    "hard-limit": true
+                  }
+                }
+              },
+              {
+                "path": "/ratelimit7",
+                "operation": "get",
+                "rate-limits": {
+                  "per-10-min": {
+                    "value": "10/10minute",
+                    "hard-limit": true
+                  },
+                  "per-hour": {
+                    "value": "3/1hour",
+                    "hard-limit": true
+                  }
                 }
               },
               {"operationId": "routes.test1"},
