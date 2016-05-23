@@ -1,0 +1,653 @@
+[{
+  "catalog": {
+    "default": false,
+    "id": "564b48aae4b0869c782edc2b",
+    "name": "sb",
+    "sandbox": true,
+    "title": "Sandbox",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+  },
+  "document": {
+    "info": {
+      "version": "1.0.0",
+      "title": "invoke",
+      "x-ibm-name": "invoke"
+    },
+    "securityDefinitions": null,
+    "basePath": "/preflow",
+    "swagger": "2.0",
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/state-running-enforced-true": {
+        "post": {
+          "responses": {
+            "200": {
+              "description": "200 OK"
+            }
+          }
+        }
+      }
+    },
+    "x-ibm-configuration": {
+      "enforced": "true",
+      "assembly": {
+        "execute": [{
+          "set-variable": {
+            "actions": [{
+              "set": "foo",
+              "value": "bar"
+            }]
+          }
+        }]
+      }
+    }
+  },
+  "id": "564b7b3ae4b0869c782eddae",
+  "organization": {
+    "id": "564b48a9e4b0869c782edc24",
+    "name": "apim",
+    "title": "Climb On"
+  },
+  "state": "running",
+  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+},
+{
+  "catalog": {
+    "default": false,
+    "id": "564b48aae4b0869c782edc2b",
+    "name": "sb",
+    "sandbox": true,
+    "title": "Sandbox",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+  },
+  "document": {
+    "info": {
+      "version": "1.0.0",
+      "title": "invoke",
+      "x-ibm-name": "invoke"
+    },
+    "securityDefinitions": null,
+    "basePath": "/preflow",
+    "swagger": "2.0",
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/state-suspended-enforced-true": {
+        "post": {
+          "responses": {
+            "200": {
+              "description": "200 OK"
+            }
+          }
+        }
+      }
+    },
+    "x-ibm-configuration": {
+      "enforced": "true",
+      "assembly": {
+        "execute": [{
+          "set-variable": {
+            "actions": [{
+              "set": "foo",
+              "value": "bar"
+            }]
+          }
+        }]
+      }
+    }
+  },
+  "id": "564b7b3ae4b0869c782eddae",
+  "organization": {
+    "id": "564b48a9e4b0869c782edc24",
+    "name": "apim",
+    "title": "Climb On"
+  },
+  "state": "suspended",
+  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+},
+{
+  "catalog": {
+    "default": false,
+    "id": "564b48aae4b0869c782edc2b",
+    "name": "sb",
+    "sandbox": true,
+    "title": "Sandbox",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+  },
+  "document": {
+    "info": {
+      "version": "1.0.0",
+      "title": "invoke",
+      "x-ibm-name": "invoke"
+    },
+    "securityDefinitions": null,
+    "basePath": "/preflow",
+    "swagger": "2.0",
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/state-stopped-enforced-true": {
+        "post": {
+          "responses": {
+            "200": {
+              "description": "200 OK"
+            }
+          }
+        }
+      }
+    },
+    "x-ibm-configuration": {
+      "enforced": "true",
+      "assembly": {
+        "execute": [{
+          "set-variable": {
+            "actions": [{
+              "set": "foo",
+              "value": "bar"
+            }]
+          }
+        }]
+      }
+    }
+  },
+  "id": "564b7b3ae4b0869c782eddae",
+  "organization": {
+    "id": "564b48a9e4b0869c782edc24",
+    "name": "apim",
+    "title": "Climb On"
+  },
+  "state": "stopped",
+  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+},
+{
+  "catalog": {
+    "default": false,
+    "id": "564b48aae4b0869c782edc2b",
+    "name": "sb",
+    "sandbox": true,
+    "title": "Sandbox",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+  },
+  "document": {
+    "info": {
+      "version": "1.0.0",
+      "title": "invoke",
+      "x-ibm-name": "invoke"
+    },
+    "securityDefinitions": null,
+    "basePath": "/preflow",
+    "swagger": "2.0",
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/state-missing-enforced-true": {
+        "post": {
+          "responses": {
+            "200": {
+              "description": "200 OK"
+            }
+          }
+        }
+      }
+    },
+    "x-ibm-configuration": {
+      "enforced": "true",
+      "assembly": {
+        "execute": [{
+          "set-variable": {
+            "actions": [{
+              "set": "foo",
+              "value": "bar"
+            }]
+          }
+        }]
+      }
+    }
+  },
+  "id": "564b7b3ae4b0869c782eddae",
+  "organization": {
+    "id": "564b48a9e4b0869c782edc24",
+    "name": "apim",
+    "title": "Climb On"
+  },
+  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+},
+{
+  "catalog": {
+    "default": false,
+    "id": "564b48aae4b0869c782edc2b",
+    "name": "sb",
+    "sandbox": true,
+    "title": "Sandbox",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+  },
+  "document": {
+    "info": {
+      "version": "1.0.0",
+      "title": "invoke",
+      "x-ibm-name": "invoke"
+    },
+    "securityDefinitions": null,
+    "basePath": "/preflow",
+    "swagger": "2.0",
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/state-running-enforced-false": {
+        "post": {
+          "responses": {
+            "200": {
+              "description": "200 OK"
+            }
+          }
+        }
+      }
+    },
+    "x-ibm-configuration": {
+      "enforced": "false",
+      "assembly": {
+        "execute": [{
+          "set-variable": {
+            "actions": [{
+              "set": "foo",
+              "value": "bar"
+            }]
+          }
+        }]
+      }
+    }
+  },
+  "id": "564b7b3ae4b0869c782eddae",
+  "organization": {
+    "id": "564b48a9e4b0869c782edc24",
+    "name": "apim",
+    "title": "Climb On"
+  },
+  "state": "running",
+  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+},
+{
+  "catalog": {
+    "default": false,
+    "id": "564b48aae4b0869c782edc2b",
+    "name": "sb",
+    "sandbox": true,
+    "title": "Sandbox",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+  },
+  "document": {
+    "info": {
+      "version": "1.0.0",
+      "title": "invoke",
+      "x-ibm-name": "invoke"
+    },
+    "securityDefinitions": null,
+    "basePath": "/preflow",
+    "swagger": "2.0",
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/state-suspended-enforced-false": {
+        "post": {
+          "responses": {
+            "200": {
+              "description": "200 OK"
+            }
+          }
+        }
+      }
+    },
+    "x-ibm-configuration": {
+      "enforced": "false",
+      "assembly": {
+        "execute": [{
+          "set-variable": {
+            "actions": [{
+              "set": "foo",
+              "value": "bar"
+            }]
+          }
+        }]
+      }
+    }
+  },
+  "id": "564b7b3ae4b0869c782eddae",
+  "organization": {
+    "id": "564b48a9e4b0869c782edc24",
+    "name": "apim",
+    "title": "Climb On"
+  },
+  "state": "suspended",
+  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+},
+{
+  "catalog": {
+    "default": false,
+    "id": "564b48aae4b0869c782edc2b",
+    "name": "sb",
+    "sandbox": true,
+    "title": "Sandbox",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+  },
+  "document": {
+    "info": {
+      "version": "1.0.0",
+      "title": "invoke",
+      "x-ibm-name": "invoke"
+    },
+    "securityDefinitions": null,
+    "basePath": "/preflow",
+    "swagger": "2.0",
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/state-stopped-enforced-false": {
+        "post": {
+          "responses": {
+            "200": {
+              "description": "200 OK"
+            }
+          }
+        }
+      }
+    },
+    "x-ibm-configuration": {
+      "enforced": "false",
+      "assembly": {
+        "execute": [{
+          "set-variable": {
+            "actions": [{
+              "set": "foo",
+              "value": "bar"
+            }]
+          }
+        }]
+      }
+    }
+  },
+  "id": "564b7b3ae4b0869c782eddae",
+  "organization": {
+    "id": "564b48a9e4b0869c782edc24",
+    "name": "apim",
+    "title": "Climb On"
+  },
+  "state": "stopped",
+  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+},
+{
+  "catalog": {
+    "default": false,
+    "id": "564b48aae4b0869c782edc2b",
+    "name": "sb",
+    "sandbox": true,
+    "title": "Sandbox",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+  },
+  "document": {
+    "info": {
+      "version": "1.0.0",
+      "title": "invoke",
+      "x-ibm-name": "invoke"
+    },
+    "securityDefinitions": null,
+    "basePath": "/preflow",
+    "swagger": "2.0",
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/state-missing-enforced-false": {
+        "post": {
+          "responses": {
+            "200": {
+              "description": "200 OK"
+            }
+          }
+        }
+      }
+    },
+    "x-ibm-configuration": {
+      "enforced": "false",
+      "assembly": {
+        "execute": [{
+          "set-variable": {
+            "actions": [{
+              "set": "foo",
+              "value": "bar"
+            }]
+          }
+        }]
+      }
+    }
+  },
+  "id": "564b7b3ae4b0869c782eddae",
+  "organization": {
+    "id": "564b48a9e4b0869c782edc24",
+    "name": "apim",
+    "title": "Climb On"
+  },
+  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+},
+{
+  "catalog": {
+    "default": false,
+    "id": "564b48aae4b0869c782edc2b",
+    "name": "sb",
+    "sandbox": true,
+    "title": "Sandbox",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+  },
+  "document": {
+    "info": {
+      "version": "1.0.0",
+      "title": "invoke",
+      "x-ibm-name": "invoke"
+    },
+    "securityDefinitions": null,
+    "basePath": "/preflow",
+    "swagger": "2.0",
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/state-running-enforced-missing": {
+        "post": {
+          "responses": {
+            "200": {
+              "description": "200 OK"
+            }
+          }
+        }
+      }
+    },
+    "x-ibm-configuration": {
+      "assembly": {
+        "execute": [{
+          "set-variable": {
+            "actions": [{
+              "set": "foo",
+              "value": "bar"
+            }]
+          }
+        }]
+      }
+    }
+  },
+  "id": "564b7b3ae4b0869c782eddae",
+  "organization": {
+    "id": "564b48a9e4b0869c782edc24",
+    "name": "apim",
+    "title": "Climb On"
+  },
+  "state": "running",
+  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+},
+{
+  "catalog": {
+    "default": false,
+    "id": "564b48aae4b0869c782edc2b",
+    "name": "sb",
+    "sandbox": true,
+    "title": "Sandbox",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+  },
+  "document": {
+    "info": {
+      "version": "1.0.0",
+      "title": "invoke",
+      "x-ibm-name": "invoke"
+    },
+    "securityDefinitions": null,
+    "basePath": "/preflow",
+    "swagger": "2.0",
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/state-suspended-enforced-missing": {
+        "post": {
+          "responses": {
+            "200": {
+              "description": "200 OK"
+            }
+          }
+        }
+      }
+    },
+    "x-ibm-configuration": {
+      "assembly": {
+        "execute": [{
+          "set-variable": {
+            "actions": [{
+              "set": "foo",
+              "value": "bar"
+            }]
+          }
+        }]
+      }
+    }
+  },
+  "id": "564b7b3ae4b0869c782eddae",
+  "organization": {
+    "id": "564b48a9e4b0869c782edc24",
+    "name": "apim",
+    "title": "Climb On"
+  },
+  "state": "suspended",
+  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+},
+{
+  "catalog": {
+    "default": false,
+    "id": "564b48aae4b0869c782edc2b",
+    "name": "sb",
+    "sandbox": true,
+    "title": "Sandbox",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+  },
+  "document": {
+    "info": {
+      "version": "1.0.0",
+      "title": "invoke",
+      "x-ibm-name": "invoke"
+    },
+    "securityDefinitions": null,
+    "basePath": "/preflow",
+    "swagger": "2.0",
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/state-stopped-enforced-missing": {
+        "post": {
+          "responses": {
+            "200": {
+              "description": "200 OK"
+            }
+          }
+        }
+      }
+    },
+    "x-ibm-configuration": {
+      "assembly": {
+        "execute": [{
+          "set-variable": {
+            "actions": [{
+              "set": "foo",
+              "value": "bar"
+            }]
+          }
+        }]
+      }
+    }
+  },
+  "id": "564b7b3ae4b0869c782eddae",
+  "organization": {
+    "id": "564b48a9e4b0869c782edc24",
+    "name": "apim",
+    "title": "Climb On"
+  },
+  "state": "stopped",
+  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+},
+{
+  "catalog": {
+    "default": false,
+    "id": "564b48aae4b0869c782edc2b",
+    "name": "sb",
+    "sandbox": true,
+    "title": "Sandbox",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+  },
+  "document": {
+    "info": {
+      "version": "1.0.0",
+      "title": "invoke",
+      "x-ibm-name": "invoke"
+    },
+    "securityDefinitions": null,
+    "basePath": "/preflow",
+    "swagger": "2.0",
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/state-missing-enforced-missing": {
+        "post": {
+          "responses": {
+            "200": {
+              "description": "200 OK"
+            }
+          }
+        }
+      }
+    },
+    "x-ibm-configuration": {
+      "assembly": {
+        "execute": [{
+          "set-variable": {
+            "actions": [{
+              "set": "foo",
+              "value": "bar"
+            }]
+          }
+        }]
+      }
+    }
+  },
+  "id": "564b7b3ae4b0869c782eddae",
+  "organization": {
+    "id": "564b48a9e4b0869c782edc24",
+    "name": "apim",
+    "title": "Climb On"
+  },
+  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+}]

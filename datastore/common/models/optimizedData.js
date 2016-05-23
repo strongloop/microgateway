@@ -400,6 +400,8 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
 
           // use JSON-ref resolved document if available
           var apiDocument = api['document-resolved'] || api.document;
+          var apiState = api.state || "running";
+          var apiEnforced = true; 
 
           var pathsProp = apiDocument.paths;
           logger.debug('pathsProp ',
@@ -518,6 +520,10 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
           var ibmSwaggerExtension = apiDocument['x-ibm-configuration'];
           var apiProperties = {};
           if (ibmSwaggerExtension) {
+            if (ibmSwaggerExtension['enforced'] === false) {
+              apiEnforced = false;
+            }
+             
             var defaultApiProperties = ibmSwaggerExtension.properties;
             if (defaultApiProperties) {
               Object.getOwnPropertyNames(defaultApiProperties).forEach(
@@ -601,6 +607,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'api-assembly': apiAssembly,
             'api-base-path': apiDocument.basePath,
             'api-name': apiDocument.info.title,
+            'api-state': apiState,
             'api-type': apiType,
             'api-version': apiDocument.info.version,
             'api-properties': apiProperties,
@@ -608,7 +615,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'snapshot-id' : pieces.snapshot
           };
 
-        if (apiPaths.length !== 0) { // no paths, no entry..
+        if (apiPaths.length !== 0 && apiEnforced === true && apiState !== "stopped") { // no paths, no entry..
           app.models.optimizedData.create(
             newOptimizedDataEntry,
             function(err, optimizedData) {

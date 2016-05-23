@@ -77,6 +77,7 @@ describe('Context variables in laptop experience', function() {
             foo: 'default_foo'
           },
           type: 'REST',
+          state: 'running',
           version: '1.0.0'
         };
 

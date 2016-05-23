@@ -47,6 +47,7 @@
         "rate-limit-scope": "string"
       }]
     }],
+    "api-state": "string",
     "snapshot-id": "string"
   },
   "validations": [],

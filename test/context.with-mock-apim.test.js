@@ -72,6 +72,7 @@ describe('Context variables testing with mock apim server', function() {
               name: apiDoc.organization.name
             },
             properties: {},
+            state: 'running',
             type: 'REST',
             version: apiDoc.document.info.version,
             operation: {
@@ -143,6 +144,7 @@ describe('Context variables testing with mock apim server', function() {
               path: "/routes"
             },
             properties: {},
+            state: 'running',
             type: 'REST',
             version: apiDoc.document.info.version
           },
@@ -243,6 +245,7 @@ describe('Context variables testing with mock apim server', function() {
               path: "/routes"
             },
             properties: {},
+            state: 'running',
             type: 'REST',
             version: apiDoc.document.info.version
           },
