@@ -243,3 +243,45 @@ exports.getRegistry = function(snapshot, registryName) {
     });
   });
 };
+
+exports.getAppInfo = function(snapshot, subscriptionId, clientId, done) {
+  logger.debug('getAppInfo entry');
+  //searching for the application info for the specific clientId
+  var queryfilter = JSON.stringify({
+    where: {
+      and: [
+        { 'snapshot-id': snapshot},
+        { id: subscriptionId }
+      ]
+    }
+  });
+  
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/subscriptions',
+        query: {filter : queryfilter}
+  };
+
+  var queryurl = url.format(queryurlObj);
+  // send request to optimizedData model from data-store
+  // for matching API(s)
+  request({url: queryurl, json: true}, function(error, response, body) {
+    logger.debug('error: ', error);
+    // exit early on error
+    if (error) {
+      done(error);
+      return;
+    }
+    var subscriptions = body;
+    //TODO: double check the clientId in the 
+    //body.application['app-credentials'] ????
+    if (!subscriptions || subscriptions.length === 0) {
+      done(new Error('no matched application'));
+      return;
+    }
+    logger.debug('application: ', subscriptions[0].application);
+    done(undefined, subscriptions[0].application);
+  });
+};
