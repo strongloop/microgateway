@@ -9,9 +9,8 @@ var YAML = require('yamljs');
 var env = {
   NODE_ENV: 'production',
   APIMANAGER_CATALOG: '',
-  APIMANAGER_PORT: 0,
-  APIMANAGER_REFRESH_INTERVAL: 15 * 1000 * 60,
-  PORT: 5000
+  APIMANAGER_PORT: 443,
+  APIMANAGER_REFRESH_INTERVAL: 15 * 1000 * 60
 };
 
 try {
