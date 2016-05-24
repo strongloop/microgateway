@@ -22,9 +22,9 @@ module.exports = function (config) {
             flow.proceed();
         }
 
-        var actualOpId = context.get('_.api.operationId');
-        var actualVerb = context.get('_.api.operation').toLowerCase();
-        var actualPath = context.get('_.api.path');
+        var actualOpId = context.get('api.operation.id');
+        var actualVerb = context.get('request.verb').toLowerCase();
+        var actualPath = context.get('api.operation.path');
         logger.info('[operation-switch] Matching %s %s (%s)',
                 actualVerb, actualPath, actualOpId);
 

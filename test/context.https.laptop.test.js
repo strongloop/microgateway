@@ -56,7 +56,7 @@ describe('Context variables in laptop experience', function() {
 
         delete swagger['x-ibm-configuration'].assembly;
 
-        assert.deepEqual(result, {
+        var expectApi = {
           document: swagger,
           endpoint: {
             address: '*',
@@ -65,17 +65,22 @@ describe('Context variables in laptop experience', function() {
           //id: 'context:1.0.0',
           //method: 'GET',
           name: 'context',
-          org: {  
+          org: {
             "id": "defaultOrgID",
             "name": "defaultOrgName"
-            },
+          },
+          operation: {
+            "path": "/context/api"
+          },
           //path: '/context/api',
           properties: {
             foo: 'default_foo'
           },
           type: 'REST',
           version: '1.0.0'
-        });
+        };
+
+        assert.deepEqual(result, expectApi);
         done();
       });
   });
