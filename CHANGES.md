@@ -1,7 +1,50 @@
-2016-05-10, Version 1.0.6
+2016-05-24, Version 1.1.0
 =========================
 
+ * Increment package and dependency versions. (Rick Curtis)
+
+ * Do not run ratelimit on auth failure (Daniel Badt)
+
+ * Remove def listen port and change def APIm port (Jon Palgon)
+
+ * Add the api.operation variables (juangmj)
+
+ * Check that doc value is initialized (Daniel Badt)
+
+ * Fix relative path resolution (Gary Tu)
+
+ * Verify API Connect swagger security conventions (Daniel Badt)
+
+ * Move bunyan from dependencies to devDependencies (Jon Palgon)
+
+ * Fix redis based rate limiting (Raymond Feng)
+
+ * freeze client,plan,env and system ctx variables (yihongwang)
+
+ * Use plan.['rate-limit'] instead of plan.rateLimit (Jon Palgon)
+
+ * Rename system.date.dayOf* properties to system.data.day-of-* for consistency (Jon Palgon)
+
+ * Aggressive retry on startup (Jon Palgon)
+
+ * Increment version for hot fix (Jon Palgon)
+
  * Suspend listening for traffic until APIs are specified (Jon Palgon)
+
+ * Add test cases for no assembly (Daniel Badt)
+
+ * Allow empty assemblies to loop back (Daniel Badt)
+
+ * Restore gnarly logging statement (Daniel Badt)
+
+ * Minor changes for the comments of code review (juangmj)
+
+ * Fix for datastore when there are no IBM extensions (Daniel Badt)
+
+ * Add RATELIMIT_REDIS env var to configure redis (Raymond Feng)
+
+ * Add a warning if rate limit is exceeded but not rejected (Raymond Feng)
+
 
 2016-05-05, Version 1.0.5
 =========================
