@@ -70,7 +70,7 @@ module.exports = function(options) {
     limit: limit,
     interval: interval,
     reject: reject,
-    prefix: options.prefix || 'ibm-apiconnect-microgateway',
+    prefix: options.prefix || ('ibm-microgateway-' + Date.now()),
     redis: options.redis,
     getKey: getKey
   };

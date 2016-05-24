@@ -11,6 +11,7 @@ var constants = require('constants');
 var Crypto = require('crypto');
 var Request = require('request');
 var url = require('url');
+var checkSecurity = require('./check-security');
 var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'microgateway:datastore:server:boot:load-model'});
 var sgwapimpull = require('../../apim-pull');
@@ -34,7 +35,7 @@ var definitionsDir = rootConfigPath + 'default';
 var gatewayMain = __dirname + '/../../../';
 var keyFile = gatewayMain + KEYNAME;
 var version ='1.0.0';
-var mixedProtocols = http = https = false;
+var mixedProtocols = false, http = false, https = false;
 
 /**
  * Creates a model type 
@@ -76,16 +77,17 @@ module.exports = function(app) {
   models.push(new ModelType('optimizedData', 'dummy'));
   models.push(new ModelType('snapshot', 'dummy')); // hack, removed later
 
-  var refreshInterval = 15 * 60 * 1000; // 15 minutes
+  var maxRefreshInterval = 15 * 60 * 1000; // 15 minutes
   if (process.env.APIMANAGER_REFRESH_INTERVAL) {
-    refreshInterval = process.env.APIMANAGER_REFRESH_INTERVAL;
+    maxRefreshInterval = process.env.APIMANAGER_REFRESH_INTERVAL;
   } 
   var apimanager = {
     host: process.env[APIMANAGER],
     port: process.env[APIMANAGER_PORT],
     catalog: process.env[APIMANAGER_CATALOG],
     handshakeOk: false,
-    refresh : refreshInterval
+    startupRefresh : 1000, // 1 second
+    maxRefresh : maxRefreshInterval
     };
 
   async.series(
@@ -193,6 +195,17 @@ function loadData(app, apimanager, models, currdir) {
       }
     ],
     function(err, results) {
+      var interval = apimanager.maxRefresh;
+      // if no error and APIs specified, do not agressively reload config
+      if (!err && apimanager.host && (http || https)) { 
+        apimanager.startupRefresh = interval;
+      } else {
+        if (apimanager.startupRefresh < apimanager.maxRefresh) {
+          // try agressively at first, and slowly back off
+          interval = apimanager.startupRefresh;
+          apimanager.startupRefresh *= 2;
+        }
+      }
       if (err) {
         if (populatedSnapshot) {
           releaseSnapshot(app, snapshotID, function (err) {
@@ -208,6 +221,7 @@ function loadData(app, apimanager, models, currdir) {
       }
       setImmediate(scheduleLoadData,
                    app,
+                   interval,
                    apimanager,
                    models,
                    currdir);
@@ -215,10 +229,10 @@ function loadData(app, apimanager, models, currdir) {
   );
 }
 
-function scheduleLoadData(app, apimanager, models, dir) {
+function scheduleLoadData(app, interval, apimanager, models, dir) {
   if (apimanager.host)
     setTimeout(loadData,
-             apimanager.refresh,
+             interval,
              app,
              apimanager,
              models,
@@ -689,10 +703,12 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
             }
             // looks like an API
             if (readfile.swagger) {
-              model.name = 'api';
               entry.id = createAPIID(readfile);
               entry.document = expandAPIData(readfile, dir);
-              apis[entry.document.info['x-ibm-name']] = entry.document;
+              if (entry.document) {
+                model.name = 'api';
+                apis[entry.document.info['x-ibm-name']] = entry.document;
+              }
             }
             
             if (model.name) {
@@ -909,6 +925,9 @@ function expandAPIData(apidoc, dir)
     apidoc = findAndReplace(apidoc, cataloghostvar, cataloghost);
     }
   checkHttps(apidoc);
+  if (!checkSecurity(apidoc)) {
+    return null;
+  }
   return apidoc;
   }
 function loadAPIsFromYAML(listOfAPIs, dir)
@@ -962,6 +981,7 @@ function populateModelsWithAPImData(app, models, dir, uid, cb) {
           }
           logger.debug('filecontents: ', readfile);
           // inject 'snapshot-id' property
+          var valid = [];
           readfile.forEach(
             function(obj) {
               obj['snapshot-id'] = uid;
@@ -969,12 +989,17 @@ function populateModelsWithAPImData(app, models, dir, uid, cb) {
               // looks like an API
               if (obj.document && obj.document.swagger) {
                 checkHttps(obj.document);
+                if (checkSecurity(obj.document)) {
+                  valid.push(obj);
+                }
+              } else {
+                valid.push(obj);
               }
             }
           );
 
           app.models[model.name].create(
-            readfile,
+            valid,
             function(err, mymodel) {
               if (err) {
                 fileCallback(err);

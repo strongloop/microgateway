@@ -73,7 +73,10 @@ describe('Context variables testing with mock apim server', function() {
             },
             properties: {},
             type: 'REST',
-            version: apiDoc.document.info.version
+            version: apiDoc.document.info.version,
+            operation: {
+              "path": "/estimates/price"
+            }
           },
           client: {
             app: {
@@ -134,6 +137,10 @@ describe('Context variables testing with mock apim server', function() {
             org: {
               id: apiDoc.organization.id,
               name: apiDoc.organization.name
+            },
+            operation: {
+              id: "routes.find",
+              path: "/routes"
             },
             properties: {},
             type: 'REST',
@@ -230,6 +237,10 @@ describe('Context variables testing with mock apim server', function() {
             org: {
               id: apiDoc.organization.id,
               name: apiDoc.organization.name
+            },
+            operation: {
+              id: "routes.find",
+              path: "/routes"
             },
             properties: {},
             type: 'REST',

@@ -29,6 +29,7 @@
   "author": "IBM Gateway Team",
   "license": "SEE LICENSE IN LICENSE.txt",
   "devDependencies": {
+    "bunyan": "^1.7.1",
     "debug": "^2.2.0",
     "eslint": "^1.x",
     "eslint-config-apiconnect": "^1.x",
@@ -47,7 +48,6 @@
     "basic-auth": "^1.0.3",
     "bluebird": "^3.3.3",
     "body-parser": "^1.14.2",
-    "bunyan": "^1.7.1",
     "chokidar": "^1.4.2",
     "compression": "^1.6.1",
     "content-type": "^1.0.1",
@@ -73,7 +73,7 @@
     "qs": "^6.1.0",
     "redis": "^2.4.2",
     "request": "^2.69.0",
-    "rolling-rate-limiter": "^0.1.2",
+    "rolling-rate-limiter": "^0.1.4",
     "type-is": "^1.6.11",
     "yamljs": "^0.2.4"
   },

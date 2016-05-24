@@ -231,7 +231,6 @@ describe('data-store-retry', function() {
     process.env.DATASTORE_PORT = 5000;
     process.env.APIMANAGER_PORT = 8890;
     process.env.APIMANAGER = '127.0.0.1';
-    process.env.APIMANAGER_REFRESH_INTERVAL = 1000; // 1 second
     process.env.CONFIG_DIR = __dirname + '/definitions/datastore';
     process.env.NODE_ENV = 'production';
     done();
@@ -241,7 +240,6 @@ describe('data-store-retry', function() {
     delete process.env.DATASTORE_PORT;
     delete process.env.APIMANAGER_PORT;
     delete process.env.APIMANAGER;
-    delete process.env.APIMANAGER_REFRESH_INTERVAL;
     delete process.env.CONFIG_DIR;
     delete process.env.NODE_ENV;
     done();
