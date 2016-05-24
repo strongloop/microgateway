@@ -1,6 +1,6 @@
 {
   "name": "microgateway",
-  "version": "1.0.6",
+  "version": "2.0.0",
   "description": "API Connect MicroGateway",
   "main": "index.js",
   "scripts": {
@@ -41,7 +41,7 @@
     "supertest": "^1.1.0"
   },
   "dependencies": {
-    "apiconnect-cli-config": "^1.x",
+    "apiconnect-cli-config": "^2.x",
     "apiconnect-cli-logger": "^1.x",
     "async": "^1.5.2",
     "auth-header": "^0.2.2",
