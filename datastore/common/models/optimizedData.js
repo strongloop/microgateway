@@ -373,6 +373,30 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
         pieces.apis,
         function(api, apidone) {  // each api
           var apiPaths = [];
+          var apiName    = api.document.info['x-ibm-name'] || api.document.info['title'];
+          var apiVersion = api.document.info['version'];
+          var apiNameVer = apiName + ':' + apiVersion;
+          var apiId      = api.id;
+          logger.debug('apiNameVer:', apiNameVer, ' apiId:', apiId);
+
+          // Find the named property (in the plan) for this API
+          var apiProperty;
+          if (pieces.product.document.apis) {
+            var apiPropertyNames = Object.getOwnPropertyNames(cloneJSON(pieces.product.document.apis));
+            apiPropertyNames.forEach(
+              function(apiPropertyName) {
+                //logger.debug('this apiPropertyName:', apiPropertyName);
+                if (pieces.product.document.apis[apiPropertyName].id === apiId || 
+                    pieces.product.document.apis[apiPropertyName].name === apiNameVer) {
+                  apiProperty = apiPropertyName;
+                }
+              }
+            );
+          }
+          if (apiProperty === undefined) {
+            apiProperty = apiName;
+          }
+          logger.debug('apiPropertyName:', apiProperty);
 
           // use JSON-ref resolved document if available
           var apiDocument = api['document-resolved'] || api.document;
@@ -403,12 +427,12 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                     var rateLimitScope = pieces.plan.id;
                     // Does the plan neglect to specify APIs, or is the api listed in the plan with no operations listed? Then allow any operation
                     if ((pieces.plan.apis === undefined) || 
-                        (pieces.plan.apis[api.document.info['x-ibm-name']] !== undefined && 
-                         pieces.plan.apis[api.document.info['x-ibm-name']].operations === undefined)){
+                        (pieces.plan.apis[apiProperty] !== undefined && 
+                         pieces.plan.apis[apiProperty].operations === undefined)){
                       allowOperation = true;
                     } else {
                       //Look to see if we got an operationID match
-                      var operations = pieces.plan.apis[api.document.info['x-ibm-name']].operations;
+                      var operations = pieces.plan.apis[apiProperty].operations;
 //                      var loop_index;
 
                       operations.forEach(function(planOp) {
