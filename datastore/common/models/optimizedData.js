@@ -652,12 +652,29 @@ function makePathRegex(basePath, apiPath) {
     basePath = '';
   }
 
+  // only the last param can have + to indicate multiple instance
+  // need to check if path ends with param with prefix +
+
+
+  var regex = /{\+([^}]+)}$/;
+  var matches = regex.exec(path);
+  if (matches) {
+     logger.debug('path before replacing multi instance: ', path);
+     braceBegin = path.lastIndexOf('{');
+     braceEnd = path.lastIndexOf('}') + 1;
+     var variablePath = path.substring(braceBegin, braceEnd);
+     path = path.replace(variablePath, ".+");
+     logger.debug('path after replacing multi instance: ', path);
+  }
+
+
   do {
     braceBegin = path.indexOf('{');
     if (braceBegin >= 0) {
       braceEnd = path.indexOf('}') + 1;
       var variablePath = path.substring(braceBegin, braceEnd);
-      path = path.replace(variablePath, ".+");
+      path = path.replace(variablePath, "[^/]+");
+      //path = path.replace(variablePath, ".+");
     }
   } while (braceBegin >= 0);
   if (apiPath === '/') {

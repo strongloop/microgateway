@@ -163,6 +163,43 @@ paths:
         '200':
           description: 200 OK
 
+  /context/request/multi/instance/parameters/{+param1}:
+    put:
+      summary: put request multiple instance parameter value
+      operationId: putParameters
+      parameters:
+        - name: +param1
+          in: path
+          description: multi instance parameter
+          type: string
+          required: true
+
+      responses:
+        '200':
+          description: 200 OK
+
+  /context/request/mix/parameters/{param1}/{+param2}:
+    put:
+      summary: put request multiple instance parameter value
+      operationId: putParameters
+      parameters:
+        - name: param1
+          in: path
+          description: multi instance parameter
+          type: string
+          required: true
+        - name: +param2
+          in: path
+          description: multi instance parameter
+          type: string
+          required: true
+
+
+      responses:
+        '200':
+          description: 200 OK
+
+
 x-kaiser-payment-methods:
   methods:
     - creditcard
