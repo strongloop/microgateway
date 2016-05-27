@@ -51,7 +51,7 @@ describe('matching score test', function() {
         request
         .get('/v1/routes/foo/bar?client_id=' + clientId1 +
           '&client_secret=' + clientSecret1)
-        .expect(200, done);
+        .expect(404, done);
       });
 
     it('client_id=' + clientId1 +
