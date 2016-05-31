@@ -216,6 +216,84 @@ describe('Context variables in laptop experience', function() {
       });
   });
 
+  it('should produce request.parameters for one match of multiple parts', function(done) {
+    var payload = 'hello world';
+    request
+      .put('/v1/context/request/multi/instance/parameters/abc')
+      .type('text/plain')
+      .send(payload)
+      .end(function(err, res) {
+        var result = res.body;
+        if (_.isString(result)) {
+          result = JSON.parse(result);
+        }
+
+        assert.deepEqual(result,
+            {'param1': ['abc']}
+        );
+        done();
+      });
+  });
+
+  it('should produce request.parameters for two match of multiple parts', function(done) {
+    var payload = 'hello world';
+    request
+      .put('/v1/context/request/multi/instance/parameters/abc/def')
+      .type('text/plain')
+      .send(payload)
+      .end(function(err, res) {
+        var result = res.body;
+        if (_.isString(result)) {
+          result = JSON.parse(result);
+        }
+
+        assert.deepEqual(result,
+            {'param1': ['abc','def']}
+        );
+        done();
+      });
+  });
+
+  it('should produce request.parameters for three match of multiple parts', function(done) {
+    var payload = 'hello world';
+    request
+      .put('/v1/context/request/multi/instance/parameters/abc/def/gh')
+      .type('text/plain')
+      .send(payload)
+      .end(function(err, res) {
+        var result = res.body;
+        if (_.isString(result)) {
+          result = JSON.parse(result);
+        }
+
+        assert.deepEqual(result,
+            {'param1': ['abc','def','gh']}
+        );
+        done();
+      });
+  });
+
+
+  it('should produce request.parameters for mixed multiple parts', function(done) {
+    var payload = 'hello world';
+    request
+      .put('/v1/context/request/mix/parameters/abc/def/gh')
+      .type('text/plain')
+      .send(payload)
+      .end(function(err, res) {
+        var result = res.body;
+        if (_.isString(result)) {
+          result = JSON.parse(result);
+        }
+
+        assert.deepEqual(result,
+            {'param1': 'abc',
+             'param2': ['def','gh']}
+        );
+        done();
+      });
+  });
+
   it('should resolve JSON-references', function(done) {
     request
       .get('/v1/context/request/parameters/abc/9999?param1=value1&param2=8888&param5=1111&paramBoolean=false&queryArray=1&queryArray=2&queryArray=3&paramRef1=foo')
