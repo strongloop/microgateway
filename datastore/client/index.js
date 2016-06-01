@@ -282,6 +282,12 @@ exports.getAppInfo = function(snapshot, subscriptionId, clientId, done) {
       return;
     }
     logger.debug('application: ', subscriptions[0].application);
-    done(undefined, subscriptions[0].application);
+    //remove unnecessary fields before return
+    var rev = subscriptions[0].application;
+    var credential = rev['app-credentials'][0];
+    delete rev['app-credentials'];
+    rev['client-id'] = credential['client-id'];
+    rev['client-secret'] = credential['client-secret'];
+    done(undefined, rev);
   });
 };

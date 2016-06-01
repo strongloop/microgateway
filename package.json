@@ -78,6 +78,7 @@
     "request": "^2.69.0",
     "rolling-rate-limiter": "^0.1.4",
     "type-is": "^1.6.11",
+    "uid-safe": "^2.1.1",
     "uid2": "0.0.3",
     "yamljs": "^0.2.4"
   },

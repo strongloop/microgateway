@@ -1,0 +1,90 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C/DTD HTML 4.0 Transitional//EN">
+  <html lang="en" xml:lang="en">
+
+
+  <head>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <meta charset="UTF-8"/>
+    <title>Login Page</title>
+
+    <script type="text/javascript" language="JavaScript">
+
+    function url2Fields()
+    {
+      var qPos = location.href.indexOf('?');
+
+      if (qPos < 0) 
+        return;
+
+      var query = location.href.substr(qPos+1);
+      var qList = query.split('&');
+      var i;
+
+      for (i=0; i<qList.length; i++) 
+      {
+        var nameVal = qList[i].split('=');
+        var name = nameVal[0];
+        var f = document.LoginForm;
+
+        if (typeof(f[name]) != 'undefined')
+        {
+          var val = unescape(nameVal[1]);
+          f[name].value=val;
+        }
+        /* The following works closely with the radius-msg div below.
+           It is for displaying the RADIUS challenge message, and it 
+           can be removed if you are not using RADIUS, or you are not
+           planning to support RADIUS challenge response protocol.
+        */
+        else if (name = 'radius-message')
+        {
+          var div = document.getElementById("radius-msg");
+          var decodedval = decodeURIComponent(nameVal[1]);
+          div.textContent = decodedval.replace(/[+]/g, ' ');
+        }
+      }
+    }
+  </script>
+  <noscript>Sorry, your browser does not support JavaScript!</noscript>
+  </head>
+
+  <body onload="url2Fields()">
+
+    <h2>Login</h2>
+    
+    <!-- radius-msg is optional, it is to support RADIUS challenge response.
+         It can be removed if you are not using RADIUS or you are not 
+         planning to support RADIUS challenge response protocol.
+    -->
+    <p><div id="radius-msg"></div></p>
+
+    <form name="LoginForm" method="post" action="##ACTIONURI##">
+      <p>
+        <strong>Please enter your user ID and password.</strong><br/>   
+        <font size="2" color="grey">If you have forgotten your user ID or password, please
+          contact the server administrator.</font>
+      </p>
+      <p>
+        <table>
+          <tr>
+          <td>User ID:</td><td><input type="text" size="20" name="j_username"/></td>
+          </tr>
+          <tr>
+          <td>Password:</td><td><input type="password" size="20" name="j_password"/></td>
+          </tr>
+        </table>
+      </p>
+      <p>
+        <input type="submit" name="login" value="Login"/>
+      </p>
+        <input type="hidden" size="1024" name="originalUrl"/>
+        <!-- radius-status is optional, it is to support RADIUS challenge response.
+             It can be removed if you are not using RADIUS or you are not 
+             planning to support RADIUS challenge response protocol.
+        -->
+        <input type="hidden" size=32" name="radius-state" />
+    </form>
+
+  </body>
+  </html>
