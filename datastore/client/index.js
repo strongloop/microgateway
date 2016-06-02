@@ -291,3 +291,36 @@ exports.getAppInfo = function(snapshot, subscriptionId, clientId, done) {
     done(undefined, rev);
   });
 };
+
+//Find clinet(s) by the client id and the application id.
+exports.getClientById = function(snapshot, clientId, apiId, done) {
+  logger.debug('getClientById entry');
+
+  // build request to send to data-store
+  var queryfilter = { where: { and: [] } };
+  queryfilter.where.and[0] = { 'snapshot-id': snapshot };
+  queryfilter.where.and[1] = { 'api-id': apiId };
+  queryfilter.where.and[2] = { 'client-id': clientId };
+
+  var queryurlObj = {
+      protocol: 'http',
+      hostname: host,
+      port: process.env.DATASTORE_PORT,
+      pathname: '/api/optimizedData',
+      query: { filter : JSON.stringify(queryfilter) }
+  };
+  var queryurl = url.format(queryurlObj);
+
+  request({ url: queryurl, json: true }, function (error, response, body) {
+    if (error) {
+      logger.debug('error: ', error);
+      return done (error);
+    }
+
+    var optimizedData = body;
+    if (!optimizedData || optimizedData.length === 0)
+        return done(new Error('no matched client'));
+
+    done(undefined, optimizedData);
+  });
+};
