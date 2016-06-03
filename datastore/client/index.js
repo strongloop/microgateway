@@ -281,9 +281,9 @@ exports.getAppInfo = function(snapshot, subscriptionId, clientId, done) {
       done(new Error('no matched application'));
       return;
     }
-    logger.debug('application: ', subscriptions[0].application);
-    //remove unnecessary fields before return
     var rev = subscriptions[0].application;
+    logger.debug('found application record:', rev.title);
+    //remove unnecessary fields before return
     var credential = rev['app-credentials'][0];
     delete rev['app-credentials'];
     rev['client-id'] = credential['client-id'];

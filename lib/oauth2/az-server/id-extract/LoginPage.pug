@@ -5,45 +5,12 @@ html(lang="en")
     meta(http-equiv="content-type", content="text/html; charset=UTF-8")
     meta(charset="UTF-8")
     title Login Page
-    script(type='text/javascript', language="JavaScript").
-      function url2Fields()
-      {
-        var qPos = location.href.indexOf('?');
 
-        if (qPos < 0) 
-          return;
-
-        var query = location.href.substr(qPos+1);
-        var qList = query.split('&');
-        var i;
-
-        for (i=0; i<qList.length; i++) 
-        {
-          var nameVal = qList[i].split('=');
-          var name = nameVal[0];
-          var f = document.LoginForm;
-
-          if (typeof(f[name]) != 'undefined')
-          {
-            var val = unescape(nameVal[1]);
-            f[name].value=val;
-          }
-          else if (name = 'radius-message')
-          {
-            var div = document.getElementById("radius-msg");
-            var decodedval = decodeURIComponent(nameVal[1]);
-            div.textContent = decodedval.replace(/[+]/g, ' ');
-          }
-        }
-      }
-    noscript Sorry, your browser does not support JavaScript!
-
-  body(onload="url2Fields()")
+  body
     h2 Login
 
     p
       div(id="radius-msg")
-
     form(name="LoginForm", method="post", action=action)
       p
         strong Please enter your user ID and password.
@@ -64,4 +31,3 @@ html(lang="en")
       p
         input(type="submit", name="login", value="Login")
         input(type="hidden", size="1024", name="transaction_id", value=transaction_id)
-        input(type="hidden", size="32", name="radius-state")
