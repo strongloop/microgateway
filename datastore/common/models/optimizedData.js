@@ -667,6 +667,14 @@ function makePathRegex(basePath, apiPath) {
      logger.debug('path after replacing multi instance: ', path);
   }
 
+  var regex_findPuls =  /{\+([^}]+)}/;
+  matches = regex_findPuls.exec(path);
+
+  // give a warning if the {+param} is not at the end of the path.
+  if (matches) {
+   logger.warn("api path \'" + apiPath + "\' contains \'{+param}\' that is not at the end of the path." +
+                  " This parameter will not be able to match multipl URI fragment.");
+  } 
 
   do {
     braceBegin = path.indexOf('{');
