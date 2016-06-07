@@ -47,6 +47,14 @@
       "length": 300,
       "index": true
     },
+    "grant": {
+      "type": "string",
+      "enum": [ "application",
+        "password",
+        "accessCode",
+        "implicit",
+        "refershToken" ]
+    },
     "refreshToken": {
       "type": "string",
       "length": 300,
