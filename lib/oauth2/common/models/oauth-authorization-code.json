@@ -8,6 +8,11 @@
       "length": 300,
       "generated": false
     },
+    "apiId": {
+      "type": "string",
+      "length": 128,
+      "index": true
+    },
     "appId": {
       "type": "string",
       "length": 128,
