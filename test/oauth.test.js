@@ -5,14 +5,107 @@
 
 'use strict';
 
+var Promise = require('bluebird');
+Promise.longStackTraces();
+var fs = require('fs');
+var path = require('path');
 var mg = require('../lib/microgw');
 var supertest = require('supertest');
 var _ = require('lodash');
 var assert = require('assert');
+var debug  = require('debug')('tests:oauth');
+var rimraf = require('rimraf');
+var mkdirp = require('mkdirp');
+var glob   = require('glob');
+var YAML   = require('yamljs');
 var apimServer = require('./support/mock-apim-server/apim-server');
 var echo = require('./support/echo-server');
 
+var configDir  = path.join(__dirname, 'definitions', 'oauth');
+
 var request, httprequest;
+
+function createSwagger () {
+  var catalogDir = path.join(configDir, 'v1', 'catalogs', 'catalog007');
+
+  // Make catalog007 directory
+  function createCatalogDir () {
+    return new Promise(function (resolve, reject) {
+      mkdirp(catalogDir, function (err) {
+        if (err)
+          return reject(err);
+        resolve();
+      });
+    });
+  }
+
+  // Find paths to all the YAML (Swagger) files under the configDir
+  function findSwaggerYamls () {
+    return new Promise(function (resolve, reject) {
+      var yamlglob = path.join(configDir, '*.yaml');
+      glob(yamlglob, function (err, files) {
+        if (err)
+          return reject(err);
+        resolve(files);
+      });
+    });
+  }
+
+  // Convert swagger files from YAML to JSON, and add them to catalogDir
+  function convertYamlsToJson (files) {
+    var promises = files.map(function (yamlpath) {
+      return new Promise(function (resolve, reject) {
+        var fname = /^.*\/([^\/]+)\.yaml$/.exec(yamlpath)[1];
+        var jsonpath = path.join(catalogDir, fname + '.json');
+        var obj = YAML.load(yamlpath);
+        var json = JSON.stringify(obj, null, 2);
+        fs.writeFile(jsonpath, json, function (err) {
+          if (err)
+            return reject(err);
+          resolve(yamlpath + ' converted to ' + jsonpath);
+        });
+      });
+    });
+    return Promise.all(promises);
+  }
+
+  return createCatalogDir()
+    .then(findSwaggerYamls)
+    .then(convertYamlsToJson)
+    .then(function (results) {
+      _.forEach(results, function (r) { debug(r); });
+    });
+}
+
+function cleanupSwagger () {
+  var catalogDir = path.join(configDir, 'v1', 'catalogs', 'catalog007');
+
+  var options = {
+    unlink: function (p, cb) {
+      fs.unlink(p, function (err) {
+        if (!err)
+          debug('Removed', p);
+        cb(err);
+      });
+    },
+
+    rmdir: function (p, cb) {
+      fs.rmdir(p, function (err) {
+        if (!err)
+          debug('Removed', p);
+        cb(err);
+      });
+    }
+  };
+
+  return new Promise(function (resolve, reject) {
+    rimraf(catalogDir, options, function (err) {
+      if (err)
+        return reject(err);
+      resolve();
+    });
+  });
+}
 
 function dsCleanup(port) {
   // clean up the directory
@@ -37,9 +130,9 @@ function dsCleanup(port) {
   });
 }
 
-describe('preflow testing', function() {
+describe('oauth testing', function() {
   before(function(done) {
-    process.env.CONFIG_DIR = __dirname + '/definitions/oauth';
+    process.env.CONFIG_DIR = configDir;
     process.env.NODE_ENV = 'production';
     mg.start(3000)
       .then(function() {
@@ -47,7 +140,7 @@ describe('preflow testing', function() {
       })
       .then(done)
       .catch(function(err) {
-        console.error(err);
+        debug(err);
         done(err);
       });
   });
@@ -84,11 +177,10 @@ describe('preflow testing', function() {
 
 });
 
-/*
-describe('preflow testing onprem', function() {
+describe('oauth testing onprem', function() {
 
   before(function(done) {
-    process.env.CONFIG_DIR = __dirname + '/definitions/preflow/security';
+    process.env.CONFIG_DIR = configDir;
     process.env.NODE_ENV = 'production';
     process.env.APIMANAGER = '127.0.0.1';
     process.env.APIMANAGER_PORT = 8081;
@@ -97,6 +189,7 @@ describe('preflow testing onprem', function() {
             process.env.APIMANAGER,
             process.env.APIMANAGER_PORT,
             process.env.CONFIG_DIR)
+      .then(createSwagger)
       .then(function() {
         return mg.start(3000);
       })
@@ -108,7 +201,7 @@ describe('preflow testing onprem', function() {
       })
       .then(done)
       .catch(function(err) {
-        console.error(err);
+        debug(err);
         done(err);
       });
   });
@@ -118,6 +211,7 @@ describe('preflow testing onprem', function() {
       .then(function() { return mg.stop(); })
       .then(function() { return apimServer.stop(); })
       .then(function() { return echo.stop(); })
+      .then(cleanupSwagger)
       .then(done, done)
       .catch(done);
     delete process.env.CONFIG_DIR;
@@ -127,18 +221,19 @@ describe('preflow testing onprem', function() {
     delete process.env.DATASTORE_PORT;
   });
 
-  it('should pass with "/api/separateIds" - onprem headerAndQueryIdsDiffReqs', headerAndQueryIdsDiffReqs);
-  it('should pass with "/api/joinedIds" - onprem headerAndQueryIdsSameReq', headerAndQueryIdsSameReq);
-  it('should pass with "/api/tooManySchemes" - onprem tooManySchemes', tooManySchemes);
-  it('should pass with "/api/badInType" - onprem badInType', badInType);
-  it('should pass with "/api/missingSecurityDef" - onprem missingSecurityDef', missingSecurityDef);
-  it('should pass with "/api/missingHeaderID" - onprem missingHeaderID', missingHeaderID);
-  it('should pass with "/api/missingQueryParameterID" - onprem missingQueryParameterID', missingQueryParameterID);
-  it('should pass with "/api/twoClientIDs" - onprem twoClientIDs', twoClientIDs);
-  it('should pass with "/api/twoClientSecrets" - onprem twoClientSecrets', twoClientSecrets);
+  //it('should pass with "/api/separateIds" - onprem headerAndQueryIdsDiffReqs', headerAndQueryIdsDiffReqs);
+  //it('should pass with "/api/joinedIds" - onprem headerAndQueryIdsSameReq', headerAndQueryIdsSameReq);
+  //it('should pass with "/api/tooManySchemes" - onprem tooManySchemes', tooManySchemes);
+  //it('should pass with "/api/badInType" - onprem badInType', badInType);
+  //it('should pass with "/api/missingSecurityDef" - onprem missingSecurityDef', missingSecurityDef);
+  //it('should pass with "/api/missingHeaderID" - onprem missingHeaderID', missingHeaderID);
+  //it('should pass with "/api/missingQueryParameterID" - onprem missingQueryParameterID', missingQueryParameterID);
+  //it('should pass with "/api/twoClientIDs" - onprem twoClientIDs', twoClientIDs);
+  //it('should pass with "/api/twoClientSecrets" - onprem twoClientSecrets', twoClientSecrets);
 
 });
 
+/*
 function pathWithSlashAtEnd(doneCB) {
   request
     .get('/api/')
