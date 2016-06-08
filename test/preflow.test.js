@@ -69,7 +69,16 @@ describe('preflow testing', function() {
   it('should pass with "/api/noxibm" - noIBMExtensions', noIBMExtensions);
   it('should pass with "/api/noassembly" - noAssembly', noAssembly);
   it('should pass with "/api/noexecute" - noExecute', noExecute);
-  
+  it('should pass with "/" - rootBasePathAndPath', rootBasePathAndPath);
+  it('should pass with "/rootbasepath" - rootBasePath', rootBasePath);
+  it('should pass with "/rootbasepath/" - rootBasePathWithSlashAtEnd', rootBasePathWithSlashAtEnd);
+  it('should pass with "/rootbasepath/foo" - rootBasePathVarPath', rootBasePathVarPath);
+  it('should pass with "/rootbasepath/foo/" - rootBasePathVarPathWithSlashAtEnd', rootBasePathVarPathWithSlashAtEnd);
+  it('should fail with "/rootbasepath/foo/bar" - rootBasePathVarPathFail', rootBasePathVarPathFail);
+  it('should pass with "/rootbasepath/a/b/c/d" - rootBasePathMultiVarPath', rootBasePathMultiVarPath);
+  it('should pass with "/rootbasepath/a/b/c/d/" - rootBasePathMultiVarPathWithSlashAtEnd', rootBasePathMultiVarPathWithSlashAtEnd);
+  it('should fail with "/rootbasepath/a/b" - rootBasePathMultiVarPathFail', rootBasePathMultiVarPathFail);
+
 });
 
 describe('ro-context testing', function() {
@@ -276,6 +285,60 @@ function noExecute(doneCB) {
   request
     .get('/api/noexecute')
     .expect(200, doneCB);
+}
+
+function rootBasePathAndPath(doneCB) {
+  request
+    .get('/')
+    .expect(200, '/', doneCB);
+}
+
+function rootBasePath(doneCB) {
+  request
+    .get('/rootbasepath')
+    .expect(200, '/rootbasepath', doneCB);
+}
+
+function rootBasePathWithSlashAtEnd(doneCB) {
+  request
+    .get('/rootbasepath/')
+    .expect(200, '/rootbasepath/', doneCB);
+}
+
+function rootBasePathVarPath(doneCB) {
+  request
+    .get('/rootbasepath/foo')
+    .expect(200, '/rootbasepath/foo', doneCB);
+}
+
+function rootBasePathVarPathWithSlashAtEnd(doneCB) {
+  request
+    .get('/rootbasepath/foo/')
+    .expect(200, '/rootbasepath/foo/', doneCB);
+}
+
+function rootBasePathVarPathFail(doneCB) {
+  request
+    .get('/rootbasepath/foo/bar')
+    .expect(404, doneCB);
+}
+
+function rootBasePathMultiVarPath(doneCB) {
+  request
+    .get('/rootbasepath/a/b/c/d')
+    .expect(200, '/rootbasepath/a/b/c/d', doneCB);
+}
+
+function rootBasePathMultiVarPathWithSlashAtEnd(doneCB) {
+  request
+    .get('/rootbasepath/a/b/c/d/')
+    .expect(200, '/rootbasepath/a/b/c/d/', doneCB);
+}
+
+function rootBasePathMultiVarPathFail(doneCB) {
+  request
+    .get('/rootbasepath/a/b')
+    .expect(404, doneCB);
 }
 
 function headerAndQueryIdsDiffReqs(doneCB) {

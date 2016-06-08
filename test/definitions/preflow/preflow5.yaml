@@ -1,0 +1,69 @@
+swagger: '2.0'
+
+info:
+  x-ibm-name: rootbasepath
+  version: 1.0.0
+  title: rootbasepath
+
+schemes:
+  - http
+
+basePath: /
+
+x-ibm-configuration:
+  assembly:
+    execute:
+      - operation-switch:
+          case:
+            - operations:
+                - rootbasepathandpath
+                - rootbasepathfixpath
+                - rootbasehpathvarpath
+                - rootbasepathmultivarpath
+              execute:
+                - set-variable:
+                    actions:
+                      - set: message.body
+                        value: $(request.path)
+
+paths:
+  /:
+    get:
+      operationId: rootbasepathandpath
+      responses:
+        '200':
+          description: 200 OK
+
+  /rootbasepath:
+    get:
+      operationId: rootbasepathfixpath
+      responses:
+        '200':
+          description: 200 OK
+
+  /rootbasepath/{id}:
+    get:
+      operationId: rootbasehpathvarpath
+      responses:
+        '200':
+          description: 200 OK
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+        format: JSON
+
+  /rootbasepath/a/b/{+id}:
+    get:
+      operationId: rootbasepathmultivarpath
+      responses:
+        '200':
+          description: 200 OK
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+        format: JSON
+
