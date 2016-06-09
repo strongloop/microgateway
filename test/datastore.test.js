@@ -13,6 +13,7 @@ var echo = require('./support/echo-server');
 var supertest = require('supertest');
 var microgw = require('../lib/microgw');
 var apimServer = require('./support/mock-apim-server/apim-server');
+var dsc = require('../datastore/client/index.js');
 
 describe('data-store', function() {
   var request;
@@ -126,6 +127,7 @@ describe('data-store', function() {
           }
         ).end(function (err, res) {
             if (err) return done(err);
+            apimServer.stop(); // down server shouldn't prevent us from working
             setTimeout(
               done,
               20000 // 15 seconds to ensure second snapshot begins
@@ -153,6 +155,19 @@ describe('data-store', function() {
             assert(parseInt(snapshotID) < 65536); // ID's are < 65536
           }
         ).end(done);
+    }
+  );
+  it('apimGetDefaultCatalog should return catalog from previous apim pull instead of config/default',
+    function(done) {
+      dsc.apimGetDefaultCatalog(snapshotID, 'apimtest')
+        .then(function(cat) { 
+            if(cat)
+              done();
+            else
+              done(new Error('Did not find catalog')); 
+          }
+        )
+        .catch(function(err) { done(err); });
     }
   );
   it('release should return old snapshot and decrement ref count',
