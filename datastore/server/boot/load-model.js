@@ -224,7 +224,7 @@ function loadData(app, apimanager, models, currdir) {
                    interval,
                    apimanager,
                    models,
-                   currdir);
+                   snapdir);
     }
   );
 }
