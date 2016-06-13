@@ -67,7 +67,6 @@ describe('oauth2 token API', function() {
       });
   });
 
-
   describe('token endpoint - client credential', function() {
     it('basic', function(done) {
       var data = {
@@ -80,7 +79,22 @@ describe('oauth2 token API', function() {
         .send(data)
         .expect(200)
         .expect(function(res) {
+          assert(res.body.access_token);
+          assert(res.body.refresh_token);
+
+          //decode the access token into jwt token
+          var token = res.body.access_token.split('.');
+          var jwtTkn = JSON.parse(new Buffer(token[1], 'base64').toString('utf-8'));
+
+          //the jwt id should not be undefined
+          assert(jwtTkn.jti);
+
+          //token should be issued to this client
+          assert.equal(jwtTkn.aud, '6a76c27f-f3f0-47dd-8e58-50924e4a1bab');
+
+          //should expire in 120 seconds
           assert(res.body.expires_in, 120);
+          assert.equal(120, (jwtTkn.exp - jwtTkn.iat) / 1000);
         })
         .end(function(err, res) {
           done(err);
@@ -103,7 +117,22 @@ describe('oauth2 token API', function() {
         .send(data)
         .expect(200)
         .expect(function(res) {
+          assert(res.body.access_token);
+          assert(res.body.refresh_token);
+
+          //decode the access token into jwt token
+          var token = res.body.access_token.split('.');
+          var jwtTkn = JSON.parse(new Buffer(token[1], 'base64').toString('utf-8'));
+
+          //the jwt id should not be undefined
+          assert(jwtTkn.jti);
+
+          //token should be issued to this client
+          assert.equal(jwtTkn.aud, '6a76c27f-f3f0-47dd-8e58-50924e4a1bab');
+
+          //should expire in 120 seconds
           assert(res.body.expires_in, 120);
+          assert.equal(120, (jwtTkn.exp - jwtTkn.iat) / 1000);
         })
         .end(function(err, res) {
           done(err);
