@@ -598,7 +598,20 @@
             },
           "apis": 
             {
-              "ascents": {},
+              "ascents": {
+                "operations": [
+                  {
+                    "path": "/ratelimit10",
+                    "operation": "get",
+                    "rate-limits": {
+                      "per-hour": {
+                        "value": "3/1hour",
+                        "hard-limit": true
+                      }
+                    }
+                  }
+                ]
+              },
               "forecasts": {},
               "routes": {
                 "operations": [
@@ -2019,6 +2032,16 @@
                     {
                       "path": "/ratelimit9",
                       "operation": "get"
+                    },
+                    {
+                      "path": "/ratelimit10",
+                      "operation": "get",
+                      "rate-limits": {
+                        "per-hour": {
+                          "value": "2/1hour",
+                          "hard-limit": true
+                        }
+                      }
                     }
                   ]
               },

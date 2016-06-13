@@ -769,6 +769,17 @@
                       }
                     }
                   }
+                },
+                "/ratelimit10": {
+                  "get": {
+                    "operationId": "ratelimit10",
+                    "responses": {
+                      "200": {
+                        "description": "200 OK"
+                      }
+                    },
+                    "security": []
+                  }
                 }
             },
             "produces": [
