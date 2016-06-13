@@ -535,7 +535,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://127.0.0.1/secret/",
+              "url": "http://127.0.0.1:8889/",
               "tls-profile": ""
             }
           },
