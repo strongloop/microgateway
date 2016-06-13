@@ -780,6 +780,26 @@
                     },
                     "security": []
                   }
+                },
+                "/ratelimit11": {
+                  "get": {
+                    "operationId": "ratelimit11",
+                    "responses": {
+                      "200": {
+                        "description": "200 OK"
+                      }
+                    }
+                  }
+                },
+                "/ratelimit12": {
+                  "get": {
+                    "operationId": "ratelimit12",
+                    "responses": {
+                      "200": {
+                        "description": "200 OK"
+                      }
+                    }
+                  }
                 }
             },
             "produces": [

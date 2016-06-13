@@ -187,6 +187,28 @@
                     "hard-limit": true
                   }
                 }
+              },
+              {
+                "path": "/ratelimit11",
+                "operation": "get",
+                "rate-limits": {
+                  "per-hour": {
+                    "value": "2/1hour",
+                    "hard-limit": true
+                  },
+                  "unl": {
+                    "value": "unlimited",
+                    "hard-limit": true
+                  }
+                }
+              },
+              {
+                "path": "/ratelimit12",
+                "operation": "get",
+                "rate-limit": {
+                  "value": "unlimited",
+                  "hard-limit": true
+                }
               }
             ]
           },

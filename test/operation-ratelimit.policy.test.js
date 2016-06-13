@@ -197,6 +197,24 @@ describe('operation rate limiting test', function() {
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .expect(429, done);
       });
+
+    it('client_id=' + clientId2 + ' "/ratelimit11" should pass"',
+      function (done) {
+        async.times(10, function(n, next) {
+          request
+            .get('/v1/ratelimit11?client_id=' + clientId2)
+            .expect(200, next);
+        }, done);
+      });
+
+    it('client_id=' + clientId2 + ' "/ratelimit12" should pass"',
+      function (done) {
+        async.times(9, function(n, next) {
+          request
+            .get('/v1/ratelimit12?client_id=' + clientId2)
+            .expect(200, next);
+        }, done);
+      });
   }
 
   tests('apim');
