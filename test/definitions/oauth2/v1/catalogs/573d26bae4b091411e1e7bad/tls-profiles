@@ -1,0 +1,25 @@
+[
+  {
+    "id": "574ea857e4b076e106cb4425",
+    "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/tls-profiles/574ea857e4b076e106cb4425",
+    "name": "talk-to-basic-auth-server",
+    "title": "Talk to Basic Auth Server",
+    "description": "",
+    "public": false,
+    "ciphers": [
+      "SSL_RSA_WITH_AES_256_CBC_SHA",
+      "SSL_RSA_WITH_AES_128_CBC_SHA",
+      "SSL_RSA_WITH_3DES_EDE_CBC_SHA",
+      "SSL_RSA_WITH_RCA_128_SHA",
+      "SSL_RSA_WITH_RCA_128_MD5"
+    ],
+    "protocols": [
+      "TLSv11",
+      "TLSv12"
+    ],
+    "certs": [],
+    "mutual-auth": false,
+    "org-id": "573ada4ce4b091411e1e7b8f"
+  }
+]
+

@@ -1,0 +1,92 @@
+[
+  {
+    "catalog": {
+      "default": false,
+      "id": "573d26bae4b091411e1e7bad",
+      "name": "foo-catalog",
+      "sandbox": true,
+      "title": "fooCatalog",
+      "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+      "portal-type": "BASIC",
+      "gateway-url": "https://<gateway-cluster-address>/myOrg/foo-catalog",
+      "is-saas": false
+    },
+    "document": {
+      "apis": {
+        "stock-quote": {
+          "name": "stock-quote:1.0.0"
+        },
+        "weather-service": {
+          "name": "weather-service:1.0.0"
+        },
+        "oauth2-endpoints": {
+          "name": "oauth2-endpoints:1.0.0"
+        }
+      },
+      "info": {
+        "name": "basic-product",
+        "title": "BasicProduct",
+        "version": "1.0.0"
+      },
+      "plans": {
+        "gold-plan": {
+          "title": "Gold Plan",
+          "approval": false,
+          "rate-limit": {
+            "hard-limit": false,
+            "value": "1000/1second"
+          },
+          "apis": {}
+        },
+        "default": {
+          "title": "Default Plan",
+          "description": "Default Plan",
+          "approval": false,
+          "rate-limit": {
+            "hard-limit": false,
+            "value": "100/1second"
+          }
+        }
+      },
+      "product": "1.0.0",
+      "visibility": {
+        "view": {
+           "enabled": true,
+           "type": "public",
+           "tags": [],
+           "orgs": []
+        },
+        "subscribe": {
+           "enabled": true,
+           "type": "authenticated",
+           "tags": [],
+           "orgs": []
+        }
+      }
+    },
+    "id": "575a0796e4b076e106cb56aa",
+    "organization": {
+      "id": "573ada4ce4b091411e1e7b8f",
+      "name": "myOrg",
+      "title": "myOrg",
+      "tags": [],
+      "members": []
+    },
+    "state": "published",
+    "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/products/575a0796e4b076e106cb56aa",
+    "visibility": {
+      "view": {
+        "enabled": true,
+        "type": "public",
+        "tags": [],
+        "orgs": []
+      },
+      "subscribe": {
+        "enabled": true,
+        "type": "authenticated",
+        "tags": [],
+        "orgs": []
+      }
+    }
+  }
+]
