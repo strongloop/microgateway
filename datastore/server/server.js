@@ -19,7 +19,7 @@ var CONFIGDIR = environment.CONFIGDIR;
 
 // if the parent get killed we need to bite the bullet
 process.on('disconnect', function() {
-  process.exit(0);
+  logger.exit(0);
 });
 
 var app = module.exports = loopback();

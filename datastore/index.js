@@ -15,7 +15,7 @@ var child;
 var server;
 var sigtermHandler = function() {
                        child.kill(true);
-                       process.exit(0);
+                       logger.exit(0);
                      };
 
 exports.start = function(fork) {
@@ -69,7 +69,7 @@ exports.start = function(fork) {
       });
 
       child.on('disconnect', function() {
-        process.exit(2);
+        logger.exit(2);
       });
 
       child.start();

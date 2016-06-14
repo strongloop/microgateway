@@ -11,6 +11,7 @@ var sgwapimpull = require('../apim-pull'),
     apimpull = sgwapimpull.pull;
 
 var options = {};
+var exit_flag = false;
 
 program
   .version('0.0.1')
@@ -35,15 +36,17 @@ options.clicert = program.cert;
 options.outdir = program.outdir;
 
 if (options.host == null)  
-{ logger.debug('<host> required'); program.outputHelp(); process.exit(1);}
-if (program.args[1] != null) 
-{ logger.debug('specify one host only'); program.outputHelp(); process.exit(1);}
+{ exit_flag = true; logger.debug('<host> required'); program.outputHelp(); logger.exit(1);}
+if (!exit_flag && program.args[1] != null) 
+{ exit_flag = true; logger.debug('specify one host only'); program.outputHelp(); logger.exit(1);}
 
-apimpull(options,function(err, response) {
+if (!exit_flag) {
+  apimpull(options,function(err, response) {
         if (err) {
             logger.error(err);
         }
         logger.debug(response);
+  }
 });
 
 
