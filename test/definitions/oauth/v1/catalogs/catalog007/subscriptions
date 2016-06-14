@@ -1,0 +1,121 @@
+[
+  {
+    "id": "subscr1",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/catalog007/subscriptions/subscr1",
+    "organization": {},
+    "catalog": {},
+    "active": true,
+    "application": {
+      "id": "app1",
+      "title": "Very Cool Application With OAuth",
+      "enabled": true,
+      "state": "ACTIVE",
+      "description": "",
+      "oauth-redirection-uri": "https://mycoolapp.example.com/",
+      "app-credentials": [
+        {
+          "id": "app1",
+          "client-id": "mycoolapp-withoauth",
+          "client-secret": "wfzP7gmjFTMXBfIyDNliOKZAtUpINDJ4iLi4eqymKKo="
+        }
+      ],
+      "test-app": false
+    },
+    "developer-organization": {
+      "id": "dorg1",
+      "name": "Dev Org 1",
+      "title": "Consumers Dev Org 1"
+    },
+    "plan-registration": {
+      "id": "product1:1.0.0:gold",
+      "product": {
+          "document" : {
+              "info": {
+                  "version" : "1.0.0"
+              } 
+          }
+      },
+      "plan": {},
+      "apis": []
+    }
+  },
+  {
+    "id": "subscr2",
+    "url": "https://mgmt-lb/v1/catalogs/catalog007/subscriptions/subscr2",
+    "organization": {},
+    "catalog": {},
+    "active": true,
+    "application": {
+      "id": "appMissingRedirUrl",
+      "title": "App Missing Redirect URL",
+      "enabled": true,
+      "state": "ACTIVE",
+      "description": "",
+      "app-credentials": [
+        {
+          "id": "appMissingRedirUrl",
+          "client-id": "appMissingRedirUrl",
+          "client-secret": "wfzP7gmjFTMXBfIyDNliOKZAtUpINDJ4iLi4eqymKKo="
+        }
+      ],
+      "test-app": false
+    },
+    "developer-organization": {
+      "id": "dorg1",
+      "name": "Dev Org 1",
+      "title": "Consumers Dev Org 1"
+    },
+    "plan-registration": {
+      "id": "product1:1.0.0:gold",
+      "product": {
+          "document" : {
+              "info": {
+                  "version" : "1.0.0"
+              } 
+          }
+      },
+      "plan": {},
+      "apis": []
+    }
+  },
+  {
+    "id": "subscr3",
+    "url": "https://mgmt-lb/v1/catalogs/catalog007/subscriptions/subscr3",
+    "organization": {},
+    "catalog": {},
+    "active": true,
+    "application": {
+      "id": "c03",
+      "title": "App2",
+      "enabled": true,
+      "state": "ACTIVE",
+      "description": "",
+      "oauth-redirection-uri": "https://mycoolapp.example.com/",
+      "app-credentials": [
+        {
+          "id": "c03",
+          "client-id": "coolapp2",
+          "client-secret": "wfzP7gmjFTMXBfIyDNliOKZAtUpINDJ4iLi4eqymKKo="
+        }
+      ],
+      "test-app": false
+    },
+    "developer-organization": {
+      "id": "dorg1",
+      "name": "Dev Org 1",
+      "title": "Consumers Dev Org 1"
+    },
+    "plan-registration": {
+      "id": "product2:2.0.0:gold",
+      "product": {
+          "document" : {
+              "info": {
+                  "version" : "2.0.0"
+              } 
+          }
+      },
+      "plan": {},
+      "apis": []
+    }
+  }
+]
