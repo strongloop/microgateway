@@ -544,10 +544,10 @@
           },
           "refresh-token": {
             "count": 3,
-            "ttl": 120
+            "ttl": 20
           },
           "access-token": {
-            "ttl": 120
+            "ttl": 10
           },
           "revocation": {
             "url": "",
