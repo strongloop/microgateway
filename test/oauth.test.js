@@ -177,6 +177,88 @@ describe('oauth testing onprem', function() {
       .end(done);
   });
 
+  describe('Bad tokens', function () {
+
+    it('Invalid token', function (done) {
+      request.get('/stock/quote?symbol=IBM')
+        .set('authorization', 'Bearer BADTOKEN')
+        .expect(401)
+        // TODO .expect('WWW-Authenticate', 'Bearer error="invalid_token"')
+        .end(done);
+    });
+
+    it('Corrupted signature', function (done) {
+      requestAccessTokenClientCredentials().then(function (tokens) {
+        request.get('/stock/quote?symbol=IBM')
+          .set('authorization', 'Bearer ' + tokens.access_token + 'foobar')
+          .expect(401)
+          .end(done);
+      }, done);
+    });
+
+    it('Fabricated token', function (done) {
+      var token = {
+        header: { alg: 'HS256' },
+        payload: {
+          jti: 'koc1t3OgERRY6x9oHxIUesNfiUXTboa65BefHrUHjOQ',
+          aud: '6a76c27f-f3f0-47dd-8e58-50924e4a1bab',
+          iat: '2016-06-02T08:07:57.392Z',
+          exp: '2100-01-01T00:00:00.000Z',
+          scope: ['/']
+        },
+        secret: 'foobar'
+      };
+      request.get('/stock/quote?symbol=IBM')
+        .set('authorization', 'Bearer ' + jws.sign(token))
+        .expect(401)
+        .end(done);
+    });
+
+    it('Valid token id (jti) with fabricated token', function (done) {
+      var token = {
+        header: { alg: 'HS256' },
+        payload: {
+          jti: 'koc1t3OgERRY6x9oHxIUesNfiUXTboa65BefHrUHjOQ',
+          aud: '6a76c27f-f3f0-47dd-8e58-50924e4a1bab',
+          iat: '2016-06-02T08:07:57.392Z',
+          exp: '2100-01-01T00:00:00.000Z',
+          scope: ['/']
+        },
+        secret: 'foobar'
+      };
+      requestAccessTokenClientCredentials().then(function (tokens) {
+        var access_token = JSON.parse(jws.decode(tokens.access_token).payload);
+        token.payload.jti = access_token.jti;
+        request.get('/stock/quote?symbol=IBM')
+          .set('authorization', 'Bearer ' + jws.sign(token))
+          .expect(401)
+          .end(done);
+      }, done);
+    });
+
+    it('Refresh token as Access token', function (done) {
+      requestAccessTokenClientCredentials().then(function (tokens) {
+        request.get('/stock/quote?symbol=IBM')
+          .set('authorization', 'Bearer ' + tokens.refresh_token)
+          .expect(401)
+          .end(done);
+      }, done);
+    });
+
+    it('Missing token', function (done) {
+      request.get('/stock/quote?symbol=IBM')
+        .set('authorization', 'Bearer ')
+        .expect(401)
+        .end(done);
+    });
+
+    it('Missing authorization header', function (done) {
+      request.get('/stock/quote?symbol=IBM')
+        .expect(401)
+        .end(done);
+    });
+
+  });
 });
 
 function requestAccessTokenClientCredentials (scope) {
