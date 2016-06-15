@@ -141,14 +141,29 @@ describe('oauth testing onprem', function() {
       request.get('/stock/quote?symbol=IBM')
         .set('authorization', 'Bearer ' + tokens.access_token)
         .expect(200, /{ "IBM": 123 }/)
-        //.end(done);
-        .end(function (err, res) {
-          if (err)
-            return done(err);
-          done();
-        });
-    });
+        .end(done);
+    }, done);
   });
+
+  // TODO need to add more scopes to security definition
+  it.skip('Access resource with token - extra scope', function (done) {
+    requestAccessTokenClientCredentials('stock stock:update').then(function (tokens) {
+      request.get('/stock/quote?symbol=IBM')
+        .set('authorization', 'Bearer ' + tokens.access_token)
+        .expect(200, /{ "IBM": 123 }/)
+        .end(done);
+    }, done);
+  });
+
+  it.skip('Attempt to access resource - wrong scope', function (done) {
+    requestAccessTokenClientCredentials('stock:update').then(function (tokens) {
+      request.get('/stock/quote?symbol=IBM')
+        .set('authorization', 'Bearer ' + tokens.access_token)
+        .expect(401)
+        .end(done);
+    }, done);
+  });
+
 
   it('Attempt to access resource with expired token', function (done) {
     var access_token = 'eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJMRjJtMVdXQTVHQURrRFA5MjgzTXFwMVh3Y0dId' +
@@ -159,16 +174,14 @@ describe('oauth testing onprem', function() {
       .set('authorization', 'Bearer ' + access_token)
       .expect(401)
       // TODO .expect('WWW-Authenticate', 'Bearer error="invalid_token"')
-      .end(function (err, res) {
-        if (err)
-          return done(err);
-        done();
-      });
+      .end(done);
   });
 
 });
 
-function requestAccessTokenClientCredentials () {
+function requestAccessTokenClientCredentials (scope) {
+  scope = scope || 'stock';
+
   // Client data
   var clientId = '6a76c27f-f3f0-47dd-8e58-50924e4a1bab';
   var clientSecret = 'oJ2xB4aM0tB5pP3aS5dF8oS1jB5hA1dI5dR0dW1sJ0gG6nK0xU';
@@ -177,9 +190,13 @@ function requestAccessTokenClientCredentials () {
   var data = {
     'grant_type': 'client_credentials',
     'client_id': clientId,
-    'client_secret': clientSecret,
-    'scope': 'stock'
+    'client_secret': clientSecret//,
+    //'scopes': scope
   };
+  if (scope.split(' ').length === 1)
+    data.scope = scope;
+  else
+    data.scopes = scope;
 
   return new Promise(function (resolve, reject) {
     request.post('/oauth2/token')
@@ -192,8 +209,9 @@ function requestAccessTokenClientCredentials () {
         assert(res.body.refresh_token);
       })
       .end(function (err, res) {
-        if (err)
+        if (err) {
           return reject(err);
+        }
         resolve(res.body);
       });
   });
