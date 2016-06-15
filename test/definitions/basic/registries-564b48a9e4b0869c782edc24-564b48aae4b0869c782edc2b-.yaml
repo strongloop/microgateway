@@ -11,7 +11,7 @@ ldap-config:
   protocol-version: '3'
   authenticated-bind: true
   authenticated-bind-admin-dn: cn=root
-  authenticated-bind-password: secret
+  authenticated-bind-admin-password: secret
   search-dn-base: 'ou=myorg,ou=com'
   search-dn-filter-prefix: (cn=
   search-dn-filter-suffix: )
