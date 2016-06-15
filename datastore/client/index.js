@@ -319,8 +319,64 @@ exports.getClientById = function(snapshot, clientId, apiId, done) {
 
     var optimizedData = body;
     if (!optimizedData || optimizedData.length === 0)
-        return done(new Error('no matched client'));
+        return done('no matched client');
 
     done(undefined, optimizedData);
+  });
+};
+
+//Look up the subscriptions and search whether the given client subscribes the
+//given API. If there is one, return the client information.
+//
+//It could be slow if there are many subscriptions. (TODO: optimization needed)
+exports.getClientCredsById = function(snapshot, clientId, apiId, done) {
+  logger.debug('getClientCredsById');
+
+  // find all subscriptions of this snapshot
+  var queryfilter = { where: { and: [] }, fields: {} };
+  queryfilter.where.and[0] = { 'snapshot-id': snapshot };
+  queryfilter.fields['application'] = true;
+  queryfilter.fields['plan-registration']= true;
+
+  var queryurlObj = {
+      protocol: 'http',
+      hostname: host,
+      port: process.env.DATASTORE_PORT,
+      pathname: '/api/subscriptions',
+      query: { filter : JSON.stringify(queryfilter) }
+  };
+  var queryurl = url.format(queryurlObj);
+
+  request({ url: queryurl, json: true }, function (error, response, results) {
+    if (error || !results) {
+      return done (error);
+    }
+
+    //lookup in the returned subscriptions
+    var found = false;
+    results.forEach(function(entry) {
+        var appCreds = entry['application'] &&
+                       entry['application']['app-credentials'];
+        if (appCreds) {
+          appCreds.forEach(function(appCred) {
+            //see if the given client subscribes the plan
+            if (clientId === appCred['client-id']) {
+              var apis = entry['plan-registration'] &&
+                         entry['plan-registration']['apis'];
+              for (var idx in apis) {
+                //see if the given api is included in the plan
+                if (typeof apis[idx] === 'object' && apis[idx].id === apiId) {
+                  found = true;
+                  return done(undefined, appCred);
+                }
+              }
+            }
+          });
+        }
+    });
+
+    if (!found) {
+      return done('no matched client');
+    }
   });
 };

@@ -325,6 +325,30 @@ describe('oauth2 token API', function() {
         });
     });
 
+    it('user without password', function(done) {
+      var data = {
+          'grant_type': 'password',
+          'client_id': clientId,
+          'client_secret': clientSecret,
+          'username': 'test300'
+      };
+
+      request.post('/token/password/ldap')
+        .type('form')
+        .send(data)
+        .expect(400)
+        .expect(function(res) {
+          //check the error and error description
+          assert.equal(res.body.error,
+                  'invalid_request');
+          assert.equal(res.body.error_description,
+                  'Missing required parameter "password"');
+        })
+        .end(function(err, res) {
+          done(err);
+        });
+    });
+
     it('user auth (http) fails', function(done) {
       var data = {
           'grant_type': 'password',
@@ -350,6 +374,76 @@ describe('oauth2 token API', function() {
         });
     });
 
+    //to run this testcase, make sure that the LDAP server
+    // (dpautosrv1.dp.rtp.raleigh.ibm.com) is reachable
+    it('user auth (LDAP) ok', function(done) {
+      var data = {
+          'grant_type': 'password',
+          'client_id': clientId,
+          'client_secret': clientSecret,
+          'username': 'test300',
+          'password': 'dp40test'
+      };
+
+      request.post('/token/password/ldap')
+        .type('form')
+        .send(data)
+        .expect(200)
+        .expect(function(res) {
+          assert(res.body.access_token);
+
+          var jwtTkn = decodeToken(res.body.access_token);
+          assert(jwtTkn.jti);
+          assert.equal(jwtTkn.aud, clientId);
+
+          assert(res.body.expires_in, 3600);
+        })
+        .end(function(err, res) {
+          done(err);
+        });
+    });
+
+    it('bad user auth (LDAP)', function(done) {
+      var data = {
+          'grant_type': 'password',
+          'client_id': clientId,
+          'client_secret': clientSecret,
+          'username': 'baduser',
+          'password': 'badpass'  //invalid user password
+      };
+
+      request.post('/token/password/ldap')
+        .type('form')
+        .send(data)
+        .expect(403)
+        .expect(function(res) {
+          //check the error and error description
+          assert.equal(res.body.error,
+                  'invalid_grant');
+          assert.equal(res.body.error_description,
+                  'Failed to authenticate the resource owner');
+        })
+        .end(function(err, res) {
+          done(err);
+        });
+    });
+
+  });
+
+  describe('token endpoint - refresh token', function() {
+    it('acceptance', function(done) {
+      done();
+    });
+  });
+
+  describe('token endpoint - misc', function() {
+    it('unregistered client', function(done) {
+      done();
+    });
+
+    it('token revocation', function(done) {
+      done();
+    });
   });
 
 });
