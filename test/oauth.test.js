@@ -141,6 +141,7 @@ describe('oauth testing onprem', function() {
       request.get('/stock/quote?symbol=IBM')
         .set('authorization', 'Bearer ' + tokens.access_token)
         .expect(200, /{ "IBM": 123 }/)
+        //.end(done);
         .end(function (err, res) {
           if (err)
             return done(err);
@@ -176,7 +177,8 @@ function requestAccessTokenClientCredentials () {
   var data = {
     'grant_type': 'client_credentials',
     'client_id': clientId,
-    'client_secret': clientSecret
+    'client_secret': clientSecret,
+    'scope': 'stock'
   };
 
   return new Promise(function (resolve, reject) {
@@ -188,7 +190,6 @@ function requestAccessTokenClientCredentials () {
       .expect(function(res) {
         assert(res.body.access_token);
         assert(res.body.refresh_token);
-        assert.equal(res.body.scope, undefined);
       })
       .end(function (err, res) {
         if (err)
