@@ -1,0 +1,583 @@
+[
+  {
+    "id": "575f9724e4b06d109c285a2e",
+    "url": "https://172.16.154.175/v1/catalogs/5714b14ce4b0e6c6f7d287eb/subscriptions/575f9724e4b06d109c285a2e",
+    "organization": {
+      "id": "5714857ee4b0e6c6f7d28767",
+      "name": "microgateway-ut",
+      "title": "microgateway-ut",
+      "tags": [],
+      "members": []
+    },
+    "catalog": {
+      "id": "5714b14ce4b0e6c6f7d287eb",
+      "url": "https://172.16.154.175/v1/catalogs/5714b14ce4b0e6c6f7d287eb",
+      "name": "oauth2-ut",
+      "title": "oauth2-ut",
+      "sandbox": false,
+      "default": false,
+      "custom-portal-url": "https://dpvm176.tw.ibm.com/portal",
+      "portal-type": "ADVANCED",
+      "gateway-url": "https://172.16.154.162:5000",
+      "is-saas": false
+    },
+    "active": true,
+    "application": {
+      "id": "5744289de4b06d109c274449",
+      "title": "OAuthApp",
+      "enabled": true,
+      "state": "ACTIVE",
+      "description": "",
+      "oauth-redirection-uri": "https://localhost:5000/use-oauth/getinfo",
+      "app-credentials": [
+        {
+          "id": "5744289de4b06d109c27444a",
+          "client-id": "2609421b-4a69-40d7-8f13-44bdf3edd18f",
+          "client-secret": "BYFFcgO4hHEn0CnDkhYeiH6uxj0GER/Pq0Wi7uDO4cg="
+        }
+      ],
+      "test-app": false
+    },
+    "developer-organization": {
+      "id": "57442568e4b06d109c2743cb",
+      "name": "org-66fd3",
+      "title": "yhwang",
+      "tags": [],
+      "members": []
+    },
+    "plan-registration": {
+      "id": "prod-use-oauth:1.0.0:default",
+      "product": {
+        "id": "575f970ee4b06d109c2859e9",
+        "state": "published",
+        "visibility": {
+          "view": {
+            "enabled": true,
+            "type": "public",
+            "tags": [],
+            "orgs": []
+          },
+          "subscribe": {
+            "enabled": true,
+            "type": "authenticated",
+            "tags": [],
+            "orgs": []
+          }
+        },
+        "document": {
+          "product": "1.0.0",
+          "info": {
+            "name": "prod-use-oauth",
+            "title": "prod-use-oauth",
+            "version": "1.0.0"
+          },
+          "visibility": {
+            "view": {
+              "enabled": true,
+              "type": "public",
+              "tags": [],
+              "orgs": []
+            },
+            "subscribe": {
+              "enabled": true,
+              "type": "authenticated",
+              "tags": [],
+              "orgs": []
+            }
+          },
+          "apis": {
+            "api-use-oauth": {
+              "name": "api-use-oauth:1.0.0"
+            },
+            "oauth-provider3": {
+              "name": "oauth-provider:1.0.0"
+            }
+          },
+          "plans": {
+            "default": {
+              "title": "Default Plan",
+              "description": "Default Plan",
+              "approval": false,
+              "rate-limit": {
+                "hard-limit": false,
+                "value": "100/hour"
+              }
+            }
+          }
+        }
+      },
+      "plan": {
+        "name": "default",
+        "title": "Default Plan"
+      },
+      "apis": [
+        {
+          "id": "575f970de4b06d109c2859e7",
+          "url": "https://172.16.154.175/v1/catalogs/5714b14ce4b0e6c6f7d287eb/apis/575f970de4b06d109c2859e7",
+          "state": "running",
+          "organization": {
+            "id": "5714857ee4b0e6c6f7d28767",
+            "name": "microgateway-ut",
+            "title": "microgateway-ut",
+            "tags": [],
+            "members": []
+          },
+          "catalog": {
+            "id": "5714b14ce4b0e6c6f7d287eb",
+            "url": "https://172.16.154.175/v1/catalogs/5714b14ce4b0e6c6f7d287eb",
+            "name": "oauth2-ut",
+            "title": "oauth2-ut",
+            "sandbox": false,
+            "default": false,
+            "custom-portal-url": "https://dpvm176.tw.ibm.com/portal",
+            "portal-type": "ADVANCED",
+            "gateway-url": "https://172.16.154.162:5000",
+            "is-saas": false
+          },
+          "document": {
+            "swagger": "2.0",
+            "info": {
+              "version": "1.0.0",
+              "title": "api-use-oauth",
+              "x-ibm-name": "api-use-oauth"
+            },
+            "host": "",
+            "basePath": "/use-oauth",
+            "paths": {
+              "/getinfo": {
+                "get": {
+                  "responses": {
+                    "200": {
+                      "description": "200 OK"
+                    }
+                  },
+                  "security": [
+                    {
+                      "oauth": []
+                    }
+                  ]
+                }
+              }
+            },
+            "securityDefinitions": {
+              "oauth": {
+                "type": "oauth2",
+                "description": "",
+                "flow": "implicit",
+                "authorizationUrl": "https://localhost:5000/security/oauth2/authorize",
+                "scopes": {
+                  "scope1": "scope1"
+                }
+              },
+              "clientID": {
+                "description": "",
+                "in": "header",
+                "name": "X-IBM-Client-Id",
+                "type": "apiKey"
+              }
+            },
+            "security": [
+              {
+                "clientID": []
+              }
+            ],
+            "x-ibm-configuration": {
+              "assembly": {
+                "execute": [
+                  {
+                    "javascript": {
+                      "title": "javascript",
+                      "source": "message.body = { text: 'Hello OAuth2' };"
+                    }
+                  }
+                ]
+              },
+              "enforced": true,
+              "testable": true,
+              "phase": "realized",
+              "cors": {
+                "enabled": true
+              }
+            },
+            "schemes": [
+              "https"
+            ],
+            "consumes": [
+              "application/xml",
+              "application/json"
+            ],
+            "produces": [
+              "application/xml",
+              "application/json"
+            ]
+          }
+        },
+        {
+          "id": "575f970ee4b06d109c2859e8",
+          "url": "https://172.16.154.175/v1/catalogs/5714b14ce4b0e6c6f7d287eb/apis/575f970ee4b06d109c2859e8",
+          "state": "running",
+          "organization": {
+            "id": "5714857ee4b0e6c6f7d28767",
+            "name": "microgateway-ut",
+            "title": "microgateway-ut",
+            "tags": [],
+            "members": []
+          },
+          "catalog": {
+            "id": "5714b14ce4b0e6c6f7d287eb",
+            "url": "https://172.16.154.175/v1/catalogs/5714b14ce4b0e6c6f7d287eb",
+            "name": "oauth2-ut",
+            "title": "oauth2-ut",
+            "sandbox": false,
+            "default": false,
+            "custom-portal-url": "https://dpvm176.tw.ibm.com/portal",
+            "portal-type": "ADVANCED",
+            "gateway-url": "https://172.16.154.162:5000",
+            "is-saas": false
+          },
+          "document": {
+            "swagger": "2.0",
+            "info": {
+              "version": "1.0.0",
+              "title": "oauth-provider",
+              "x-ibm-name": "oauth-provider"
+            },
+            "host": "",
+            "basePath": "/security",
+            "paths": {
+              "/oauth2/authorize": {
+                "get": {
+                  "produces": [
+                    "text/html"
+                  ],
+                  "summary": "endpoint for Authorization Code and Implicit grants",
+                  "description": "description",
+                  "parameters": [
+                    {
+                      "name": "response_type",
+                      "in": "query",
+                      "description": "request an authorization code or or access token (implicit)",
+                      "required": true,
+                      "type": "string",
+                      "enum": [
+                        "code",
+                        "token"
+                      ]
+                    },
+                    {
+                      "name": "client_id",
+                      "in": "query",
+                      "description": "Application client ID",
+                      "required": true,
+                      "type": "string"
+                    },
+                    {
+                      "name": "scope",
+                      "in": "query",
+                      "description": "Scope being requested",
+                      "type": "string",
+                      "required": true
+                    },
+                    {
+                      "name": "redirect_uri",
+                      "in": "query",
+                      "type": "string",
+                      "description": "URI where user is redirected to after authorization",
+                      "required": false
+                    },
+                    {
+                      "name": "state",
+                      "in": "query",
+                      "type": "string",
+                      "description": "This string will be echoed back to application when user is redirected",
+                      "required": false
+                    }
+                  ],
+                  "responses": {
+                    "200": {
+                      "description": "An HTML form for authentication or authorization of this request."
+                    },
+                    "302": {
+                      "description": "Redirect to the clients redirect_uri containing one of the following\n- **authorization code** for Authorization code grant\n- **access token** for Implicity grant\n- **error** in case of errors, such as the user has denied the request\n"
+                    }
+                  },
+                  "security": [
+                    {
+                      "clientID": []
+                    }
+                  ]
+                },
+                "post": {
+                  "consumes": [
+                    "application/x-www-form-urlencoded"
+                  ],
+                  "produces": [
+                    "text/html"
+                  ],
+                  "summary": "submit approval to authorization code or access token",
+                  "description": "Submit resource owners approval (or rejection) for the OAuth2 Server to issue an\nauthorization code or access token to the application.\n",
+                  "security": [
+                    {
+                      "clientID": []
+                    }
+                  ],
+                  "parameters": [
+                    {
+                      "name": "client_id",
+                      "in": "formData",
+                      "description": "application requesting the access code or token",
+                      "required": true,
+                      "type": "string"
+                    },
+                    {
+                      "name": "scope",
+                      "in": "formData",
+                      "description": "requested scope of this authorization",
+                      "required": true,
+                      "type": "string"
+                    },
+                    {
+                      "name": "resource-owner",
+                      "in": "formData",
+                      "description": "resource owners user name",
+                      "required": true,
+                      "type": "string"
+                    },
+                    {
+                      "name": "redirect_uri",
+                      "in": "formData",
+                      "description": "URI the application is requesting this code or token to be redirected to",
+                      "required": true,
+                      "type": "string"
+                    },
+                    {
+                      "name": "original-url",
+                      "in": "formData",
+                      "description": "URL of the original authorization request",
+                      "required": true,
+                      "type": "string"
+                    },
+                    {
+                      "name": "dp-state",
+                      "in": "formData",
+                      "description": "state information provided in the authorization form",
+                      "required": true,
+                      "type": "string"
+                    },
+                    {
+                      "name": "dp-data",
+                      "in": "formData",
+                      "description": "state information provided in the authorization form",
+                      "required": true,
+                      "type": "string"
+                    }
+                  ],
+                  "responses": {
+                    "200": {
+                      "description": "Cool"
+                    }
+                  }
+                }
+              },
+              "/oauth2/token": {
+                "post": {
+                  "consumes": [
+                    "application/x-www-form-urlencoded"
+                  ],
+                  "produces": [
+                    "application/json"
+                  ],
+                  "summary": "Request Access Tokens",
+                  "description": "This endpoint allows requesting an access token following one of the flows below:\n- Authorization Code (exchange code for access token)\n- Client Credentials (2-legged, there isnt resource owner information)\n- Resource Owner Password Credentials (2-legged, client provides resource owner name and password)\n- Refresh Token (exchange refresh token for a new access code)\n\nThe table below indicates the required parameters for each specific grant_type options.\nEmpty cells indicate a parameter is ignored for that specific grant type.\n\nClient authentication:\n- Confidential clients should authenticate using HTTP Basic Authentication. Alternatively, they may post\n  their client_id and client_secret information as a formData parameter.\n- Public clients should send their client_id as formData parameter.\n\n| grant_type           | code       | client_credentials | password    | refresh_token |\n|----------------------|------------|--------------------|-------------|---------------|\n| client_id            | required*  | required*          | required*   | required*     |\n| client_secret        | required*  | required*          | required*   | required*     |\n| code                 | required   |                    |             |               |\n| redirect_uri         | required   |                    |             |               |\n| username             |            |                    | required    |               |\n| password             |            |                    | required    |               |\n| scope                |            | optional           | optional    |               |\n| refresh_token        |            |                    |             | required      |\n\nThe implicit grant requests, see /oauth2/authorize.\n",
+                  "security": [],
+                  "parameters": [
+                    {
+                      "name": "grant_type",
+                      "in": "formData",
+                      "description": "Type of grant",
+                      "type": "string",
+                      "required": true,
+                      "enum": [
+                        "authorization_code",
+                        "password",
+                        "client_credentials",
+                        "refresh_token"
+                      ]
+                    },
+                    {
+                      "name": "client_id",
+                      "in": "formData",
+                      "description": "Application client ID, can be provided in formData or using HTTP Basic Authentication",
+                      "required": false,
+                      "type": "string"
+                    },
+                    {
+                      "name": "client_secret",
+                      "in": "formData",
+                      "description": "Application secret, must be provided in formData or using HTTP Basic Authentication",
+                      "required": false,
+                      "type": "string"
+                    },
+                    {
+                      "name": "code",
+                      "in": "formData",
+                      "description": "Authorization code provided by the /oauth2/authorize endpoint",
+                      "required": false,
+                      "type": "string"
+                    },
+                    {
+                      "name": "redirect_uri",
+                      "in": "formData",
+                      "description": "required only if the redirect_uri parameter was included in the authorization request /oauth2/authorize; their values MUST be identical.",
+                      "required": false,
+                      "type": "string"
+                    },
+                    {
+                      "name": "username",
+                      "in": "formData",
+                      "type": "string",
+                      "description": "Resource owner username",
+                      "required": false
+                    },
+                    {
+                      "name": "password",
+                      "in": "formData",
+                      "type": "string",
+                      "description": "Resource owner password",
+                      "required": false
+                    },
+                    {
+                      "name": "scope",
+                      "in": "formData",
+                      "type": "string",
+                      "description": "Scope being requested",
+                      "required": false
+                    },
+                    {
+                      "name": "refresh_token",
+                      "in": "formData",
+                      "type": "string",
+                      "description": "The refresh token that the client wants to exchange for a new access token (refresh_token grant_type)",
+                      "required": false
+                    }
+                  ],
+                  "responses": {
+                    "200": {
+                      "description": "json document containing token, etc.",
+                      "schema": {
+                        "$ref": "#/definitions/access_token_response"
+                      }
+                    },
+                    "400": {
+                      "description": "json document that may contain additional details about the failure"
+                    }
+                  }
+                }
+              }
+            },
+            "securityDefinitions": {
+              "clientID": {
+                "description": "",
+                "in": "query",
+                "name": "client_id",
+                "type": "apiKey"
+              }
+            },
+            "security": [
+              {
+                "clientID": []
+              }
+            ],
+            "x-ibm-configuration": {
+              "testable": true,
+              "enforced": true,
+              "phase": "realized",
+              "oauth2": {
+                "client-type": "confidential",
+                "scopes": {
+                  "scope1": "Description 1",
+                  "scope2": "Description 2",
+                  "scope3": "Description 3"
+                },
+                "grants": [
+                  "application",
+                  "password",
+                  "accessCode",
+                  "implicit"
+                ],
+                "identity-extraction": {
+                  "type": "custom-form",
+                  "custom-form": {
+                    "url": "https://localhost:8000/custom-login-form.html"
+                  }
+                },
+                "authentication": {
+                  "x-ibm-authentication-url": {
+                    "url": "http://localhost:7000/"
+                  }
+                },
+                "authorization": {
+                  "type": "authenticated"
+                },
+                "refresh-token": {
+                  "count": 2048,
+                  "ttl": 2682000
+                },
+                "access-token": {
+                  "ttl": 3600
+                },
+                "revocation": {
+                  "url": "",
+                  "tls-profile": ""
+                }
+              },
+              "cors": {
+                "enabled": true
+              },
+              "type": "oauth"
+            },
+            "schemes": [
+              "https"
+            ],
+            "definitions": {
+              "access_token_response": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "token_type",
+                  "access_token",
+                  "expires_in"
+                ],
+                "properties": {
+                  "token_type": {
+                    "enum": [
+                      "bearer"
+                    ]
+                  },
+                  "access_token": {
+                    "type": "string"
+                  },
+                  "expires_in": {
+                    "type": "integer"
+                  },
+                  "scope": {
+                    "type": "string"
+                  },
+                  "refresh_token": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "consumes": [
+              "application/json"
+            ],
+            "produces": [
+              "application/json"
+            ]
+          }
+        }
+      ]
+    }
+  }
+]

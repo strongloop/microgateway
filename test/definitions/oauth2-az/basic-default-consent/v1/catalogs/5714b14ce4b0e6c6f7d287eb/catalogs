@@ -1,0 +1,21 @@
+[
+  {
+    "id": "5714b14ce4b0e6c6f7d287eb",
+    "url": "https://172.16.154.175/v1/catalogs/5714b14ce4b0e6c6f7d287eb",
+    "name": "oauth2-ut",
+    "title": "oauth2-ut",
+    "sandbox": false,
+    "organization": {
+      "id": "5714857ee4b0e6c6f7d28767",
+      "name": "microgateway-ut",
+      "title": "microgateway-ut",
+      "tags": [],
+      "members": []
+    },
+    "default": false,
+    "custom-portal-url": "https://dpvm176.tw.ibm.com/portal",
+    "portal-type": "ADVANCED",
+    "gateway-url": "https://172.16.154.162:5000",
+    "is-saas": false
+  }
+]
