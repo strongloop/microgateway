@@ -69,23 +69,23 @@ describe.skip('oauth testing', function() {
     delete process.env.NODE_ENV;
   });
 
-  it('should pass requests through OAuth2 resource server - /resource-test/res1', function (done) {
-    var token = {
-      header: { alg: 'HS256' },
-      payload: {
-        jti: 'koc1t3OgERRY6x9oHxIUesNfiUXTboa65BefHrUHjOQ',
-        aud: '6a76c27f-f3f0-47dd-8e58-50924e4a1bab',
-        iat: '2016-06-02T08:07:57.392Z',
-        exp: '2100-01-01T00:00:00.000Z',
-        scope: ['/']
-      },
-      secret: 'foobar'
-    };
-    request
-      .get('/resource-test/res1')
-      .set('Authorization', 'Bearer ' + jws.sign(token))
-      .expect(200, done);
-  });
+  //it('should pass requests through OAuth2 resource server - /resource-test/res1', function (done) {
+  //  var token = {
+  //    header: { alg: 'HS256' },
+  //    payload: {
+  //      jti: 'koc1t3OgERRY6x9oHxIUesNfiUXTboa65BefHrUHjOQ',
+  //      aud: '6a76c27f-f3f0-47dd-8e58-50924e4a1bab',
+  //      iat: '2016-06-02T08:07:57.392Z',
+  //      exp: '2100-01-01T00:00:00.000Z',
+  //      scope: ['/']
+  //    },
+  //    secret: 'foobar'
+  //  };
+  //  request
+  //    .get('/resource-test/res1')
+  //    .set('Authorization', 'Bearer ' + jws.sign(token))
+  //    .expect(200, done);
+  //});
 
   //it('should pass requests through OAuth2 resource server - /resource-test/res3', function (done) {
   //  request
@@ -147,6 +147,22 @@ describe('oauth testing onprem', function() {
           done();
         });
     });
+  });
+
+  it('Attempt to access resource with expired token', function (done) {
+    var access_token = 'eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJMRjJtMVdXQTVHQURrRFA5MjgzTXFwMVh3Y0dId' +
+                       'Wd2V2NWQ1FXbWQ0cW1VIiwiYXVkIjoiNmE3NmMyN2YtZjNmMC00N2RkLThlNTgtNTA5MjR' +
+                       'lNGExYmFiIiwiaWF0IjoxNDY1OTk3MDgwMDIwLCJleHAiOjE0NjU5OTcwODcwMjB9.FKc8' +
+                       'ikjkAmsGnAuVjU0LwN42pWvWGAL_CK6u4ONjVBg';
+    request.get('/stock/quote?symbol=IBM')
+      .set('authorization', 'Bearer ' + access_token)
+      .expect(401)
+      // TODO .expect('WWW-Authenticate', 'Bearer error="invalid_token"')
+      .end(function (err, res) {
+        if (err)
+          return done(err);
+        done();
+      });
   });
 
 });
