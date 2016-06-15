@@ -18,9 +18,10 @@ var debug  = require('debug')('tests:oauth');
 var apimServer = require('./support/mock-apim-server/apim-server');
 var echo = require('./support/echo-server');
 
-var configDir = path.join(__dirname, 'definitions', 'oauth');
+//var configDir = path.join(__dirname, 'definitions', 'oauth');
+var configDir = path.join(__dirname, 'definitions', 'oauth2');
 
-var request, httprequest;
+var request, httprequest, NODE_TLS_REJECT_UNAUTHORIZED;
 
 function dsCleanup(port) {
   // clean up the directory
@@ -45,7 +46,7 @@ function dsCleanup(port) {
   });
 }
 
-describe('oauth testing', function() {
+describe.skip('oauth testing', function() {
   before(function(done) {
     process.env.CONFIG_DIR = configDir;
     process.env.NODE_ENV = 'production';
@@ -97,27 +98,25 @@ describe('oauth testing', function() {
 describe('oauth testing onprem', function() {
 
   before(function(done) {
-    process.env.CONFIG_DIR = configDir;
+    //process.env.CONFIG_DIR = configDir;
     process.env.NODE_ENV = 'production';
     process.env.APIMANAGER = '127.0.0.1';
     process.env.APIMANAGER_PORT = 8081;
     process.env.DATASTORE_PORT = 5000;
+
+    NODE_TLS_REJECT_UNAUTHORIZED = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     apimServer.start(
             process.env.APIMANAGER,
             process.env.APIMANAGER_PORT,
-            process.env.CONFIG_DIR)
-      .then(createSwagger)
+            //process.env.CONFIG_DIR)
+            configDir)
+      .then(function() { return mg.start(3000); })
+      .then(function() { return echo.start(8889); })
       .then(function() {
-        return mg.start(3000);
+        request = supertest('https://localhost:3000');
       })
-      .then(function() {
-        return echo.start(8889);
-      })
-      .then(function() {
-        request = supertest('http://localhost:3000');
-      })
-      .then(done)
-      .catch(function(err) {
+      .then(done, function (err) {
         debug(err);
         done(err);
       });
@@ -128,24 +127,66 @@ describe('oauth testing onprem', function() {
       .then(function() { return mg.stop(); })
       .then(function() { return apimServer.stop(); })
       .then(function() { return echo.stop(); })
-      .then(cleanupSwagger)
-      .then(done, done)
-      .catch(done);
+      .then(done, done);
     delete process.env.CONFIG_DIR;
     delete process.env.NODE_ENV;
     delete process.env.APIMANAGER;
     delete process.env.APIMAMANGER_PORT;
     delete process.env.DATASTORE_PORT;
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = NODE_TLS_REJECT_UNAUTHORIZED;
   });
 
-  //it('should pass with "/api/separateIds" - onprem headerAndQueryIdsDiffReqs', headerAndQueryIdsDiffReqs);
-  //it('should pass with "/api/joinedIds" - onprem headerAndQueryIdsSameReq', headerAndQueryIdsSameReq);
-  //it('should pass with "/api/tooManySchemes" - onprem tooManySchemes', tooManySchemes);
-  //it('should pass with "/api/badInType" - onprem badInType', badInType);
-  //it('should pass with "/api/missingSecurityDef" - onprem missingSecurityDef', missingSecurityDef);
-  //it('should pass with "/api/missingHeaderID" - onprem missingHeaderID', missingHeaderID);
-  //it('should pass with "/api/missingQueryParameterID" - onprem missingQueryParameterID', missingQueryParameterID);
-  //it('should pass with "/api/twoClientIDs" - onprem twoClientIDs', twoClientIDs);
-  //it('should pass with "/api/twoClientSecrets" - onprem twoClientSecrets', twoClientSecrets);
+  it('Access resource with token', function (done) {
+    requestAccessTokenClientCredentials().then(function (tokens) {
+      request.get('/stock/quote?symbol=IBM')
+        .set('authorization', 'Bearer ' + tokens.access_token)
+        .expect(200, /{ "IBM": 123 }/)
+        .end(function (err, res) {
+          if (err)
+            return done(err);
+          done();
+        });
+    });
+  });
 
 });
+
+function requestAccessTokenClientCredentials () {
+  // Client data
+  var clientId = '6a76c27f-f3f0-47dd-8e58-50924e4a1bab';
+  var clientSecret = 'oJ2xB4aM0tB5pP3aS5dF8oS1jB5hA1dI5dR0dW1sJ0gG6nK0xU';
+
+  // Form data
+  var data = {
+    'grant_type': 'client_credentials',
+    'client_id': clientId,
+    'client_secret': clientSecret
+  };
+
+  return new Promise(function (resolve, reject) {
+    request.post('/oauth2/token')
+      .type('form')
+      .send(data)
+      .expect('Content-Type', /application\/json/)
+      .expect(200)
+      .expect(function(res) {
+        assert(res.body.access_token);
+        assert(res.body.refresh_token);
+        assert.equal(res.body.scope, undefined);
+      })
+      .end(function (err, res) {
+        if (err)
+          return reject(err);
+        resolve(res.body);
+      });
+  });
+}
+
+
+
+
+
+
+
+
+
