@@ -15,98 +15,12 @@ var _ = require('lodash');
 var jws = require('jws');
 var assert = require('assert');
 var debug  = require('debug')('tests:oauth');
-var rimraf = require('rimraf');
-var mkdirp = require('mkdirp');
-var glob   = require('glob');
-var YAML   = require('yamljs');
 var apimServer = require('./support/mock-apim-server/apim-server');
 var echo = require('./support/echo-server');
 
 var configDir = path.join(__dirname, 'definitions', 'oauth');
 
 var request, httprequest;
-
-function createSwagger () {
-  var catalogDir = path.join(configDir, 'v1', 'catalogs', 'catalog007');
-
-  // Make catalog007 directory
-  function createCatalogDir () {
-    return new Promise(function (resolve, reject) {
-      mkdirp(catalogDir, function (err) {
-        if (err)
-          return reject(err);
-        resolve();
-      });
-    });
-  }
-
-  // Find paths to all the YAML (Swagger) files under the configDir
-  function findSwaggerYamls () {
-    return new Promise(function (resolve, reject) {
-      var yamlglob = path.join(configDir, '*.yaml');
-      glob(yamlglob, function (err, files) {
-        if (err)
-          return reject(err);
-        resolve(files);
-      });
-    });
-  }
-
-  // Convert swagger files from YAML to JSON, and add them to catalogDir
-  function convertYamlsToJson (files) {
-    var promises = files.map(function (yamlpath) {
-      return new Promise(function (resolve, reject) {
-        var fname = /^.*\/([^\/]+)\.yaml$/.exec(yamlpath)[1];
-        var jsonpath = path.join(catalogDir, fname + '.json');
-        var obj = YAML.load(yamlpath);
-        var json = JSON.stringify(obj, null, 2);
-        fs.writeFile(jsonpath, json, function (err) {
-          if (err)
-            return reject(err);
-          resolve(yamlpath + ' converted to ' + jsonpath);
-        });
-      });
-    });
-    return Promise.all(promises);
-  }
-
-  return createCatalogDir()
-    .then(findSwaggerYamls)
-    .then(convertYamlsToJson)
-    .then(function (results) {
-      _.forEach(results, function (r) { debug(r); });
-    });
-}
-
-function cleanupSwagger () {
-  var catalogDir = path.join(configDir, 'v1', 'catalogs', 'catalog007');
-
-  var options = {
-    unlink: function (p, cb) {
-      fs.unlink(p, function (err) {
-        if (!err)
-          debug('Removed', p);
-        cb(err);
-      });
-    },
-
-    rmdir: function (p, cb) {
-      fs.rmdir(p, function (err) {
-        if (!err)
-          debug('Removed', p);
-        cb(err);
-      });
-    }
-  };
-
-  return new Promise(function (resolve, reject) {
-    rimraf(catalogDir, options, function (err) {
-      if (err)
-        return reject(err);
-      resolve();
-    });
-  });
-}
 
 function dsCleanup(port) {
   // clean up the directory
