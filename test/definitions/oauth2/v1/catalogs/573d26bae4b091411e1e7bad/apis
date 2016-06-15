@@ -544,10 +544,10 @@
           },
           "refresh-token": {
             "count": 3,
-            "ttl": 20
+            "ttl": 12
           },
           "access-token": {
-            "ttl": 10
+            "ttl": 7
           },
           "revocation": {
             "url": "",
@@ -641,13 +641,11 @@
               "application/json"
             ],
             "summary": "Request Access Tokens",
-            "description": "This endpoint allows requesting an access token following one of the flows below:\n- Authorization Code (exchange code for access token)\n- Client Credentials (2-legged, there isnt resource owner information)\n- Resource Owner Password Credentials (2-legged, client provides resource owner name and password)\n- Refresh Token (exchange refresh token for a new access code)\n\nThe table below indicates the required parameters for each specific grant_type options.\nEmpty cells indicate a parameter is ignored for that specific grant type.\n\nClient authentication:\n- Confidential clients should authenticate using HTTP Basic Authentication. Alternatively, they may post\n  their client_id and client_secret information as a formData parameter.\n- Public clients should send their client_id as formData parameter.\n\n| grant_type           | code       | client_credentials | password    | refresh_token |\n|----------------------|------------|--------------------|-------------|---------------|\n| client_id            | required*  | required*          | required*   | required*     |\n| client_secret        | required*  | required*          | required*   | required*     |\n| code                 | required   |                    |             |               |\n| redirect_uri         | required   |                    |             |               |\n| username             |            |                    | required    |               |\n| password             |            |                    | required    |               |\n| scope                |            | optional           | optional    |               |\n| refresh_token        |            |                    |             | required      |\n\nThe implicit grant requests, see /oauth2/authorize.\n",
             "security": [],
             "parameters": [
               {
                 "name": "grant_type",
                 "in": "formData",
-                "description": "Type of grant",
                 "type": "string",
                 "required": true,
                 "enum": [
@@ -660,28 +658,24 @@
               {
                 "name": "client_id",
                 "in": "formData",
-                "description": "Application client ID, can be provided in formData or using HTTP Basic Authentication",
                 "required": false,
                 "type": "string"
               },
               {
                 "name": "client_secret",
                 "in": "formData",
-                "description": "Application secret, must be provided in formData or using HTTP Basic Authentication",
                 "required": false,
                 "type": "string"
               },
               {
                 "name": "code",
                 "in": "formData",
-                "description": "Authorization code provided by the /oauth2/authorize endpoint",
                 "required": false,
                 "type": "string"
               },
               {
                 "name": "redirect_uri",
                 "in": "formData",
-                "description": "required only if the redirect_uri parameter was included in the authorization request /oauth2/authorize; their values MUST be identical.",
                 "required": false,
                 "type": "string"
               },
@@ -689,28 +683,24 @@
                 "name": "username",
                 "in": "formData",
                 "type": "string",
-                "description": "Resource owner username",
                 "required": false
               },
               {
                 "name": "password",
                 "in": "formData",
                 "type": "string",
-                "description": "Resource owner password",
                 "required": false
               },
               {
                 "name": "scope",
                 "in": "formData",
                 "type": "string",
-                "description": "Scope being requested",
                 "required": false
               },
               {
                 "name": "refresh_token",
                 "in": "formData",
                 "type": "string",
-                "description": "The refresh token that the client wants to exchange for a new access token (refresh_token grant_type)",
                 "required": false
               }
             ],
@@ -843,13 +833,11 @@
               "application/json"
             ],
             "summary": "Request Access Tokens",
-            "description": "This endpoint allows requesting an access token following one of the flows below:\n- Authorization Code (exchange code for access token)\n- Client Credentials (2-legged, there isnt resource owner information)\n- Resource Owner Password Credentials (2-legged, client provides resource owner name and password)\n- Refresh Token (exchange refresh token for a new access code)\n\nThe table below indicates the required parameters for each specific grant_type options.\nEmpty cells indicate a parameter is ignored for that specific grant type.\n\nClient authentication:\n- Confidential clients should authenticate using HTTP Basic Authentication. Alternatively, they may post\n  their client_id and client_secret information as a formData parameter.\n- Public clients should send their client_id as formData parameter.\n\n| grant_type           | code       | client_credentials | password    | refresh_token |\n|----------------------|------------|--------------------|-------------|---------------|\n| client_id            | required*  | required*          | required*   | required*     |\n| client_secret        | required*  | required*          | required*   | required*     |\n| code                 | required   |                    |             |               |\n| redirect_uri         | required   |                    |             |               |\n| username             |            |                    | required    |               |\n| password             |            |                    | required    |               |\n| scope                |            | optional           | optional    |               |\n| refresh_token        |            |                    |             | required      |\n\nThe implicit grant requests, see /oauth2/authorize.\n",
             "security": [],
             "parameters": [
               {
                 "name": "grant_type",
                 "in": "formData",
-                "description": "Type of grant",
                 "type": "string",
                 "required": true,
                 "enum": [
@@ -862,28 +850,24 @@
               {
                 "name": "client_id",
                 "in": "formData",
-                "description": "Application client ID, can be provided in formData or using HTTP Basic Authentication",
                 "required": false,
                 "type": "string"
               },
               {
                 "name": "client_secret",
                 "in": "formData",
-                "description": "Application secret, must be provided in formData or using HTTP Basic Authentication",
                 "required": false,
                 "type": "string"
               },
               {
                 "name": "code",
                 "in": "formData",
-                "description": "Authorization code provided by the /oauth2/authorize endpoint",
                 "required": false,
                 "type": "string"
               },
               {
                 "name": "redirect_uri",
                 "in": "formData",
-                "description": "required only if the redirect_uri parameter was included in the authorization request /oauth2/authorize; their values MUST be identical.",
                 "required": false,
                 "type": "string"
               },
@@ -891,28 +875,24 @@
                 "name": "username",
                 "in": "formData",
                 "type": "string",
-                "description": "Resource owner username",
                 "required": false
               },
               {
                 "name": "password",
                 "in": "formData",
                 "type": "string",
-                "description": "Resource owner password",
                 "required": false
               },
               {
                 "name": "scope",
                 "in": "formData",
                 "type": "string",
-                "description": "Scope being requested",
                 "required": false
               },
               {
                 "name": "refresh_token",
                 "in": "formData",
                 "type": "string",
-                "description": "The refresh token that the client wants to exchange for a new access token (refresh_token grant_type)",
                 "required": false
               }
             ],

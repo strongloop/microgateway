@@ -80,17 +80,14 @@ describe('oauth2 token API', function() {
 
   /**
    * TODO:
+   *
+   * access token expire:
+   *
    * negatives:
    *   bad request
    *
    * password:
    *   user auth (http, https, ldap)
-   *
-   * refresh token:
-   *   count
-   *   ttl
-   *   invalid the previous tokens
-   *   auth error should revoke the token
    */
 
   describe('token endpoint - client credential', function() {
@@ -128,11 +125,11 @@ describe('oauth2 token API', function() {
           assert.equal(jwtTkn1.aud, clientId);
           assert.equal(jwtTkn2.aud, clientId);
 
-          //access token should expire in 10 seconds
-          assert(res.body.expires_in, 10);
-          assert.equal(10, (jwtTkn1.exp - jwtTkn1.iat) / 1000);
-          //while refresh token should expire in 20 seconds
-          assert.equal(20, (jwtTkn2.exp - jwtTkn2.iat) / 1000);
+          //access token should expire in 7 seconds
+          assert(res.body.expires_in, 7);
+          assert.equal(7, (jwtTkn1.exp - jwtTkn1.iat) / 1000);
+          //while refresh token should expire in 12 seconds
+          assert.equal(12, (jwtTkn2.exp - jwtTkn2.iat) / 1000);
         })
         .end(function(err, res) {
           done(err);
@@ -313,12 +310,12 @@ describe('oauth2 token API', function() {
           assert.equal(jwtTkn1.aud, clientId);
           assert.equal(jwtTkn2.aud, clientId);
 
-          //access token should expire in 10 seconds
-          assert(res.body.expires_in, 10);
-          assert.equal(10, (jwtTkn1.exp - jwtTkn1.iat) / 1000);
+          //access token should expire in 7 seconds
+          assert(res.body.expires_in, 7);
+          assert.equal(7, (jwtTkn1.exp - jwtTkn1.iat) / 1000);
 
-          //while refresh token should expire in 20 seconds
-          assert.equal(20, (jwtTkn2.exp - jwtTkn2.iat) / 1000);
+          //while refresh token should expire in 12 seconds
+          assert.equal(12, (jwtTkn2.exp - jwtTkn2.iat) / 1000);
         })
         .end(function(err, res) {
           done(err);
@@ -432,7 +429,289 @@ describe('oauth2 token API', function() {
 
   describe('token endpoint - refresh token', function() {
     it('acceptance', function(done) {
-      done();
+      var data1 = {
+          'grant_type': 'client_credentials',
+          'client_id': clientId,
+          'client_secret': clientSecret
+      };
+
+      //request the access token
+      request.post('/oauth2/token')
+        .type('form')
+        .send(data1)
+        .expect(function(res1) {
+          var refreshToken = res1.body.refresh_token;
+
+          var data2 = {
+            'grant_type': 'refresh_token',
+            'client_id': clientId,
+            'client_secret': clientSecret,
+            'refresh_token': refreshToken
+          };
+
+          //exchange the refresh token with the access token
+          request.post('/oauth2/token')
+            .type('form')
+            .send(data2)
+            .expect(function(res2) {
+              assert(res2.body.access_token);
+              assert(res2.body.refresh_token);
+
+              assert(res2.body.access_token !== res1.body.access_token);
+              assert(res2.body.refresh_token !== res1.body.refresh_token);
+
+              assert.equal(res2.body.scope2, undefined);
+
+              var jwtTkn1 = decodeToken(res2.body.access_token);
+              var jwtTkn2 = decodeToken(res2.body.refresh_token);
+              //the jwt id should not be undefined
+              assert(jwtTkn1.jti);
+              assert(jwtTkn2.jti);
+
+              //token should be issued to this client
+              assert.equal(jwtTkn1.aud, clientId);
+              assert.equal(jwtTkn2.aud, clientId);
+
+              //access token should expire in 7 seconds
+              assert(res2.body.expires_in, 7);
+              assert.equal(7, (jwtTkn1.exp - jwtTkn1.iat) / 1000);
+              //while refresh token should expire in 12 seconds
+              assert.equal(12, (jwtTkn2.exp - jwtTkn2.iat) / 1000);
+            })
+            .end(function(err, res) {
+              done(err);
+            });
+
+        })
+        .end(function(err, res) {
+          assert(!err);
+        });
+    });
+
+    it('expired in "ttl" seconds', function(done) {
+      var data1 = {
+          'grant_type': 'client_credentials',
+          'client_id': clientId,
+          'client_secret': clientSecret
+      };
+
+      //request the access token
+      request.post('/oauth2/token')
+        .type('form')
+        .send(data1)
+        .expect(function(res1) {
+          var refreshToken = res1.body.refresh_token;
+
+          var data2 = {
+            'grant_type': 'refresh_token',
+            'client_id': clientId,
+            'client_secret': clientSecret,
+            'refresh_token': refreshToken
+          };
+
+          var timeout = 12 * 1000;
+          console.log('Waiting for %d seconds to test expired refresh token...',
+                  timeout / 1000);
+          setTimeout(function() {
+            //exchange the refresh token with the access token
+            request.post('/oauth2/token')
+              .type('form')
+              .send(data2)
+              .expect(function(res2) {
+                //check the error and error description
+                assert.equal(res2.body.error,
+                        'invalid_grant');
+                assert.equal(res2.body.error_description,
+                        'Invalid refresh token');
+              })
+              .end(function(err, res) {
+                done(err);
+              });
+          }, timeout);
+        })
+        .end(function(err, res) {
+          assert(!err);
+        });
+    });
+
+    it('count == 3', function(done) {
+      var data1 = {
+          'grant_type': 'client_credentials',
+          'client_id': clientId,
+          'client_secret': clientSecret
+      };
+
+      //request the access token
+      request.post('/oauth2/token')
+        .type('form')
+        .send(data1)
+        .expect(function(res1) {
+          var refreshToken = res1.body.refresh_token; //the first one
+
+          var data2 = {
+            'grant_type': 'refresh_token',
+            'client_id': clientId,
+            'client_secret': clientSecret
+          };
+
+          //exchange the refresh token for another two (=3-1) times
+          (function testRefreshTokenCount(token, count) {
+            data2.refresh_token = token;
+
+            //exchange the refresh token with the access token
+            request.post('/oauth2/token')
+              .type('form')
+              .send(data2)
+              .end(function(err, res2) {
+                assert(res2.body.access_token);
+                assert(res2.body.expires_in, 7);
+
+                if (count > 0) {
+                  var jwtTkn = decodeToken(res2.body.refresh_token);
+
+                  //token should be issued to this client
+                  assert.equal(jwtTkn.aud, clientId);
+                  assert.equal(12, (jwtTkn.exp - jwtTkn.iat) / 1000);
+
+                  //another exchange
+                  testRefreshTokenCount(res2.body.refresh_token, count - 1);
+                } else {
+                  //This time, no refresh token should be returned.
+                  assert(!res2.body.refresh_token);
+                  done(err);
+                }
+              });
+          })(refreshToken, 3 - 1);
+        })
+        .end(function(err, res) {
+          assert(!err);
+        });
+    });
+
+    //same refresh token can only be used for only one time
+    it('cannot be used again', function(done) {
+      var data1 = {
+          'grant_type': 'client_credentials',
+          'client_id': clientId,
+          'client_secret': clientSecret
+      };
+
+      //request the access token
+      request.post('/oauth2/token')
+        .type('form')
+        .send(data1)
+        .expect(function(res1) {
+          var data2 = {
+            'grant_type': 'refresh_token',
+            'client_id': clientId,
+            'client_secret': clientSecret,
+            'refresh_token': res1.body.refresh_token
+          };
+
+          //Use the same refresh token twice. The second time should fail
+          function test() {
+            var count = 2;
+            return function testRefreshToken() {
+              //exchange the refresh token with the access token
+              request.post('/oauth2/token')
+                .type('form')
+                .send(data2)
+                .end(function(err, res2) {
+                  count--;
+                  if (count > 0) {
+                    //the access token is successfully received
+                    assert(res2.body.access_token);
+                    testRefreshToken();
+                  }
+                  else {
+                    //failed to request an access token with a used refresh token
+                    assert(!res2.body.access_token);
+                    assert(!res2.body.refresh_token);
+
+                    assert.equal(res2.body.error,
+                            'invalid_grant');
+                    assert.equal(res2.body.error_description,
+                            'Invalid refresh token');
+
+                    done();
+                  }
+                });
+            };
+          }
+
+          test()();
+        })
+        .end(function(err, res) {
+          assert(!err);
+        });
+    });
+
+    //The given refresh token should be deleted if there is any auth error.
+    it('auth error should revoke the token', function(done) {
+      var data1 = {
+          'grant_type': 'client_credentials',
+          'client_id': clientId,
+          'client_secret': clientSecret
+      };
+
+      //request the access token
+      request.post('/oauth2/token')
+        .type('form')
+        .send(data1)
+        .expect(function(res1) {
+          var data2 = {
+            'grant_type': 'refresh_token',
+            'client_id': clientId,
+            'refresh_token': res1.body.refresh_token
+          };
+
+          //The refresh token will be revoked if there is auth error
+          function test() {
+            var count = 2;
+            return function testRefreshToken() {
+              data2['client_secret'] = (count > 1 ? 'badpass' : clientSecret);
+
+              //exchange the refresh token with the access token
+              request.post('/oauth2/token')
+                .type('form')
+                .send(data2)
+                .end(function(err, res2) {
+                  count--;
+                  if (count > 0) {
+                    //auth error
+                    assert(!res2.body.access_token);
+                    assert(!res2.body.refresh_token);
+
+                    assert.equal(res2.body.error,
+                            'invalid_client');
+                    assert.equal(res2.body.error_description,
+                            'Authentication error');
+
+                    //call one more time
+                    testRefreshToken();
+                  }
+                  else {
+                    //failed to request an access token with a used refresh token
+                    assert(!res2.body.access_token);
+                    assert(!res2.body.refresh_token);
+
+                    assert.equal(res2.body.error,
+                            'invalid_grant');
+                    assert.equal(res2.body.error_description,
+                            'Invalid refresh token');
+
+                    //test is done
+                    done();
+                  }
+                });
+            };
+          }
+
+          test()();
+        })
+        .end(function(err, res) {
+          assert(!err);
+        });
     });
   });
 
