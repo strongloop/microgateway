@@ -41,23 +41,37 @@ module.exports = function(options) {
   switch (unit) {
     case 'min':
     case 'mins':
+    case 'minute':
+    case 'minutes':
       unit = 'm';
       break;
     case 'sec':
     case 'secs':
+    case 'second':
+    case 'seconds':
       unit = 's';
-      break;
-    case 'yr':
-    case 'yrs':
-      unit = 'y';
       break;
     case 'hr':
     case 'hrs':
+    case 'hour':
+    case 'hours':
       unit = 'h';
+      break;
+    case 'day':
+    case 'days':
+      unit = 'd';
       break;
     case 'wk':
     case 'wks':
+    case 'week':
+    case 'weeks':
       unit = 'w';
+      break;
+    default:
+      logger.error('Invalid unit for limit: %d/%d%s Reject: %s ' +
+                   'defaulting to hours',
+                   limit, period, unit, reject);
+      unit = 'h';
       break;
   }
 
