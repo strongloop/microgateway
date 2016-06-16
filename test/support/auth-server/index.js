@@ -86,6 +86,7 @@ var sslOpts = {
     key: sarahKeyf,
     cert: sarahCertf,
     agent: false,
+    requestCert: true,
 };
 
 var httpServer;
@@ -112,7 +113,7 @@ exports.start = function(port) {
 
         httpsServer = https.createServer(sslOpts, theApplication);
         httpsServer.listen(port + 1);
-        console.log('Auth server (https) is listening at port %d.', port);
+        console.log('Auth server (https) is listening at port %d.', port + 1);
 
         httpsServer.on('error', function(e) {
             console.log('Auth server receives an error: %s', e);

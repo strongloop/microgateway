@@ -27,6 +27,9 @@
         },
         "resource-owner-token-endpoint-ldap": {
           "name": "resource-owner-token-endpoint-ldap:1.0.0"
+        },
+        "resource-owner-token-endpoint-auth-url": {
+          "name": "resource-owner-token-endpoint-auth-url:1.0.0"
         }
       },
       "info": {
@@ -35,6 +38,18 @@
         "version": "1.0.0"
       },
       "plans": {
+        "Limited": {
+          "title": "Limited",
+          "rate-limit": {
+            "hard-limit": false,
+            "value": "unlimited"
+          },
+          "apis": {
+            "weather-service": {},
+            "oauth2-endpoints": {},
+            "stock-quote": {}
+          }
+        },
         "gold-plan": {
           "title": "Gold Plan",
           "approval": false,
@@ -70,7 +85,7 @@
         }
       }
     },
-    "id": "5760df0fe4b076e106cb60a8",
+    "id": "5762173fe4b076e106cb624c",
     "organization": {
       "id": "573ada4ce4b091411e1e7b8f",
       "name": "myOrg",
@@ -79,7 +94,7 @@
       "members": []
     },
     "state": "published",
-    "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/products/5760df0fe4b076e106cb60a8",
+    "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/products/5762173fe4b076e106cb624c",
     "visibility": {
       "view": {
         "enabled": true,

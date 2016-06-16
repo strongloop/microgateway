@@ -8,9 +8,11 @@
 var _ = require('lodash');
 var assert = require('assert');
 var supertest = require('supertest');
+
 var microgw = require('../lib/microgw');
 var authServer = require('./support/auth-server');
 var apimServer = require('./support/mock-apim-server/apim-server');
+var dsCleanup = require('./support/utils').dsCleanup;
 
 function decodeToken(token) {
   //decode the access token into jwt token
@@ -58,7 +60,8 @@ describe('oauth2 token API', function() {
     delete process.env.APIMANAGER_PORT;
     delete process.env.DATASTORE_PORT;
 
-    apimServer.stop()
+      dsCleanup(5000)
+      .then(function() {return apimServer.stop();})
       .then(function() { return microgw.stop(); })
       .then(function() { return authServer.stop(); })
       .then(done, done)
@@ -80,14 +83,13 @@ describe('oauth2 token API', function() {
 
   /**
    * TODO:
-   *
+   * bad AZ code
    * access token expire:
    *
    * negatives:
    *   bad request
    *
-   * password:
-   *   user auth (http, https, ldap)
+   * LDAP with tls profile
    */
 
   describe('token endpoint - client credential', function() {
@@ -138,8 +140,7 @@ describe('oauth2 token API', function() {
 
     it('http basic auth', function(done) {
       var data = {
-          'grant_type': 'client_credentials',
-          'scope': 'stock'
+          'grant_type': 'client_credentials'
       };
 
       request.post('/oauth2/token')
@@ -204,7 +205,7 @@ describe('oauth2 token API', function() {
           'grant_type': 'client_credentials',
           'client_id': clientId,
           'client_secret': clientSecret,
-          'scope': 'stock foo weather'
+          'scope': 'weather stock foo'
       };
 
       request.post('/oauth2/token')
@@ -223,7 +224,7 @@ describe('oauth2 token API', function() {
           assert.equal(res.body.error,
                   'invalid_scope');
           assert.equal(res.body.error_description,
-                  'Unrecognized scope "stock,foo,weather"');
+                  'Unrecognized scope "weather,stock,foo"');
         })
         .end(function(err, res) {
           done(err);
@@ -233,18 +234,17 @@ describe('oauth2 token API', function() {
     it('without client_id', function(done) {
       var data = {
           'grant_type': 'client_credentials',
-          'client_secret': clientSecret,
-          'scope': 'stock foo weather'
+          'client_secret': clientSecret
       };
 
       request.post('/oauth2/token')
         .type('form')
         .send(data)
-        .expect(401)
+        .expect(400)
         .expect(function(res) {
           //check the error and error description
           assert.equal(res.body.error,
-                  'invalid_client');
+                  'invalid_request');
           assert.equal(res.body.error_description,
                   'Missing required parameter: client_*');
         })
@@ -257,8 +257,7 @@ describe('oauth2 token API', function() {
       var data = {
           'grant_type': 'client_credentials',
           'client_id': clientId,
-          'client_secret': 'blah',
-          'scope': 'stock weather'
+          'client_secret': 'blah'
       };
 
       request.post('/oauth2/token')
@@ -300,8 +299,11 @@ describe('oauth2 token API', function() {
           assert(res.body.access_token);
           assert(res.body.refresh_token);
 
+          assert.equal(res.body.scope, undefined);
+
           var jwtTkn1 = decodeToken(res.body.access_token);
           var jwtTkn2 = decodeToken(res.body.refresh_token);
+
           //the jwt id should not be undefined
           assert(jwtTkn1.jti);
           assert(jwtTkn2.jti);
@@ -322,7 +324,7 @@ describe('oauth2 token API', function() {
         });
     });
 
-    it('user without password', function(done) {
+    it('user/password are required', function(done) {
       var data = {
           'grant_type': 'password',
           'client_id': clientId,
@@ -346,7 +348,7 @@ describe('oauth2 token API', function() {
         });
     });
 
-    it('user auth (http) fails', function(done) {
+    it('auth url (http) incorrect password', function(done) {
       var data = {
           'grant_type': 'password',
           'client_id': clientId,
@@ -373,7 +375,7 @@ describe('oauth2 token API', function() {
 
     //to run this testcase, make sure that the LDAP server
     // (dpautosrv1.dp.rtp.raleigh.ibm.com) is reachable
-    it('user auth (LDAP) ok', function(done) {
+    it('user registry (LDAP) ok', function(done) {
       var data = {
           'grant_type': 'password',
           'client_id': clientId,
@@ -400,13 +402,13 @@ describe('oauth2 token API', function() {
         });
     });
 
-    it('bad user auth (LDAP)', function(done) {
+    it('user registry (LDAP) incorrect password', function(done) {
       var data = {
           'grant_type': 'password',
           'client_id': clientId,
           'client_secret': clientSecret,
           'username': 'baduser',
-          'password': 'badpass'  //invalid user password
+          'password': 'badpass'
       };
 
       request.post('/token/password/ldap')
@@ -419,6 +421,60 @@ describe('oauth2 token API', function() {
                   'invalid_grant');
           assert.equal(res.body.error_description,
                   'Failed to authenticate the resource owner');
+        })
+        .end(function(err, res) {
+          done(err);
+        });
+    });
+
+    it('auth url (HTTPS) ok', function(done) {
+      var data = {
+          'grant_type': 'password',
+          'client_id': clientId,
+          'client_secret': clientSecret,
+          'username': 'root',
+          'password': 'Hunter2'
+      };
+
+      request.post('/token/password/https')
+        .type('form')
+        .send(data)
+        .expect(200)
+        .expect(function(res) {
+          assert(res.body.access_token);
+
+          var jwtTkn = decodeToken(res.body.access_token);
+          assert(jwtTkn.jti);
+          assert.equal(jwtTkn.aud, clientId);
+
+          assert(res.body.expires_in, 3600);
+        })
+        .end(function(err, res) {
+          done(err);
+        });
+    });
+
+    it('auth url (https without tls profile) ok', function(done) {
+      var data = {
+          'grant_type': 'password',
+          'client_id': clientId,
+          'client_secret': clientSecret,
+          'username': 'root',
+          'password': 'Hunter2'
+      };
+
+      request.post('/oauth2/token/httpsAuthUrl')
+        .type('form')
+        .send(data)
+        .expect(200)
+        .expect(function(res) {
+          assert(res.body.access_token);
+
+          var jwtTkn = decodeToken(res.body.access_token);
+          assert(jwtTkn.jti);
+          assert.equal(jwtTkn.aud, clientId);
+
+          assert(res.body.expires_in, 3600);
         })
         .end(function(err, res) {
           done(err);
@@ -439,6 +495,7 @@ describe('oauth2 token API', function() {
       request.post('/oauth2/token')
         .type('form')
         .send(data1)
+        .expect(200)
         .expect(function(res1) {
           var refreshToken = res1.body.refresh_token;
 
@@ -453,6 +510,7 @@ describe('oauth2 token API', function() {
           request.post('/oauth2/token')
             .type('form')
             .send(data2)
+            .expect(200)
             .expect(function(res2) {
               assert(res2.body.access_token);
               assert(res2.body.refresh_token);
@@ -460,7 +518,7 @@ describe('oauth2 token API', function() {
               assert(res2.body.access_token !== res1.body.access_token);
               assert(res2.body.refresh_token !== res1.body.refresh_token);
 
-              assert.equal(res2.body.scope2, undefined);
+              assert.equal(res2.body.scope, undefined);
 
               var jwtTkn1 = decodeToken(res2.body.access_token);
               var jwtTkn2 = decodeToken(res2.body.refresh_token);
@@ -485,6 +543,50 @@ describe('oauth2 token API', function() {
         })
         .end(function(err, res) {
           assert(!err);
+        });
+    });
+
+    it('invalid token #1', function(done) {
+      var data = {
+        'grant_type': 'refresh_token',
+        'client_id': clientId,
+        'client_secret': clientSecret,
+        'refresh_token': 'CANNOT_BE_VALID'
+      };
+
+      //exchange the refresh token with the access token
+      request.post('/oauth2/token')
+        .type('form')
+        .send(data)
+        .expect(403)
+        .expect(function(res) {
+          assert.equal(res.body.error, 'invalid_grant');
+          assert.equal(res.body.error_description, 'Invalid refresh token');
+        })
+        .end(function(err, res) {
+          done(err);
+        });
+    });
+
+    it('invalid token #2', function(done) {
+      var data = {
+        'grant_type': 'refresh_token',
+        'client_id': clientId,
+        'client_secret': clientSecret,
+        'refresh_token': 'eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJGLUJkZ19xdXdaemUzNnpMX1haem1RTGhtVjZteFY4OGlDRXZCSXVCdVo0IiwiYXVkIjoiNmE3NmMyN2YtZjNmMC00N2RkLThlNTgtNTA5MjRlNGExYmFiIiwiaWF0IjoxNDY2MDYzOTkxMDY0LCJleHAiOjE0NjYwNjQwMDMwNjR9.K-IVR5f442G0MhIBfQMMybjKm_J1LPrUM0xhPaNC82c'
+      };
+
+      //exchange the refresh token with the access token
+      request.post('/oauth2/token')
+        .type('form')
+        .send(data)
+        .expect(403)
+        .expect(function(res) {
+          assert.equal(res.body.error, 'invalid_grant');
+          assert.equal(res.body.error_description, 'Invalid refresh token');
+        })
+        .end(function(err, res) {
+          done(err);
         });
     });
 
@@ -716,12 +818,56 @@ describe('oauth2 token API', function() {
   });
 
   describe('token endpoint - misc', function() {
+    it('invalid grant type', function(done) {
+      var data = {
+          'grant_type': 'FOO',
+          'client_id': clientId,
+          'client_secret': clientSecret
+      };
+
+      request.post('/oauth2/token')
+        .type('form')
+        .send(data)
+        .expect(400)
+        .expect(function(res) {
+          assert.equal(res.body.error, 'unsupported_grant_type');
+          assert.equal(res.body.error_description, 'Unsupported grant type: FOO');
+        })
+        .end(function(err, res) {
+          done(err);
+        });
+    });
+
+    //the client doesn't subscribe the plan that include the api
     it('unregistered client', function(done) {
-      done();
+      var clientId2 = '20fd2370-4346-4961-9db7-abdc6d58b3f8';
+      var clientSecret2 = 'V1fI2vF1tL0sG1vX6bF7sM7qW2pM7gP1aA3oG5dF8iF4oU1rN7';
+      var data = {
+          'grant_type': 'password',
+          'client_id': clientId2,
+          'client_secret': clientSecret2,
+          'username': 'test300',
+          'password': 'dp40test'
+      };
+
+      request.post('/token/password/ldap')
+        .type('form')
+        .send(data)
+        .expect(401)
+        .expect(function(res) {
+          //check the error and error description
+          assert.equal(res.body.error,
+                  'invalid_client');
+          assert.equal(res.body.error_description,
+                  'Authentication error');
+        })
+        .end(function(err, res) {
+          done(err);
+        });
     });
 
     it('token revocation', function(done) {
-      done();
+      done(); //TODO
     });
   });
 
