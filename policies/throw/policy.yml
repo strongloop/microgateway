@@ -2,7 +2,7 @@ policy: 1.1.0
 
 info:
   title: Throw
-  name: apim-throw
+  name: throw
   version: 1.0.0
   description: Throw policy for the IBM API Connect
   contact:
