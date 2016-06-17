@@ -62,7 +62,7 @@ describe('oauth2 AZ-server', function() {
 
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
-    it('greet path - token', function(done) {
+    it('green path - token', function(done) {
       request.get('/security/oauth2/authorize')
         .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
         .query({response_type: 'token'})
@@ -87,7 +87,7 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302);
+                assert(res2.statusCode === 302, 'not 302 redirect response');
                 var location = res2.header.location;
                 var uri = url.parse(location);
                 uri.query = qs.parse(uri.hash.substring(1));
@@ -111,7 +111,7 @@ describe('oauth2 AZ-server', function() {
         });
     });
 
-    it('greet path - code', function(done) {
+    it('green path - code', function(done) {
       request.get('/security/oauth2/authorize')
         .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
         .query({response_type: 'code'})
@@ -171,6 +171,30 @@ describe('oauth2 AZ-server', function() {
                 'incorrect redirect_uri');
             assert(uri.query.state === 'xyz', 'incorrect state');
             assert(uri.query.error === 'invalid_scope', 'incorrect error code');
+            done(err);
+          } catch (e) {
+            done(e);
+          }
+        });
+    });
+
+    it('empty scope - token', function(done) {
+      request.get('/security/oauth2/authorize')
+        .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
+        .query({response_type: 'token'})
+        .query({scope: ''})
+        .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
+        .query({state: 'xyz'})
+        .end(function(err, res) {
+          try {
+            assert(err === null && res.statusCode === 302, 'incorrect status code');
+            var location = res.header.location;
+            var uri = url.parse(location);
+            uri.query = qs.parse(uri.hash.substring(1));
+            assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
+                'incorrect redirect_uri');
+            assert(uri.query.state === 'xyz', 'incorrect state');
+            assert(uri.query.error === 'invalid_request', 'incorrect error code');
             done(err);
           } catch (e) {
             done(e);
@@ -420,7 +444,7 @@ describe('oauth2 AZ-server', function() {
 
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
-    it('greet path - token', function(done) {
+    it('green path - token', function(done) {
       request.get('/security/oauth2/authorize')
         .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
         .query({response_type: 'token'})
@@ -430,7 +454,7 @@ describe('oauth2 AZ-server', function() {
         .auth('root', 'Hunter2')
         .end(function(err, res) {
           try {
-            assert(res.statusCode === 302);
+            assert(res.statusCode === 302, 'not 302 redirect response');
             var location = res.header.location;
             var uri = url.parse(location);
             uri.query = qs.parse(uri.hash.substring(1));
@@ -450,7 +474,7 @@ describe('oauth2 AZ-server', function() {
         });
     });
 
-    it('greet path - code', function(done) {
+    it('green path - code', function(done) {
       request.get('/security/oauth2/authorize')
         .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
         .query({response_type: 'code'})
@@ -533,7 +557,7 @@ describe('oauth2 AZ-server', function() {
         .auth('root', 'wrongpassword')
         .end(function(err, res) {
           try {
-            assert(res.statusCode === 302);
+            assert(res.statusCode === 302, 'not 302 redirect response');
             var location = res.header.location;
             var uri = url.parse(location);
             uri.query = qs.parse(uri.hash.substring(1));
@@ -617,7 +641,7 @@ describe('oauth2 AZ-server', function() {
 
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
-    it('greet path - token', function(done) {
+    it('green path - token', function(done) {
       request.get('/security/oauth2/authorize')
         .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
         .query({response_type: 'token'})
@@ -642,7 +666,7 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302);
+                assert(res2.statusCode === 302, 'not 302 redirect response');
                 var location = res2.header.location;
                 var uri = url.parse(location);
                 uri.query = qs.parse(uri.hash.substring(1));
@@ -666,7 +690,7 @@ describe('oauth2 AZ-server', function() {
 
     });
 
-    it('greet path - code', function(done) {
+    it('green path - code', function(done) {
       request.get('/security/oauth2/authorize')
         .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
         .query({response_type: 'code'})
@@ -781,7 +805,7 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=invalidtransactionid')
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302);
+                assert(res2.statusCode === 302, 'not 302 redirect response');
                 var location = res2.header.location;
                 var uri = url.parse(location);
                 uri.query = qs.parse(uri.hash.substring(1));
@@ -869,7 +893,7 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302);
+                assert(res2.statusCode === 302, 'not 302 redirect response');
                 var location = res2.header.location;
                 var uri = url.parse(location);
                 uri.query = qs.parse(uri.hash.substring(1));
@@ -1020,7 +1044,7 @@ describe('oauth2 AZ-server', function() {
 
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
-    it('greet path - token', function(done) {
+    it('green path - token', function(done) {
       request.get('/security/oauth2/authorize')
         .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
         .query({response_type: 'token'})
@@ -1055,7 +1079,7 @@ describe('oauth2 AZ-server', function() {
             .query({'app-name': uri.query['app-name']})
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302);
+                assert(res2.statusCode === 302, 'not 302 redirect response');
                 var location = res2.header.location;
                 var uri = url.parse(location);
                 uri.query = qs.parse(uri.hash.substring(1));
@@ -1080,7 +1104,7 @@ describe('oauth2 AZ-server', function() {
 
     });
 
-    it('greet path - code', function(done) {
+    it('green path - code', function(done) {
       request.get('/security/oauth2/authorize')
         .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
         .query({response_type: 'code'})
@@ -1385,7 +1409,7 @@ describe('oauth2 AZ-server', function() {
 
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
-    it('greet path - token', function(done) {
+    it('green path - token', function(done) {
       request.get('/security/oauth2/authorize')
         .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
         .query({response_type: 'token'})
@@ -1448,7 +1472,7 @@ describe('oauth2 AZ-server', function() {
         });
     });
 
-    it('greet path - code', function(done) {
+    it('green path - code', function(done) {
       request.get('/security/oauth2/authorize')
         .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
         .query({response_type: 'code'})
@@ -1567,7 +1591,7 @@ describe('oauth2 AZ-server', function() {
         .auth('root', 'wrongpassword')
         .end(function(err, res) {
           try {
-            assert(res.statusCode === 302);
+            assert(res.statusCode === 302, 'not 302 redirect response');
             var location = res.header.location;
             var uri = url.parse(location);
             uri.query = qs.parse(uri.hash.substring(1));
@@ -1895,7 +1919,7 @@ describe('oauth2 AZ-server', function() {
 
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
-    it('greet path - token', function(done) {
+    it('green path - token', function(done) {
       request.get('/security/oauth2/authorize')
         .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
         .query({response_type: 'token'})
@@ -1977,7 +2001,7 @@ describe('oauth2 AZ-server', function() {
         });
     });
 
-    it('greet path - code', function(done) {
+    it('green path - code', function(done) {
       request.get('/security/oauth2/authorize')
         .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
         .query({response_type: 'code'})
@@ -2128,7 +2152,7 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=invalidtransactionid')
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302);
+                assert(res2.statusCode === 302, 'not 302 redirect response');
                 var location = res2.header.location;
                 var uri = url.parse(location);
                 uri.query = qs.parse(uri.hash.substring(1));
@@ -2215,7 +2239,7 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302);
+                assert(res2.statusCode === 302, 'not 302 redirect response');
                 var location = res2.header.location;
                 var uri = url.parse(location);
                 uri.query = qs.parse(uri.hash.substring(1));
