@@ -79,7 +79,7 @@ describe('oauth2 token API', function() {
     apimServer.start(
             process.env.APIMANAGER,
             process.env.APIMANAGER_PORT,
-            __dirname + '/definitions/oauth2')
+            __dirname + '/definitions/oauth2-token')
         .then(function() { return microgw.start(3000); })
         .then(function() { return authServer.start(8889); })
         .then(function() {
@@ -860,6 +860,60 @@ describe('oauth2 token API', function() {
         });
     });
 
+    it('refresh token is not issued when refresh token is disabled', function(done) {
+      var data = {
+          'grant_type': 'client_credentials',
+          'client_id': clientId,
+          'client_secret': clientSecret,
+          'scope': 'stock weather'
+      };
+
+      request.post('/oauth2/token/no_refresh')
+        .type('form')
+        .send(data)
+        .expect(200)
+        .expect(function(res) {
+          //only access token is issued but not refresh token
+          assert(res.body.access_token);
+
+          assert(res.body.expires_in, 7);
+
+          assert(!res.body.refresh_token);
+
+          var jwtTkn = decodeToken(res.body.access_token);
+          assert(jwtTkn.jti);
+          assert.equal(jwtTkn.aud, clientId);
+        })
+        .end(function(err, res) {
+          done(err);
+        });
+    });
+
+    it('no refresh token grant type when refresh token is disabled', function(done) {
+      var data = {
+          'grant_type': 'refresh_token',
+          'client_id': clientId,
+          'client_secret': clientSecret,
+          'refresh_token': 'eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJGLUJkZ19xdXdaemUzNnpMX1haem1RTGhtVjZteFY4OGlDRXZCSXVCdVo0IiwiYXVkIjoiNmE3NmMyN2YtZjNmMC00N2RkLThlNTgtNTA5MjRlNGExYmFiIiwiaWF0IjoxNDY2MDYzOTkxMDY0LCJleHAiOjE0NjYwNjQwMDMwNjR9.K-IVR5f442G0MhIBfQMMybjKm_J1LPrUM0xhPaNC82c',
+          'scope': 'stock weather'
+      };
+
+      request.post('/oauth2/token/no_refresh')
+        .type('form')
+        .send(data)
+        .expect(400)
+        .expect(function(res) {
+          //check the error and error description
+          assert.equal(res.body.error,
+                  'unsupported_grant_type');
+          assert.equal(res.body.error_description,
+                  'Unsupported grant type: refresh_token');
+        })
+        .end(function(err, res) {
+          done(err);
+        });
+    });
+
     it('refresh token to expire in "ttl" seconds', function(done) {
       var data1 = {
           'grant_type': 'client_credentials',
@@ -1144,10 +1198,6 @@ describe('oauth2 token API', function() {
         .end(function(err, res) {
           done(err);
         });
-    });
-
-    it('token revocation', function(done) {
-      done(); //TODO
     });
   });
 
