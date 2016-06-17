@@ -297,7 +297,8 @@
             "url": "https://127.0.0.1:7200/service/revocation",
             "tls-profile": "api-sslcli-all"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -624,7 +625,8 @@
           "authorization": {
             "type": "default-form"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -947,7 +949,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -958,7 +962,8 @@
           "revocation": {
             "url": null
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -1397,7 +1402,8 @@
           "authorization": {
             "type": "default-form"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -1843,7 +1849,8 @@
             "count": 2048,
             "ttl": 6000
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -2171,7 +2178,8 @@
           "authorization": {
             "type": "default-form"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -2502,7 +2510,8 @@
           "refresh-token": {
             "count": 2048
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -2835,7 +2844,8 @@
           "revocation": {
             "url": "https://127.0.0.1:7200/service/revocation"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -3498,7 +3508,8 @@
           "authorization": {
             "type": "authenticated"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -3826,7 +3837,8 @@
           "authorization": {
             "type": "default-form"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -4155,7 +4167,8 @@
           "authorization": {
             "type": "default-form"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -4486,7 +4499,8 @@
           "authorization": {
             "type": "default-form"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -4817,7 +4831,8 @@
           "authorization": {
             "type": "default-form"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -4987,7 +5002,8 @@
           "authorization": {
             "type": "default-form"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -5145,7 +5161,8 @@
           "authorization": {
             "type": "default-form"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
