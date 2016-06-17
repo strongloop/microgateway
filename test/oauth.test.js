@@ -19,7 +19,7 @@ var apimServer = require('./support/mock-apim-server/apim-server');
 var echo = require('./support/echo-server');
 
 //var configDir = path.join(__dirname, 'definitions', 'oauth');
-var configDir = path.join(__dirname, 'definitions', 'oauth2');
+var configDir = path.join(__dirname, 'definitions', 'oauth2-resource');
 
 var request, httprequest, NODE_TLS_REJECT_UNAUTHORIZED;
 
@@ -46,55 +46,6 @@ function dsCleanup(port) {
   });
 }
 
-describe.skip('oauth testing', function() {
-  before(function(done) {
-    process.env.CONFIG_DIR = configDir;
-    process.env.NODE_ENV = 'production';
-    mg.start(3000)
-      .then(function() {
-        request = supertest(mg.app);
-      })
-      .then(done)
-      .catch(function(err) {
-        debug(err);
-        done(err);
-      });
-  });
-
-  after(function(done) {
-    mg.stop()
-      .then(done, done)
-      .catch(done);
-    delete process.env.CONFIG_DIR;
-    delete process.env.NODE_ENV;
-  });
-
-  //it('should pass requests through OAuth2 resource server - /resource-test/res1', function (done) {
-  //  var token = {
-  //    header: { alg: 'HS256' },
-  //    payload: {
-  //      jti: 'koc1t3OgERRY6x9oHxIUesNfiUXTboa65BefHrUHjOQ',
-  //      aud: '6a76c27f-f3f0-47dd-8e58-50924e4a1bab',
-  //      iat: '2016-06-02T08:07:57.392Z',
-  //      exp: '2100-01-01T00:00:00.000Z',
-  //      scope: ['/']
-  //    },
-  //    secret: 'foobar'
-  //  };
-  //  request
-  //    .get('/resource-test/res1')
-  //    .set('Authorization', 'Bearer ' + jws.sign(token))
-  //    .expect(200, done);
-  //});
-
-  //it('should pass requests through OAuth2 resource server - /resource-test/res3', function (done) {
-  //  request
-  //    .get('/resource-test/res3')
-  //    .expect(200, done);
-  //});
-
-});
-
 describe('oauth testing onprem', function() {
 
   before(function(done) {
@@ -109,7 +60,6 @@ describe('oauth testing onprem', function() {
     apimServer.start(
             process.env.APIMANAGER,
             process.env.APIMANAGER_PORT,
-            //process.env.CONFIG_DIR)
             configDir)
       .then(function() { return mg.start(3000); })
       .then(function() { return echo.start(8889); })
@@ -145,9 +95,8 @@ describe('oauth testing onprem', function() {
     }, done);
   });
 
-  // TODO need to add more scopes to security definition
-  it.skip('Access resource with token - extra scope', function (done) {
-    requestAccessTokenClientCredentials('stock stock:update').then(function (tokens) {
+  it('Access resource with token - extra scope', function (done) {
+    requestAccessTokenClientCredentials('stock:quote stock:info').then(function (tokens) {
       request.get('/stock/quote?symbol=IBM')
         .set('authorization', 'Bearer ' + tokens.access_token)
         .expect(200, /{ "IBM": 123 }/)
@@ -155,29 +104,29 @@ describe('oauth testing onprem', function() {
     }, done);
   });
 
-  it.skip('Attempt to access resource - wrong scope', function (done) {
-    requestAccessTokenClientCredentials('stock:update').then(function (tokens) {
-      request.get('/stock/quote?symbol=IBM')
-        .set('authorization', 'Bearer ' + tokens.access_token)
-        .expect(401)
-        .end(done);
-    }, done);
-  });
-
-
-  it('Attempt to access resource with expired token', function (done) {
-    var access_token = 'eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJMRjJtMVdXQTVHQURrRFA5MjgzTXFwMVh3Y0dId' +
-                       'Wd2V2NWQ1FXbWQ0cW1VIiwiYXVkIjoiNmE3NmMyN2YtZjNmMC00N2RkLThlNTgtNTA5MjR' +
-                       'lNGExYmFiIiwiaWF0IjoxNDY1OTk3MDgwMDIwLCJleHAiOjE0NjU5OTcwODcwMjB9.FKc8' +
-                       'ikjkAmsGnAuVjU0LwN42pWvWGAL_CK6u4ONjVBg';
-    request.get('/stock/quote?symbol=IBM')
-      .set('authorization', 'Bearer ' + access_token)
-      .expect(401)
-      // TODO .expect('WWW-Authenticate', 'Bearer error="invalid_token"')
-      .end(done);
-  });
-
   describe('Bad tokens', function () {
+
+    it('Attempt to access resource - wrong scope', function (done) {
+      requestAccessTokenClientCredentials('stock:info').then(function (tokens) {
+        request.get('/stock/quote?symbol=IBM')
+          .set('authorization', 'Bearer ' + tokens.access_token)
+          .expect(401)
+          .end(done);
+      }, done);
+    });
+
+
+    it('Attempt to access resource with expired token', function (done) {
+      var access_token = 'eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJMRjJtMVdXQTVHQURrRFA5MjgzTXFwMVh3Y0dId' +
+        'Wd2V2NWQ1FXbWQ0cW1VIiwiYXVkIjoiNmE3NmMyN2YtZjNmMC00N2RkLThlNTgtNTA5MjR' +
+        'lNGExYmFiIiwiaWF0IjoxNDY1OTk3MDgwMDIwLCJleHAiOjE0NjU5OTcwODcwMjB9.FKc8' +
+        'ikjkAmsGnAuVjU0LwN42pWvWGAL_CK6u4ONjVBg';
+      request.get('/stock/quote?symbol=IBM')
+        .set('authorization', 'Bearer ' + access_token)
+        .expect(401)
+        // TODO .expect('WWW-Authenticate', 'Bearer error="invalid_token"')
+        .end(done);
+    });
 
     it('Invalid token', function (done) {
       request.get('/stock/quote?symbol=IBM')
@@ -262,7 +211,7 @@ describe('oauth testing onprem', function() {
 });
 
 function requestAccessTokenClientCredentials (scope) {
-  scope = scope || 'stock';
+  scope = scope || 'stock:quote';
 
   // Client data
   var clientId = '6a76c27f-f3f0-47dd-8e58-50924e4a1bab';
@@ -272,13 +221,9 @@ function requestAccessTokenClientCredentials (scope) {
   var data = {
     'grant_type': 'client_credentials',
     'client_id': clientId,
-    'client_secret': clientSecret//,
-    //'scopes': scope
+    'client_secret': clientSecret,
+    'scope': scope
   };
-  if (scope.split(' ').length === 1)
-    data.scope = scope;
-  else
-    data.scopes = scope;
 
   return new Promise(function (resolve, reject) {
     request.post('/oauth2/token')
@@ -292,6 +237,7 @@ function requestAccessTokenClientCredentials (scope) {
       })
       .end(function (err, res) {
         if (err) {
+          console.log(res);
           return reject(err);
         }
         resolve(res.body);
