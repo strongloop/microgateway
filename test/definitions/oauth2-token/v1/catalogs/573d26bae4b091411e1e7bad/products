@@ -30,6 +30,9 @@
         },
         "resource-owner-token-endpoint-auth-url": {
           "name": "resource-owner-token-endpoint-auth-url:1.0.0"
+        },
+        "oauth2-without-refresh-token": {
+          "name": "oauth2-without-refresh-token:1.0.0"
         }
       },
       "info": {
@@ -85,7 +88,7 @@
         }
       }
     },
-    "id": "5762173fe4b076e106cb624c",
+    "id": "57637427e4b076e106cb6517",
     "organization": {
       "id": "573ada4ce4b091411e1e7b8f",
       "name": "myOrg",
@@ -94,7 +97,7 @@
       "members": []
     },
     "state": "published",
-    "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/products/5762173fe4b076e106cb624c",
+    "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/products/57637427e4b076e106cb6517",
     "visibility": {
       "view": {
         "enabled": true,
@@ -111,3 +114,4 @@
     }
   }
 ]
+
