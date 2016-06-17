@@ -122,13 +122,8 @@ describe('oauth2 token API', function() {
 
   /**
    * TODO:
-   * bad AZ code
-   *   - mismatch redirect uri
-   *   - mismatch scope
-   *
-   * grant_type == accessCode
-   *
-   * access token expire:
+   * resource server:
+   *   access token expire:
    *
    * negatives:
    *   bad request
@@ -575,7 +570,6 @@ describe('oauth2 token API', function() {
               'client_id': clientId,
               'client_secret': clientSecret,
               'code': code,
-              'scope': 'weather',
               'redirect_uri': 'https://myApp.com/foo'
           };
 
@@ -618,6 +612,141 @@ describe('oauth2 token API', function() {
         }
       })();
     });
+
+    it('without the required redirect_uri', function(done) {
+      sendAZRequest(request, done, function (err, res) {
+        try {
+          assert(res.statusCode === 302, '302 redirect failed');
+          var uri = url.parse(res.header.location, true);
+          var code = uri.query.code;
+
+          //get the access token with the AZ code
+          var data = {
+              'grant_type': 'authorization_code',
+              'client_id': clientId,
+              'client_secret': clientSecret,
+              'code': code
+          };
+
+          request.post('/oauth2/token')
+            .type('form')
+            .send(data)
+            .expect(403)
+            .expect(function(res2) {
+              //check the error and error description
+              assert.equal(res2.body.error,
+                      'invalid_grant');
+              assert.equal(res2.body.error_description,
+                      'Redirect uri mismatches');
+            })
+            .end(function(err2) {
+              done(err2);
+            });
+        } catch(err) {
+          done(err);
+        }
+      })();
+    });
+
+    it('redirect_uri mismatched', function(done) {
+      sendAZRequest(request, done, function (err, res) {
+        try {
+          assert(res.statusCode === 302, '302 redirect failed');
+          var uri = url.parse(res.header.location, true);
+          var code = uri.query.code;
+
+          //get the access token with the AZ code
+          var data = {
+              'grant_type': 'authorization_code',
+              'client_id': clientId,
+              'client_secret': clientSecret,
+              'code': code,
+              'scope': 'weather',
+              'redirect_uri': 'https://myApp.com/MISMATCHED'
+          };
+
+          request.post('/oauth2/token')
+            .type('form')
+            .send(data)
+            .expect(403)
+            .expect(function(res2) {
+              //check the error and error description
+              assert.equal(res2.body.error,
+                      'invalid_grant');
+              assert.equal(res2.body.error_description,
+                      'Redirect uri mismatches');
+            })
+            .end(function(err2) {
+              done(err2);
+            });
+        } catch(err) {
+          done(err);
+        }
+      })();
+    });
+
+    //Check the section 4.1.3, there is no scope parameter for the grant type
+    //'authorization_code'. So the scope will just be ignored, no matter it is
+    //matched or now.
+    it('scope should be ignored', function(done) {
+      sendAZRequest(request, done, function (err, res) {
+        try {
+          assert(res.statusCode === 302, '302 redirect failed');
+          var uri = url.parse(res.header.location, true);
+          var code = uri.query.code;
+
+          //get the access token with the AZ code
+          var data = {
+              'grant_type': 'authorization_code',
+              'client_id': clientId,
+              'client_secret': clientSecret,
+              'code': code,
+              'scope': 'foo bar', //this will be ignored
+              'redirect_uri': 'https://myApp.com/foo'
+          };
+
+          request.post('/oauth2/token')
+            .type('form')
+            .send(data)
+            .expect(200)
+            .expect(function(res2) {
+              //The scope was set to 'weather' in the sendAZRequest()
+              assert.equal(res2.body.scope, 'weather');
+            })
+            .end(function(err2) {
+              done(err2);
+            });
+        } catch(err) {
+          done(err);
+        }
+      })();
+    });
+
+    it('invalid AZ code', function(done) {
+      var invalidCode = 'yRkp15gcddMAYSNX45IfJX2Y5U2JrmX4SQkgHLnsDjs';
+
+      var data = {
+          'grant_type': 'authorization_code',
+          'client_id': clientId,
+          'client_secret': clientSecret,
+          'code': invalidCode,
+          'scope': 'foo bar',
+          'redirect_uri': 'https://myApp.com/foo'
+      };
+
+      request.post('/oauth2/token')
+        .type('form')
+        .send(data)
+        .expect(403)
+        .expect(function(res) {
+          assert.equal(res.body.error, 'invalid_grant');
+          assert.equal(res.body.error_description, 'Invalid authorization code');
+        })
+        .end(function(err) {
+          done(err);
+        });
+    });
+
   });
 
   describe('token endpoint - refresh token', function() {
@@ -731,7 +860,7 @@ describe('oauth2 token API', function() {
         });
     });
 
-    it('expired in "ttl" seconds', function(done) {
+    it('refresh token to expire in "ttl" seconds', function(done) {
       var data1 = {
           'grant_type': 'client_credentials',
           'client_id': clientId,
