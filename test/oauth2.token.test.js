@@ -6,7 +6,9 @@
 'use strict';
 
 var _ = require('lodash');
+var url = require('url');
 var assert = require('assert');
+var qs = require('querystring');
 var supertest = require('supertest');
 
 var microgw = require('../lib/microgw');
@@ -20,6 +22,43 @@ function decodeToken(token) {
   var jwtTkn = JSON.parse(new Buffer(plain[1], 'base64').toString('utf-8'));
 
   return jwtTkn;
+}
+
+function decodeAMP(url) {
+  return decodeURIComponent(url.replace(/&amp;/g, '&'));
+}
+
+function sendAZRequest(request, done, testCallBack) {
+  return function (done) {
+    //send the AZ request to the /authorize endpoint
+    request.get('/oauth2/authorize')
+      .query({ client_id: clientId })
+      .query({ response_type: 'code' })
+      .query({ scope: 'weather' })
+      .query({ redirect_uri: 'https://myApp.com/foo' })
+      .query({ state: 'blahblah' })
+      .end(function(err, res) {
+        try {
+          assert(err === null && res.ok === true, 'AZ request failed');
+
+          var cookie = res.header['set-cookie'];
+          var actionURL = /action="(.*?)"/g;
+          var transactionID = /name="transaction_id".*value="(.*?)"/g;
+          var match = actionURL.exec(res.text);
+          var match2 = transactionID.exec(res.text);
+
+          //user authentication
+          request.post(decodeAMP(match[1]))
+            .set('cookie', cookie[0].split(';')[0])
+            .send('j_username=root')
+            .send('j_password=Hunter2')
+            .send('transaction_id=' + match2[1])
+            .end(testCallBack);
+        } catch (e) {
+          done(e);
+        }
+      });
+  };
 }
 
 var clientId = '6a76c27f-f3f0-47dd-8e58-50924e4a1bab';
@@ -84,6 +123,11 @@ describe('oauth2 token API', function() {
   /**
    * TODO:
    * bad AZ code
+   *   - mismatch redirect uri
+   *   - mismatch scope
+   *
+   * grant_type == accessCode
+   *
    * access token expire:
    *
    * negatives:
@@ -97,7 +141,8 @@ describe('oauth2 token API', function() {
       var data = {
           'grant_type': 'client_credentials',
           'client_id': clientId,
-          'client_secret': clientSecret
+          'client_secret': clientSecret,
+          'scope': 'weather stock'
       };
 
       request.post('/oauth2/token')
@@ -115,7 +160,7 @@ describe('oauth2 token API', function() {
           //all request headers should not be included in the response
           assert(!res.headers['x-dummy-id'] && !res.headers['X-DUMMY-ID']);
 
-          assert.equal(res.body.scope, undefined);
+          assert.equal(res.body.scope, 'weather stock');
 
           var jwtTkn1 = decodeToken(res.body.access_token);
           var jwtTkn2 = decodeToken(res.body.refresh_token);
@@ -140,7 +185,8 @@ describe('oauth2 token API', function() {
 
     it('http basic auth', function(done) {
       var data = {
-          'grant_type': 'client_credentials'
+          'grant_type': 'client_credentials',
+          'scope': 'stock weather'
       };
 
       request.post('/oauth2/token')
@@ -200,6 +246,29 @@ describe('oauth2 token API', function() {
         });
     });
 
+    it('without the required scope', function(done) {
+      var data = {
+          'grant_type': 'client_credentials',
+          'client_id': clientId,
+          'client_secret': clientSecret
+      };
+
+      request.post('/oauth2/token')
+        .type('form')
+        .send(data)
+        .expect(400)
+        .expect(function(res) {
+          //check the error and error description
+          assert.equal(res.body.error,
+                  'invalid_request');
+          assert.equal(res.body.error_description,
+                  'Missing required parameter: scope');
+        })
+        .end(function(err, res) {
+          done(err);
+        });
+    });
+
     it('with an invalid scope', function(done) {
       var data = {
           'grant_type': 'client_credentials',
@@ -234,7 +303,8 @@ describe('oauth2 token API', function() {
     it('without client_id', function(done) {
       var data = {
           'grant_type': 'client_credentials',
-          'client_secret': clientSecret
+          'client_secret': clientSecret,
+          'scope': 'stock weather'
       };
 
       request.post('/oauth2/token')
@@ -257,7 +327,8 @@ describe('oauth2 token API', function() {
       var data = {
           'grant_type': 'client_credentials',
           'client_id': clientId,
-          'client_secret': 'blah'
+          'client_secret': 'blah',
+          'scope': 'stock weather'
       };
 
       request.post('/oauth2/token')
@@ -285,7 +356,8 @@ describe('oauth2 token API', function() {
           'client_id': clientId,
           'client_secret': clientSecret,
           'username': 'root',
-          'password': 'Hunter2'
+          'password': 'Hunter2',
+          'scope': 'stock weather'
       };
 
       request.post('/oauth2/token')
@@ -299,7 +371,7 @@ describe('oauth2 token API', function() {
           assert(res.body.access_token);
           assert(res.body.refresh_token);
 
-          assert.equal(res.body.scope, undefined);
+          assert.equal(res.body.scope, 'stock weather');
 
           var jwtTkn1 = decodeToken(res.body.access_token);
           var jwtTkn2 = decodeToken(res.body.refresh_token);
@@ -329,7 +401,8 @@ describe('oauth2 token API', function() {
           'grant_type': 'password',
           'client_id': clientId,
           'client_secret': clientSecret,
-          'username': 'test300'
+          'username': 'test300',
+          'scope': 'stock weather'
       };
 
       request.post('/token/password/ldap')
@@ -354,7 +427,8 @@ describe('oauth2 token API', function() {
           'client_id': clientId,
           'client_secret': clientSecret,
           'username': 'root',
-          'password': 'badPass'
+          'password': 'badPass',
+          'scope': 'stock weather'
       };
 
       request.post('/oauth2/token')
@@ -381,7 +455,8 @@ describe('oauth2 token API', function() {
           'client_id': clientId,
           'client_secret': clientSecret,
           'username': 'test300',
-          'password': 'dp40test'
+          'password': 'dp40test',
+          'scope': 'stock weather'
       };
 
       request.post('/token/password/ldap')
@@ -408,7 +483,8 @@ describe('oauth2 token API', function() {
           'client_id': clientId,
           'client_secret': clientSecret,
           'username': 'baduser',
-          'password': 'badpass'
+          'password': 'badpass',
+          'scope': 'stock weather'
       };
 
       request.post('/token/password/ldap')
@@ -433,7 +509,8 @@ describe('oauth2 token API', function() {
           'client_id': clientId,
           'client_secret': clientSecret,
           'username': 'root',
-          'password': 'Hunter2'
+          'password': 'Hunter2',
+          'scope': 'stock weather'
       };
 
       request.post('/token/password/https')
@@ -460,7 +537,8 @@ describe('oauth2 token API', function() {
           'client_id': clientId,
           'client_secret': clientSecret,
           'username': 'root',
-          'password': 'Hunter2'
+          'password': 'Hunter2',
+          'scope': 'stock weather'
       };
 
       request.post('/oauth2/token/httpsAuthUrl')
@@ -483,12 +561,72 @@ describe('oauth2 token API', function() {
 
   });
 
+  describe('token endpoint - authorization code', function() {
+    it('acceptance', function(done) {
+      sendAZRequest(request, done, function (err, res) {
+        try {
+          assert(res.statusCode === 302, '302 redirect failed');
+          var uri = url.parse(res.header.location, true);
+          var code = uri.query.code;
+
+          //get the access token with the AZ code
+          var data = {
+              'grant_type': 'authorization_code',
+              'client_id': clientId,
+              'client_secret': clientSecret,
+              'code': code,
+              'scope': 'weather',
+              'redirect_uri': 'https://myApp.com/foo'
+          };
+
+          request.post('/oauth2/token')
+            .type('form')
+            .send(data)
+            .expect('Cache-Control', 'no-store')
+            .expect('Pragma', 'no-cache')
+            .expect('Content-Type', /application\/json/)
+            .expect(200)
+            .expect(function(res2) {
+              assert(res2.body.access_token);
+              assert(res2.body.refresh_token);
+
+              assert.equal(res2.body.scope, 'weather');
+
+              var jwtTkn1 = decodeToken(res2.body.access_token);
+              var jwtTkn2 = decodeToken(res2.body.refresh_token);
+
+              //the jwt id should not be undefined
+              assert(jwtTkn1.jti);
+              assert(jwtTkn2.jti);
+
+              //token should be issued to this client
+              assert.equal(jwtTkn1.aud, clientId);
+              assert.equal(jwtTkn2.aud, clientId);
+
+              //access token should expire in 7 seconds
+              assert(res2.body.expires_in, 7);
+              assert.equal(7, (jwtTkn1.exp - jwtTkn1.iat) / 1000);
+
+              //while refresh token should expire in 12 seconds
+              assert.equal(12, (jwtTkn2.exp - jwtTkn2.iat) / 1000);
+            })
+            .end(function(err2) {
+              done(err2);
+            });
+        } catch(err) {
+          done(err);
+        }
+      })();
+    });
+  });
+
   describe('token endpoint - refresh token', function() {
     it('acceptance', function(done) {
       var data1 = {
           'grant_type': 'client_credentials',
           'client_id': clientId,
-          'client_secret': clientSecret
+          'client_secret': clientSecret,
+          'scope': 'stock weather'
       };
 
       //request the access token
@@ -503,7 +641,8 @@ describe('oauth2 token API', function() {
             'grant_type': 'refresh_token',
             'client_id': clientId,
             'client_secret': clientSecret,
-            'refresh_token': refreshToken
+            'refresh_token': refreshToken,
+            'scope': 'stock weather'
           };
 
           //exchange the refresh token with the access token
@@ -518,7 +657,7 @@ describe('oauth2 token API', function() {
               assert(res2.body.access_token !== res1.body.access_token);
               assert(res2.body.refresh_token !== res1.body.refresh_token);
 
-              assert.equal(res2.body.scope, undefined);
+              assert.equal(res2.body.scope, 'stock weather');
 
               var jwtTkn1 = decodeToken(res2.body.access_token);
               var jwtTkn2 = decodeToken(res2.body.refresh_token);
@@ -551,7 +690,8 @@ describe('oauth2 token API', function() {
         'grant_type': 'refresh_token',
         'client_id': clientId,
         'client_secret': clientSecret,
-        'refresh_token': 'CANNOT_BE_VALID'
+        'refresh_token': 'CANNOT_BE_VALID',
+        'scope': 'stock weather'
       };
 
       //exchange the refresh token with the access token
@@ -573,7 +713,8 @@ describe('oauth2 token API', function() {
         'grant_type': 'refresh_token',
         'client_id': clientId,
         'client_secret': clientSecret,
-        'refresh_token': 'eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJGLUJkZ19xdXdaemUzNnpMX1haem1RTGhtVjZteFY4OGlDRXZCSXVCdVo0IiwiYXVkIjoiNmE3NmMyN2YtZjNmMC00N2RkLThlNTgtNTA5MjRlNGExYmFiIiwiaWF0IjoxNDY2MDYzOTkxMDY0LCJleHAiOjE0NjYwNjQwMDMwNjR9.K-IVR5f442G0MhIBfQMMybjKm_J1LPrUM0xhPaNC82c'
+        'refresh_token': 'eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJGLUJkZ19xdXdaemUzNnpMX1haem1RTGhtVjZteFY4OGlDRXZCSXVCdVo0IiwiYXVkIjoiNmE3NmMyN2YtZjNmMC00N2RkLThlNTgtNTA5MjRlNGExYmFiIiwiaWF0IjoxNDY2MDYzOTkxMDY0LCJleHAiOjE0NjYwNjQwMDMwNjR9.K-IVR5f442G0MhIBfQMMybjKm_J1LPrUM0xhPaNC82c',
+        'scope': 'stock weather'
       };
 
       //exchange the refresh token with the access token
@@ -594,7 +735,8 @@ describe('oauth2 token API', function() {
       var data1 = {
           'grant_type': 'client_credentials',
           'client_id': clientId,
-          'client_secret': clientSecret
+          'client_secret': clientSecret,
+          'scope': 'stock weather'
       };
 
       //request the access token
@@ -608,7 +750,8 @@ describe('oauth2 token API', function() {
             'grant_type': 'refresh_token',
             'client_id': clientId,
             'client_secret': clientSecret,
-            'refresh_token': refreshToken
+            'refresh_token': refreshToken,
+            'scope': 'stock weather'
           };
 
           var timeout = 12 * 1000;
@@ -640,7 +783,8 @@ describe('oauth2 token API', function() {
       var data1 = {
           'grant_type': 'client_credentials',
           'client_id': clientId,
-          'client_secret': clientSecret
+          'client_secret': clientSecret,
+          'scope': 'stock weather'
       };
 
       //request the access token
@@ -653,7 +797,8 @@ describe('oauth2 token API', function() {
           var data2 = {
             'grant_type': 'refresh_token',
             'client_id': clientId,
-            'client_secret': clientSecret
+            'client_secret': clientSecret,
+            'scope': 'stock weather'
           };
 
           //exchange the refresh token for another two (=3-1) times
@@ -695,7 +840,8 @@ describe('oauth2 token API', function() {
       var data1 = {
           'grant_type': 'client_credentials',
           'client_id': clientId,
-          'client_secret': clientSecret
+          'client_secret': clientSecret,
+          'scope': 'stock weather'
       };
 
       //request the access token
@@ -707,7 +853,8 @@ describe('oauth2 token API', function() {
             'grant_type': 'refresh_token',
             'client_id': clientId,
             'client_secret': clientSecret,
-            'refresh_token': res1.body.refresh_token
+            'refresh_token': res1.body.refresh_token,
+            'scope': 'stock weather'
           };
 
           //Use the same refresh token twice. The second time should fail
@@ -753,7 +900,8 @@ describe('oauth2 token API', function() {
       var data1 = {
           'grant_type': 'client_credentials',
           'client_id': clientId,
-          'client_secret': clientSecret
+          'client_secret': clientSecret,
+          'scope': 'stock weather'
       };
 
       //request the access token
@@ -764,7 +912,8 @@ describe('oauth2 token API', function() {
           var data2 = {
             'grant_type': 'refresh_token',
             'client_id': clientId,
-            'refresh_token': res1.body.refresh_token
+            'refresh_token': res1.body.refresh_token,
+            'scope': 'stock weather'
           };
 
           //The refresh token will be revoked if there is auth error
@@ -822,7 +971,8 @@ describe('oauth2 token API', function() {
       var data = {
           'grant_type': 'FOO',
           'client_id': clientId,
-          'client_secret': clientSecret
+          'client_secret': clientSecret,
+          'scope': 'stock weather'
       };
 
       request.post('/oauth2/token')
@@ -847,7 +997,8 @@ describe('oauth2 token API', function() {
           'client_id': clientId2,
           'client_secret': clientSecret2,
           'username': 'test300',
-          'password': 'dp40test'
+          'password': 'dp40test',
+          'scope': 'stock weather'
       };
 
       request.post('/token/password/ldap')

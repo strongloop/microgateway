@@ -540,7 +540,7 @@
             }
           },
           "authorization": {
-            "type": "default-form"
+            "type": "authenticated"
           },
           "refresh-token": {
             "count": 3,
