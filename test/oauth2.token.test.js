@@ -124,11 +124,6 @@ describe('oauth2 token API', function() {
    * TODO:
    * resource server:
    *   access token expire:
-   *
-   * negatives:
-   *   bad request
-   *
-   * LDAP with tls profile
    */
 
   describe('token endpoint - client credential', function() {
@@ -720,6 +715,31 @@ describe('oauth2 token API', function() {
           done(err);
         }
       })();
+    });
+
+    it('without the required AZ code', function(done) {
+      //get the access token with the AZ code
+      var data = {
+          'grant_type': 'authorization_code',
+          'client_id': clientId,
+          'client_secret': clientSecret,
+          'redirect_uri': 'https://myApp.com/foo'
+      };
+
+      request.post('/oauth2/token')
+        .type('form')
+        .send(data)
+        .expect(400)
+        .expect(function(res) {
+          //check the error and error description
+          assert.equal(res.body.error,
+                  'invalid_request');
+          assert.equal(res.body.error_description,
+                  'Missing required parameter "code"');
+        })
+        .end(function(err) {
+          done(err);
+        });
     });
 
     it('invalid AZ code', function(done) {
