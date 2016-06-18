@@ -32,7 +32,7 @@ exports.start = function(port, definition) {
     var app       = express();
 
     //for analytics event publish
-    app.post('/x2020/v1/events/_bulk', rawParser, function(req, res, next) {
+    app.post('/v1/catalogs/*/analytics', rawParser, function(req, res, next) {
       logger.debug('got analytics event', req.headers);
       var urlParts = url.parse(req.originalUrl || req.url);
       var query = qs.parse(urlParts.query);
