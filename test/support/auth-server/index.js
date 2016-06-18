@@ -36,7 +36,7 @@ function theApplication(req, resp) {
                     if (auth.scheme == 'Basic') {
                         var token = (new Buffer(auth.token, 'base64')).toString('utf-8');
                         var tokens = token.split(':');
-                        if (tokens[0] !== 'root' || tokens[1] !== 'Hunter2') {
+                        if (!users[tokens[0]] || users[tokens[0]] !== tokens[1]) {
                             resp.writeHead(401);
                             resp.write('Not Authorized');
                             resp.end();
@@ -80,6 +80,8 @@ function theApplication(req, resp) {
 //two servers: Sarah and Sandy
 var sarahKeyf = fs.readFileSync(__dirname + '/sarah.key');
 var sarahCertf = fs.readFileSync(__dirname + '/sarah.crt');
+
+var users = require('./users');
 
 //The server 'Sarah'
 var sslOpts = {
