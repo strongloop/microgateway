@@ -44,8 +44,8 @@
       "members": []
     },
     "plan-registration": {
-      "apis": {
-        "0": {
+      "apis": [
+        {
           "id": "5762173fe4b076e106cb6247",
           "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb6247",
           "state": "running",
@@ -175,7 +175,7 @@
             ]
           }
         },
-        "1": {
+        {
           "id": "5762173ee4b076e106cb6246",
           "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173ee4b076e106cb6246",
           "state": "running",
@@ -296,7 +296,7 @@
             ]
           }
         },
-        "2": {
+        {
           "id": "5762173fe4b076e106cb6249",
           "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb6249",
           "state": "running",
@@ -489,7 +489,7 @@
             }
           }
         },
-        "3": {
+        {
           "id": "5762173fe4b076e106cb6248",
           "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb6248",
           "state": "running",
@@ -822,7 +822,7 @@
             }
           }
         },
-        "4": {
+        {
           "id": "5762173fe4b076e106cb624a",
           "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb624a",
           "state": "running",
@@ -1012,7 +1012,7 @@
             }
           }
         },
-        "5": {
+        {
           "id": "5762173fe4b076e106cb624b",
           "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb624b",
           "state": "running",
@@ -1210,7 +1210,7 @@
             }
           }
         }
-      },
+      ],
       "id": "basic-product:1.0.0:gold-plan",
       "plan": {
         "name": "gold-plan",
@@ -1356,8 +1356,8 @@
       "members": []
     },
     "plan-registration": {
-      "apis": {
-        "0": {
+      "apis": [
+        {
           "id": "5762173fe4b076e106cb6247",
           "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb6247",
           "state": "running",
@@ -1487,7 +1487,7 @@
             ]
           }
         },
-        "1": {
+        {
           "id": "5762173ee4b076e106cb6246",
           "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173ee4b076e106cb6246",
           "state": "running",
@@ -1608,7 +1608,7 @@
             ]
           }
         },
-        "2": {
+        {
           "id": "5762173fe4b076e106cb6248",
           "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb6248",
           "state": "running",
@@ -1941,7 +1941,7 @@
             }
           }
         }
-      },
+      ],
       "id": "basic-product:1.0.0:Limited",
       "plan": {
         "name": "Limited",

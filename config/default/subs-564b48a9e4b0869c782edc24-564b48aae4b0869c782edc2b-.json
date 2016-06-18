@@ -139,8 +139,8 @@
       "name": "trial",
       "title": "Trial Climb On"
     },
-    "apis": {
-      "ascents": {
+    "apis": [
+      {
         "id": "564b7b44e4b0869c782eddd2",
         "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b44e4b0869c782eddd2",
         "state": "running",
@@ -466,7 +466,7 @@
           }
         }
       }
-    }
+    ]
   }
 }, {
   "id": "564bc01be4b0869c782ee45c",
@@ -712,8 +712,8 @@
       "name": "gold",
       "title": "Gold Climb On"
     },
-    "apis": {
-      "ascents": {
+    "apis": [
+      {
         "id": "564b7b44e4b0869c782eddd2",
         "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b44e4b0869c782eddd2",
         "state": "running",
@@ -1039,7 +1039,7 @@
           }
         }
       }, 
-   "forecasts": {
+   {
       "id": "564b7b44e4b0869c782eddd5",
       "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b44e4b0869c782eddd5",
       "state": "running",
@@ -1344,7 +1344,7 @@
         }
       }
     }, 
-    "routes": {
+    {
       "id": "564b7b44e4b0869c782ede0a",
       "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b44e4b0869c782ede0a",
       "state": "running",
@@ -1896,7 +1896,7 @@
         }
       }
     }
-  }
+  ]
   }
 }, {
   "id": "564bc04fe4b0869c782ee4c3",
@@ -2104,8 +2104,8 @@
       "name": "silver",
       "title": "Silver Climb On"
     },
-    "apis": {
-      "ascents": {
+    "apis": [
+      {
         "id": "564b7b44e4b0869c782eddd2",
         "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b44e4b0869c782eddd2",
         "state": "running",
@@ -2431,7 +2431,7 @@
           }
         }
       }, 
-    "forecasts": {
+    {
       "id": "564b7b44e4b0869c782eddd5",
       "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b44e4b0869c782eddd5",
       "state": "running",
@@ -2736,6 +2736,6 @@
         }
       }
     }
-  }
+  ]
   }
 }]
