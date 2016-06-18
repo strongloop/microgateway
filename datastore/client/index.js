@@ -353,30 +353,33 @@ exports.getClientCredsById = function(snapshot, clientId, apiId, done) {
     }
 
     //lookup in the returned subscriptions
-    var found = false;
-    results.forEach(function(entry) {
-        var appCreds = entry['application'] &&
-                       entry['application']['app-credentials'];
-        if (appCreds) {
-          appCreds.forEach(function(appCred) {
-            //see if the given client subscribes the plan
-            if (clientId === appCred['client-id']) {
-              var apis = entry['plan-registration'] &&
-                         entry['plan-registration']['apis'];
-              for (var idx in apis) {
+    for (var idx = 0, len = results.length; idx < len; idx++) {
+      var entry = results[idx];
+      var appCreds = entry['application'] &&
+                     entry['application']['app-credentials'];
+      if (appCreds) {
+        for (var idx2 = 0, len2 = appCreds.length; idx2 < len2; idx2++) {
+          var appCred = appCreds[idx2];
+          //see if the given client subscribes the plan
+          if (clientId === appCred['client-id']) {
+            var apis = entry['plan-registration'] &&
+                       entry['plan-registration']['apis'];
+            if (apis.length === 0) {
+              //treat this as all apis are subscribed
+              return done(undefined, appCred);
+            } else {
+              for (var idx3 = 0, len3 = apis.length; idx3 < len3; idx3++) {
                 //see if the given api is included in the plan
-                if (typeof apis[idx] === 'object' && apis[idx].id === apiId) {
-                  found = true;
+                if (typeof apis[idx3] === 'object' && apis[idx3].id === apiId) {
                   return done(undefined, appCred);
                 }
               }
             }
-          });
+          }
         }
-    });
-
-    if (!found) {
-      return done('no matched client');
+      }
     }
+
+    return done('no matched client');
   });
 };
