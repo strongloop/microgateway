@@ -1517,7 +1517,7 @@
           "authorizationUrl": "",
           "flow": "implicit",
           "scopes": {
-            "/": "default root scope"
+            "/test102": "/test102"
           }
         }
       },
@@ -2959,7 +2959,7 @@
           "authorizationUrl": "",
           "flow": "implicit",
           "scopes": {
-            "/": "default root scope"
+            "/test200": "/test200"
           }
         }
       },
@@ -3070,7 +3070,7 @@
           "authorizationUrl": "",
           "flow": "implicit",
           "scopes": {
-            "/": "default root scope"
+            "/test202": "/test202"
           }
         }
       },
@@ -3181,7 +3181,7 @@
           "authorizationUrl": "",
           "flow": "implicit",
           "scopes": {
-            "/": "default root scope"
+            "/test203": "/test203"
           }
         }
       },
@@ -5614,7 +5614,7 @@
           "authorizationUrl": "",
           "flow": "implicit",
           "scopes": {
-            "/": "default root scope"
+            "/test400-auth-url": "/test400-auth-url"
           }
         }
       },
@@ -5725,7 +5725,7 @@
           "authorizationUrl": "",
           "flow": "implicit",
           "scopes": {
-            "/": "default root scope"
+            "/test402-auth-url": "/test402-auth-url"
           }
         }
       },
@@ -6058,7 +6058,7 @@
           "authorizationUrl": "",
           "flow": "implicit",
           "scopes": {
-            "/": "default root scope"
+            "/test405-client-cred": "/test405-client-cred"
           }
         }
       },
@@ -6170,7 +6170,7 @@
           "authorizationUrl": "",
           "flow": "implicit",
           "scopes": {
-            "/": "default root scope"
+            "/test406-client-cred": "/test406-client-cred"
           }
         }
       },
@@ -7342,7 +7342,7 @@
           "authorizationUrl": "",
           "flow": "implicit",
           "scopes": {
-            "/": "default root scope"
+            "/test1": "/test1"
           }
         }
       },
@@ -7453,7 +7453,7 @@
           "authorizationUrl": "",
           "flow": "implicit",
           "scopes": {
-            "/": "default root scope"
+            "/test500": "/test500"
           }
         }
       },
@@ -7564,7 +7564,7 @@
           "authorizationUrl": "",
           "flow": "implicit",
           "scopes": {
-            "/": "default root scope"
+            "/test501": "/test501"
           }
         }
       },
@@ -11850,7 +11850,7 @@
           "authorizationUrl": "",
           "flow": "implicit accessCode",
           "scopes": {
-            "/": "default root scope"
+            "/test600": "/test600"
           }
         }
       },
@@ -11962,7 +11962,7 @@
           "authorizationUrl": "",
           "flow": "accessCode",
           "scopes": {
-            "/": "default root scope"
+            "/test600rev": "/test600rev"
           }
         }
       },
@@ -12074,7 +12074,7 @@
           "authorizationUrl": "",
           "flow": "accessCode",
           "scopes": {
-            "/": "default root scope"
+            "/test600ro-rev": "/test600ro-rev"
           }
         }
       },
@@ -12186,7 +12186,7 @@
           "authorizationUrl": "",
           "flow": "implicit",
           "scopes": {
-            "/": "default root scope"
+            "/test606": "/test606"
           }
         }
       },
@@ -12401,7 +12401,7 @@
           "authorizationUrl": "",
           "flow": "implicit",
           "scopes": {
-            "/": "default root scope"
+            "/test600allYesterday": "/test600allYesterday"
           }
         }
       },
@@ -12513,7 +12513,7 @@
           "authorizationUrl": "",
           "flow": "implicit",
           "scopes": {
-            "/": "default root scope"
+            "/test600allTomorrow": "/test600allTomorrow"
           }
         }
       },
@@ -12625,7 +12625,7 @@
           "authorizationUrl": "",
           "flow": "implicit",
           "scopes": {
-            "/": "default root scope"
+            "/test600allTimezone": "/test600allTimezone"
           }
         }
       },
@@ -12737,7 +12737,7 @@
           "authorizationUrl": "",
           "flow": "implicit",
           "scopes": {
-            "/": "default root scope"
+            "/test600all": "/test600all"
           }
         }
       },
@@ -12840,7 +12840,7 @@
           "authorizationUrl": "",
           "flow": "implicit",
           "scopes": {
-            "/": "default root scope"
+            "/test600roRevNow": "/test600roRevNow"
           }
         }
       },
@@ -13037,7 +13037,7 @@
           "authorizationUrl": "",
           "flow": "implicit",
           "scopes": {
-            "/": "default root scope"
+            "/test621": "/test621"
           }
         }
       },
@@ -13131,7 +13131,7 @@
           "authorizationUrl": "",
           "flow": "implicit",
           "scopes": {
-            "/": "default root scope"
+            "/test901": "/test901"
           }
         }
       },
