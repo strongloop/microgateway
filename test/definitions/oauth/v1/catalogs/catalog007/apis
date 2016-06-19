@@ -950,7 +950,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost/basic-auth"
+              "url": "http://localhost:7000/basic-auth"
             }
           },
           "authorization": {
@@ -1098,8 +1098,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -1463,7 +1463,7 @@
         "description": "OAuth Protected API\n  provider = api102.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test102",
+      "basePath": "/test102",
       "paths": {
         "/res1": {
           "get": {
@@ -1538,8 +1538,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -2905,7 +2905,7 @@
         "description": "OAuth Protected API\n  provider = api200.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test200",
+      "basePath": "/test200",
       "paths": {
         "/res1": {
           "get": {
@@ -2980,8 +2980,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -3016,7 +3016,7 @@
         "description": "OAuth Protected API\n  provider = api202.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test202",
+      "basePath": "/test202",
       "paths": {
         "/res1": {
           "get": {
@@ -3091,8 +3091,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -3127,7 +3127,7 @@
         "description": "OAuth Protected API\n  provider = api203.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test203",
+      "basePath": "/test203",
       "paths": {
         "/res1": {
           "get": {
@@ -3202,8 +3202,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -5560,7 +5560,7 @@
         "description": "OAuth Protected API\n  provider = api400.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test400-auth-url",
+      "basePath": "/test400-auth-url",
       "paths": {
         "/res1": {
           "get": {
@@ -5635,8 +5635,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -5671,7 +5671,7 @@
         "description": "OAuth Protected API\n  provider = api402.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test402-auth-url",
+      "basePath": "/test402-auth-url",
       "paths": {
         "/res1": {
           "get": {
@@ -5746,8 +5746,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -5782,7 +5782,7 @@
         "description": "OAuth Protected API\n  provider = api403.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test403-resource-owner-password",
+      "basePath": "/test403-resource-owner-password",
       "paths": {
         "/res1": {
           "get": {
@@ -5857,8 +5857,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -5893,7 +5893,7 @@
         "description": "OAuth Protected API\n  provider = api404.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test404-resource-owner-password",
+      "basePath": "/test404-resource-owner-password",
       "paths": {
         "/res1": {
           "get": {
@@ -5968,8 +5968,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -6004,7 +6004,7 @@
         "description": "OAuth Protected API\n  provider = api405.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test405-client-cred",
+      "basePath": "/test405-client-cred",
       "paths": {
         "/res1": {
           "get": {
@@ -6080,8 +6080,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -6116,7 +6116,7 @@
         "description": "OAuth Protected API\n  provider = api456.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test406-client-cred",
+      "basePath": "/test406-client-cred",
       "paths": {
         "/res1": {
           "get": {
@@ -6192,8 +6192,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -7270,8 +7270,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -7306,7 +7306,7 @@
         "description": "OAuth Protected API\n  provider = api01.yaml\n  old tenant testcases = ten20_api0011.xml\n"
       },
       "host": "host.com",
-      "basePath": "test1",
+      "basePath": "/test1",
       "paths": {
         "/res3": {
           "get": {
@@ -7363,8 +7363,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -7399,7 +7399,7 @@
         "description": "OAuth Protected API\n  provider = api500.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test500",
+      "basePath": "/test500",
       "paths": {
         "/res1": {
           "get": {
@@ -7474,8 +7474,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -7510,7 +7510,7 @@
         "description": "OAuth Protected API\n  provider = api501.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test501",
+      "basePath": "/test501",
       "paths": {
         "/res1": {
           "get": {
@@ -7585,8 +7585,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -7621,7 +7621,7 @@
         "description": "OAuth Protected API\n  provider = api502.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test502",
+      "basePath": "/test502",
       "paths": {
         "/res1": {
           "get": {
@@ -7696,8 +7696,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -7732,7 +7732,7 @@
         "description": "OAuth Protected API\n  provider = api503.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test503",
+      "basePath": "/test503",
       "paths": {
         "/res1": {
           "get": {
@@ -7807,8 +7807,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -11872,8 +11872,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -11908,7 +11908,7 @@
         "description": "OAuth Protected API\n  provider = api601.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test600rev",
+      "basePath": "/test600rev",
       "paths": {
         "/res1": {
           "get": {
@@ -11984,8 +11984,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -12020,7 +12020,7 @@
         "description": "OAuth Protected API\n  provider = api602.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test600ro-rev",
+      "basePath": "/test600ro-rev",
       "paths": {
         "/res1": {
           "get": {
@@ -12096,8 +12096,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -12132,7 +12132,7 @@
         "description": "OAuth Protected API\n  provider = api606.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test606",
+      "basePath": "/test606",
       "paths": {
         "/res1": {
           "get": {
@@ -12208,8 +12208,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -12244,7 +12244,7 @@
         "description": "OAuth Protected API\n  provider = api609.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test609",
+      "basePath": "/test609",
       "paths": {
         "/res1": {
           "get": {
@@ -12311,8 +12311,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -12347,7 +12347,7 @@
         "description": "OAuth Protected API\n  provider = api610.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test600allYesterday",
+      "basePath": "/test600allYesterday",
       "paths": {
         "/res1": {
           "get": {
@@ -12423,8 +12423,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -12459,7 +12459,7 @@
         "description": "OAuth Protected API\n  provider = api611.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test600allTomorrow",
+      "basePath": "/test600allTomorrow",
       "paths": {
         "/res1": {
           "get": {
@@ -12535,8 +12535,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -12571,7 +12571,7 @@
         "description": "OAuth Protected API\n  provider = api612.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test600allTimezone",
+      "basePath": "/test600allTimezone",
       "paths": {
         "/res1": {
           "get": {
@@ -12647,8 +12647,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -12683,7 +12683,7 @@
         "description": "OAuth Protected API\n  provider = api613.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test600all",
+      "basePath": "/test600all",
       "paths": {
         "/res1": {
           "get": {
@@ -12759,8 +12759,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -12795,7 +12795,7 @@
         "description": "OAuth Protected API\n  provider = api614.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test600roRevNow",
+      "basePath": "/test600roRevNow",
       "paths": {
         "/res1": {
           "get": {
@@ -12862,8 +12862,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -12898,7 +12898,7 @@
         "description": "OAuth Protected API\n  provider = api615.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test600roRevNowAllClients",
+      "basePath": "/test600roRevNowAllClients",
       "paths": {
         "/res1": {
           "get": {
@@ -12974,8 +12974,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -13010,7 +13010,7 @@
         "description": "OAuth Protected API\n  provider = api621.yaml\n"
       },
       "host": "host.com",
-      "basePath": "test606",
+      "basePath": "/test606",
       "paths": {
         "/foo": {
           "get": {
@@ -13059,8 +13059,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
@@ -13095,7 +13095,7 @@
         "description": "OAuth Protected API\n"
       },
       "host": "host.com",
-      "basePath": "test901",
+      "basePath": "/test901",
       "paths": {
         "/res1": {
           "post": {
@@ -13153,8 +13153,8 @@
         "assembly": {
           "execute": [
             {
-              "proxy": {
-                "title": "proxy",
+              "invoke": {
+                "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
               }
             }
