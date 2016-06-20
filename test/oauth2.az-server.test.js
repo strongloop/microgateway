@@ -239,9 +239,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined);
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
             var match = actionURL.exec(res.text);
-            var match2 = transactionID.exec(res.text);
 
             request.post(decodeAMP(match[1]))
             .set('cookie', cookie[0].split(';')[0])
@@ -250,14 +248,9 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=invalidtransactionid')
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302);
-                var location = res2.header.location;
-                var uri = url.parse(location);
-                uri.query = qs.parse(uri.hash.substring(1));
-                assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-                  'incorrect redirect_uri');
-                assert(uri.query.error === 'server_error', 'incorrect error code');
-                assert(uri.query.state === 'xyz', 'incorrect state');
+                assert(res2.statusCode === 403, 'not 403');
+                assert(res2.text.indexOf('Unable to load OAuth 2.0 transaction') !== -1,
+                    'incorrect error msg');
                 done(err2);
               } catch (e2) {
                 done(e2);
@@ -283,9 +276,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no set-cookie');
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
             var match = actionURL.exec(res.text);
-            var match2 = transactionID.exec(res.text);
 
             request.post(decodeAMP(match[1]))
             .set('cookie', cookie[0].split(';')[0])
@@ -294,13 +285,9 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=invalidtransactionid')
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302, 'not 302 redirect response');
-                var location = res2.header.location;
-                var uri = url.parse(location, true);
-                assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-                  'incorrect redirect_uri');
-                assert(uri.query.state === 'xyz', 'incorrect state');
-                assert(uri.query.error === 'server_error', 'incorrect error code');
+                assert(res2.statusCode === 403, 'not 403');
+                assert(res2.text.indexOf('Unable to load OAuth 2.0 transaction') !== -1,
+                    'incorrect error msg');
                 done(err2);
               } catch(e2) {
                 done(e2);
@@ -337,14 +324,10 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302);
-                var location = res2.header.location;
-                var uri = url.parse(location);
-                uri.query = qs.parse(uri.hash.substring(1));
-                assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-                  'incorrect redirect_uri');
-                assert(uri.query.error === 'unauthorized_client', 'incorrect error code');
-                assert(uri.query.state === 'xyz', 'incorrect state');
+                assert(res2.statusCode === 401, 'not 401');
+                assert(res2.header['www-authenticate'] === undefined,
+                    'extra www-authenticate header');
+                assert(res2.text.indexOf('Failed to authenticate the user') !== -1);
                 done(err2);
               } catch (e2) {
                 done(e2);
@@ -381,13 +364,10 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302, 'not 302 redirect response');
-                var location = res2.header.location;
-                var uri = url.parse(location, true);
-                assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-                  'incorrect redirect_uri');
-                assert(uri.query.state === 'xyz', 'incorrect state');
-                assert(uri.query.error === 'unauthorized_client', 'incorrect error code');
+                assert(res2.statusCode === 401, 'not 401');
+                assert(res2.header['www-authenticate'] === undefined,
+                    'extra www-authenticate header');
+                assert(res2.text.indexOf('Failed to authenticate the user') !== -1);
                 done(err2);
               } catch(e2) {
                 done(e2);
@@ -557,14 +537,10 @@ describe('oauth2 AZ-server', function() {
         .auth('root', 'wrongpassword')
         .end(function(err, res) {
           try {
-            assert(res.statusCode === 302, 'not 302 redirect response');
-            var location = res.header.location;
-            var uri = url.parse(location);
-            uri.query = qs.parse(uri.hash.substring(1));
-            assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-              'incorrect redirect_uri');
-            assert(uri.query.error === 'unauthorized_client', 'in correct error code');
-            assert(uri.query.state === 'xyz', 'incorrect state');
+            assert(res.statusCode === 401, 'not 401');
+            assert(res.header['www-authenticate'] === 'Basic realm="apim"',
+                'no or incorrect www-authenticate header');
+            assert(res.text.indexOf('Failed to authenticate the user') !== -1);
             done(err);
           } catch (e) {
             done(e);
@@ -582,13 +558,10 @@ describe('oauth2 AZ-server', function() {
         .auth('root', 'wrong password')
         .end(function(err, res) {
           try {
-            assert(res.statusCode === 302, 'not 302 redirect response');
-            var location = res.header.location;
-            var uri = url.parse(location, true);
-            assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-              'incorrect redirect_uri');
-            assert(uri.query.state === 'xyz', 'incorrect state');
-            assert(uri.query.error === 'unauthorized_client', 'in correct error code');
+            assert(res.statusCode === 401, 'not 401');
+            assert(res.header['www-authenticate'] === 'Basic realm="apim"',
+                'no or incorrect www-authenticate header');
+            assert(res.text.indexOf('Failed to authenticate the user') !== -1);
             done(err);
           } catch (e) {
             done(e);
@@ -794,9 +767,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined);
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
             var match = actionURL.exec(res.text);
-            var match2 = transactionID.exec(res.text);
 
             request.post(decodeAMP(match[1]))
             .set('cookie', cookie[0].split(';')[0])
@@ -805,15 +776,10 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=invalidtransactionid')
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302, 'not 302 redirect response');
-                var location = res2.header.location;
-                var uri = url.parse(location);
-                uri.query = qs.parse(uri.hash.substring(1));
-                assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-                  'incorrect redirect_uri');
-                assert(uri.query.error === 'server_error', 'incorrect error code');
-                assert(uri.query.state === 'xyz', 'incorrect state');
-                done(err);
+                assert(res2.statusCode === 403, 'not 403');
+                assert(res2.text.indexOf('Unable to load OAuth 2.0 transaction') !== -1,
+                    'incorrect error msg');
+                done(err2);
               } catch (e2) {
                 done(e2);
               }
@@ -839,9 +805,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no set-cookie');
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
             var match = actionURL.exec(res.text);
-            var match2 = transactionID.exec(res.text);
 
             request.post(decodeAMP(match[1]))
             .set('cookie', cookie[0].split(';')[0])
@@ -850,14 +814,10 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=invalidtransactionid')
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302, 'not 302 redirect response');
-                var location = res2.header.location;
-                var uri = url.parse(location, true);
-                assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-                  'incorrect redirect_uri');
-                assert(uri.query.state === 'xyz', 'incorrect state');
-                assert(uri.query.error === 'server_error', 'incorrect error code');
-                done(err);
+                assert(res2.statusCode === 403, 'not 403');
+                assert(res2.text.indexOf('Unable to load OAuth 2.0 transaction') !== -1,
+                    'incorrect error msg');
+                done(err2);
               } catch(e2) {
                 done(e2);
               }
@@ -893,15 +853,11 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302, 'not 302 redirect response');
-                var location = res2.header.location;
-                var uri = url.parse(location);
-                uri.query = qs.parse(uri.hash.substring(1));
-                assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-                  'incorrect redirect_uri');
-                assert(uri.query.error === 'unauthorized_client', 'incorrect error code');
-                assert(uri.query.state === 'xyz', 'incorrect state');
-                done(err);
+                assert(res2.statusCode === 401, 'not 401');
+                assert(res2.header['www-authenticate'] === undefined,
+                    'extra www-authenticate header');
+                assert(res2.text.indexOf('Failed to authenticate the user') !== -1);
+                done(err2);
               } catch (e2) {
                 done(e2);
               }
@@ -938,14 +894,11 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302, 'not 302 redirect response');
-                var location = res2.header.location;
-                var uri = url.parse(location, true);
-                assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-                  'incorrect redirect_uri');
-                assert(uri.query.state === 'xyz', 'incorrect state');
-                assert(uri.query.error === 'unauthorized_client', 'incorrect error code');
-                done(err);
+                assert(res2.statusCode === 401, 'not 401');
+                assert(res2.header['www-authenticate'] === undefined,
+                    'extra www-authenticate header');
+                assert(res2.text.indexOf('Failed to authenticate the user') !== -1);
+                done(err2);
               } catch(e2) {
                 done(e2);
               }
@@ -981,14 +934,11 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302, 'not 302 redirect response');
-                var location = res2.header.location;
-                var uri = url.parse(location, true);
-                assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-                  'incorrect redirect_uri');
-                assert(uri.query.state === 'xyz', 'incorrect state');
-                assert(uri.query.error === 'unauthorized_client', 'incorrect error code');
-                done(err);
+                assert(res2.statusCode === 401, 'not 401');
+                assert(res2.header['www-authenticate'] === undefined,
+                    'extra www-authenticate header');
+                assert(res2.text.indexOf('Failed to authenticate the user') !== -1);
+                done(err2);
               } catch(e2) {
                 done(e2);
               }
@@ -1190,14 +1140,10 @@ describe('oauth2 AZ-server', function() {
             .query({'app-name': uri.query['app-name']})
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302, 'not 302 redirect response');
-                var location = res2.header.location;
-                var uri = url.parse(location);
-                uri.query = qs.parse(uri.hash.substring(1));
-                assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-                  'incorrect redirect_uri');
-                assert(uri.query.state === 'xyz', 'incorrect state');
-                assert(uri.query.error === 'unauthorized_client', 'incorrect error code');
+                assert(res2.statusCode === 401, 'not 401');
+                assert(res2.header['www-authenticate'] === undefined,
+                    'extra www-authenticate header');
+                assert(res2.text.indexOf('Failed to authenticate the user') !== -1);
                 done(err2);
               } catch(e2) {
                 done(e2);
@@ -1243,13 +1189,10 @@ describe('oauth2 AZ-server', function() {
             .query({'app-name': uri.query['app-name']})
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302, 'not 302 redirect response');
-                var location = res2.header.location;
-                var uri = url.parse(location, true);
-                assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-                  'incorrect redirect_uri');
-                assert(uri.query.state === 'xyz', 'incorrect state');
-                assert(uri.query.error === 'unauthorized_client', 'incorrect error code');
+                assert(res2.statusCode === 401, 'not 401');
+                assert(res2.header['www-authenticate'] === undefined,
+                    'extra www-authenticate header');
+                assert(res2.text.indexOf('Failed to authenticate the user') !== -1);
                 done(err2);
               } catch(e2) {
                 done(e2);
@@ -1591,14 +1534,10 @@ describe('oauth2 AZ-server', function() {
         .auth('root', 'wrongpassword')
         .end(function(err, res) {
           try {
-            assert(res.statusCode === 302, 'not 302 redirect response');
-            var location = res.header.location;
-            var uri = url.parse(location);
-            uri.query = qs.parse(uri.hash.substring(1));
-            assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-              'incorrect redirect_uri');
-            assert(uri.query.error === 'unauthorized_client', 'in correct error code');
-            assert(uri.query.state === 'xyz', 'incorrect state');
+            assert(res.statusCode === 401, 'not 401');
+            assert(res.header['www-authenticate'] === 'Basic realm="apim"',
+                'no or incorrect www-authenticate header');
+            assert(res.text.indexOf('Failed to authenticate the user') !== -1);
             done(err);
           } catch (e) {
             done(e);
@@ -1616,13 +1555,10 @@ describe('oauth2 AZ-server', function() {
         .auth('root', 'wrong password')
         .end(function(err, res) {
           try {
-            assert(res.statusCode === 302, 'not 302 redirect response');
-            var location = res.header.location;
-            var uri = url.parse(location, true);
-            assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-              'incorrect redirect_uri');
-            assert(uri.query.state === 'xyz', 'incorrect state');
-            assert(uri.query.error === 'unauthorized_client', 'in correct error code');
+            assert(res.statusCode === 401, 'not 401');
+            assert(res.header['www-authenticate'] === 'Basic realm="apim"',
+                'no or incorrect www-authenticate header');
+            assert(res.text.indexOf('Failed to authenticate the user') !== -1);
             done(err);
           } catch (e) {
             done(e);
@@ -2141,9 +2077,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined);
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
             var match = actionURL.exec(res.text);
-            var match2 = transactionID.exec(res.text);
 
             request.post(decodeAMP(match[1]))
             .set('cookie', cookie[0].split(';')[0])
@@ -2152,14 +2086,9 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=invalidtransactionid')
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302, 'not 302 redirect response');
-                var location = res2.header.location;
-                var uri = url.parse(location);
-                uri.query = qs.parse(uri.hash.substring(1));
-                assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-                  'incorrect redirect_uri');
-                assert(uri.query.error === 'server_error', 'incorrect error code');
-                assert(uri.query.state === 'xyz', 'incorrect state');
+                assert(res2.statusCode === 403, 'not 403');
+                assert(res2.text.indexOf('Unable to load OAuth 2.0 transaction') !== -1,
+                    'incorrect error msg');
                 done(err2);
               } catch (e2) {
                 done(e2);
@@ -2185,9 +2114,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no set-cookie');
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
             var match = actionURL.exec(res.text);
-            var match2 = transactionID.exec(res.text);
 
             request.post(decodeAMP(match[1]))
             .set('cookie', cookie[0].split(';')[0])
@@ -2196,13 +2123,9 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=invalidtransactionid')
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302, 'not 302 redirect response');
-                var location = res2.header.location;
-                var uri = url.parse(location, true);
-                assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-                  'incorrect redirect_uri');
-                assert(uri.query.state === 'xyz', 'incorrect state');
-                assert(uri.query.error === 'server_error', 'incorrect error code');
+                assert(res2.statusCode === 403, 'not 403');
+                assert(res2.text.indexOf('Unable to load OAuth 2.0 transaction') !== -1,
+                    'incorrect error msg');
                 done(err2);
               } catch(e2) {
                 done(e2);
@@ -2239,14 +2162,10 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302, 'not 302 redirect response');
-                var location = res2.header.location;
-                var uri = url.parse(location);
-                uri.query = qs.parse(uri.hash.substring(1));
-                assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-                  'incorrect redirect_uri');
-                assert(uri.query.error === 'unauthorized_client', 'incorrect error code');
-                assert(uri.query.state === 'xyz', 'incorrect state');
+                assert(res2.statusCode === 401, 'not 401');
+                assert(res2.header['www-authenticate'] === undefined,
+                    'extra www-authenticate header');
+                assert(res2.text.indexOf('Failed to authenticate the user') !== -1);
                 done(err2);
               } catch (e2) {
                 done(e2);
@@ -2283,13 +2202,10 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 302, 'not 302 redirect response');
-                var location = res2.header.location;
-                var uri = url.parse(location, true);
-                assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-                  'incorrect redirect_uri');
-                assert(uri.query.state === 'xyz', 'incorrect state');
-                assert(uri.query.error === 'unauthorized_client', 'incorrect error code');
+                assert(res2.statusCode === 401, 'not 401');
+                assert(res2.header['www-authenticate'] === undefined,
+                    'extra www-authenticate header');
+                assert(res2.text.indexOf('Failed to authenticate the user') !== -1);
                 done(err2);
               } catch(e2) {
                 done(e2);
