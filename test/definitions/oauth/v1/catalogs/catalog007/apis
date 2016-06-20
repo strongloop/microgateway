@@ -5432,7 +5432,8 @@
           "authorization": {
             "type": "default-form"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -5631,7 +5632,8 @@
           "authorization": {
             "type": "default-form"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -6632,7 +6634,8 @@
           "refresh-token": {
             "count": 2048
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -6965,7 +6968,8 @@
           "refresh-token": {
             "count": 2048
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -7162,7 +7166,8 @@
           "refresh-token": {
             "count": 2048
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -7358,7 +7363,8 @@
           "refresh-token": {
             "count": 2048
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -8322,7 +8328,8 @@
             "url": "https://127.0.0.1:7200/service/revocation",
             "tls-profile": "api-sslcli-all"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -8655,7 +8662,8 @@
             "url": "https://127.0.0.1:7200/service/revocation/revokelasttoken",
             "tls-profile": "api-sslcli-all"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -8989,7 +8997,8 @@
             "url": "https://127.0.0.1:7200/service/revocation/revokeResourceOwner",
             "tls-profile": "api-sslcli-all"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -9319,7 +9328,8 @@
           "authorization": {
             "type": "default-form"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -9652,7 +9662,8 @@
             "url": "https://fail:7200/service/revocation",
             "tls-profile": "api-sslcli-all"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -9985,7 +9996,8 @@
             "url": "https://127.0.0.1:7200/service/revocation/allRevokedYesterday",
             "tls-profile": "api-sslcli-all"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -10318,7 +10330,8 @@
             "url": "https://127.0.0.1:7200/service/revocation/allRevokedTomorrow",
             "tls-profile": "api-sslcli-all"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -10651,7 +10664,8 @@
             "url": "https://127.0.0.1:7200/service/revocation/allRevokedNowOnDiffTimezone",
             "tls-profile": "api-sslcli-all"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -10984,7 +10998,8 @@
             "url": "https://127.0.0.1:7200/service/revocation/allRevokedNoDate",
             "tls-profile": "api-sslcli-all"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -11317,7 +11332,8 @@
             "url": "https://127.0.0.1:7200/service/revocation/roRevokeNow",
             "tls-profile": "api-sslcli-all"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -11650,7 +11666,8 @@
             "url": "https://127.0.0.1:7200/service/revocation/roRevokeNowAllClients",
             "tls-profile": "api-sslcli-all"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
@@ -11981,7 +11998,8 @@
           "authorization": {
             "type": "authenticated"
           }
-        }
+        },
+        "type": "oauth"
       },
       "definitions": {
         "access_token_response": {
