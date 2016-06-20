@@ -155,14 +155,14 @@ describe('basic auth policy', function() {
     });
 
     describe('ComposeUPN', function () {
-      it('should pass with user1:c@pstone123', function (done) {
+      it.skip('should pass with user1:c@pstone123', function (done) {
         request
         .get('/basic/compose-upn')
         .auth('user1', 'c@pstone123')
         .expect(200, done);
       });
 
-      it('should fail with user1:capstone123', function (done) {
+      it.skip('should fail with user1:capstone123', function (done) {
         request
         .get('/basic/compose-upn')
         .auth('user1', 'capstone123')
