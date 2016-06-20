@@ -285,7 +285,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -620,7 +622,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -1397,7 +1401,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -2833,7 +2839,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -4162,7 +4170,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -4924,12 +4934,7 @@
             ],
             "summary": "Request Access Tokens",
             "description": "This endpoint allows requesting an access token following one of the flows below:\n- Authorization Code (exchange code for access token)\n- Client Credentials (2-legged, there isnt resource owner information)\n- Resource Owner Password Credentials (2-legged, client provides resource owner name and password)\n- Refresh Token (exchange refresh token for a new access code)\n\nThe table below indicates the required parameters for each specific grant_type options.\nEmpty cells indicate a parameter is ignored for that specific grant type.\n\nClient authentication:\n- Confidential clients should authenticate using HTTP Basic Authentication. Alternatively, they may post\n  their client_id and client_secret information as a formData parameter.\n- Public clients should send their client_id as formData parameter.\n\n| grant_type           | code       | client_credentials | password    | refresh_token |\n|----------------------|------------|--------------------|-------------|---------------|\n| client_id            | required*  | required*          | required*   | required*     |\n| client_secret        | required*  | required*          | required*   | required*     |\n| code                 | required   |                    |             |               |\n| redirect_uri         | required   |                    |             |               |\n| username             |            |                    | required    |               |\n| password             |            |                    | required    |               |\n| scope                |            | optional           | optional    |               |\n| refresh_token        |            |                    |             | required      |\n\nThe implicit grant requests, see /oauth/authorize.\n",
-            "security": [
-              {
-                "clientID": [],
-                "clientSecret": []
-              }
-            ],
+            "security": [],
             "parameters": [
               {
                 "name": "grant_type",
@@ -4956,10 +4961,40 @@
                 "type": "string"
               },
               {
-                "name": "scope",
+                "name": "code",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "redirect_uri",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "username",
                 "in": "formData",
                 "type": "string",
+                "required": false
+              },
+              {
+                "name": "password",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "scope",
+                "in": "formData",
                 "description": "Scope being requested",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "refresh_token",
+                "in": "formData",
+                "type": "string",
                 "required": false
               }
             ],
@@ -5115,10 +5150,46 @@
                 "type": "string"
               },
               {
-                "name": "scope",
+                "name": "client_secret",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "code",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "redirect_uri",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "username",
                 "in": "formData",
                 "type": "string",
+                "required": false
+              },
+              {
+                "name": "password",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "scope",
+                "in": "formData",
                 "description": "Scope being requested",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "refresh_token",
+                "in": "formData",
+                "type": "string",
                 "required": false
               }
             ],
@@ -5286,10 +5357,40 @@
                 "type": "string"
               },
               {
-                "name": "scope",
+                "name": "code",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "redirect_uri",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "username",
                 "in": "formData",
                 "type": "string",
+                "required": false
+              },
+              {
+                "name": "password",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "scope",
+                "in": "formData",
                 "description": "Scope being requested",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "refresh_token",
+                "in": "formData",
+                "type": "string",
                 "required": false
               }
             ],
@@ -5455,10 +5556,40 @@
                 "type": "string"
               },
               {
-                "name": "scope",
+                "name": "code",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "redirect_uri",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "username",
                 "in": "formData",
                 "type": "string",
+                "required": false
+              },
+              {
+                "name": "password",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "scope",
+                "in": "formData",
                 "description": "Scope being requested",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "refresh_token",
+                "in": "formData",
+                "type": "string",
                 "required": false
               }
             ],
@@ -6491,7 +6622,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -6822,7 +6955,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -6950,10 +7085,40 @@
                 "type": "string"
               },
               {
-                "name": "scope",
+                "name": "code",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "redirect_uri",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "username",
                 "in": "formData",
                 "type": "string",
+                "required": false
+              },
+              {
+                "name": "password",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "scope",
+                "in": "formData",
                 "description": "Scope being requested",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "refresh_token",
+                "in": "formData",
+                "type": "string",
                 "required": false
               }
             ],
@@ -6987,7 +7152,9 @@
             "type": "default-form"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -7108,10 +7275,46 @@
                 "type": "string"
               },
               {
-                "name": "scope",
+                "name": "client_secret",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "code",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "redirect_uri",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "username",
                 "in": "formData",
                 "type": "string",
+                "required": false
+              },
+              {
+                "name": "password",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "scope",
+                "in": "formData",
                 "description": "Scope being requested",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "refresh_token",
+                "in": "formData",
+                "type": "string",
                 "required": false
               }
             ],
@@ -7145,7 +7348,9 @@
             "type": "default-form"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -8103,7 +8308,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -8434,7 +8641,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -8766,7 +8975,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -9101,7 +9312,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -9425,7 +9638,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -9756,7 +9971,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -10087,7 +10304,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -10418,7 +10637,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -10749,7 +10970,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -11080,7 +11303,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -11411,7 +11636,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
