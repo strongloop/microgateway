@@ -15,7 +15,7 @@ var path          = require('path');
 
 describe('policy-loader', function() {
     describe('load default policy', function() {
-        it('should contains cors, invoke, redaction set-variable', function() {
+        it('should contain cors, invoke, redaction set-variable', function() {
             var pl = policyLoader.create(path.resolve(__dirname, '..', 'policies'));
             pl.should.be.a.Object();
             var policies = pl.getPolicies();
@@ -55,7 +55,7 @@ describe('policy-loader', function() {
             function next() {};
             policies.mypolicy1({}, context, next);
             //the second mypolicy1 override the first one
-            context.policyName.should.exactly('mypolicy1a').and.be.a.String();
+            context.policyName.should.exactly('mypolicy1').and.be.a.String();
             policies.mypolicy2({}, context, next);
             context.policyName.should.exactly('mypolicy2').and.be.a.String();
             policies.mypolicy3({}, context, next);
@@ -120,7 +120,7 @@ describe('policy-loader', function() {
             function next() {};
             policies.mypolicy1({}, context, next);
             //the second mypolicy1 override the first one
-            context.policyName.should.exactly('mypolicy1a').and.be.a.String();
+            context.policyName.should.exactly('mypolicy1').and.be.a.String();
             done();
         });
 
@@ -191,4 +191,3 @@ describe('policy-loader', function() {
         });
       });
 });
-
