@@ -608,6 +608,59 @@ describe('oauth2 token API', function() {
       })();
     });
 
+    it('bad credential', function(done) {
+      sendAZRequest(request, done, function (err, res) {
+        try {
+          assert(res.statusCode === 302, '302 redirect failed');
+          var uri = url.parse(res.header.location, true);
+          var code = uri.query.code;
+
+          //get the access token with the AZ code
+          var data = {
+              'grant_type': 'authorization_code',
+              'client_id': clientId,
+              'client_secret': 'badpass',
+              'code': code,
+              'redirect_uri': 'https://myApp.com/foo'
+          };
+
+          request.post('/oauth2/token')
+            .type('form')
+            .send(data)
+            .expect(401)
+            .expect(function(res2) {
+              //check the error and error description
+              assert.equal(res2.body.error,
+                      'invalid_client');
+              assert.equal(res2.body.error_description,
+                      'Authentication error');
+
+              //The previous AZ code should have been deleted
+              data.client_secret = clientSecret;
+              request.post('/oauth2/token')
+                .type('form')
+                .send(data)
+                .expect(403)
+                .expect(function(res3) {
+                  //check the error and error description
+                  assert.equal(res3.body.error,
+                          'invalid_grant');
+                  assert.equal(res3.body.error_description,
+                          'Invalid authorization code');
+                })
+                .end(function(err3) {
+                  done(err3);
+                });
+            })
+            .end(function(err2) {
+              assert(!err2)
+            });
+        } catch(err) {
+          done(err);
+        }
+      })();
+    });
+
     it('without the required redirect_uri', function(done) {
       sendAZRequest(request, done, function (err, res) {
         try {
