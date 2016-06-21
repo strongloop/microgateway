@@ -60,7 +60,7 @@ describe('oauth2 AZ-server', function() {
         .catch(done);
     });
 
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
     it('green path - token', function(done) {
       request.get('/security/oauth2/authorize')
@@ -73,7 +73,7 @@ describe('oauth2 AZ-server', function() {
           try {
             assert(err === null && res.ok === true, 'initial AZ request failed');
             var cookie = res.header['set-cookie'];
-            assert(cookie !== undefined);
+            assert(cookie !== undefined, 'no cookie');
 
             var actionURL = /action="(.*?)"/g;
             var transactionID = /name="transaction_id".*value="(.*?)"/g;
@@ -422,7 +422,7 @@ describe('oauth2 AZ-server', function() {
         .catch(done);
     });
 
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
     it('green path - token', function(done) {
       request.get('/security/oauth2/authorize')
@@ -612,7 +612,7 @@ describe('oauth2 AZ-server', function() {
         .catch(done);
     });
 
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
     it('green path - token', function(done) {
       request.get('/security/oauth2/authorize')
@@ -992,7 +992,7 @@ describe('oauth2 AZ-server', function() {
         .catch(done);
     });
 
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
     it('green path - token', function(done) {
       request.get('/security/oauth2/authorize')
@@ -1350,7 +1350,7 @@ describe('oauth2 AZ-server', function() {
         .catch(done);
     });
 
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
     it('green path - token', function(done) {
       request.get('/security/oauth2/authorize')
@@ -1853,7 +1853,7 @@ describe('oauth2 AZ-server', function() {
         .catch(done);
     });
 
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
     it('green path - token', function(done) {
       request.get('/security/oauth2/authorize')
