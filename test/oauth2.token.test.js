@@ -386,6 +386,54 @@ describe('oauth2 token API', function() {
         });
     });
 
+    it('confidential client must provide client_secret', function(done) {
+      var data = {
+          'grant_type': 'password',
+          'client_id': clientId,
+          'username': 'root',
+          'password': 'Hunter2',
+          'scope': 'stock weather'
+      };
+
+      request.post('/oauth2/token')
+        .type('form')
+        .send(data)
+        .expect(400)
+        .expect(function(res) {
+          //check the error and error description
+          assert.equal(res.body.error,
+                  'invalid_request');
+          assert.equal(res.body.error_description,
+                  'Missing required parameter: client_*');
+        })
+        .end(function(err, res) {
+          done(err);
+        });
+    });
+
+    //client_secret is not required for public client
+    it('public client does not provide client_secret', function(done) {
+      var data = {
+          'grant_type': 'password',
+          'client_id': clientId,
+          'username': 'root',
+          'password': 'Hunter2',
+          'scope': 'stock weather'
+      };
+
+      request.post('/public/oauth2/token')
+        .type('form')
+        .send(data)
+        .expect(200)
+        .expect(function(res) {
+          assert(res.body.access_token);
+          assert(res.body.refresh_token);
+        })
+        .end(function(err, res) {
+          done(err);
+        });
+    });
+
     it('user/password are required', function(done) {
       var data = {
           'grant_type': 'password',
