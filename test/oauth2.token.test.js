@@ -894,7 +894,6 @@ describe('oauth2 token API', function() {
             'refresh_token': refreshToken,
             'scope': 'stock weather'
           };
-
           //exchange the refresh token with the access token
           request.post('/oauth2/token')
             .type('form')
@@ -924,6 +923,196 @@ describe('oauth2 token API', function() {
               assert.equal(7, (jwtTkn1.exp - jwtTkn1.iat) / 1000);
               //while refresh token should expire in 12 seconds
               assert.equal(12, (jwtTkn2.exp - jwtTkn2.iat) / 1000);
+            })
+            .end(function(err, res) {
+              done(err);
+            });
+
+        })
+        .end(function(err, res) {
+          assert(!err);
+        });
+    });
+
+    //clients are not allowed to get refresh token from the token endpoint A,
+    //and then renew the access token from the token endpoint B.
+    it('must not renew the access token using the other API', function(done) {
+      var data1 = {
+          'grant_type': 'client_credentials',
+          'client_id': clientId,
+          'client_secret': clientSecret,
+          'scope': 'stock weather'
+      };
+
+      //request the access token
+      request.post('/oauth2/token')
+        .type('form')
+        .send(data1)
+        .expect(200)
+        .expect(function(res1) {
+          var refreshToken = res1.body.refresh_token;
+
+          var data2 = {
+            'grant_type': 'refresh_token',
+            'client_id': clientId,
+            'client_secret': clientSecret,
+            'refresh_token': refreshToken,
+            'scope': 'stock weather'
+          };
+
+          //exchange the refresh token using the wrong API endpoint
+          //the refresh token won't be recognized
+          request.post('/public/oauth2/token')
+            .type('form')
+            .send(data2)
+            .expect(403)
+            .expect(function(res2) {
+              assert.equal(res2.body.error,
+                      'invalid_grant');
+              assert.equal(res2.body.error_description,
+                      'Invalid refresh token');
+            })
+            .end(function(err, res) {
+              done(err);
+            });
+
+        })
+        .end(function(err, res) {
+          assert(!err);
+        });
+    });
+
+    //a public client doesn't need to authenticate with AZ server
+    it('public client may skip authentication', function(done) {
+      //no client_secret is provided
+      var data1 = {
+          'grant_type': 'password',
+          'username': 'root',
+          'password': 'Hunter2',
+          'client_id': clientId,
+          'scope': 'stock weather'
+      };
+
+      request.post('/public/oauth2/token')
+        .type('form')
+        .send(data1)
+        .expect(200)
+        .expect(function(res1) {
+          var refreshToken = res1.body.refresh_token;
+
+          //no client_secret is provided for the authentication
+          var data2 = {
+            'grant_type': 'refresh_token',
+            'client_id': clientId,
+            'refresh_token': refreshToken,
+            'scope': 'stock weather'
+          };
+
+          request.post('/public/oauth2/token')
+            .type('form')
+            .send(data2)
+            .expect(200)
+            .expect(function(res2) {
+              assert(res2.body.access_token);
+              assert(res2.body.refresh_token);
+            })
+            .end(function(err, res) {
+              done(err);
+            });
+
+        })
+        .end(function(err, res) {
+          assert(!err);
+        });
+    });
+
+    //if client_secret is provided, it will always be validated
+    it('even public client must not provide invalid secret', function(done) {
+      //no client_secret is provided
+      var data1 = {
+          'grant_type': 'password',
+          'username': 'root',
+          'password': 'Hunter2',
+          'client_id': clientId,
+          'scope': 'stock weather'
+      };
+
+      //request the access token
+      request.post('/public/oauth2/token')
+        .type('form')
+        .send(data1)
+        .expect(200)
+        .expect(function(res1) {
+          var refreshToken = res1.body.refresh_token;
+
+          //invalid client_secret is provided
+          var data2 = {
+            'grant_type': 'refresh_token',
+            'client_id': clientId,
+            'client_secret': 'badpass',
+            'refresh_token': refreshToken,
+            'scope': 'stock weather'
+          };
+
+          //exchange the refresh token with the access token
+          request.post('/public/oauth2/token')
+            .type('form')
+            .send(data2)
+            .expect(401)
+            .expect(function(res2) {
+              //check the error and error description
+              assert.equal(res2.body.error,
+                      'invalid_client');
+              assert.equal(res2.body.error_description,
+                      'Authentication error');
+            })
+            .end(function(err, res) {
+              done(err);
+            });
+
+        })
+        .end(function(err, res) {
+          assert(!err);
+        });
+    });
+
+    it('confidential client must not skip authentication', function(done) {
+      var data1 = {
+          'grant_type': 'password',
+          'username': 'root',
+          'password': 'Hunter2',
+          'client_id': clientId,
+          'client_secret': clientSecret,
+          'scope': 'stock weather'
+      };
+
+      //request the access token
+      request.post('/oauth2/token')
+        .type('form')
+        .send(data1)
+        .expect(200)
+        .expect(function(res1) {
+          var refreshToken = res1.body.refresh_token;
+
+          //no client_secret is provided
+          var data2 = {
+            'grant_type': 'refresh_token',
+            'client_id': clientId,
+            'refresh_token': refreshToken,
+            'scope': 'stock weather'
+          };
+
+          //exchange the refresh token with the access token
+          request.post('/oauth2/token')
+            .type('form')
+            .send(data2)
+            .expect(400)
+            .expect(function(res2) {
+              //check the error and error description
+              assert.equal(res2.body.error,
+                       'invalid_request');
+              assert.equal(res2.body.error_description,
+                      'Missing required parameter: client_*');
             })
             .end(function(err, res) {
               done(err);
