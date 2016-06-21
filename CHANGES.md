@@ -1,3 +1,33 @@
+2016-06-21, Version 1.2.0
+=========================
+
+ * Add shrinkwrap file (Krishna Raman)
+
+ * Bump version to 1.2.0 (Krishna Raman)
+
+ * skip hanging ComposeUPN tests (Thomas Burke)
+
+ * replace process.exit with logger.exit (Clement)
+
+ * Use latest snapshot directory on refresh (Jon Palgon)
+
+ * Account for `/` basePath and/or path (Jon Palgon)
+
+ * modify copyright statements (Clement)
+
+ * modify copyright statments (Clement)
+
+ * add log for issue#154 (Clement)
+
+ * correct test case expected response (Clement)
+
+ * change regex to support {+...} (Clement)
+
+ * add ut (Thomas Burke)
+
+ * Add logic to disambiguate api in plan (Jon Palgon)
+
+
 2016-05-24, Version 1.1.0
 =========================
 
