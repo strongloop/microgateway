@@ -93,6 +93,96 @@ var sslOpts = {
 
 var httpServer;
 var httpsServer;
+var dpBackendServer;
+
+function theDPAuthApp(userCfg) {
+    var accounts;
+    if (userCfg)
+        accounts = require('./' + userCfg);
+
+    return function (req, resp) {
+        req.on('error', function(e) {
+            console.log('The DataPower Auth server receives error: %s', e);
+        });
+
+        var chunks = [];
+        req.on('data', function(data) {
+            chunks.push(data);
+        });
+
+        req.on('end', function() {
+            //general cases
+            try {
+                //authenticate first
+                var authHdr = req.headers.authorization;
+                if (authHdr && accounts) {
+                    var results = ah.parse(authHdr).values;
+                    var auth = (results.length === 1 ? results[0] : null);
+                    if (auth) {
+                        if (auth.scheme == 'Basic') {
+                            var token = (new Buffer(auth.token, 'base64')).toString('utf-8');
+                            var tokens = token.split(':');
+                            console.log('user auth:', tokens);
+                            if (!accounts[tokens[0]] || accounts[tokens[0]] !== tokens[1]) {
+                                resp.writeHead(401);
+                                resp.write('Not Authorized');
+                                resp.end();
+                                return;
+                            }
+                        }
+                        else {
+                            resp.writeHead(401);
+                            resp.write('Not Authorized');
+                            resp.end();
+                            return;
+                        }
+                    }
+                    else {
+                        resp.writeHead(401);
+                        resp.write('Not Authorized');
+                        resp.end();
+                        return;
+                    }
+                }
+
+                //prepare the 200 response
+                resp.setHeader('IBM-App-User', 'tonyf');
+                resp.write("<response>");
+                resp.end();
+            }
+            catch (e) {
+                console.log('The DataPower Auth server catches exception: %s', e);
+                resp.writeHead(500, 'javascript error');
+                resp.write('Exception found in the DataPower Auth server: ' + e);
+                resp.end();
+            }
+        });
+    };
+}
+
+//This http Auth server is only used for DataPower backend servers
+exports.dpAuth = function(port, userCfg) {
+    if (port === undefined)
+        port = 3000;
+
+    return new Promise(function(resolve, reject) {
+        //One http server
+        dpBackendServer = http.createServer(theDPAuthApp(userCfg));
+        dpBackendServer.listen(port);
+        console.log('DataPower Auth server (http) is listening at port %d.', port);
+
+        dpBackendServer.on('error', function(e) {
+            console.log('DataPower Auth server receives an error: %s', e);
+        });
+
+        dpBackendServer.on('abort', function(e) {
+            console.log('DataPowerAuth server receives an abort: %s', e);
+        });
+
+        resolve();
+    });
+};
+
 
 exports.start = function(port) {
     if (port === undefined)
@@ -136,6 +226,8 @@ exports.stop = function() {
                 httpServer.close(function() {});
             if (httpsServer)
                 httpsServer.close(function() {});
+            if (dpBackendServer)
+                dpBackendServer.close(function() {});
         }
         catch (error) {
             console.log('Found error when stoping Auth servers: ', error);
