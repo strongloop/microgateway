@@ -934,6 +934,96 @@ describe('oauth2 token API', function() {
         });
     });
 
+    it('scope is optional', function(done) {
+      var data1 = {
+          'grant_type': 'client_credentials',
+          'client_id': clientId,
+          'client_secret': clientSecret,
+          'scope': 'stock weather'
+      };
+
+      //request the access token
+      request.post('/oauth2/token')
+        .type('form')
+        .send(data1)
+        .expect(200)
+        .expect(function(res1) {
+          var refreshToken = res1.body.refresh_token;
+
+          var data2 = {
+            'grant_type': 'refresh_token',
+            'client_id': clientId,
+            'client_secret': clientSecret,
+            'refresh_token': refreshToken
+            //The scope is optional for refresh token
+            //'scope': 'stock weather'
+          };
+
+          //exchange the refresh token with the access token
+          request.post('/oauth2/token')
+            .type('form')
+            .send(data2)
+            .expect(200)
+            .expect(function(res2) {
+              assert(res2.body.access_token);
+              assert(res2.body.refresh_token);
+            })
+            .end(function(err, res) {
+              done(err);
+            });
+
+        })
+        .end(function(err, res) {
+          assert(!err);
+        });
+    });
+
+    it('The requst scope must be subset of grant scope', function(done) {
+      var data1 = {
+          'grant_type': 'client_credentials',
+          'client_id': clientId,
+          'client_secret': clientSecret,
+          'scope': 'weather'
+      };
+
+      //request the access token
+      request.post('/oauth2/token')
+        .type('form')
+        .send(data1)
+        .expect(200)
+        .expect(function(res1) {
+          var refreshToken = res1.body.refresh_token;
+
+          var data2 = {
+            'grant_type': 'refresh_token',
+            'client_id': clientId,
+            'client_secret': clientSecret,
+            'refresh_token': refreshToken,
+            //Oops! stock was not granted
+            'scope': 'stock weather'
+          };
+
+          //exchange the refresh token with the access token
+          request.post('/oauth2/token')
+            .type('form')
+            .send(data2)
+            .expect(403)
+            .expect(function(res2) {
+              assert.equal(res2.body.error,
+                      'invalid_grant');
+              assert.equal(res2.body.error_description,
+                      'Invalid refresh token');
+            })
+            .end(function(err, res) {
+              done(err);
+            });
+
+        })
+        .end(function(err, res) {
+          assert(!err);
+        });
+    });
+
     //clients are not allowed to get refresh token from the token endpoint A,
     //and then renew the access token from the token endpoint B.
     it('must not renew the access token using the other API', function(done) {
