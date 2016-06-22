@@ -1,0 +1,18 @@
+policy: 1.0.0
+
+info:
+  title: my policy 1
+  name: ver-test-policy
+  version: 1.0.1
+  description: |
+    Mock policy yaml
+  contact:
+    name: IBM API Connect
+    url: ibm.biz/apiconnect
+
+properties:
+  fake-property:
+    label: fake
+    description: not used
+    type: boolean
+    default: false
