@@ -65,6 +65,7 @@ function theApplication(req, resp) {
             }
 
             //prepare the 200 response
+            resp.writeHead(200);
             resp.write("Authentication OK");
             resp.end();
         }
@@ -115,7 +116,7 @@ function theDPAuthApp(userCfg) {
             try {
                 //authenticate first
                 var authHdr = req.headers.authorization;
-                if (authHdr && accounts) {
+                if (req.url != '/' && authHdr && accounts) {
                     var results = ah.parse(authHdr).values;
                     var auth = (results.length === 1 ? results[0] : null);
                     if (auth) {
@@ -146,7 +147,7 @@ function theDPAuthApp(userCfg) {
                 }
 
                 //prepare the 200 response
-                resp.setHeader('IBM-App-User', 'tonyf');
+                resp.writeHeader(200, {'IBM-App-User': 'tonyf'});
                 resp.write("<response>");
                 resp.end();
             }
