@@ -19,15 +19,17 @@ module.exports = function (server, authreq) {
   function authorize (req, res, next) {
     if (authreq === false)
       return next();
-    if (!req.connection.ldap.bindDN.equals('cn=root'))
+    if (!(req.connection.ldap.bindDN.equals('cn=root') || 
+        req.connection.ldap.bindDN.equals('uid=alice, ou=people, dc=sixfour1, dc=com')))
       return next(new ldap.InsufficientAccessRightsError());
     return next();
   }
 
   function doBind (key, user) {
     server.bind(user.dn, function(req, res, next) {
-      if (req.dn.toString() !== user.dn || req.credentials !== user.pass)
+      if (req.dn.toString() !== user.dn || req.credentials !== user.pass) {
         return next(new ldap.InvalidCredentialsError());
+      }
       res.end();
       return next();
     });
@@ -73,6 +75,17 @@ module.exports = function (server, authreq) {
       _.forEach(users, function (user) {
       //for (var user of users.values()) {
         if (req.filter.matches(user.attributes)) {
+          res.send(user);
+        }
+      });
+      res.end();
+      return next();
+    });
+    server.search('uid=alice,ou=people,dc=sixfour1,dc=com', authorize, function (req, res, next) {
+      _.forEach(users, function (user) {
+      //for (var user of users.values()) {
+        if (req.filter.matches(user.attributes) &&
+            user.dn === 'uid=alice, ou=people, dc=sixfour1, dc=com') {
           res.send(user);
         }
       });

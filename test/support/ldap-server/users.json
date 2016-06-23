@@ -25,6 +25,20 @@
       "objectclass": "unixUser"
     }
   },
+  "alice": {
+    "dn": "uid=alice, ou=people, dc=sixfour1, dc=com",
+    "pass": "password",
+    "attributes": {
+      "cn": "alice",
+      "uid": "alice",
+      "gid": "501",
+      "gidNumber": "501",
+      "description": "alice for oauth regression",
+      "homedirectory": "/home/jsmith",
+      "shell": "/bin/sh",
+      "objectclass": "unixUser"
+    }
+  },
   "ldapjs": {
     "dn": "cn=ldapjs, ou=myorg, ou=com",
     "pass": "helloworld",
