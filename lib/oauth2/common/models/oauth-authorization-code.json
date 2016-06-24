@@ -41,18 +41,6 @@
     "used": "boolean",
     "redirectURI": "string",
     "hash": "string"
-  },
-  "relations": {
-    "application": {
-      "type": "belongsTo",
-      "model": "OAuthClientApplication",
-      "foreignKey": "appId"
-    },
-    "user": {
-      "type": "belongsTo",
-      "model": "User",
-      "foreignKey": "userId"
-    }
   }
 }
 

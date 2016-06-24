@@ -26,18 +26,6 @@
       "index": true
     },
     "scopes": [ "string" ]
-  },
-  "relations": {
-    "application": {
-      "type": "belongsTo",
-      "model": "OAuthClientApplication",
-      "foreignKey": "appId"
-    },
-    "user": {
-      "type": "belongsTo",
-      "model": "User",
-      "foreignKey": "userId"
-    }
   }
 }
 

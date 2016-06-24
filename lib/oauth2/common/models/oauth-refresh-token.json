@@ -56,18 +56,6 @@
       "enum": [ "Bearer", "MAC" ]
     },
     "hash": "string"
-  },
-  "relations": {
-    "application": {
-      "type": "belongsTo",
-      "model": "OAuthClientApplication",
-      "foreignKey": "appId"
-    },
-    "user": {
-      "type": "belongsTo",
-      "model": "User",
-      "foreignKey": "userId"
-    }
   }
 }
 
