@@ -20,7 +20,7 @@
     "plan-id": "string",
     "plan-name": "string",
     "plan-version": "string",
-    "plan-rate-limit": {},
+    "plan-rate-limit": [],
     "api-id": "string",
     "api-document": {},
     "api-document-resolved": {},
@@ -43,7 +43,7 @@
         "responses": {},
         "securityDefs": {},
         "securityReqs": [],
-        "observed-rate-limit": {},
+        "observed-rate-limit": [],
         "rate-limit-scope": "string"
       }]
     }],

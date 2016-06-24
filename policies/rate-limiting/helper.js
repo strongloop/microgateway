@@ -11,7 +11,7 @@ var logger = require('apiconnect-cli-logger/logger.js')
 exports.handleResponse =
   function(name, limit, remaining, reset, reject, context, flow) {
     if (remaining < 0 && reject) {
-//      var resMsg = setupHeaders();
+      setupHeaders();
       var err = new Error('Rate limit exceeded');
       err.status = { code: 429 };
       err.name = 'RateLimitExceeded';
@@ -47,8 +47,16 @@ exports.handleResponse =
         resMsg.headers = resMsgHeaders;
       }
       name = name || 'RateLimit';
-      logger.debug('Name %s Limit: %d Remaining: %d Reset: %d', name, limit, remaining, reset);
+      var dispRemaining = remaining + 1;
+      logger.debug('Name %s Limit: %d Remaining: %d Reset: %d', name, limit, dispRemaining, reset);
       var prefix;
+      if (reject && remaining < 0 && resMsgHeaders['X-RateLimit-Limit']) {
+        // On reject we only want the rateLimit that caused it
+        resMsgHeaders['X-RateLimit-Limit'] = '';
+        resMsgHeaders['X-RateLimit-Remaining'] = '';
+        resMsgHeaders['X-RateLimit-Reset'] = '';
+      }
+
       if (!resMsgHeaders['X-RateLimit-Limit']) {
         if (name === 'x-ibm-unnamed-rate-limit') {
           prefix = '';
@@ -57,7 +65,7 @@ exports.handleResponse =
         }
         // First item in list, "<value>" for single, "name=<name>,<value>" for multi-level
         resMsgHeaders['X-RateLimit-Limit'] = prefix + limit;
-        resMsgHeaders['X-RateLimit-Remaining'] = prefix + remaining;
+        resMsgHeaders['X-RateLimit-Remaining'] = prefix + dispRemaining;
         resMsgHeaders['X-RateLimit-Reset'] = prefix + reset;
       } else {
         if (name === 'x-ibm-unnamed-rate-limit') {
@@ -65,17 +73,17 @@ exports.handleResponse =
           resMsgHeaders['X-RateLimit-Limit'] = splice(resMsgHeaders['X-RateLimit-Limit'],
                                                       resMsgHeaders['X-RateLimit-Limit'].indexOf('=') + 1,
                                                       limit + '; ');
-          resMsgHeaders['X-RateLimit-Remaining'] = splice(resMsgHeaders['X-RateLimit-Limit'],
-                                                          resMsgHeaders['X-RateLimit-Limit'].indexOf('=') + 1,
-                                                          remaining + '; ');
-          resMsgHeaders['X-RateLimit-Reset'] = splice(resMsgHeaders['X-RateLimit-Limit'],
-                                                      resMsgHeaders['X-RateLimit-Limit'].indexOf('=') + 1,
+          resMsgHeaders['X-RateLimit-Remaining'] = splice(resMsgHeaders['X-RateLimit-Remaining'],
+                                                          resMsgHeaders['X-RateLimit-Remaining'].indexOf('=') + 1,
+                                                          dispRemaining + '; ');
+          resMsgHeaders['X-RateLimit-Reset'] = splice(resMsgHeaders['X-RateLimit-Reset'],
+                                                      resMsgHeaders['X-RateLimit-Reset'].indexOf('=') + 1,
                                                       reset + '; ');
         } else {
           // Append multi-level value at end: "; name=<name>,<value>"
           prefix = '; name=' + name + ',';
           resMsgHeaders['X-RateLimit-Limit'] += prefix + limit;
-          resMsgHeaders['X-RateLimit-Remaining'] += prefix + remaining;
+          resMsgHeaders['X-RateLimit-Remaining'] += prefix + dispRemaining;
           resMsgHeaders['X-RateLimit-Reset'] += prefix + reset;
         }
       }

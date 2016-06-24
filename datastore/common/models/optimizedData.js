@@ -8,6 +8,8 @@ var async = require('async');
 var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'microgateway:datastore:optimizedData'});
 var jsonRefs = require('json-refs');
+var _ = require('lodash');
+var getInterval = require('../../../policies/rate-limiting/get-interval');
 
 var ALLPLANS = 'ALLPLANS';
 function createProductOptimizedEntry(app, ctx)
@@ -35,12 +37,25 @@ function cloneJSON(json) {
 }
 
 function setRateLimits(rateLimit, rateLimits) {
-  var combined = rateLimits;
+  var combined;
+  if (rateLimits) {
+    combined = Object.keys(rateLimits).map(function(key) {
+                 var obj = {};
+                 obj[key] = rateLimits[key];
+                 return obj;
+               });
+  }
   if (rateLimit) {
     if (!combined) {
-      combined = {};
+      combined = [];
     }
-    combined['x-ibm-unnamed-rate-limit'] = rateLimit;
+    combined.unshift({'x-ibm-unnamed-rate-limit' : rateLimit});
+    combined.sort(function(a, b) {
+      var parsedA = getInterval(1000, 1, "hours", _.values(a)[0].value);
+      var parsedB = getInterval(1000, 1, "hours", _.values(b)[0].value);
+      return parsedA.interval === parsedB.interval ? parsedA.limit - parsedB.limit :
+                                                     parsedA.interval - parsedB.interval;
+    });
   }
   return combined;
 }
