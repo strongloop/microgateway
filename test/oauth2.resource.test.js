@@ -111,7 +111,7 @@ describe('oauth testing onprem', function() {
         request.get('/stock/quote?symbol=IBM')
           .set('authorization', 'Bearer ' + tokens.access_token)
           //.expect(401)
-          .expect(400)  // TODO verify what response code we should expect here
+          .expect(403)  // TODO verify what response code we should expect here
           .end(done);
       }, done);
     });
