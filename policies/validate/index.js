@@ -124,9 +124,9 @@ module.exports = function(config) {
         // resolve the JSON Reference on the modified swagger document
         JsonRefs.resolveRefs(swg_doc,{subDocPath: '#/internal_def_schema'}).then(function(res) {
             var schema = res.resolved.internal_def_schema.schema;
-            var result = validator.validate(context.request.body, schema);
+            var result = validator.validate(context.message.body, schema);
             if (!result.valid) {
-                logger.debug('Validation failed on request: %s. Assigned validation schema: %s',
+                logger.debug('Validation failed message: %s. Assigned validation schema: %s',
                         JSON.stringify(context.message.body),
                         JSON.stringify(schema));
                 var error = {
