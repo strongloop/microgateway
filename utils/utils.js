@@ -238,7 +238,7 @@ exports.handshakeWithAPIm = function (apim, privKey, doneCB) {
 
   })
   .then(function(result) {
-    log.info('Successful handshake with API Connect server, clientID:', result.clientID);
+    log.info('Successful handshake with API Connect server');
     doneCB(undefined, {'clientID': result.clientID });
     log.debug('handshakeWithAPIm exit');
   })
