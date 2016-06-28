@@ -57,6 +57,9 @@ function setRateLimits(rateLimit, rateLimits) {
                                                      parsedA.interval - parsedB.interval;
     });
   }
+  if (combined && combined.length == 0) {
+    combined = undefined;
+  }
   return combined;
 }
 

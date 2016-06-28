@@ -2064,6 +2064,21 @@
                         "value": "unlimited",
                         "hard-limit": true
                       }
+                    },
+                    {
+                      "path": "/ratelimit13",
+                      "operation": "get",
+                      "rate-limits": {
+                        "unl": {
+                          "value": "unlimited",
+                          "hard-limit": true
+                        }
+                      }
+                    },
+                    {
+                      "path": "/ratelimit14",
+                      "operation": "get",
+                      "rate-limits": {}
                     }
                   ]
               },

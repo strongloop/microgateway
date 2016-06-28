@@ -200,20 +200,52 @@ describe('operation rate limiting test', function() {
 
     it('client_id=' + clientId2 + ' "/ratelimit11" should pass"',
       function (done) {
-        async.times(10, function(n, next) {
+        async.times(2, function(n, next) {
           request
             .get('/v1/ratelimit11?client_id=' + clientId2)
             .expect(200, next);
         }, done);
       });
 
+    it('client_id=' + clientId2 + ' "/ratelimit11" should reject"',
+      function (done) {
+        request
+        .get('/v1/ratelimit11?client_id=' + clientId2)
+        .expect(429, done);
+      });
+
     it('client_id=' + clientId2 + ' "/ratelimit12" should pass"',
       function (done) {
-        async.times(9, function(n, next) {
+        async.times(11, function(n, next) {
           request
             .get('/v1/ratelimit12?client_id=' + clientId2)
             .expect(200, next);
         }, done);
+      });
+
+    it('client_id=' + clientId2 + ' "/ratelimit13" should pass"',
+      function (done) {
+        async.times(11, function(n, next) {
+          request
+            .get('/v1/ratelimit13?client_id=' + clientId2)
+            .expect(200, next);
+        }, done);
+      });
+
+    it('client_id=' + clientId2 + ' "/ratelimit14" should pass"',
+      function (done) {
+        async.times(10, function(n, next) {
+          request
+            .get('/v1/ratelimit14?client_id=' + clientId2)
+            .expect(200, next);
+        }, done);
+      });
+
+    it('client_id=' + clientId2 + ' "/ratelimit14" should reject"',
+      function (done) {
+        request
+        .get('/v1/ratelimit14?client_id=' + clientId2)
+        .expect(429, done);
       });
   }
 

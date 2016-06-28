@@ -800,6 +800,26 @@
                       }
                     }
                   }
+                },
+                "/ratelimit13": {
+                  "get": {
+                    "operationId": "ratelimit13",
+                    "responses": {
+                      "200": {
+                        "description": "200 OK"
+                      }
+                    }
+                  }
+                },
+                "/ratelimit14": {
+                  "get": {
+                    "operationId": "ratelimit14",
+                    "responses": {
+                      "200": {
+                        "description": "200 OK"
+                      }
+                    }
+                  }
                 }
             },
             "produces": [
