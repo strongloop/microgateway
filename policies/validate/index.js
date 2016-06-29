@@ -13,7 +13,7 @@ module.exports = function(config) {
     var logger = flow.logger;
 
     var def = props.definition;
-    
+
     var hasError = false;
     if (def === 'request') {
 //        post:
@@ -34,23 +34,23 @@ module.exports = function(config) {
 
             // there is only one parameter which "in" is "body" and this parameter can have "schema" property
             if (parameter.hasOwnProperty('schema') && parameter.in === 'body') {
-        	    var schema = parameter.schema;
-    	        var result = validator.validate(context.request.body, schema);
-    	        if (!result.valid) {
-    	            logger.debug('Validation failed on request.parameters.%s: %s. Validation schema: %s',
-    	                    parameter.name,
-    	                    JSON.stringify(context.request.parameters[parameter.name]),
-    	                    JSON.stringify(schema));
-    	            
-    	            var error = {
-    	                    name: 'ValidateError',
-    	                    message:
-    	                        'Validation on request parameter ' + parameter.name + ' is failed.'
-    	                };
-    	            flow.fail(error);
-    	            hasError = true;    	            		
-    	        }
-        	}
+                var schema = parameter.schema;
+                var result = validator.validate(context.request.body, schema);
+                if (!result.valid) {
+                    logger.debug('Validation failed on request.parameters.%s: %s. Validation schema: %s',
+                            parameter.name,
+                            JSON.stringify(context.request.parameters[parameter.name]),
+                            JSON.stringify(schema));
+
+                    var error = {
+                            name: 'ValidateError',
+                            message:
+                                'Validation on request parameter ' + parameter.name + ' is failed.'
+                        };
+                    flow.fail(error);
+                    hasError = true;
+                }
+            }
         });
     }
     else if (def === 'response') {
@@ -67,7 +67,7 @@ module.exports = function(config) {
 
 
         logger.debug('Validation schema is from response property');
-        
+
         var responses = context._.api.responses;
         var status = JSON.stringify(context.message.status.code);
         if (responses.hasOwnProperty(status) && responses[status].hasOwnProperty('schema')) {
@@ -85,7 +85,7 @@ module.exports = function(config) {
                             'Validation on response ' + status + ' is failed.'
                     };
                 flow.fail(error);
-                hasError = true;                            
+                hasError = true;
             }
         } else if (responses.hasOwnProperty('default') && responses['default'].hasOwnProperty('schema')) {
             var schema = responses.default.schema;
@@ -101,7 +101,7 @@ module.exports = function(config) {
                             'Validation on response with default schema is failed.'
                     };
                 flow.fail(error);
-                hasError = true;                            
+                hasError = true;
             }
         } else {
             logger.debug('No validation is performed due to no validation schema found');
@@ -111,16 +111,16 @@ module.exports = function(config) {
 //        - validate:
 //            title: validate
 //            definition: '#/definitions/Error'
-        
+
         logger.debug('Validation schema is assigned directly');
-        
+
         // since the returned definition will be a string, we need to do a trick here to 
         // get the JSON object that this JSON Pointer (the string) is refering 
         
         // get the whole swagger document and add the JSON Pointer with a JSON Reference
         var swg_doc = context.api.document;
         swg_doc.internal_def_schema = {schema: {"$ref" : def}};
-        
+
         // resolve the JSON Reference on the modified swagger document
         JsonRefs.resolveRefs(swg_doc,{subDocPath: '#/internal_def_schema'}).then(function(res) {
             var schema = res.resolved.internal_def_schema.schema;
@@ -135,7 +135,7 @@ module.exports = function(config) {
                             'Validation on request is failed.'
                     };
                 flow.fail(error);
-                hasError = true;                            
+                hasError = true;
             }
         }, function (err) {
             logger.debug('Resolve validation schema failed: %s. No validation is performed.', err);
@@ -148,5 +148,3 @@ module.exports = function(config) {
       flow.proceed();
   };
 };
-
-
