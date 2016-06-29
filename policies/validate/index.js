@@ -37,10 +37,10 @@ module.exports = function(config) {
                 var schema = parameter.schema;
                 var result = validator.validate(context.request.body, schema);
                 if (!result.valid) {
-                    logger.debug('Validation failed on request.parameters.%s: %s. Validation schema: %s',
+                    logger.debug('Validation failed on request.parameters.%s: %j. Validation schema: %j',
                             parameter.name,
-                            JSON.stringify(context.request.parameters[parameter.name]),
-                            JSON.stringify(schema));
+                            context.request.parameters[parameter.name],
+                            schema);
 
                     var error = {
                             name: 'ValidateError',
@@ -74,10 +74,10 @@ module.exports = function(config) {
             var schema = responses[status].schema;
             var result = validator.validate(context.message.body, schema);
             if (!result.valid) {
-                logger.debug('Validation failed on response status %s: %s. Validation schema: %s',
+                logger.debug('Validation failed on response status %s: %j. Validation schema: %j',
                         status,
-                        JSON.stringify(context.message.body),
-                        JSON.stringify(schema));
+                        context.message.body,
+                        schema);
 
                 var error = {
                         name: 'ValidateError',
@@ -91,10 +91,10 @@ module.exports = function(config) {
             var schema = responses.default.schema;
             var result = validator.validate(context.message.body, schema);
             if (!result.valid) {
-                logger.debug('Validation failed on response status %s: %s. Default validation schema: %s',
+                logger.debug('Validation failed on response status %s: %j. Default validation schema: %j',
                         status,
-                        JSON.stringify(context.message.body),
-                        JSON.stringify(schema));
+                        context.message.body,
+                        schema);
                 var error = {
                         name: 'ValidateError',
                         message:
@@ -126,9 +126,9 @@ module.exports = function(config) {
             var schema = res.resolved.internal_def_schema.schema;
             var result = validator.validate(context.message.body, schema);
             if (!result.valid) {
-                logger.debug('Validation failed message: %s. Assigned validation schema: %s',
-                        JSON.stringify(context.message.body),
-                        JSON.stringify(schema));
+                logger.debug('Validation failed message: %j. Assigned validation schema: %j',
+                        context.message.body,
+                        schema);
                 var error = {
                         name: 'ValidateError',
                         message:
@@ -142,6 +142,13 @@ module.exports = function(config) {
         });
     } else {
         logger.debug('No validation is performed due to invalid definition property');
+        var error = {
+                name: 'ValidateError',
+                message:
+                    'No validation schema definition is defined.'
+            };
+        flow.fail(error);
+        hasError = true;
     }
 
   if (!hasError)
