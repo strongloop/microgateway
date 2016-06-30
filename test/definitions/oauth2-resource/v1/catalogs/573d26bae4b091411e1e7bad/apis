@@ -1,0 +1,1167 @@
+[
+  {
+    "catalog": {
+      "default": false,
+      "id": "573d26bae4b091411e1e7bad",
+      "name": "foo-catalog",
+      "sandbox": true,
+      "title": "fooCatalog",
+      "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+      "portal-type": "BASIC",
+      "gateway-url": "https://<gateway-cluster-address>/myOrg/foo-catalog",
+      "is-saas": false
+    },
+    "document": {
+      "basePath": "/stock/quote",
+      "host": "",
+      "info": {
+        "title": "StockQuote",
+        "version": "1.0.0",
+        "x-ibm-name": "stock-quote"
+      },
+      "paths": {
+        "/": {
+          "get": {
+            "responses": {
+              "200": {
+                "description": "200 OK"
+              }
+            }
+          },
+          "parameters": [
+            {
+              "name": "symbol",
+              "type": "string",
+              "required": true,
+              "in": "query",
+              "description": "stock symbol"
+            }
+          ]
+        }
+      },
+      "produces": [
+        "application/json"
+      ],
+      "schemes": [
+        "https"
+      ],
+      "swagger": "2.0",
+      "x-ibm-configuration": {
+        "cors": {
+          "enabled": true
+        },
+        "enforced": true,
+        "phase": "realized",
+        "testable": true,
+        "assembly": {
+          "execute": [
+            {
+              "set-variable": {
+                "title": "set-variable",
+                "actions": [
+                  {
+                    "set": "message.body",
+                    "value": "{ \"$(request.parameters.symbol)\": 123 }"
+                  },
+                  {
+                    "set": "message.headers.content-type",
+                    "value": "application/json"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "securityDefinitions": {
+        "oauth-stock": {
+          "type": "oauth2",
+          "description": "",
+          "flow": "application",
+          "scopes": {
+            "stock:quote": "stock quote",
+            "stock:info": "get stock info"
+          },
+          "tokenUrl": "https://hostname:5000/oauth2/token"
+        },
+        "api-key-client-secret": {
+          "type": "apiKey",
+          "description": "",
+          "in": "header",
+          "name": "X-IBM-Client-Secret"
+        },
+        "api-key-client-d": {
+          "type": "apiKey",
+          "description": "",
+          "in": "header",
+          "name": "X-IBM-Client-Id"
+        }
+      },
+      "security": [
+        {
+          "api-key-client-secret": [],
+          "api-key-client-d": []
+        },
+        {
+          "oauth-stock": [
+            "stock:quote"
+          ]
+        }
+      ]
+    },
+    "id": "5762173ee4b076e106cb6246",
+    "organization": {
+      "id": "573ada4ce4b091411e1e7b8f",
+      "name": "myOrg",
+      "title": "myOrg",
+      "tags": [],
+      "members": []
+    },
+    "state": "running",
+    "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173ee4b076e106cb6246"
+  },
+  {
+    "catalog": {
+      "default": false,
+      "id": "573d26bae4b091411e1e7bad",
+      "name": "foo-catalog",
+      "sandbox": true,
+      "title": "fooCatalog",
+      "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+      "portal-type": "BASIC",
+      "gateway-url": "https://<gateway-cluster-address>/myOrg/foo-catalog",
+      "is-saas": false
+    },
+    "document": {
+      "basePath": "/weather",
+      "host": "",
+      "info": {
+        "title": "WeatherService",
+        "version": "1.0.0",
+        "x-ibm-name": "weather-service"
+      },
+      "paths": {
+        "/wind": {
+          "get": {
+            "responses": {
+              "200": {
+                "description": "200 OK"
+              }
+            }
+          }
+        },
+        "/temperature": {
+          "get": {
+            "responses": {
+              "200": {
+                "description": "200 OK"
+              }
+            }
+          }
+        }
+      },
+      "produces": [
+        "application/json"
+      ],
+      "schemes": [
+        "https"
+      ],
+      "swagger": "2.0",
+      "x-ibm-configuration": {
+        "cors": {
+          "enabled": true
+        },
+        "enforced": true,
+        "phase": "realized",
+        "testable": true,
+        "assembly": {
+          "execute": [
+            {
+              "operation-switch": {
+                "title": "operation-switch",
+                "case": [
+                  {
+                    "operations": [
+                      {
+                        "verb": "get",
+                        "path": "/wind"
+                      }
+                    ],
+                    "execute": [
+                      {
+                        "set-variable": {
+                          "title": "set-variable",
+                          "actions": [
+                            {
+                              "set": "message.body",
+                              "value": "{ \"wind\": \"17km/h\" }"
+                            },
+                            {
+                              "set": "message.headers.content-type",
+                              "value": "application/json"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "operations": [
+                      {
+                        "verb": "get",
+                        "path": "/temperature"
+                      }
+                    ],
+                    "execute": [
+                      {
+                        "set-variable": {
+                          "title": "set-variable",
+                          "actions": [
+                            {
+                              "set": "message.body",
+                              "value": "{ \"temperature\": \"27C\" }"
+                            },
+                            {
+                              "set": "message.headers.content-type",
+                              "value": "application/json"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "securityDefinitions": {},
+      "security": []
+    },
+    "id": "5762173fe4b076e106cb6247",
+    "organization": {
+      "id": "573ada4ce4b091411e1e7b8f",
+      "name": "myOrg",
+      "title": "myOrg",
+      "tags": [],
+      "members": []
+    },
+    "state": "running",
+    "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb6247"
+  },
+  {
+    "catalog": {
+      "default": false,
+      "id": "573d26bae4b091411e1e7bad",
+      "name": "foo-catalog",
+      "sandbox": true,
+      "title": "fooCatalog",
+      "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+      "portal-type": "BASIC",
+      "gateway-url": "https://<gateway-cluster-address>/myOrg/foo-catalog",
+      "is-saas": false
+    },
+    "document": {
+      "basePath": "/",
+      "definitions": {
+        "access_token_response": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "token_type",
+            "access_token",
+            "expires_in"
+          ],
+          "properties": {
+            "token_type": {
+              "enum": [
+                "bearer"
+              ]
+            },
+            "access_token": {
+              "type": "string"
+            },
+            "expires_in": {
+              "type": "integer"
+            },
+            "scope": {
+              "type": "string"
+            },
+            "refresh_token": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "host": "",
+      "info": {
+        "title": "OAuth2 Endpoints",
+        "version": "1.0.0",
+        "x-ibm-name": "oauth2-endpoints"
+      },
+      "paths": {
+        "/oauth2/authorize": {
+          "get": {
+            "produces": [
+              "text/html"
+            ],
+            "summary": "endpoint for Authorization Code and Implicit grants",
+            "parameters": [
+              {
+                "name": "response_type",
+                "in": "query",
+                "required": true,
+                "type": "string",
+                "enum": [
+                  "code",
+                  "token"
+                ]
+              },
+              {
+                "name": "client_id",
+                "in": "query",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "scope",
+                "in": "query",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "redirect_uri",
+                "in": "query",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "state",
+                "in": "query",
+                "type": "string",
+                "required": false
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "An HTML form for authentication or authorization of this request."
+              },
+              "302": {
+                "description": "Redirect to the clients redirect_uri containing one of AZ code, access token or error.\n"
+              }
+            },
+            "security": [
+              {
+                "clientID": []
+              }
+            ]
+          },
+          "post": {
+            "consumes": [
+              "application/x-www-form-urlencoded"
+            ],
+            "produces": [
+              "text/html"
+            ],
+            "summary": "submit approval to authorization code or access token",
+            "security": [
+              {
+                "clientID": []
+              }
+            ],
+            "parameters": [
+              {
+                "name": "client_id",
+                "in": "formData",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "scope",
+                "in": "formData",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "resource-owner",
+                "in": "formData",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "redirect_uri",
+                "in": "formData",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "original-url",
+                "in": "formData",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "dp-state",
+                "in": "formData",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "dp-data",
+                "in": "formData",
+                "required": true,
+                "type": "string"
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Cool"
+              }
+            }
+          }
+        },
+        "/oauth2/token": {
+          "post": {
+            "consumes": [
+              "application/x-www-form-urlencoded"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "summary": "Request Access Tokens",
+            "security": [],
+            "parameters": [
+              {
+                "name": "grant_type",
+                "in": "formData",
+                "description": "Type of grant",
+                "type": "string",
+                "required": true,
+                "enum": [
+                  "authorization_code",
+                  "password",
+                  "client_credentials",
+                  "refresh_token"
+                ]
+              },
+              {
+                "name": "client_id",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "client_secret",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "code",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "redirect_uri",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "username",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "password",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "scope",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "refresh_token",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "json document containing token, etc.",
+                "schema": {
+                  "$ref": "#/definitions/access_token_response"
+                }
+              },
+              "400": {
+                "description": "json document that may contain additional details about the failure"
+              }
+            }
+          }
+        }
+      },
+      "schemes": [
+        "https"
+      ],
+      "swagger": "2.0",
+      "x-ibm-configuration": {
+        "cors": {
+          "enabled": true
+        },
+        "enforced": true,
+        "phase": "realized",
+        "testable": true,
+        "oauth2": {
+          "client-type": "public",
+          "scopes": {
+            "stock:quote": "stock",
+            "stock:info": "stock",
+            "weather": "weather"
+          },
+          "grants": [
+            "application",
+            "password",
+            "accessCode",
+            "implicit"
+          ],
+          "identity-extraction": {
+            "type": "default-form"
+          },
+          "authentication": {
+            "x-ibm-authentication-url": {
+              "url": "http://127.0.0.1:8889/",
+              "tls-profile": ""
+            }
+          },
+          "authorization": {
+            "type": "default-form"
+          },
+          "refresh-token": {
+            "count": 3,
+            "ttl": 12
+          },
+          "access-token": {
+            "ttl": 7
+          },
+          "revocation": {
+            "url": "",
+            "tls-profile": ""
+          }
+        },
+        "type": "oauth"
+      },
+      "securityDefinitions": {
+        "clientID": {
+          "description": "",
+          "in": "query",
+          "name": "client_id",
+          "type": "apiKey"
+        }
+      },
+      "security": [
+        {
+          "clientID": []
+        }
+      ]
+    },
+    "id": "5762173fe4b076e106cb6248",
+    "organization": {
+      "id": "573ada4ce4b091411e1e7b8f",
+      "name": "myOrg",
+      "title": "myOrg",
+      "tags": [],
+      "members": []
+    },
+    "state": "running",
+    "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb6248"
+  },
+  {
+    "catalog": {
+      "default": false,
+      "id": "573d26bae4b091411e1e7bad",
+      "name": "foo-catalog",
+      "sandbox": true,
+      "title": "fooCatalog",
+      "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+      "portal-type": "BASIC",
+      "gateway-url": "https://<gateway-cluster-address>/myOrg/foo-catalog",
+      "is-saas": false
+    },
+    "document": {
+      "basePath": "/",
+      "definitions": {
+        "access_token_response": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "token_type",
+            "access_token",
+            "expires_in"
+          ],
+          "properties": {
+            "token_type": {
+              "enum": [
+                "bearer"
+              ]
+            },
+            "access_token": {
+              "type": "string"
+            },
+            "expires_in": {
+              "type": "integer"
+            },
+            "scope": {
+              "type": "string"
+            },
+            "refresh_token": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "host": "",
+      "info": {
+        "title": "Resource Owner Token Endpoint (HTTPS)",
+        "version": "1.0.0",
+        "x-ibm-name": "resource-owner-token-endpoint-https"
+      },
+      "paths": {
+        "/token/password/https": {
+          "post": {
+            "consumes": [
+              "application/x-www-form-urlencoded"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "summary": "Request Access Tokens",
+            "security": [],
+            "parameters": [
+              {
+                "name": "grant_type",
+                "in": "formData",
+                "type": "string",
+                "required": true,
+                "enum": [
+                  "authorization_code",
+                  "password",
+                  "client_credentials",
+                  "refresh_token"
+                ]
+              },
+              {
+                "name": "client_id",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "client_secret",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "code",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "redirect_uri",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "username",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "password",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "scope",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "refresh_token",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "json document containing token, etc.",
+                "schema": {
+                  "$ref": "#/definitions/access_token_response"
+                }
+              },
+              "400": {
+                "description": "json document that may contain additional details about the failure"
+              }
+            }
+          }
+        }
+      },
+      "schemes": [
+        "https"
+      ],
+      "swagger": "2.0",
+      "x-ibm-configuration": {
+        "cors": {
+          "enabled": true
+        },
+        "enforced": true,
+        "phase": "realized",
+        "testable": true,
+        "oauth2": {
+          "client-type": "public",
+          "scopes": {
+            "stock:quote": "stock",
+            "stock:info": "stock",
+            "weather": "weather"
+          },
+          "grants": [
+            "password"
+          ],
+          "identity-extraction": {
+            "type": "default-form"
+          },
+          "authentication": {
+            "x-ibm-authentication-url": {
+              "url": "https://localhost:8890/",
+              "tls-profile": "https-auth-tls-profile"
+            }
+          },
+          "authorization": {
+            "type": "authenticated"
+          },
+          "refresh-token": {
+            "count": 10,
+            "ttl": 2682000
+          },
+          "access-token": {
+            "ttl": 3600
+          }
+        },
+        "type": "oauth"
+      },
+      "securityDefinitions": {}
+    },
+    "id": "5762173fe4b076e106cb6249",
+    "organization": {
+      "id": "573ada4ce4b091411e1e7b8f",
+      "name": "myOrg",
+      "title": "myOrg",
+      "tags": [],
+      "members": []
+    },
+    "state": "running",
+    "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb6249"
+  },
+  {
+    "catalog": {
+      "default": false,
+      "id": "573d26bae4b091411e1e7bad",
+      "name": "foo-catalog",
+      "sandbox": true,
+      "title": "fooCatalog",
+      "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+      "portal-type": "BASIC",
+      "gateway-url": "https://<gateway-cluster-address>/myOrg/foo-catalog",
+      "is-saas": false
+    },
+    "document": {
+      "basePath": "/",
+      "definitions": {
+        "access_token_response": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "token_type",
+            "access_token",
+            "expires_in"
+          ],
+          "properties": {
+            "token_type": {
+              "enum": [
+                "bearer"
+              ]
+            },
+            "access_token": {
+              "type": "string"
+            },
+            "expires_in": {
+              "type": "integer"
+            },
+            "scope": {
+              "type": "string"
+            },
+            "refresh_token": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "host": "",
+      "info": {
+        "title": "Resource Owner Token Endpoint (LDAP)",
+        "version": "1.0.0",
+        "x-ibm-name": "resource-owner-token-endpoint-ldap"
+      },
+      "paths": {
+        "/token/password/ldap": {
+          "post": {
+            "consumes": [
+              "application/x-www-form-urlencoded"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "summary": "Request Access Tokens",
+            "security": [],
+            "parameters": [
+              {
+                "name": "grant_type",
+                "in": "formData",
+                "type": "string",
+                "required": true,
+                "enum": [
+                  "authorization_code",
+                  "password",
+                  "client_credentials",
+                  "refresh_token"
+                ]
+              },
+              {
+                "name": "client_id",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "client_secret",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "code",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "redirect_uri",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "username",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "password",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "scope",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "refresh_token",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "json document containing token, etc.",
+                "schema": {
+                  "$ref": "#/definitions/access_token_response"
+                }
+              },
+              "400": {
+                "description": "json document that may contain additional details about the failure"
+              }
+            }
+          }
+        }
+      },
+      "schemes": [
+        "https"
+      ],
+      "swagger": "2.0",
+      "x-ibm-configuration": {
+        "cors": {
+          "enabled": true
+        },
+        "enforced": true,
+        "phase": "realized",
+        "testable": true,
+        "oauth2": {
+          "client-type": "public",
+          "scopes": {
+            "stock:quote": "stock",
+            "stock:info": "stock",
+            "weather": "weather"
+          },
+          "grants": [
+            "password"
+          ],
+          "identity-extraction": {
+            "type": "default-form"
+          },
+          "authentication": {
+            "x-ibm-authentication-registry": "userauth-ldap"
+          },
+          "authorization": {
+            "type": "authenticated"
+          },
+          "refresh-token": {
+            "count": 12,
+            "ttl": 2682000
+          },
+          "access-token": {
+            "ttl": 3600
+          }
+        },
+        "type": "oauth"
+      },
+      "securityDefinitions": {}
+    },
+    "id": "5762173fe4b076e106cb624a",
+    "organization": {
+      "id": "573ada4ce4b091411e1e7b8f",
+      "name": "myOrg",
+      "title": "myOrg",
+      "tags": [],
+      "members": []
+    },
+    "state": "running",
+    "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb624a"
+  },
+  {
+    "catalog": {
+      "default": false,
+      "id": "573d26bae4b091411e1e7bad",
+      "name": "foo-catalog",
+      "sandbox": true,
+      "title": "fooCatalog",
+      "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+      "portal-type": "BASIC",
+      "gateway-url": "https://<gateway-cluster-address>/myOrg/foo-catalog",
+      "is-saas": false
+    },
+    "document": {
+      "basePath": "/",
+      "definitions": {
+        "access_token_response": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "token_type",
+            "access_token",
+            "expires_in"
+          ],
+          "properties": {
+            "token_type": {
+              "enum": [
+                "bearer"
+              ]
+            },
+            "access_token": {
+              "type": "string"
+            },
+            "expires_in": {
+              "type": "integer"
+            },
+            "scope": {
+              "type": "string"
+            },
+            "refresh_token": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "host": "",
+      "info": {
+        "description": "Test the HTTPS Auth URL without TLS Profile",
+        "title": "Resource Owner Token Endpoint (Auth URL)",
+        "version": "1.0.0",
+        "x-ibm-name": "resource-owner-token-endpoint-auth-url"
+      },
+      "paths": {
+        "/oauth2/token/httpsAuthUrl": {
+          "post": {
+            "consumes": [
+              "application/x-www-form-urlencoded"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "summary": "Request Access Tokens",
+            "security": [],
+            "parameters": [
+              {
+                "name": "grant_type",
+                "in": "formData",
+                "type": "string",
+                "required": true,
+                "enum": [
+                  "authorization_code",
+                  "password",
+                  "client_credentials",
+                  "refresh_token"
+                ]
+              },
+              {
+                "name": "client_id",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "client_secret",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "code",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "redirect_uri",
+                "in": "formData",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "username",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "password",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "scope",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              },
+              {
+                "name": "refresh_token",
+                "in": "formData",
+                "type": "string",
+                "required": false
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "json document containing token, etc.",
+                "schema": {
+                  "$ref": "#/definitions/access_token_response"
+                }
+              },
+              "400": {
+                "description": "json document that may contain additional details about the failure"
+              }
+            }
+          }
+        }
+      },
+      "schemes": [
+        "https"
+      ],
+      "swagger": "2.0",
+      "x-ibm-configuration": {
+        "cors": {
+          "enabled": true
+        },
+        "enforced": true,
+        "phase": "realized",
+        "testable": true,
+        "oauth2": {
+          "client-type": "public",
+          "scopes": {
+            "stock:quote": "stock",
+            "stock:info": "stock",
+            "weather": "weather"
+          },
+          "grants": [
+            "password"
+          ],
+          "identity-extraction": {
+            "type": "default-form"
+          },
+          "authentication": {
+            "x-ibm-authentication-url": {
+              "url": "https://localhost:8890",
+              "tls-profile": ""
+            }
+          },
+          "authorization": {
+            "type": "authenticated"
+          },
+          "refresh-token": {
+            "count": 2048,
+            "ttl": 2682000
+          },
+          "access-token": {
+            "ttl": 3600
+          },
+          "revocation": {
+            "url": "",
+            "tls-profile": ""
+          }
+        },
+        "type": "oauth"
+      },
+      "securityDefinitions": {}
+    },
+    "id": "5762173fe4b076e106cb624b",
+    "organization": {
+      "id": "573ada4ce4b091411e1e7b8f",
+      "name": "myOrg",
+      "title": "myOrg",
+      "tags": [],
+      "members": []
+    },
+    "state": "running",
+    "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb624b"
+  }
+]

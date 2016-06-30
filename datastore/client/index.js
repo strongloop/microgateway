@@ -243,3 +243,143 @@ exports.getRegistry = function(snapshot, registryName) {
     });
   });
 };
+
+exports.getAppInfo = function(snapshot, subscriptionId, clientId, done) {
+  logger.debug('getAppInfo entry');
+  //searching for the application info for the specific clientId
+  var queryfilter = JSON.stringify({
+    where: {
+      and: [
+        { 'snapshot-id': snapshot},
+        { id: subscriptionId }
+      ]
+    }
+  });
+  
+  var queryurlObj = {
+        protocol: 'http',
+        hostname: host,
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/subscriptions',
+        query: {filter : queryfilter}
+  };
+
+  var queryurl = url.format(queryurlObj);
+  // send request to optimizedData model from data-store
+  // for matching API(s)
+  request({url: queryurl, json: true}, function(error, response, body) {
+    logger.debug('error: ', error);
+    // exit early on error
+    if (error) {
+      done(error);
+      return;
+    }
+    var subscriptions = body;
+    //TODO: double check the clientId in the 
+    //body.application['app-credentials'] ????
+    if (!subscriptions || subscriptions.length === 0) {
+      done(new Error('no matched application'));
+      return;
+    }
+    var rev = subscriptions[0].application;
+    logger.debug('found application record:', rev.title);
+    //remove unnecessary fields before return
+    var credential = rev['app-credentials'][0];
+    delete rev['app-credentials'];
+    rev['client-id'] = credential['client-id'];
+    rev['client-secret'] = credential['client-secret'];
+    done(undefined, rev);
+  });
+};
+
+//Find clinet(s) by the client id and the application id.
+exports.getClientById = function(snapshot, clientId, apiId, done) {
+  logger.debug('getClientById entry');
+
+  // build request to send to data-store
+  var queryfilter = { where: { and: [] } };
+  queryfilter.where.and[0] = { 'snapshot-id': snapshot };
+  queryfilter.where.and[1] = { 'api-id': apiId };
+  queryfilter.where.and[2] = { 'client-id': clientId };
+
+  var queryurlObj = {
+      protocol: 'http',
+      hostname: host,
+      port: process.env.DATASTORE_PORT,
+      pathname: '/api/optimizedData',
+      query: { filter : JSON.stringify(queryfilter) }
+  };
+  var queryurl = url.format(queryurlObj);
+
+  request({ url: queryurl, json: true }, function (error, response, body) {
+    if (error) {
+      logger.debug('error: ', error);
+      return done (error);
+    }
+
+    var optimizedData = body;
+    if (!optimizedData || optimizedData.length === 0)
+        return done('no matched client');
+
+    done(undefined, optimizedData);
+  });
+};
+
+//Look up the subscriptions and search whether the given client subscribes the
+//given API. If there is one, return the client information.
+//
+//It could be slow if there are many subscriptions. (TODO: optimization needed)
+exports.getClientCredsById = function(snapshot, clientId, apiId, done) {
+  logger.debug('getClientCredsById');
+
+  // find all subscriptions of this snapshot
+  var queryfilter = { where: { and: [] }, fields: {} };
+  queryfilter.where.and[0] = { 'snapshot-id': snapshot };
+  queryfilter.fields['application'] = true;
+  queryfilter.fields['plan-registration']= true;
+
+  var queryurlObj = {
+      protocol: 'http',
+      hostname: host,
+      port: process.env.DATASTORE_PORT,
+      pathname: '/api/subscriptions',
+      query: { filter : JSON.stringify(queryfilter) }
+  };
+  var queryurl = url.format(queryurlObj);
+
+  request({ url: queryurl, json: true }, function (error, response, results) {
+    if (error || !results) {
+      return done (error);
+    }
+
+    //lookup in the returned subscriptions
+    for (var idx = 0, len = results.length; idx < len; idx++) {
+      var entry = results[idx];
+      var appCreds = entry['application'] &&
+                     entry['application']['app-credentials'];
+      if (appCreds) {
+        for (var idx2 = 0, len2 = appCreds.length; idx2 < len2; idx2++) {
+          var appCred = appCreds[idx2];
+          //see if the given client subscribes the plan
+          if (clientId === appCred['client-id']) {
+            var apis = entry['plan-registration'] &&
+                       entry['plan-registration']['apis'];
+            if (apis.length === 0) {
+              //treat this as all apis are subscribed
+              return done(undefined, appCred);
+            } else {
+              for (var idx3 = 0, len3 = apis.length; idx3 < len3; idx3++) {
+                //see if the given api is included in the plan
+                if (typeof apis[idx3] === 'object' && apis[idx3].id === apiId) {
+                  return done(undefined, appCred);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return done('no matched client');
+  });
+};

@@ -1,0 +1,46 @@
+//- Copyright IBM Corp. 2016. All Rights Reserved.
+//- Node module: microgateway
+//- US Government Users Restricted Rights - Use, duplication or disclosure
+//- restricted by GSA ADP Schedule Contract with IBM Corp.
+html(lang="en", xml:lang="en")
+head
+  title Request for Permission
+  meta(http-equiv="Cache-Control", content="no-cache")
+  meta(http-equiv="Pragma", content="no-cache")
+  meta(http-equiv="Expires", content="-1")
+  meta(http-equiv="X-UA-Compatible", content="IE=8")
+
+body
+  form(method="POST", style="display: inline;", enctype="application/x-www-form-urlencoded", action=action)
+    h2 Request for Permission
+    p Welcome 
+      span(style="font-weight:bold;")= resource_owner
+
+    p
+      if scope
+        font(size="3") Do you allow #{client_title} access to:
+        br
+        font(size="2" color="grey") Choosing "Allow access" with no scope selected, MicroGateway will interpret it as the resource owner grants permission to all the requested scope(s)
+        br
+        each val in scope
+          input(type="checkbox", checked="yes", name="selectedscope", value=val)
+          font(size="3")= val
+          br
+      else
+        font(size="3") Do you allow #{client_title} access the resource?
+
+    input(type="hidden", name="dp-state",value=transaction_id)
+    input(type="hidden", name="resource-owner", value=resource_owner)
+    input(type="hidden", name="redirect_uri", value=redirect_uri)
+    input(type="hidden", name="scope", value=scopeStr)
+    input(type="hidden", name="original-url", value=original_url)
+    input(type="hidden", name="client_id", value=client_id)
+    input(type="hidden", name="dp-data", value=dp_data)
+    input(type="radio" name="approve" value="true")
+    label Allow access
+    input(type="radio", name="approve", value="false", checked="checked")
+    label No thanks
+    br
+    input(type="submit", name="submit", value="Submit")
+    font(size="2" color="grey") Clicking Submit will redirect you to
+      span(style="font-weight:bold;")= redirect_uri

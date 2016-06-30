@@ -49,7 +49,7 @@
       "title": "string"
     },
     "plan-registration": {
-      "apis": {},
+      "apis": [],
       "id": "string",
       "plan": {
         "name": "string",

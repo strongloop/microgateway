@@ -136,7 +136,7 @@ function ripCTX(ctx)
     credentials: ctx.instance.application['app-credentials'],
     developerOrg: ctx.instance['developer-organization']
   };
-  ctx.instance['plan-registration'].apis = {}; // old list, wipe it
+  ctx.instance['plan-registration'].apis = []; // old list, wipe it
   locals.product = ctx.instance['plan-registration'].product;
   locals.plan = {};
   if (ctx.instance['plan-registration'].plan) {

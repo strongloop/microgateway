@@ -1,0 +1,61 @@
+{
+  "name": "OAuthRefreshToken",
+  "base": "PersistedModel",
+  "properties": {
+    "id": {
+      "type": "string",
+      "id": true,
+      "length": 300,
+      "generated": false
+    },
+    "apiId": {
+      "type": "string",
+      "length": 128,
+      "index": true
+    },
+    "appId": {
+      "type": "string",
+      "length": 128,
+      "index": true
+    },
+    "secret": {
+      "type": "string",
+      "length": 32
+    },
+    "userId": {
+      "type": "string",
+      "index": true
+    },
+    "issuedAt": {
+      "type": "date",
+      "index": true
+    },
+    "expiresIn": "number",
+    "expiredAt": {
+      "type": "date",
+      "index": true
+    },
+    "countDown": "number",
+    "scopes": [ "string" ],
+    "parameters": [
+      {
+        "name": "string",
+        "value": "string"
+      }
+    ],
+    "grant": {
+      "type": "string",
+      "enum": [ "application",
+        "password",
+        "accessCode",
+        "implicit",
+        "refershToken" ]
+    },
+    "tokenType": {
+      "type": "string",
+      "enum": [ "Bearer", "MAC" ]
+    },
+    "hash": "string"
+  }
+}
+

@@ -1,0 +1,44 @@
+[
+    {
+        "$note$": "tenant1.xml",
+        "id": "registry1",
+        "url": "https://mgmt-lb:7203/v1/catalogs/catalog008/registries/registry1",
+        "name": "ldap200",
+        "title": "ldap200",
+        "description": "OpenLDAP with Compose DN + Dynamic Group Authorization",
+        "type": "ldap",
+        "ldap-config": {
+            "host": "wpalmaapim1.rtp.raleigh.ibm.com",
+            "port": 389,
+            "protocol-version": "3",
+            "ssl": false,
+            "authenticated-bind": false,
+            "auth-method": "bindDN",
+            "bind-prefix": "uid=",
+            "bind-suffix": ",ou=people,dc=sixfour1,dc=com",
+            "group-auth-method": "dynamicAuth",
+            "dynamic-group-filter": "(gidNumber=501)"
+        }
+    },
+    {
+        "$note$": "tenant1.xml",
+        "id": "registry2",
+        "url": "https://mgmt-lb:7203/v1/catalogs/catalog008/registries/registry2",
+        "name": "ldap203",
+        "title": "ldap203",
+        "description": "OpenLDAP with Compose DN + Dynamic Group Authorization",
+        "type": "ldap",
+        "ldap-config": {
+            "host": "wpalmaapim1.rtp.raleigh.ibm.com",
+            "port": 389,
+            "protocol-version": "2",
+            "ssl": false,
+            "authenticated-bind": false,
+            "auth-method": "bindDN",
+            "bind-prefix": "uid=",
+            "bind-suffix": ",ou=people,dc=sixfour1,dc=com",
+            "group-auth-method": "dynamicAuth",
+            "dynamic-group-filter": "(gidNumber=501)"
+        }
+    }
+]
