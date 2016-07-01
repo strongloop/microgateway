@@ -13,8 +13,7 @@ module.exports = function(config) {
     var logger = flow.logger;
 
     var def = props.definition;
-
-    var hasError = false;
+    var stopProceed = false;
     if (def === 'request') {
 //        post:
 //            summary: ''
@@ -37,18 +36,19 @@ module.exports = function(config) {
                 var schema = parameter.schema;
                 var result = validator.validate(context.request.body, schema);
                 if (!result.valid) {
-                    logger.debug('Validation failed on request.parameters.%s: %j. Validation schema: %j',
+                    logger.debug('Validation failed on request.parameters.%s: %j. Validation schema: %j. Error: %s',
                             parameter.name,
                             context.request.parameters[parameter.name],
-                            schema);
+                            schema,
+                            result.errors);
 
                     var error = {
                             name: 'ValidateError',
                             message:
-                                'Validation on request parameter ' + parameter.name + ' is failed.'
+                                'Validation on request parameter ' + parameter.name + ' is failed. Error: ' + result.errors
                         };
                     flow.fail(error);
-                    hasError = true;
+                    stopProceed = true;
                 }
             }
         });
@@ -74,34 +74,36 @@ module.exports = function(config) {
             var schema = responses[status].schema;
             var result = validator.validate(context.message.body, schema);
             if (!result.valid) {
-                logger.debug('Validation failed on response status %s: %j. Validation schema: %j',
+                logger.debug('Validation failed on response status %s: %j. Validation schema: %j. Error: %s',
                         status,
                         context.message.body,
-                        schema);
+                        schema,
+                        result.errors);
 
                 var error = {
                         name: 'ValidateError',
                         message:
-                            'Validation on response ' + status + ' is failed.'
+                            'Validation on response ' + status + ' is failed. Error: ' + result.errors
                     };
                 flow.fail(error);
-                hasError = true;
+                stopProceed = true;
             }
         } else if (responses.hasOwnProperty('default') && responses['default'].hasOwnProperty('schema')) {
             var schema = responses.default.schema;
             var result = validator.validate(context.message.body, schema);
             if (!result.valid) {
-                logger.debug('Validation failed on response status %s: %j. Default validation schema: %j',
+                logger.debug('Validation failed on response status %s: %j. Default validation schema: %j. Error: %s',
                         status,
                         context.message.body,
-                        schema);
+                        schema,
+                        result.errors);
                 var error = {
                         name: 'ValidateError',
                         message:
-                            'Validation on response with default schema is failed.'
+                            'Validation on response with default schema is failed. Error: ' + result.errors
                     };
                 flow.fail(error);
-                hasError = true;
+                stopProceed = true;
             }
         } else {
             logger.debug('No validation is performed due to no validation schema found');
@@ -113,11 +115,14 @@ module.exports = function(config) {
 //            definition: '#/definitions/Error'
 
         logger.debug('Validation schema is assigned directly');
+        // we don't want to execute flow.proceed() first, and will let the callback function to
+        // decide if flow.proceed() or flow.fail() should be called
+        stopProceed = true;
 
         // since the returned definition will be a string, we need to do a trick here to 
         // get the JSON object that this JSON Pointer (the string) is refering 
-        
-        // get the whole swagger document and add the JSON Pointer with a JSON Reference
+
+        // get the whole swagger document and add the JSON Pointer with a JSON Reference(ie. $ref)
         var swg_doc = context.api.document;
         swg_doc.internal_def_schema = {schema: {"$ref" : def}};
 
@@ -126,32 +131,48 @@ module.exports = function(config) {
             var schema = res.resolved.internal_def_schema.schema;
             var result = validator.validate(context.message.body, schema);
             if (!result.valid) {
-                logger.debug('Validation failed message: %j. Assigned validation schema: %j',
+                logger.debug('Validation failed content: %j. Assigned validation schema: %j. Error: %s',
                         context.message.body,
-                        schema);
+                        schema,
+                        result.errors);
                 var error = {
                         name: 'ValidateError',
                         message:
-                            'Validation on request is failed.'
+                            'Validation failed. Error: ' + result.errors
                     };
                 flow.fail(error);
-                hasError = true;
+            }
+            else {
+                flow.proceed();
             }
         }, function (err) {
-            logger.debug('Resolve validation schema failed: %s. No validation is performed.', err);
+            logger.debug('Validation failed. Error: %s', err);
+            var error = {
+                    name: 'ValidateError',
+                    message:
+                        'Validation failed. Error: ' + err
+                };
+            flow.fail(error);
+        }).catch(function(err) {
+            logger.debug('Validation failed. Error: %s', err);
+            var error = {
+                    name: 'ValidateError',
+                    message:
+                        'Validation failed. Error: ' + err
+                };
+            flow.fail(error);
         });
     } else {
         logger.debug('No validation is performed due to invalid definition property');
         var error = {
                 name: 'ValidateError',
                 message:
-                    'No validation schema definition is defined.'
+                    'No validation schema definition is funod.'
             };
         flow.fail(error);
-        hasError = true;
+        stopProceed = true;
     }
-
-  if (!hasError)
+    if(!stopProceed)
       flow.proceed();
   };
 };
