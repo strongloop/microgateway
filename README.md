@@ -17,8 +17,9 @@ downloaded and setup by the laptop run and start functions. You do not
 need to manually download and install it.
 
 If you would like to use `microgateway` as a standalone gateway,
-use `npm -i microgateway` to install it. To start the gateway,
-use `node .`. 
+use `npm install microgateway` to install it. To start the gateway,
+change working directories to where the microgateway installed
+(e.g. `cd node_modules/microgateway`), and use `node .`.
 
 ## Configuration
 By default, the gateway look up the configuration from `config/default`
