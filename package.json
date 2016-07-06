@@ -72,7 +72,7 @@
     "loopback": "^2.26.2",
     "loopback-boot": "^2.16.0",
     "loopback-component-explorer": "^2.3.0",
-    "loopback-connector-redis": "0.0.15",
+    "loopback-connector-redis": "0.0.3",
     "lru-cache": "^4.0.0",
     "moment": "^2.11.2",
     "multer": "^1.1.0",
