@@ -1314,7 +1314,8 @@ describe('oauth2 token API', function() {
         });
     });
 
-    it('refresh token to expire in "ttl" seconds', function(done) {
+    it('refresh token to expire in "ttl + 1" seconds', function(done) {
+      this.timeout(20000);
       var data1 = {
           'grant_type': 'client_credentials',
           'client_id': clientId,
@@ -1337,7 +1338,7 @@ describe('oauth2 token API', function() {
             'scope': 'stock weather'
           };
 
-          var timeout = 12 * 1000;
+          var timeout = (12 + 1) * 1000;
           console.log('Waiting for %d seconds to test expired refresh token...',
                   timeout / 1000);
           setTimeout(function() {
@@ -1353,12 +1354,14 @@ describe('oauth2 token API', function() {
                         'Invalid refresh token');
               })
               .end(function(err, res) {
+                if (err)
+                  console.log('Unexpcted error in refreshing token request:', err);
                 done(err);
               });
           }, timeout);
         })
         .end(function(err, res) {
-          assert(!err);
+          assert(!err, 'Failed to get access token. ' + (err ? err.toString() : ''));
         });
     });
 
