@@ -19,12 +19,12 @@ x-ibm-configuration:
                 - ver100
               execute:
                 - ver-test-policy:
-                  version: 1.0.0
+                    version: 1.0.0
             - operations:
                 - ver101
               execute:
                 - ver-test-policy:
-                  version: 1.0.1
+                    version: 1.0.1
             - operations:
                 - verDefault
               execute:
@@ -33,26 +33,28 @@ x-ibm-configuration:
                 - ver100and101
               execute:
                 - ver-test-policy:
-                  version: 1.0.0
+                    version: 1.0.0
                 - ver-test-policy:
-                  version: 1.0.1
+                    version: 1.0.1
             - operations:
                 - ver100andDefault
               execute:
                 - ver-test-policy:
-                  version: 1.0.0
+                    version: 1.0.0
                 - ver-test-policy:
+                    title: "Should be default version"
             - operations:
                 - ver101andDefault
               execute:
                 - ver-test-policy:
-                  version: 1.0.1
+                    version: 1.0.1
                 - ver-test-policy:
+                    title: "Should be default version"
             - operations:
                 - verMissing
               execute:
                 - ver-test-policy:
-                  version: 1.0.2
+                    version: 1.0.2
 
 paths:
   /ver100:
