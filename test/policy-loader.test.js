@@ -161,7 +161,7 @@ describe('policy-loader', function() {
         });
 
         after(function(done) {
-            process.chdir(cwd);
+          process.chdir(cwd);
             done();
         });
 
@@ -182,6 +182,7 @@ describe('policy-loader', function() {
             policies['mypolicy2'].should.be.a.Function();
             policies['mypolicy3'].should.be.a.Function();
             var context = {};
+
             function next() {};
             policies.mypolicy1({}, context, next);
             //the second mypolicy1 override the first one
