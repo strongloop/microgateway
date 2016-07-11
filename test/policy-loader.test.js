@@ -157,12 +157,12 @@ describe('policy-loader', function() {
         var testdir = path.resolve(__dirname, 'definitions', 'policy-loader', 'location1');
         before(function(done) {
             process.env.POLICY_DIR = testdir;
-            process.chdir(testdir);
+            //process.chdir(testdir);
             done();
         });
 
         after(function(done) {
-            process.chdir(cwd);
+            //process.chdir(cwd);
             delete process.env.POLICY_DIR;
             done();
         });
