@@ -55,7 +55,7 @@ describe('policy-loader', function() {
             function next() {};
             policies.mypolicy1({}, context, next);
             //the second mypolicy1 override the first one
-            context.policyName.should.exactly('mypolicy1').and.be.a.String();
+            context.policyName.should.exactly('mypolicy1a').and.be.a.String();
             policies.mypolicy2({}, context, next);
             context.policyName.should.exactly('mypolicy2').and.be.a.String();
             policies.mypolicy3({}, context, next);
@@ -120,7 +120,7 @@ describe('policy-loader', function() {
             function next() {};
             policies.mypolicy1({}, context, next);
             //the second mypolicy1 override the first one
-            context.policyName.should.exactly('mypolicy1').and.be.a.String();
+            context.policyName.should.exactly('mypolicy1a').and.be.a.String();
             done();
         });
 
@@ -154,14 +154,16 @@ describe('policy-loader', function() {
     describe('use projectDir to load policies', function() {
 
         var cwd = process.cwd();
-        var testdir = path.resolve(__dirname, 'definitions', 'policy-loader');
+        var testdir = path.resolve(__dirname, 'definitions', 'policy-loader', 'location1');
         before(function(done) {
+            process.env.POLICY_DIR = testdir;
             process.chdir(testdir);
             done();
         });
 
         after(function(done) {
-          process.chdir(cwd);
+            process.chdir(cwd);
+            delete process.env.POLICY_DIR;
             done();
         });
 
@@ -181,7 +183,6 @@ describe('policy-loader', function() {
             policies['mypolicy1'].should.be.a.Function();
             policies['mypolicy2'].should.be.a.Function();
             policies['mypolicy3'].should.be.a.Function();
-
             var context = {};
             function next() {};
             policies.mypolicy1({}, context, next);
