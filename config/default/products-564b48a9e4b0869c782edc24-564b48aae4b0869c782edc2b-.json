@@ -203,6 +203,24 @@
                 }
               },
               {
+                "path": "/ratelimit11R",
+                "operation": "get",
+                "rate-limits": {
+                  "unl": {
+                    "value": "unlimited",
+                    "hard-limit": true
+                  },
+                  "per-hour": {
+                    "value": "2/1hour",
+                    "hard-limit": true
+                  },
+                  "per-day": {
+                    "value": "3/1day",
+                    "hard-limit": true
+                  }
+                }
+              },
+              {
                 "path": "/ratelimit12",
                 "operation": "get",
                 "rate-limit": {

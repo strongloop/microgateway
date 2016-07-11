@@ -214,6 +214,22 @@ describe('operation rate limiting test', function() {
         .expect(429, done);
       });
 
+    it('client_id=' + clientId2 + ' "/ratelimit11R" should pass"',
+      function (done) {
+        async.times(2, function(n, next) {
+          request
+            .get('/v1/ratelimit11R?client_id=' + clientId2)
+            .expect(200, next);
+        }, done);
+      });
+
+    it('client_id=' + clientId2 + ' "/ratelimit11R" should reject"',
+      function (done) {
+        request
+        .get('/v1/ratelimit11R?client_id=' + clientId2)
+        .expect(429, done);
+      });
+
     it('client_id=' + clientId2 + ' "/ratelimit12" should pass"',
       function (done) {
         async.times(11, function(n, next) {
