@@ -20,7 +20,7 @@ module.exports = function getInterval(limit, period, unit, unparsed) {
      */
     var parts;
     if (unparsed.toUpperCase() === 'UNLIMITED') {
-      parts = [unparsed, 1, Number.MAX_SAFE_INTEGER/1000, 'seconds'];
+      parts = [unparsed, Number.MAX_SAFE_INTEGER/1000, 1, 'seconds'];
     } else {
       var pattern = /^([\d\s]+)(?:\/([\d\s]*)([a-zA-Z\s]*))?$/;
       parts = pattern.exec(unparsed);
