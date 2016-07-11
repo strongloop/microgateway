@@ -154,16 +154,14 @@ describe('policy-loader', function() {
     describe('use projectDir to load policies', function() {
 
         var cwd = process.cwd();
-        var testdir = path.resolve(__dirname, 'definitions', 'policy-loader', 'location1');
+        var testdir = path.resolve(__dirname, 'definitions', 'policy-loader');
         before(function(done) {
-            process.env.POLICY_DIR = testdir;
-            //process.chdir(testdir);
+            process.chdir(testdir);
             done();
         });
 
         after(function(done) {
-            //process.chdir(cwd);
-            delete process.env.POLICY_DIR;
+            process.chdir(cwd);
             done();
         });
 
