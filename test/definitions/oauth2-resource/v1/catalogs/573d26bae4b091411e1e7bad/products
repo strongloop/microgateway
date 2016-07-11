@@ -1,0 +1,113 @@
+[
+  {
+    "catalog": {
+      "default": false,
+      "id": "573d26bae4b091411e1e7bad",
+      "name": "foo-catalog",
+      "sandbox": true,
+      "title": "fooCatalog",
+      "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+      "portal-type": "BASIC",
+      "gateway-url": "https://<gateway-cluster-address>/myOrg/foo-catalog",
+      "is-saas": false
+    },
+    "document": {
+      "apis": {
+        "stock-quote": {
+          "name": "stock-quote:1.0.0"
+        },
+        "weather-service": {
+          "name": "weather-service:1.0.0"
+        },
+        "oauth2-endpoints": {
+          "name": "oauth2-endpoints:1.0.0"
+        },
+        "resource-owner-token-endpoint-https": {
+          "name": "resource-owner-token-endpoint-https:1.0.0"
+        },
+        "resource-owner-token-endpoint-ldap": {
+          "name": "resource-owner-token-endpoint-ldap:1.0.0"
+        },
+        "resource-owner-token-endpoint-auth-url": {
+          "name": "resource-owner-token-endpoint-auth-url:1.0.0"
+        }
+      },
+      "info": {
+        "name": "basic-product",
+        "title": "BasicProduct",
+        "version": "1.0.0"
+      },
+      "plans": {
+        "Limited": {
+          "title": "Limited",
+          "rate-limit": {
+            "hard-limit": false,
+            "value": "unlimited"
+          },
+          "apis": {
+            "weather-service": {},
+            "oauth2-endpoints": {},
+            "stock-quote": {}
+          }
+        },
+        "gold-plan": {
+          "title": "Gold Plan",
+          "approval": false,
+          "rate-limit": {
+            "hard-limit": false,
+            "value": "1000/1second"
+          },
+          "apis": {}
+        },
+        "default": {
+          "title": "Default Plan",
+          "description": "Default Plan",
+          "approval": false,
+          "rate-limit": {
+            "hard-limit": false,
+            "value": "100/1second"
+          }
+        }
+      },
+      "product": "1.0.0",
+      "visibility": {
+        "view": {
+           "enabled": true,
+           "type": "public",
+           "tags": [],
+           "orgs": []
+        },
+        "subscribe": {
+           "enabled": true,
+           "type": "authenticated",
+           "tags": [],
+           "orgs": []
+        }
+      }
+    },
+    "id": "5762173fe4b076e106cb624c",
+    "organization": {
+      "id": "573ada4ce4b091411e1e7b8f",
+      "name": "myOrg",
+      "title": "myOrg",
+      "tags": [],
+      "members": []
+    },
+    "state": "published",
+    "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/products/5762173fe4b076e106cb624c",
+    "visibility": {
+      "view": {
+        "enabled": true,
+        "type": "public",
+        "tags": [],
+        "orgs": []
+      },
+      "subscribe": {
+        "enabled": true,
+        "type": "authenticated",
+        "tags": [],
+        "orgs": []
+      }
+    }
+  }
+]

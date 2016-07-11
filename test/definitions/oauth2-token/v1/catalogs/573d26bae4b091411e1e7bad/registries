@@ -1,0 +1,34 @@
+[
+  {
+    "id":"574ea9c7e4b076e106cb4432",
+    "url":"https://dpvm210.tw.ibm.com/v1/catalogs/573d26bae4b091411e1e7bad/registries/574ea9c7e4b076e106cb4432",
+    "type":"ldap",
+    "name":"userauth-ldap",
+    "title":"UserAuth LDAP",
+    "description":"",
+    "org-id":"573ada4ce4b091411e1e7b8f",
+    "ldap-config":{
+      "host":"dpautosrv1.dp.rtp.raleigh.ibm.com",
+      "port":389,
+      "ssl":false,
+      "authenticated-bind-admin-password":"dp40test",
+      "protocol-version":"3",
+      "authenticated-bind":true,
+      "authenticated-bind-admin-dn":"cn=root,dc=datapower,dc=com",
+      "search-dn-base":"dc=datapower,dc=com",
+      "search-dn-filter-prefix":"(&(uid=",
+      "search-dn-filter-suffix":")(objectClass=person))",
+      "auth-method":"searchDN",
+      "bind-prefix":"",
+      "bind-suffix":"",
+      "search-dn-scope":"sub",
+      "group-auth-method":"none",
+      "static-group-dn":"",
+      "static-group-filter-prefix":"",
+      "static-group-filter-suffix":"",
+      "static-group-scope":"sub",
+      "dynamic-group-filter":"",
+      "tls-profile":""
+    }
+  }
+]

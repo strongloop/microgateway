@@ -139,8 +139,8 @@
       "name": "trial",
       "title": "Trial Climb On"
     },
-    "apis": {
-      "ascents": {
+    "apis": [
+      {
         "id": "564b7b44e4b0869c782eddd2",
         "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b44e4b0869c782eddd2",
         "state": "running",
@@ -466,7 +466,7 @@
           }
         }
       }
-    }
+    ]
   }
 }, {
   "id": "564bc01be4b0869c782ee45c",
@@ -598,7 +598,20 @@
             },
           "apis": 
             {
-              "ascents": {},
+              "ascents": {
+                "operations": [
+                  {
+                    "path": "/ratelimit10",
+                    "operation": "get",
+                    "rate-limits": {
+                      "per-hour": {
+                        "value": "3/1hour",
+                        "hard-limit": true
+                      }
+                    }
+                  }
+                ]
+              },
               "forecasts": {},
               "routes": {
                 "operations": [
@@ -616,6 +629,60 @@
                       "value": "3/10minute",
                       "hard-limit": true
 
+                    }
+                  },
+                  {
+                    "operationId": "ratelimit4",
+                    "rate-limits": {
+                      "per-10-min": {
+                        "value": "2/10minute",
+                        "hard-limit": true
+                      },
+                      "per-hour": {
+                        "value": "4/1hour",
+                        "hard-limit": true
+                      }
+                    }
+                  },
+                  {
+                    "path": "/ratelimit5",
+                    "operation": "get",
+                    "rate-limits": {
+                      "per-10-min": {
+                        "value": "3/10minute",
+                        "hard-limit": true
+                      },
+                      "per-hour": {
+                        "value": "4/1hour",
+                        "hard-limit": true
+                      }
+                    }
+                  },
+                  {
+                    "operationId": "ratelimit6",
+                    "rate-limits": {
+                      "per-10-min": {
+                        "value": "10/10minute",
+                        "hard-limit": true
+                      },
+                      "per-hour": {
+                        "value": "2/1hour",
+                        "hard-limit": true
+                      }
+                    }
+                  },
+                  {
+                    "path": "/ratelimit7",
+                    "operation": "get",
+                    "rate-limits": {
+                      "per-10-min": {
+                        "value": "10/10minute",
+                        "hard-limit": true
+                      },
+                      "per-hour": {
+                        "value": "3/1hour",
+                        "hard-limit": true
+                      }
                     }
                   },
                   {"operationId": "routes.test1"},
@@ -645,8 +712,8 @@
       "name": "gold",
       "title": "Gold Climb On"
     },
-    "apis": {
-      "ascents": {
+    "apis": [
+      {
         "id": "564b7b44e4b0869c782eddd2",
         "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b44e4b0869c782eddd2",
         "state": "running",
@@ -972,7 +1039,7 @@
           }
         }
       }, 
-   "forecasts": {
+   {
       "id": "564b7b44e4b0869c782eddd5",
       "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b44e4b0869c782eddd5",
       "state": "running",
@@ -1277,7 +1344,7 @@
         }
       }
     }, 
-    "routes": {
+    {
       "id": "564b7b44e4b0869c782ede0a",
       "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b44e4b0869c782ede0a",
       "state": "running",
@@ -1829,7 +1896,7 @@
         }
       }
     }
-  }
+  ]
   }
 }, {
   "id": "564bc04fe4b0869c782ee4c3",
@@ -1945,9 +2012,94 @@
               "hard-limit": false,
               "value": "100/min"
             },
+            "rate-limits": {
+              "plan-per-10-min": {
+                "value": "100/10minute",
+                "hard-limit": true
+              },
+              "plan-per-hour": {
+                "value": "10/1hour",
+                "hard-limit": true
+              }
+            },
             "apis": 
               {
-              "ascents": {},
+              "ascents": {
+                  "operations": [
+                    {
+                      "operationId": "ratelimit8"
+                    },
+                    {
+                      "path": "/ratelimit9",
+                      "operation": "get"
+                    },
+                    {
+                      "path": "/ratelimit10",
+                      "operation": "get",
+                      "rate-limits": {
+                        "per-hour": {
+                          "value": "2/1hour",
+                          "hard-limit": true
+                        }
+                      }
+                    },
+                    {
+                      "path": "/ratelimit11",
+                      "operation": "get",
+                      "rate-limits": {
+                        "per-hour": {
+                          "value": "2/1hour",
+                          "hard-limit": true
+                        },
+                        "unl": {
+                          "value": "unlimited",
+                          "hard-limit": true
+                        }
+                      }
+                    },
+                    {
+                      "path": "/ratelimit11R",
+                      "operation": "get",
+                      "rate-limits": {
+                        "unl": {
+                          "value": "unlimited",
+                          "hard-limit": true
+                        },
+                        "per-hour": {
+                          "value": "2/1hour",
+                          "hard-limit": true
+                        },
+                        "per-day": {
+                          "value": "3/1day",
+                          "hard-limit": true
+                        }
+                      }
+                    },
+                    {
+                      "path": "/ratelimit12",
+                      "operation": "get",
+                      "rate-limit": {
+                        "value": "unlimited",
+                        "hard-limit": true
+                      }
+                    },
+                    {
+                      "path": "/ratelimit13",
+                      "operation": "get",
+                      "rate-limits": {
+                        "unl": {
+                          "value": "unlimited",
+                          "hard-limit": true
+                        }
+                      }
+                    },
+                    {
+                      "path": "/ratelimit14",
+                      "operation": "get",
+                      "rate-limits": {}
+                    }
+                  ]
+              },
               "forecasts": {}
               }
           },
@@ -1970,8 +2122,8 @@
       "name": "silver",
       "title": "Silver Climb On"
     },
-    "apis": {
-      "ascents": {
+    "apis": [
+      {
         "id": "564b7b44e4b0869c782eddd2",
         "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b44e4b0869c782eddd2",
         "state": "running",
@@ -2297,7 +2449,7 @@
           }
         }
       }, 
-    "forecasts": {
+    {
       "id": "564b7b44e4b0869c782eddd5",
       "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b44e4b0869c782eddd5",
       "state": "running",
@@ -2602,6 +2754,6 @@
         }
       }
     }
-  }
+  ]
   }
 }]

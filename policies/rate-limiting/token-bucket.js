@@ -22,6 +22,8 @@ module.exports = function(options) {
     var limiter;
     var key = options.getKey(context);
     logger.debug('Key: %s', key);
+    var fields = key.split(':');
+    var name = fields[fields.length - 2];
     if (key) {
       limiter = limiters[key];
       if (!limiter) {
@@ -37,7 +39,7 @@ module.exports = function(options) {
         var reset = Math.max(interval - (Date.now() - limiter.curIntervalStart),
           0);
 
-        handleResponse(limit, remaining, reset, reject, context, flow);
+        handleResponse(name, limit, remaining, reset, reject, context, flow);
       });
     } else {
       flow.proceed();

@@ -1,0 +1,37 @@
+//- Copyright IBM Corp. 2016. All Rights Reserved.
+//- Node module: microgateway
+//- US Government Users Restricted Rights - Use, duplication or disclosure
+//- restricted by GSA ADP Schedule Contract with IBM Corp.
+doctype html
+html(lang="en")
+  head
+    meta(http-equiv="Pragma", content="no-cache")
+    meta(http-equiv="content-type", content="text/html; charset=UTF-8")
+    meta(charset="UTF-8")
+    title Login Page
+
+  body
+    h2 Login
+
+    p
+      div(id="radius-msg")
+    form(name="LoginForm", method="post", action=action)
+      p
+        strong Please enter your user ID and password.
+        br
+        font(size="2", color="grey") If you have forgotten your user ID or password, please contact the server administrator.
+
+      p
+        table
+          tr
+            td User ID:
+            td
+              input(type="text", size="20", name="j_username")
+          tr
+            td Password:
+            td
+              input(type="password", size="20", name="j_password")
+
+      p
+        input(type="submit", name="login", value="Login")
+        input(type="hidden", size="1024", name="transaction_id", value=transaction_id)

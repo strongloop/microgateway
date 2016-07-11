@@ -1,0 +1,66 @@
+{
+  "name": "OAuthClientApplication",
+  "base": "Application",
+  "properties": {
+    "id": {
+      "type": "string",
+      "id": true,
+      "generated": false,
+      "length": 128
+    },
+    "clientType": {
+      "type": "string",
+      "enum": ["public", "confidential"]
+    },
+    "redirectURIs": [ "string" ],
+    "tokenEndpointAuthMethod": {
+      "type": "string",
+      "enum": ["none", "client_secret_post", "client_secret_basic"]
+    },
+    "grantTypes": [
+      {
+        "type": "string",
+        "enum": ["authorization_code", "implicit", "client_credentials",
+          "password", "urn:ietf:params:oauth:grant-type:jwt-bearer",
+          "urn:ietf:params:oauth:grant-type:saml2-bearer"]
+      }
+    ],
+    "responseTypes": [
+      {
+        "type": "string",
+        "enum": ["code", "token"]
+      }
+    ],
+    "tokenType": {
+      "type": "string",
+      "enum": ["bearer", "jwt", "mac"]
+    },
+    "clientSecret": "string",
+    "clientName": "string",
+    "clientURI": "string",
+    "logoURI": "string",
+    "scopes": ["string"],
+    "contacts": ["string"],
+    "tosURI": "string",
+    "policyURI": "string",
+    "jwksURI": "string",
+    "jwks": {
+      "type": "string",
+      "mysql": {
+        "dataLength": 4096,
+        "dataType": "TEXT"
+      }
+    },
+    "softwareId": "string",
+    "softwareVersion": "string",
+
+    "callbackUrls": null,
+    "permissions": null,
+    "authenticationEnabled": null,
+    "anonymousAllowed": null,
+    "authenticationSchemes": null,
+    "icon": null,
+    "url": null
+  },
+  "comments": "https://tools.ietf.org/html/draft-ietf-oauth-dyn-reg-24"
+}

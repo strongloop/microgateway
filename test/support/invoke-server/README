@@ -36,6 +36,9 @@ openssl req -new -key sandy.key -out sandy.csr
 openssl x509 -req -days 7300 -in sandy.csr -CA root2.crt -CAkey root2.key -set_serial 01 -out sandy.crt
 
 
+//PKCS (password: 123456)
+openssl pkcs12 -export -out alice.pfx -inkey alice.key -in alice.crt -certfile root.crt
+
 /////////////////////////////////////////////
 // To self-signed:
 /////////////////////////////////////////////

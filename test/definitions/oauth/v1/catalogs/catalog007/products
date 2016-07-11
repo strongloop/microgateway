@@ -1,0 +1,145 @@
+[
+    {
+        "id": "product1",
+        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/catalog007/products/product1",
+        "state": "published",
+        "visibility": {},
+        "organization": {},
+        "catalog": {},
+        "document": {
+            "product": "1.0.0",
+            "info": {
+                "name": "product1",
+                "title": "Product1",
+                "version": "1.0.0"
+            },
+            "visibility": {},
+            "apis": {
+              "api01": { "name": "api01:1.0.0" },
+              "api02": { "name": "api02:1.0.0" },
+
+              "api25": { "name": "api25:1.0.0" },
+
+              "api32": { "name": "api32:1.0.0" },
+              "api34": { "name": "api34:1.0.0" },
+              "api35": { "name": "api35:1.0.0" },
+
+              "api51": { "name": "api51:1.0.0" },
+              "api52": { "name": "api52:1.0.0" },
+
+              "api85": { "name": "api85:1.0.0" },
+
+              "api000": { "name": "api000:1.0.0" },
+              "api102": { "name": "api102:1.0.0" },
+
+              "api050": { "name": "api050:1.0.0" },
+              "api152": { "name": "api152:1.0.0" },
+
+              "api200": { "name": "api200:1.0.0" },
+              "api202": { "name": "api202:1.0.0" },
+              "api203": { "name": "api203:1.0.0" },
+              "api250": { "name": "api250:1.0.0" },
+              "api252": { "name": "api252:1.0.0" },
+              "api253": { "name": "api253:1.0.0" },
+
+              "api400": { "name": "api400:1.0.0" },
+              "api402": { "name": "api402:1.0.0" },
+              "api403": { "name": "api403:1.0.0" },
+              "api404": { "name": "api404:1.0.0" },
+              "api405": { "name": "api405:1.0.0" },
+              "api406": { "name": "api406:1.0.0" },
+
+              "api450": { "name": "api450:1.0.0" },
+              "api452": { "name": "api452:1.0.0" },
+              "api453": { "name": "api453:1.0.0" },
+              "api454": { "name": "api454:1.0.0" },
+              "api455": { "name": "api455:1.0.0" },
+              "api456": { "name": "api456:1.0.0" },
+
+              "api500": { "name": "api500:1.0.0" },
+              "api501": { "name": "api501:1.0.0" },
+              "api502": { "name": "api502:1.0.0" },
+              "api503": { "name": "api503:1.0.0" },
+
+              "api550": { "name": "api550:1.0.0" },
+              "api551": { "name": "api551:1.0.0" },
+              "api552": { "name": "api552:1.0.0" },
+              "api553": { "name": "api553:1.0.0" },
+
+              "api600": { "name": "api600:1.0.0" },
+              "api601": { "name": "api601:1.0.0" },
+              "api602": { "name": "api602:1.0.0" },
+              "api606": { "name": "api606:1.0.0" },
+              "api609": { "name": "api609:1.0.0" },
+
+              "api610": { "name": "api610:1.0.0" },
+              "api611": { "name": "api611:1.0.0" },
+              "api612": { "name": "api612:1.0.0" },
+              "api613": { "name": "api613:1.0.0" },
+              "api614": { "name": "api614:1.0.0" },
+              "api615": { "name": "api615:1.0.0" },
+
+              "api621": { "name": "api621:1.0.0" },
+
+              "api650": { "name": "api650:1.0.0" },
+              "api651": { "name": "api651:1.0.0" },                
+              "api652": { "name": "api652:1.0.0" },
+              "api656": { "name": "api656:1.0.0" },
+              "api659": { "name": "api659:1.0.0" },
+
+              "api660": { "name": "api660:1.0.0" },
+              "api661": { "name": "api661:1.0.0" },
+              "api662": { "name": "api662:1.0.0" },
+              "api663": { "name": "api663:1.0.0" },
+              "api664": { "name": "api664:1.0.0" },
+              "api665": { "name": "api665:1.0.0" },
+
+              "api671": { "name": "api671:1.0.0" }
+
+
+
+            },
+            "plans": {
+                "gold": {
+                    "title": "Gold Plan",
+                    "rate-limit": {
+                        "hard-limit": false,
+                        "value": "10/sec"
+                    },
+                    "apis": {}
+                }
+            }
+        }
+    },
+    {
+        "id": "product2",
+        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/catalog007/products/product2",
+        "state": "published",
+        "visibility": {},
+        "organization": {},
+        "catalog": {},
+        "document": {
+            "product": "1.0.0",
+            "info": {
+                "name": "product2",
+                "title": "Product2",
+                "version": "2.0.0"
+            },
+            "visibility": {},
+            "apis": {
+              "api51": { "name": "api51:1.0.0" },
+              "api25": { "name": "api25:1.0.0" }
+            },
+            "plans": {
+                "gold": {
+                    "title": "Gold Plan",
+                    "rate-limit": {
+                        "hard-limit": false,
+                        "value": "10/sec"
+                    },
+                    "apis": {}
+                }
+            }
+        }
+    }
+]

@@ -1,0 +1,31 @@
+{
+  "name": "OAuthPermission",
+  "base": "PersistedModel",
+  "properties": {
+    "apiId": {
+      "type": "string",
+      "length": 128,
+      "index": true
+    },
+    "appId": {
+      "type": "string",
+      "length": 128,
+      "index": true
+    },
+    "userId": {
+      "type": "string",
+      "index": true
+    },
+    "issuedAt": {
+      "type": "date",
+      "index": true
+    },
+    "expiresIn": "number",
+    "expiredAt": {
+      "type": "date",
+      "index": true
+    },
+    "scopes": [ "string" ]
+  }
+}
+

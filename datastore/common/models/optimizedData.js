@@ -8,6 +8,8 @@ var async = require('async');
 var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'microgateway:datastore:optimizedData'});
 var jsonRefs = require('json-refs');
+var _ = require('lodash');
+var getInterval = require('../../../policies/rate-limiting/get-interval');
 
 var ALLPLANS = 'ALLPLANS';
 function createProductOptimizedEntry(app, ctx)
@@ -34,6 +36,33 @@ function cloneJSON(json) {
   return JSON.parse(JSON.stringify(json));
 }
 
+function setRateLimits(rateLimit, rateLimits) {
+  var combined;
+  if (rateLimits) {
+    combined = Object.keys(rateLimits).map(function(key) {
+                 var obj = {};
+                 obj[key] = rateLimits[key];
+                 return obj;
+               });
+  }
+  if (rateLimit) {
+    if (!combined) {
+      combined = [];
+    }
+    combined.unshift({'x-ibm-unnamed-rate-limit' : rateLimit});
+    combined.sort(function(a, b) {
+      var parsedA = getInterval(1000, 1, "hours", _.values(a)[0].value);
+      var parsedB = getInterval(1000, 1, "hours", _.values(b)[0].value);
+      return parsedA.interval === parsedB.interval ? parsedA.limit - parsedB.limit :
+                                                     parsedA.interval - parsedB.interval;
+    });
+  }
+  if (combined && combined.length == 0) {
+    combined = undefined;
+  }
+  return combined;
+}
+
 function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, productCallback)
   {
   var plans = cloneJSON(product.document.plans);
@@ -52,8 +81,8 @@ function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, pr
       locals.plan.name = propname;
       locals.plan.id = getPlanID(locals.product, propname);
       locals.plan.version = locals.product.document.info.version;
-      locals.plan.rateLimit =
-        locals.product.document.plans[locals.plan.name]['rate-limit'];
+      locals.plan.rateLimit = setRateLimits(locals.product.document.plans[locals.plan.name]['rate-limit'],
+                                            locals.product.document.plans[locals.plan.name]['rate-limits']);
       // 1. trying to add to a particular plan
       // 2. trying to add to all plans
       //    a. all subscription
@@ -107,7 +136,7 @@ function ripCTX(ctx)
     credentials: ctx.instance.application['app-credentials'],
     developerOrg: ctx.instance['developer-organization']
   };
-  ctx.instance['plan-registration'].apis = {}; // old list, wipe it
+  ctx.instance['plan-registration'].apis = []; // old list, wipe it
   locals.product = ctx.instance['plan-registration'].product;
   locals.plan = {};
   if (ctx.instance['plan-registration'].plan) {
@@ -123,8 +152,8 @@ function ripCTX(ctx)
       }
     locals.plan.id = getPlanID(locals.product, locals.plan.name);
     locals.plan.version = locals.product.document.info.version;
-    locals.plan.rateLimit =
-      locals.product.document.plans[locals.plan.name]['rate-limit'];
+    locals.plan.rateLimit = setRateLimits(locals.product.document.plans[locals.plan.name]['rate-limit'],
+                                          locals.product.document.plans[locals.plan.name]['rate-limits']);
     }
   locals.snapshot = ctx.instance['snapshot-id'];
   return locals;
@@ -400,6 +429,8 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
 
           // use JSON-ref resolved document if available
           var apiDocument = api['document-resolved'] || api.document;
+          var apiState = api.state || "running";
+          var apiEnforced = true; 
 
           var pathsProp = apiDocument.paths;
           logger.debug('pathsProp ',
@@ -446,8 +477,9 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                                opPath.toUpperCase() === propname.toUpperCase())) {
                           allowOperation = true;
                           // Look for some operation scoped ratelimit metadata
-                          if (planOp["rate-limit"] !== undefined) {
-                            observedRatelimit=planOp["rate-limit"];
+                          observedRatelimit = setRateLimits(planOp['rate-limit'], planOp['rate-limits']) ||
+                                              pieces.plan.rateLimit;
+                          if (observedRatelimit !== undefined) {
 
                             if (opId) {
                               rateLimitScope = pieces.plan.id+":"+opId;
@@ -518,6 +550,10 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
           var ibmSwaggerExtension = apiDocument['x-ibm-configuration'];
           var apiProperties = {};
           if (ibmSwaggerExtension) {
+            if (ibmSwaggerExtension['enforced'] === false) {
+              apiEnforced = false;
+            }
+             
             var defaultApiProperties = ibmSwaggerExtension.properties;
             if (defaultApiProperties) {
               Object.getOwnPropertyNames(defaultApiProperties).forEach(
@@ -601,6 +637,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'api-assembly': apiAssembly,
             'api-base-path': apiDocument.basePath,
             'api-name': apiDocument.info.title,
+            'api-state': apiState,
             'api-type': apiType,
             'api-version': apiDocument.info.version,
             'api-properties': apiProperties,
@@ -608,7 +645,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'snapshot-id' : pieces.snapshot
           };
 
-        if (apiPaths.length !== 0) { // no paths, no entry..
+        if (apiPaths.length !== 0 && apiEnforced === true && apiState !== "stopped") { // no paths, no entry..
           app.models.optimizedData.create(
             newOptimizedDataEntry,
             function(err, optimizedData) {

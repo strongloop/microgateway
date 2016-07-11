@@ -157,9 +157,94 @@
           "hard-limit": false,
           "value": "100/min"
         },
+        "rate-limits": {
+          "plan-per-10-min": {
+            "value": "100/10minute",
+            "hard-limit": true
+          },
+          "plan-per-hour": {
+            "value": "10/1hour",
+            "hard-limit": true
+          }
+        },
         "apis": 
           {
-          "ascents": {},
+          "ascents": {
+            "operations": [
+              {
+                "operationId": "ratelimit8"
+              },
+              {
+                "path": "/ratelimit9",
+                "operation": "get"
+              },
+              {
+                "path": "/ratelimit10",
+                "operation": "get",
+                "rate-limits": {
+                  "per-hour": {
+                    "value": "2/1hour",
+                    "hard-limit": true
+                  }
+                }
+              },
+              {
+                "path": "/ratelimit11",
+                "operation": "get",
+                "rate-limits": {
+                  "per-hour": {
+                    "value": "2/1hour",
+                    "hard-limit": true
+                  },
+                  "unl": {
+                    "value": "unlimited",
+                    "hard-limit": true
+                  }
+                }
+              },
+              {
+                "path": "/ratelimit11R",
+                "operation": "get",
+                "rate-limits": {
+                  "unl": {
+                    "value": "unlimited",
+                    "hard-limit": true
+                  },
+                  "per-hour": {
+                    "value": "2/1hour",
+                    "hard-limit": true
+                  },
+                  "per-day": {
+                    "value": "3/1day",
+                    "hard-limit": true
+                  }
+                }
+              },
+              {
+                "path": "/ratelimit12",
+                "operation": "get",
+                "rate-limit": {
+                  "value": "unlimited",
+                  "hard-limit": true
+                }
+              },
+              {
+                "path": "/ratelimit13",
+                "operation": "get",
+                "rate-limits": {
+                  "unl": {
+                    "value": "unlimited",
+                    "hard-limit": true
+                  }
+                }
+              },
+              {
+                "path": "/ratelimit14",
+                "operation": "get",
+                "rate-limits": {}
+              }
+            ]
+          },
           "forecasts": {}
           }
       },
@@ -173,7 +258,20 @@
         },
         "apis": 
           {
-          "ascents": {},
+          "ascents": {
+            "operations": [
+              {
+                "path": "/ratelimit10",
+                "operation": "get",
+                "rate-limits": {
+                  "per-hour": {
+                    "value": "3/1hour",
+                    "hard-limit": true
+                  }
+                }
+              }
+            ]
+          },
           "routes": {
             "operations": [
               {
@@ -189,6 +287,60 @@
                 "rate-limit": {
                   "value": "3/10minute",
                   "hard-limit": true
+                }
+              },
+              {
+                "operationId": "ratelimit4",
+                "rate-limits": {
+                  "per-10-min": {
+                    "value": "2/10minute",
+                    "hard-limit": true
+                  },
+                  "per-hour": {
+                    "value": "4/1hour",
+                    "hard-limit": true
+                  }
+                }
+              },
+              {
+                "path": "/ratelimit5",
+                "operation": "get",
+                "rate-limits": {
+                  "per-10-min": {
+                    "value": "3/10minute",
+                    "hard-limit": true
+                  },
+                  "per-hour": {
+                    "value": "4/1hour",
+                    "hard-limit": true
+                  }
+                }
+              },
+              {
+                "operationId": "ratelimit6",
+                "rate-limits": {
+                  "per-10-min": {
+                    "value": "10/10minute",
+                    "hard-limit": true
+                  },
+                  "per-hour": {
+                    "value": "2/1hour",
+                    "hard-limit": true
+                  }
+                }
+              },
+              {
+                "path": "/ratelimit7",
+                "operation": "get",
+                "rate-limits": {
+                  "per-10-min": {
+                    "value": "10/10minute",
+                    "hard-limit": true
+                  },
+                  "per-hour": {
+                    "value": "3/1hour",
+                    "hard-limit": true
+                  }
                 }
               },
               {"operationId": "routes.test1"},

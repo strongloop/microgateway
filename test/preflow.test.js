@@ -9,33 +9,12 @@ var mg = require('../lib/microgw');
 var supertest = require('supertest');
 var _ = require('lodash');
 var assert = require('assert');
+
+var dsCleanup = require('./support/utils').dsCleanup;
 var apimServer = require('./support/mock-apim-server/apim-server');
 var echo = require('./support/echo-server');
 
 var request, httprequest;
-
-function dsCleanup(port) {
-  // clean up the directory
-  return new Promise(function(resolve, reject) {
-    var expect = {snapshot : {}};
-    var datastoreRequest = supertest('http://localhost:' + port);
-    datastoreRequest
-      .get('/api/snapshots')
-      .end(function (err, res) {
-        var snapshotID = res.body[0].id;
-        datastoreRequest
-          .get('/api/snapshots/release?id=' + snapshotID)
-          .end(function(err, res) {
-            try {
-              assert(_.isEqual(expect, res.body));
-              resolve();
-            } catch (error) {
-              reject(error);
-            }
-          });
-      });
-  });
-}
 
 describe('preflow testing', function() {
   before(function(done) {

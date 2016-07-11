@@ -1,0 +1,15 @@
+{
+  "name": "OAuthScopeMapping",
+  "properties": {
+    "scope": {
+      "type": "string",
+      "length": 255,
+      "index": true,
+      "description": "The scope name"
+    },
+    "route": {
+      "type": "string",
+      "description": "The route as [verb] /api/users"
+    }
+  }
+}
