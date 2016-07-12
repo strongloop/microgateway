@@ -101,15 +101,17 @@ function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, pr
 }
 
 function determineNeededSubscriptionOptimizedEntries(app, ctx) {
-  var locals;
-  locals = ripCTX(ctx);
-  if (!process.env.APIMANAGER) {
-    var planid = ctx.instance['plan-registration'].id;
-    findPlansToAddSubscriptions(app, locals, planid);
-  } else {
-    //specific subscription from APIm
-    var isWildcard = false;
-    gatherDataCreateOptimizedEntry(app, locals, isWildcard);
+  if (ctx && ctx.instance && (ctx.instance.active === true || ctx.instance.active === undefined)) {
+    var locals;
+    locals = ripCTX(ctx);
+    if (!process.env.APIMANAGER) {
+      var planid = ctx.instance['plan-registration'].id;
+      findPlansToAddSubscriptions(app, locals, planid);
+    } else {
+      //specific subscription from APIm
+      var isWildcard = false;
+      gatherDataCreateOptimizedEntry(app, locals, isWildcard);
+    }
   }
 }
 
