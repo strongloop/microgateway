@@ -1014,8 +1014,8 @@ describe('oauth2 AZ-server', function() {
             assert(location.indexOf('http://localhost:7010/redirect') === 0,
               'incorrect redirect_uri');
 
-            assert(uri.query.hasOwnProperty('original-url'), 'no original-url');
-            assert(uri.query.hasOwnProperty('app-name'), 'no app-name');
+            assert(_.isString(uri.query['original-url']), 'no original-url');
+            assert(_.isString(uri.query['app-name']), 'no app-name');
 
             var originalURL = url.parse(decodeURIComponent(uri.query['original-url']), true);
 
@@ -1073,8 +1073,8 @@ describe('oauth2 AZ-server', function() {
             var uri = url.parse(location, true);
             assert(location.indexOf('http://localhost:7010/redirect') === 0,
               'incorrect redirect_uri');
-            assert(uri.query.hasOwnProperty('original-url'), 'no original-url');
-            assert(uri.query.hasOwnProperty('app-name'), 'no app-name');
+            assert(_.isString(uri.query['original-url']), 'no original-url');
+            assert(_.isString(uri.query['app-name']), 'no app-name');
 
             var originalURL = url.parse(decodeURIComponent(uri.query['original-url']), true);
 
@@ -1125,8 +1125,8 @@ describe('oauth2 AZ-server', function() {
             var uri = url.parse(location, true);
             assert(location.indexOf('http://localhost:7010/redirect') === 0,
               'incorrect redirect_uri');
-            assert(uri.query.hasOwnProperty('original-url'), 'no original-url');
-            assert(uri.query.hasOwnProperty('app-name'), 'no app-name');
+            assert(_.isString(uri.query['original-url']), 'no original-url');
+            assert(_.isString(uri.query['app-name']), 'no app-name');
 
             var originalURL = url.parse(decodeURIComponent(uri.query['original-url']), true);
 
@@ -1174,8 +1174,8 @@ describe('oauth2 AZ-server', function() {
             var uri = url.parse(location, true);
             assert(location.indexOf('http://localhost:7010/redirect') === 0,
               'incorrect redirect_uri');
-            assert(uri.query.hasOwnProperty('original-url'), 'no original-url');
-            assert(uri.query.hasOwnProperty('app-name'), 'no app-name');
+            assert(_.isString(uri.query['original-url']), 'no original-url');
+            assert(_.isString(uri.query['app-name']), 'no app-name');
 
             var originalURL = url.parse(decodeURIComponent(uri.query['original-url']), true);
 
@@ -1223,8 +1223,8 @@ describe('oauth2 AZ-server', function() {
             var uri = url.parse(location, true);
             assert(location.indexOf('http://localhost:7010/redirect') === 0,
               'incorrect redirect_uri');
-            assert(uri.query.hasOwnProperty('original-url'), 'no original-url');
-            assert(uri.query.hasOwnProperty('app-name'), 'no app-name');
+            assert(_.isString(uri.query['original-url']), 'no original-url');
+            assert(_.isString(uri.query['app-name']), 'no app-name');
 
             var originalURL = url.parse(decodeURIComponent(uri.query['original-url']), true);
 
@@ -1275,8 +1275,8 @@ describe('oauth2 AZ-server', function() {
             var uri = url.parse(location, true);
             assert(location.indexOf('http://localhost:7010/redirect') === 0,
               'incorrect redirect_uri');
-            assert(uri.query.hasOwnProperty('original-url'), 'no original-url');
-            assert(uri.query.hasOwnProperty('app-name'), 'no app-name');
+            assert(_.isString(uri.query['original-url']), 'no original-url');
+            assert(_.isString(uri.query['app-name']), 'no app-name');
 
             var originalURL = url.parse(decodeURIComponent(uri.query['original-url']), true);
 
