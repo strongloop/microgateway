@@ -16,6 +16,8 @@ var microgw = require('../lib/microgw');
 var authServer = require('./support/auth-server');
 var apimServer = require('./support/mock-apim-server/apim-server');
 
+var encodedRedirectURI = 
+  encodeURIComponent('https://localhost:5000/use-oauth/getinfo');
 
 describe('oauth2 AZ-server', function() {
 
@@ -1367,9 +1369,9 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no cookie');
             var form = parseConsentForm(res.text);
 
-            assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
+            assert(form.redirectURI === encodedRedirectURI,
                 'incorrect redirectURI');
-            assert(form.scope === 'scope1 scope2 scope3',
+            assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
                 'incorrect scope');
             assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                 'incorrect client_id');
@@ -1430,9 +1432,9 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no cookie');
             var form = parseConsentForm(res.text);
 
-            assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
+            assert(form.redirectURI === encodedRedirectURI,
                 'incorrect redirectURI');
-            assert(form.scope === 'scope1 scope2 scope3',
+            assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
                 'incorrect scope');
             assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                 'incorrect client_id');
@@ -1582,9 +1584,9 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no cookie');
             var form = parseConsentForm(res.text);
 
-            assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
+            assert(form.redirectURI === encodedRedirectURI,
                 'incorrect redirectURI');
-            assert(form.scope === 'scope1 scope2 scope3',
+            assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
                 'incorrect scope');
             assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                 'incorrect client_id');
@@ -1646,9 +1648,9 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no cookie');
             var form = parseConsentForm(res.text);
 
-            assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
+            assert(form.redirectURI === encodedRedirectURI,
                 'incorrect redirectURI');
-            assert(form.scope === 'scope1 scope2 scope3',
+            assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
                 'incorrect scope');
             assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                 'incorrect client_id');
@@ -1706,9 +1708,9 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no cookie');
             var form = parseConsentForm(res.text);
 
-            assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
+            assert(form.redirectURI === encodedRedirectURI,
                 'incorrect redirectURI');
-            assert(form.scope === 'scope1 scope2 scope3',
+            assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
                 'incorrect scope');
             assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                 'incorrect client_id');
@@ -1766,9 +1768,9 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no cookie');
             var form = parseConsentForm(res.text);
 
-            assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
+            assert(form.redirectURI === encodedRedirectURI,
                 'incorrect redirectURI');
-            assert(form.scope === 'scope1 scope2 scope3',
+            assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
                 'incorrect scope');
             assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                 'incorrect client_id');
@@ -1885,9 +1887,9 @@ describe('oauth2 AZ-server', function() {
                   assert(cookie !== undefined, 'no cookie');
                   var form = parseConsentForm(res2.text);
 
-                  assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
+                  assert(form.redirectURI === encodedRedirectURI,
                       'incorrect redirectURI');
-                  assert(form.scope === 'scope1 scope2 scope3',
+                  assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
                       'incorrect scope');
                   assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                       'incorrect client_id');
@@ -1967,9 +1969,9 @@ describe('oauth2 AZ-server', function() {
                  assert(cookie !== undefined, 'no cookie');
                  var form = parseConsentForm(res2.text);
 
-                 assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
+                 assert(form.redirectURI === encodedRedirectURI,
                      'incorrect redirectURI');
-                 assert(form.scope === 'scope1 scope2 scope3',
+                 assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
                      'incorrect scope');
                  assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                      'incorrect client_id');
@@ -2246,9 +2248,9 @@ describe('oauth2 AZ-server', function() {
                   var cookie = res2.header['set-cookie'];
                   assert(cookie !== undefined, 'no cookie');
                   var form = parseConsentForm(res2.text);
-                  assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
+                  assert(form.redirectURI === encodedRedirectURI,
                       'incorrect redirectURI');
-                  assert(form.scope === 'scope1 scope2 scope3',
+                  assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
                       'incorrect scope');
                   assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                       'incorrect client_id');
@@ -2328,9 +2330,9 @@ describe('oauth2 AZ-server', function() {
                   var cookie = res2.header['set-cookie'];
                   assert(cookie !== undefined, 'no cookie');
                   var form = parseConsentForm(res2.text);
-                  assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
+                  assert(form.redirectURI === encodedRedirectURI,
                       'incorrect redirectURI');
-                  assert(form.scope === 'scope1 scope2 scope3',
+                  assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
                       'incorrect scope');
                   assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                       'incorrect client_id');
@@ -2405,9 +2407,9 @@ describe('oauth2 AZ-server', function() {
                   assert(cookie !== undefined, 'no cookie');
                   var form = parseConsentForm(res2.text);
 
-                  assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
+                  assert(form.redirectURI === encodedRedirectURI,
                       'incorrect redirectURI');
-                  assert(form.scope === 'scope1 scope2 scope3',
+                  assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
                     'incorrect scope');
                   assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                       'incorrect client_id');
@@ -2482,9 +2484,9 @@ describe('oauth2 AZ-server', function() {
                   assert(cookie !== undefined, 'no cookie');
                   var form = parseConsentForm(res2.text);
 
-                  assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
+                  assert(form.redirectURI === encodedRedirectURI,
                       'incorrect redirectURI');
-                  assert(form.scope === 'scope1 scope2 scope3',
+                  assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
                       'incorrect scope');
                   assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                       'incorrect client_id');
