@@ -5,9 +5,7 @@
 
 'use strict';
 
-//This env has to be before the mg require because policy loader runs early
-process.env.POLICY_DIR = __dirname + '/definitions/policy-loader/location3';
-var mg = require('../lib/microgw');
+var mg;
 var supertest = require('supertest');
 var _ = require('lodash');
 var assert = require('assert');
@@ -42,6 +40,9 @@ describe('policy loader version support test', function() {
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/policy-loader';
     process.env.NODE_ENV = 'production';
+    process.env.POLICY_DIR = __dirname + '/definitions/policy-loader/location3';
+    delete require.cache[require.resolve('../lib/microgw')];
+    mg = require('../lib/microgw');
     mg.start(3000)
       .then(function() {
         request = supertest(mg.app);

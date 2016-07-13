@@ -38,6 +38,7 @@ describe('ratelimit basic policy', function() {
       .then(function() { return echo.stop(); })
       .then(done, done)
       .catch(done);
+    delete process.env.APIMANAGER;
     delete process.env.CONFIG_DIR;
     delete process.env.NODE_ENV;
     // A hacky way to reset rate limiters
