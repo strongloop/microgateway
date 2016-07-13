@@ -168,7 +168,7 @@ function loadData(app, apimanager, models, currdir) {
             // && apimanager.handshakeOk << shouldn't call if handshake failed.. not ready #TODO
             // don't look for successful handshake currently because UT depends on this
           // we have an APIm, handshake succeeded, so try to pull data..
-          pullFromAPIm(apimanager, snapshotID, function(err, dir) {
+          pullFromAPIm(apimanager, currdir, snapshotID, function(err, dir) {
             snapdir = dir; // even in case of error, we need to try loading from the file system
             callback();
           });
@@ -452,11 +452,12 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
 /**
  * Attempt to request data from APIm server and persist to disk
  * @param {Object} config - configuration pointing to APIm server
+ * @param {string} currdir - current snapshot symbolic link path 
  * @param {string} uid - snapshot identifier
  * @param {callback} cb - callback that handles error or path to
  *                        snapshot directory
  */
-function pullFromAPIm(apimanager, uid, cb) {
+function pullFromAPIm(apimanager, currdir, uid, cb) {
   logger.debug('pullFromAPIm entry');
   // Have an APIm, grab latest if we can..
   var snapdir =  process.env.ROOTCONFIGDIR +
@@ -487,6 +488,7 @@ function pullFromAPIm(apimanager, uid, cb) {
       options.clikey = apimanager.clikey;
       options.clicert = apimanager.clicert;
       options.clientid = apimanager.clientid;
+      options.indir = currdir;
       options.outdir = snapdir;
       logger.debug('apimpull start');
       apimpull(options,function(err, response) {

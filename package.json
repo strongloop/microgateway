@@ -41,7 +41,8 @@
     "rimraf": "^2.5.2",
     "should": "^8.2.1",
     "sinon": "^1.17.3",
-    "supertest": "^1.1.0"
+    "supertest": "^1.1.0",
+    "touch": "^1.0.0"
   },
   "dependencies": {
     "apiconnect-cli-config": "^2.x",
