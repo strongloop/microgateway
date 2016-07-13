@@ -62,13 +62,13 @@ describe('policy loader version support test', function() {
     delete process.env.NODE_ENV;
   });
 
-  it('ver-test-policy:1.0.0 should pass', version100);
-  it('ver-test-policy:1.0.1 should pass', version101);
-  it('ver-test-policy (Default) should resolve to 1.0.1', versionDefault);
-  it('ver-test-policy:1.0.0 and 1.0.1 should pass', version100and101);
-  it('ver-test-policy:1.0.0 and (Default) should pass', version100andDefault);
-  it('ver-test-policy:1.0.1 and (Default) should pass (same policy 2x)', version101andDefault);
-  it('ver-test-policy:1.0.2 should fail (module not found)', versionMissing);
+  it.skip('ver-test-policy:1.0.0 should pass', version100);
+  it.skip('ver-test-policy:1.0.1 should pass', version101);
+  it.skip('ver-test-policy (Default) should resolve to 1.0.1', versionDefault);
+  it.skip('ver-test-policy:1.0.0 and 1.0.1 should pass', version100and101);
+  it.skip('ver-test-policy:1.0.0 and (Default) should pass', version100andDefault);
+  it.skip('ver-test-policy:1.0.1 and (Default) should pass (same policy 2x)', version101andDefault);
+  it.skip('ver-test-policy:1.0.2 should fail (module not found)', versionMissing);
 });
 
 function version100(doneCB) {
