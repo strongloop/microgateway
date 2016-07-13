@@ -1,0 +1,101 @@
+swagger: '2.0'
+
+info:
+  x-ibm-name: apiconnect-demo
+  version: 1.0.0
+  title: apiconnect-demo
+
+schemes:
+  - http
+
+basePath: /policyloader
+
+x-ibm-configuration:
+  assembly:
+    execute:
+      - operation-switch:
+          case:
+            - operations:
+                - ver100
+              execute:
+                - ver-test-policy:
+                    version: 1.0.0
+            - operations:
+                - ver101
+              execute:
+                - ver-test-policy:
+                    version: 1.0.1
+            - operations:
+                - verDefault
+              execute:
+                - ver-test-policy:
+            - operations:
+                - ver100and101
+              execute:
+                - ver-test-policy:
+                    version: 1.0.0
+                - ver-test-policy:
+                    version: 1.0.1
+            - operations:
+                - ver100andDefault
+              execute:
+                - ver-test-policy:
+                    version: 1.0.0
+                - ver-test-policy:
+                    title: "Should be default version"
+            - operations:
+                - ver101andDefault
+              execute:
+                - ver-test-policy:
+                    version: 1.0.1
+                - ver-test-policy:
+                    title: "Should be default version"
+            - operations:
+                - verMissing
+              execute:
+                - ver-test-policy:
+                    version: 1.0.2
+
+paths:
+  /ver100:
+    get:
+      operationId: ver100
+      responses:
+        '200':
+          description: 200 OK
+  /ver101:
+    get:
+      operationId: ver101
+      responses:
+        '200':
+          description: 200 OK
+  /verDefault:
+    get:
+      operationId: verDefault
+      responses:
+        '200':
+          description: 200 OK
+  /ver100and101:
+    get:
+      operationId: ver100and101
+      responses:
+        '200':
+          description: 200 OK
+  /ver100andDefault:
+    get:
+      operationId: ver100andDefault
+      responses:
+        '200':
+          description: 200 OK
+  /ver101andDefault:
+    get:
+      operationId: ver101andDefault
+      responses:
+        '200':
+          description: 200 OK
+  /verMissing:
+    get:
+      operationId: verMissing
+      responses:
+        '200':
+          description: 200 OK

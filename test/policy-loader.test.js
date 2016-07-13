@@ -15,7 +15,7 @@ var path          = require('path');
 
 describe('policy-loader', function() {
     describe('load default policy', function() {
-        it('should contains cors, invoke, redaction set-variable', function() {
+        it('should contain cors, invoke, redaction set-variable', function() {
             var pl = policyLoader.create(path.resolve(__dirname, '..', 'policies'));
             pl.should.be.a.Object();
             var policies = pl.getPolicies();
@@ -191,4 +191,3 @@ describe('policy-loader', function() {
         });
       });
 });
-

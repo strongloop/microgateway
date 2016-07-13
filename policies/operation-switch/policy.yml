@@ -2,7 +2,7 @@ policy: 1.1.0
 
 info:
   title: Operation-Switch
-  name: apim-operation-switch
+  name: operation-switch
   version: 1.0.0
   description: Operation-Switch policy for the IBM API Connect
   contact:
@@ -47,4 +47,3 @@ properties:
               $ref: '#/definitions/assembly-policy'
   required:
     - case
-
