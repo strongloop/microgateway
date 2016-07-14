@@ -25,9 +25,7 @@ module.exports = function(config) {
 //              required: false
 //              in: "body"
 
-
         logger.debug('Validation schema is from request property');
-
         var parameters = context._.api.parameters;
         parameters.forEach( function(parameter) {
 
@@ -45,7 +43,8 @@ module.exports = function(config) {
                     var error = {
                             name: 'ValidateError',
                             message:
-                                'Validation on request parameter ' + parameter.name + ' is failed. Error: ' + result.errors
+                                'Validation on request parameter ' + parameter.name + ' is failed. Error: ' + result.errors,
+                            status: {code: 400}
                         };
                     flow.fail(error);
                     stopProceed = true;
@@ -67,7 +66,6 @@ module.exports = function(config) {
 
 
         logger.debug('Validation schema is from response property');
-
         var responses = context._.api.responses;
         var status = JSON.stringify(context.message.status.code);
         if (responses.hasOwnProperty(status) && responses[status].hasOwnProperty('schema')) {
@@ -83,7 +81,8 @@ module.exports = function(config) {
                 var error = {
                         name: 'ValidateError',
                         message:
-                            'Validation on response ' + status + ' is failed. Error: ' + result.errors
+                            'Validation on response ' + status + ' is failed. Error: ' + result.errors,
+                        status: {code: 422}
                     };
                 flow.fail(error);
                 stopProceed = true;
@@ -100,7 +99,8 @@ module.exports = function(config) {
                 var error = {
                         name: 'ValidateError',
                         message:
-                            'Validation on response with default schema is failed. Error: ' + result.errors
+                            'Validation on response with default schema is failed. Error: ' + result.errors,
+                        status: {code: 422}
                     };
                 flow.fail(error);
                 stopProceed = true;
@@ -127,7 +127,7 @@ module.exports = function(config) {
         swg_doc.internal_def_schema = {schema: {"$ref" : def}};
 
         // resolve the JSON Reference on the modified swagger document
-        JsonRefs.resolveRefs(swg_doc,{subDocPath: '#/internal_def_schema'}).then(function(res) {
+        JsonRefs.resolveRefs(swg_doc).then(function(res) {
             var schema = res.resolved.internal_def_schema.schema;
             var result = validator.validate(context.message.body, schema);
             if (!result.valid) {
@@ -138,7 +138,8 @@ module.exports = function(config) {
                 var error = {
                         name: 'ValidateError',
                         message:
-                            'Validation failed. Error: ' + result.errors
+                            'Validation failed. Error: ' + result.errors,
+                        status: {code: 422}
                     };
                 flow.fail(error);
             }
@@ -150,7 +151,8 @@ module.exports = function(config) {
             var error = {
                     name: 'ValidateError',
                     message:
-                        'Validation failed. Error: ' + err
+                        'Validation failed. Error: ' + err,
+                    status: {code: 422}
                 };
             flow.fail(error);
         }).catch(function(err) {
@@ -158,7 +160,8 @@ module.exports = function(config) {
             var error = {
                     name: 'ValidateError',
                     message:
-                        'Validation failed. Error: ' + err
+                        'Validation failed. Error: ' + err,
+                    status: {code: 422}
                 };
             flow.fail(error);
         });
