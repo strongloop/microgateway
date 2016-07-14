@@ -26,7 +26,24 @@
     "secure",
     "enforce"
   ],
-  "author": "IBM Gateway Team",
+  "author": {
+    "name" : "IBM Gateway Team"
+  },
+  "contributors" : [
+    { "name" : "Ally Juang" },
+    { "name" : "Clement Su" },
+    { "name" : "Dan Badt" },
+    { "name" : "Gary Tu" },
+    { "name" : "Jeremy Geddes" },
+    { "name" : "John Bellessa" },
+    { "name" : "Jon Palgon" },
+    { "name" : "Libra Huang" },
+    { "name" : "Raymond Feng" },
+    { "name" : "Thomas Burke" },
+    { "name" : "Tim Smith" },
+    { "name" : "Tony Ffrench" },
+    { "name" : "Yi-hong Wang" }
+  ],
   "license": "SEE LICENSE IN LICENSE.txt",
   "devDependencies": {
     "bunyan": "^1.7.1",
