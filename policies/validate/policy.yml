@@ -1,0 +1,24 @@
+policy: 1.0.0
+
+info:
+  title: Validate
+  name: validate
+  version: 1.0.0
+  description: Use the validate policy to validate the payload in an assembly flow against a JSON schema.
+  contact:
+    name: IBM API Management
+    email: ibmapi@us.ibm.com
+    url: http://www.ibm.com/apimanagement
+
+attach:
+  - rest
+
+properties:
+  type: object
+  properties: 
+    definition: 
+      label: Definition
+      description: Specify a Swagger schema definition with which to validate the payload ('request', 'response', '#/definitions/XXXX' or XXXX).
+      type: "string"
+  required:
+    - definition

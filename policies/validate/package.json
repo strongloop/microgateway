@@ -1,0 +1,15 @@
+{
+  "name": "apiconnect-policy-validate",
+  "version": "1.0.0",
+  "description": "Validate Policy for API Connect",
+  "main": "index.js",
+  "scripts": {
+  },
+  "keywords": [
+    "apiconnect",
+    "policy",
+    "validate"
+  ],
+  "author": "",
+  "license": "SEE LICENSE IN LICENSE"
+}
