@@ -5325,12 +5325,7 @@
             ],
             "summary": "Request Access Tokens",
             "description": "This endpoint allows requesting an access token following one of the flows below:\n- Authorization Code (exchange code for access token)\n- Client Credentials (2-legged, there isnt resource owner information)\n- Resource Owner Password Credentials (2-legged, client provides resource owner name and password)\n- Refresh Token (exchange refresh token for a new access code)\n\nThe table below indicates the required parameters for each specific grant_type options.\nEmpty cells indicate a parameter is ignored for that specific grant type.\n\nClient authentication:\n- Confidential clients should authenticate using HTTP Basic Authentication. Alternatively, they may post\n  their client_id and client_secret information as a formData parameter.\n- Public clients should send their client_id as formData parameter.\n\n| grant_type           | code       | client_credentials | password    | refresh_token |\n|----------------------|------------|--------------------|-------------|---------------|\n| client_id            | required*  | required*          | required*   | required*     |\n| client_secret        | required*  | required*          | required*   | required*     |\n| code                 | required   |                    |             |               |\n| redirect_uri         | required   |                    |             |               |\n| username             |            |                    | required    |               |\n| password             |            |                    | required    |               |\n| scope                |            | optional           | optional    |               |\n| refresh_token        |            |                    |             | required      |\n\nThe implicit grant requests, see /oauth/authorize.\n",
-            "security": [
-              {
-                "clientID": [],
-                "clientSecret": []
-              }
-            ],
+            "security": [],
             "parameters": [
               {
                 "name": "grant_type",
@@ -5525,12 +5520,7 @@
             ],
             "summary": "Request Access Tokens",
             "description": "This endpoint allows requesting an access token following one of the flows below:\n- Authorization Code (exchange code for access token)\n- Client Credentials (2-legged, there isnt resource owner information)\n- Resource Owner Password Credentials (2-legged, client provides resource owner name and password)\n- Refresh Token (exchange refresh token for a new access code)\n\nThe table below indicates the required parameters for each specific grant_type options.\nEmpty cells indicate a parameter is ignored for that specific grant type.\n\nClient authentication:\n- Confidential clients should authenticate using HTTP Basic Authentication. Alternatively, they may post\n  their client_id and client_secret information as a formData parameter.\n- Public clients should send their client_id as formData parameter.\n\n| grant_type           | code       | client_credentials | password    | refresh_token |\n|----------------------|------------|--------------------|-------------|---------------|\n| client_id            | required*  | required*          | required*   | required*     |\n| client_secret        | required*  | required*          | required*   | required*     |\n| code                 | required   |                    |             |               |\n| redirect_uri         | required   |                    |             |               |\n| username             |            |                    | required    |               |\n| password             |            |                    | required    |               |\n| scope                |            | optional           | optional    |               |\n| refresh_token        |            |                    |             | required      |\n\nThe implicit grant requests, see /oauth/authorize.\n",
-            "security": [
-              {
-                "clientID": [],
-                "clientSecret": []
-              }
-            ],
+            "security": [],
             "parameters": [
               {
                 "name": "grant_type",
@@ -7407,6 +7397,342 @@
       "title": "Sandbox",
       "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/catalog007"
     },
+    "id": "api505564b7b3ae4b0869c782eddae",
+    "organization": {
+      "id": "564b48a9e4b0869c782edc24",
+      "name": "apim",
+      "title": "Climb On"
+    },
+    "state": "running",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/api505564b7b3ae4b0869c782eddae",
+    "document": {
+      "swagger": "2.0",
+      "info": {
+        "version": "1.0.0",
+        "title": "OAuth 2.0 Endpoints (former ten20/ten20-api4051.xml)",
+        "x-ibm-name": "api505"
+      },
+      "schemes": [
+        "https"
+      ],
+      "securityDefinitions": {
+        "clientID": {
+          "description": "application's client_id",
+          "in": "header",
+          "name": "client_id",
+          "type": "apiKey"
+        },
+        "clientSecret": {
+          "description": "application's client_secret",
+          "in": "header",
+          "name": "client_secret",
+          "type": "apiKey"
+        }
+      },
+      "security": [
+        {
+          "clientID": []
+        }
+      ],
+      "basePath": "/test505-client-cred",
+      "paths": {
+        "/oauth/token": {
+          "post": {
+            "consumes": [
+              "application/x-www-form-urlencoded"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "summary": "Request Access Tokens",
+            "description": "This endpoint allows requesting an access token following one of the flows below:\n- Authorization Code (exchange code for access token)\n- Client Credentials (2-legged, there isnt resource owner information)\n- Resource Owner Password Credentials (2-legged, client provides resource owner name and password)\n- Refresh Token (exchange refresh token for a new access code)\n\nThe table below indicates the required parameters for each specific grant_type options.\nEmpty cells indicate a parameter is ignored for that specific grant type.\n\nClient authentication:\n- Confidential clients should authenticate using HTTP Basic Authentication. Alternatively, they may post\n  their client_id and client_secret information as a formData parameter.\n- Public clients should send their client_id as formData parameter.\n\n| grant_type           | code       | client_credentials | password    | refresh_token |\n|----------------------|------------|--------------------|-------------|---------------|\n| client_id            | required*  | required*          | required*   | required*     |\n| client_secret        | required*  | required*          | required*   | required*     |\n| code                 | required   |                    |             |               |\n| redirect_uri         | required   |                    |             |               |\n| username             |            |                    | required    |               |\n| password             |            |                    | required    |               |\n| scope                |            | optional           | optional    |               |\n| refresh_token        |            |                    |             | required      |\n\nThe implicit grant requests, see /oauth/authorize.\n",
+            "security": [],
+            "parameters": [
+              {
+                "name": "grant_type",
+                "in": "formData",
+                "description": "Type of grant",
+                "type": "string",
+                "required": true,
+                "enum": [
+                  "client_credentials"
+                ]
+              },
+              {
+                "name": "client_id",
+                "in": "formData",
+                "description": "Application client ID, can be provided in formData or using HTTP Basic Authentication",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "client_secret",
+                "in": "formData",
+                "description": "Application secret, must be provided in formData or using HTTP Basic Authentication",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "scope",
+                "in": "formData",
+                "type": "string",
+                "description": "Scope being requested",
+                "required": false
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "json document containing token, etc.",
+                "schema": {
+                  "$ref": "#/definitions/access_token_response"
+                }
+              },
+              "400": {
+                "description": "json document that may contain additional details about the failure"
+              }
+            }
+          }
+        }
+      },
+      "x-ibm-configuration": {
+        "testable": true,
+        "enforced": true,
+        "phase": "realized",
+        "oauth2": {
+          "client-type": "confidential",
+          "scopes": {
+            "/test505-client-cred": "Root Scope",
+            "shortlife": "Short life",
+            "scope2": "Scope 2",
+            "scope3": "Scope 3"
+          },
+          "grants": [
+            "application"
+          ],
+          "identity-extraction": {
+            "type": "default-form"
+          },
+          "authentication": {
+            "x-ibm-authentication-url": {
+              "url": "http://127.0.0.1:9006//auth-url/test1",
+              "tls-profile": "api-sslcli-all"
+            }
+          },
+          "authorization": {
+            "type": "default-form"
+          }
+        },
+        "type": "oauth"
+      },
+      "definitions": {
+        "access_token_response": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "token_type",
+            "access_token",
+            "expires_in"
+          ],
+          "properties": {
+            "token_type": {
+              "enum": [
+                "bearer"
+              ]
+            },
+            "access_token": {
+              "type": "string"
+            },
+            "expires_in": {
+              "type": "integer"
+            },
+            "scope": {
+              "type": "string"
+            },
+            "refresh_token": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "catalog": {
+      "default": false,
+      "id": "catalog007",
+      "name": "sb",
+      "sandbox": true,
+      "title": "Sandbox",
+      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/catalog007"
+    },
+    "id": "api506564b7b3ae4b0869c782eddae",
+    "organization": {
+      "id": "564b48a9e4b0869c782edc24",
+      "name": "apim",
+      "title": "Climb On"
+    },
+    "state": "running",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/api506564b7b3ae4b0869c782eddae",
+    "document": {
+      "swagger": "2.0",
+      "info": {
+        "version": "1.0.0",
+        "title": "OAuth 2.0 Endpoints (former ten20/ten20-api4051.xml)",
+        "x-ibm-name": "api506"
+      },
+      "schemes": [
+        "https"
+      ],
+      "securityDefinitions": {
+        "clientID": {
+          "description": "application's client_id",
+          "in": "header",
+          "name": "client_id",
+          "type": "apiKey"
+        },
+        "clientSecret": {
+          "description": "application's client_secret",
+          "in": "header",
+          "name": "client_secret",
+          "type": "apiKey"
+        }
+      },
+      "security": [
+        {
+          "clientID": []
+        }
+      ],
+      "basePath": "/test506-client-cred",
+      "paths": {
+        "/oauth/token": {
+          "post": {
+            "consumes": [
+              "application/x-www-form-urlencoded"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "summary": "Request Access Tokens",
+            "description": "This endpoint allows requesting an access token following one of the flows below:\n- Authorization Code (exchange code for access token)\n- Client Credentials (2-legged, there isnt resource owner information)\n- Resource Owner Password Credentials (2-legged, client provides resource owner name and password)\n- Refresh Token (exchange refresh token for a new access code)\n\nThe table below indicates the required parameters for each specific grant_type options.\nEmpty cells indicate a parameter is ignored for that specific grant type.\n\nClient authentication:\n- Confidential clients should authenticate using HTTP Basic Authentication. Alternatively, they may post\n  their client_id and client_secret information as a formData parameter.\n- Public clients should send their client_id as formData parameter.\n\n| grant_type           | code       | client_credentials | password    | refresh_token |\n|----------------------|------------|--------------------|-------------|---------------|\n| client_id            | required*  | required*          | required*   | required*     |\n| client_secret        | required*  | required*          | required*   | required*     |\n| code                 | required   |                    |             |               |\n| redirect_uri         | required   |                    |             |               |\n| username             |            |                    | required    |               |\n| password             |            |                    | required    |               |\n| scope                |            | optional           | optional    |               |\n| refresh_token        |            |                    |             | required      |\n\nThe implicit grant requests, see /oauth/authorize.\n",
+            "security": [],
+            "parameters": [
+              {
+                "name": "grant_type",
+                "in": "formData",
+                "description": "Type of grant",
+                "type": "string",
+                "required": true,
+                "enum": [
+                  "client_credentials"
+                ]
+              },
+              {
+                "name": "client_id",
+                "in": "formData",
+                "description": "Application client ID, can be provided in formData or using HTTP Basic Authentication",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "client_secret",
+                "in": "formData",
+                "description": "Application secret, must be provided in formData or using HTTP Basic Authentication",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "scope",
+                "in": "formData",
+                "type": "string",
+                "description": "Scope being requested",
+                "required": false
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "json document containing token, etc.",
+                "schema": {
+                  "$ref": "#/definitions/access_token_response"
+                }
+              },
+              "400": {
+                "description": "json document that may contain additional details about the failure"
+              }
+            }
+          }
+        }
+      },
+      "x-ibm-configuration": {
+        "testable": true,
+        "enforced": true,
+        "phase": "realized",
+        "oauth2": {
+          "client-type": "confidential",
+          "scopes": {
+            "/test506-client-cred": "Root Scope",
+            "shortlife": "Short life",
+            "scope2": "Scope 2",
+            "scope3": "Scope 3"
+          },
+          "grants": [
+            "application"
+          ],
+          "identity-extraction": {
+            "type": "default-form"
+          },
+          "authentication": {
+            "x-ibm-authentication-url": {
+              "url": "http://127.0.0.1:9006//auth-url/test1",
+              "tls-profile": "api-sslcli-all"
+            }
+          },
+          "authorization": {
+            "type": "default-form"
+          }
+        },
+        "type": "oauth"
+      },
+      "definitions": {
+        "access_token_response": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "token_type",
+            "access_token",
+            "expires_in"
+          ],
+          "properties": {
+            "token_type": {
+              "enum": [
+                "bearer"
+              ]
+            },
+            "access_token": {
+              "type": "string"
+            },
+            "expires_in": {
+              "type": "integer"
+            },
+            "scope": {
+              "type": "string"
+            },
+            "refresh_token": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "catalog": {
+      "default": false,
+      "id": "catalog007",
+      "name": "sb",
+      "sandbox": true,
+      "title": "Sandbox",
+      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/catalog007"
+    },
     "id": "api51564b7b3ae4b0869c782eddae",
     "organization": {
       "id": "564b48a9e4b0869c782edc24",
@@ -8021,6 +8347,286 @@
               "invoke": {
                 "title": "invoke",
                 "target-url": "http://127.0.0.1:9006/"
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "catalog": {
+      "default": false,
+      "id": "catalog007",
+      "name": "sb",
+      "sandbox": true,
+      "title": "Sandbox",
+      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/catalog007"
+    },
+    "id": "api555564b7b3ae4b0869c782eddae",
+    "organization": {
+      "id": "564b48a9e4b0869c782edc24",
+      "name": "apim",
+      "title": "Climb On"
+    },
+    "state": "running",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/api555564b7b3ae4b0869c782eddae",
+    "document": {
+      "swagger": "2.0",
+      "info": {
+        "version": "1.0.0",
+        "title": "API555",
+        "x-ibm-name": "api555",
+        "description": "OAuth Protected API\n  provider = api505.yaml\n"
+      },
+      "host": "host.com",
+      "basePath": "/test505-client-cred",
+      "paths": {
+        "/res1": {
+          "get": {
+            "responses": {
+              "200": {
+                "description": "200 OK"
+              }
+            },
+            "security": [
+              {
+                "OAuthDef": [
+                  "/test505-client-cred"
+                ]
+              }
+            ]
+          }
+        },
+        "/res2": {
+          "get": {
+            "responses": {
+              "200": {
+                "description": "200 OK"
+              }
+            },
+            "security": [
+              {
+                "OAuthDef": [
+                  "shortlife"
+                ]
+              }
+            ]
+          }
+        },
+        "/res3": {
+          "get": {
+            "responses": {
+              "200": {
+                "description": "200 OK"
+              }
+            }
+          }
+        },
+        "/res4": {
+          "get": {
+            "responses": {
+              "200": {
+                "description": "200 OK"
+              }
+            }
+          }
+        }
+      },
+      "definitions": {},
+      "schemes": [
+        "https"
+      ],
+      "securityDefinitions": {
+        "ClientID": {
+          "in": "query",
+          "name": "client_id",
+          "type": "apiKey"
+        },
+        "OAuthDef": {
+          "type": "oauth2",
+          "authorizationUrl": "",
+          "flow": "implicit",
+          "scopes": {
+            "/": "default root scope"
+          }
+        }
+      },
+      "security": [
+        {
+          "OAuthDef": [
+            "/test505-client-cred"
+          ]
+        },
+        {
+          "OAuthDef": [
+            "shortlife"
+          ]
+        }
+      ],
+      "consumes": [
+        "application/xml",
+        "application/json"
+      ],
+      "produces": [
+        "application/xml",
+        "application/json"
+      ],
+      "x-ibm-configuration": {
+        "enforced": true,
+        "phase": "realized",
+        "testable": true,
+        "cors": {
+          "enabled": true
+        },
+        "assembly": {
+          "execute": [
+            {
+              "invoke": {
+                "title": "invoke",
+                "target-url": "http://httpbin.org/get?scope=$(oauth.scope)&reqpath=$(request.path)"
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "catalog": {
+      "default": false,
+      "id": "catalog007",
+      "name": "sb",
+      "sandbox": true,
+      "title": "Sandbox",
+      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/catalog007"
+    },
+    "id": "api556564b7b3ae4b0869c782eddae",
+    "organization": {
+      "id": "564b48a9e4b0869c782edc24",
+      "name": "apim",
+      "title": "Climb On"
+    },
+    "state": "running",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/api556564b7b3ae4b0869c782eddae",
+    "document": {
+      "swagger": "2.0",
+      "info": {
+        "version": "1.0.0",
+        "title": "API556",
+        "x-ibm-name": "api556",
+        "description": "OAuth Protected API\n  provider = api506.yaml\n"
+      },
+      "host": "host.com",
+      "basePath": "test506-client-cred",
+      "paths": {
+        "/res1": {
+          "get": {
+            "responses": {
+              "200": {
+                "description": "200 OK"
+              }
+            },
+            "security": [
+              {
+                "OAuthDef": [
+                  "shortlife",
+                  "scope3"
+                ]
+              }
+            ]
+          }
+        },
+        "/res2": {
+          "get": {
+            "responses": {
+              "200": {
+                "description": "200 OK"
+              }
+            },
+            "security": [
+              {
+                "OAuthDef": [
+                  "/test506-client-cred",
+                  "scope2"
+                ]
+              }
+            ]
+          }
+        },
+        "/res3": {
+          "get": {
+            "responses": {
+              "200": {
+                "description": "200 OK"
+              }
+            }
+          }
+        },
+        "/res4": {
+          "get": {
+            "responses": {
+              "200": {
+                "description": "200 OK"
+              }
+            }
+          }
+        }
+      },
+      "definitions": {},
+      "schemes": [
+        "https"
+      ],
+      "securityDefinitions": {
+        "ClientID": {
+          "in": "query",
+          "name": "client_id",
+          "type": "apiKey"
+        },
+        "OAuthDef": {
+          "type": "oauth2",
+          "authorizationUrl": "",
+          "flow": "implicit",
+          "scopes": {
+            "/": "default root scope"
+          }
+        }
+      },
+      "security": [
+        {
+          "OAuthDef": [
+            "shortlife",
+            "scope3"
+          ]
+        },
+        {
+          "OAuthDef": [
+            "/test506-client-cred",
+            "scope2"
+          ]
+        }
+      ],
+      "consumes": [
+        "application/xml",
+        "application/json"
+      ],
+      "produces": [
+        "application/xml",
+        "application/json"
+      ],
+      "x-ibm-configuration": {
+        "enforced": true,
+        "phase": "realized",
+        "testable": true,
+        "cors": {
+          "enabled": true
+        },
+        "assembly": {
+          "execute": [
+            {
+              "invoke": {
+                "title": "invoke",
+                "target-url": "http://httpbin.org/get?reqpath=$(request.path)"
               }
             }
           ]
@@ -13292,6 +13898,916 @@
             "/test621"
           ],
           "ClientID": []
+        }
+      ],
+      "x-ibm-configuration": {
+        "enforced": true,
+        "phase": "realized",
+        "testable": true,
+        "cors": {
+          "enabled": true
+        },
+        "assembly": {
+          "execute": [
+            {
+              "invoke": {
+                "title": "invoke",
+                "target-url": "http://127.0.0.1:9006/"
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "catalog": {
+      "default": false,
+      "id": "catalog007",
+      "name": "sb",
+      "sandbox": true,
+      "title": "Sandbox",
+      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/catalog007"
+    },
+    "id": "api700564b7b3ae4b0869c782eddae",
+    "organization": {
+      "id": "564b48a9e4b0869c782edc24",
+      "name": "apim",
+      "title": "Climb On"
+    },
+    "state": "running",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/api700564b7b3ae4b0869c782eddae",
+    "document": {
+      "swagger": "2.0",
+      "info": {
+        "version": "1.0.0",
+        "title": "OAuth 2.0 Endpoints (former ten02-api102.xml)",
+        "x-ibm-name": "api700"
+      },
+      "schemes": [
+        "https"
+      ],
+      "securityDefinitions": {
+        "clientID": {
+          "description": "application's client_id",
+          "in": "query",
+          "name": "client_id",
+          "type": "apiKey"
+        },
+        "clientIdHeader": {
+          "in": "header",
+          "type": "apiKey",
+          "name": "X-IBM-Client-Id"
+        },
+        "clientSecretHeader": {
+          "in": "header",
+          "type": "apiKey",
+          "name": "X-IBM-Client-Secret"
+        }
+      },
+      "security": [
+        {
+          "clientID": []
+        }
+      ],
+      "basePath": "/test700",
+      "paths": {
+        "/oauth/authorize": {
+          "get": {
+            "produces": [
+              "text/html"
+            ],
+            "summary": "endpoint for Authorization Code and Implicit grants",
+            "description": "description",
+            "parameters": [
+              {
+                "name": "response_type",
+                "in": "query",
+                "description": "request an authorization code or or access token (implicit)",
+                "required": true,
+                "type": "string",
+                "enum": [
+                  "code",
+                  "token"
+                ]
+              },
+              {
+                "name": "client_id",
+                "in": "query",
+                "description": "Application client ID",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "scope",
+                "in": "query",
+                "description": "Scope being requested",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "redirect_uri",
+                "in": "query",
+                "type": "string",
+                "description": "URI where user is redirected to after authorization",
+                "required": false
+              },
+              {
+                "name": "state",
+                "in": "query",
+                "type": "string",
+                "description": "This string will be echoed back to application when user is redirected",
+                "required": false
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "An HTML form for authentication or authorization of this request."
+              },
+              "302": {
+                "description": "Redirect to the clients redirect_uri containing one of the following\n- **authorization code** for Authorization code grant\n- **access token** for Implicity grant\n- **error** in case of errors, such as the user has denied the request\n"
+              }
+            },
+            "security": [
+              {
+                "clientID": []
+              }
+            ]
+          },
+          "post": {
+            "consumes": [
+              "application/x-www-form-urlencoded"
+            ],
+            "produces": [
+              "text/html"
+            ],
+            "summary": "submit approval to authorization code or access token",
+            "description": "Submit resource owners approval (or rejection) for the OAuth2 Server to issue an\nauthorization code or access token to the application.\n",
+            "security": [
+              {
+                "clientID": []
+              }
+            ],
+            "parameters": [
+              {
+                "name": "client_id",
+                "in": "formData",
+                "description": "application requesting the access code or token",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "scope",
+                "in": "formData",
+                "description": "requested scope of this authorization",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "resource-owner",
+                "in": "formData",
+                "description": "resource owners user name",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "redirect_uri",
+                "in": "formData",
+                "description": "URI the application is requesting this code or token to be redirected to",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "original-url",
+                "in": "formData",
+                "description": "URL of the original authorization request",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "dp-state",
+                "in": "formData",
+                "description": "state information provided in the authorization form",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "dp-data",
+                "in": "formData",
+                "description": "state information provided in the authorization form",
+                "required": true,
+                "type": "string"
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK"
+              }
+            }
+          }
+        },
+        "/oauth/token": {
+          "post": {
+            "consumes": [
+              "application/x-www-form-urlencoded"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "summary": "Request Access Tokens",
+            "description": "This endpoint allows requesting an access token following one of the flows below:\n- Authorization Code (exchange code for access token)\n- Client Credentials (2-legged, there isnt resource owner information)\n- Resource Owner Password Credentials (2-legged, client provides resource owner name and password)\n- Refresh Token (exchange refresh token for a new access code)\n\nThe table below indicates the required parameters for each specific grant_type options.\nEmpty cells indicate a parameter is ignored for that specific grant type.\n\nClient authentication:\n- Confidential clients should authenticate using HTTP Basic Authentication. Alternatively, they may post\n  their client_id and client_secret information as a formData parameter.\n- Public clients should send their client_id as formData parameter.\n\n| grant_type           | code       | client_credentials | password    | refresh_token |\n|----------------------|------------|--------------------|-------------|---------------|\n| client_id            | required*  | required*          | required*   | required*     |\n| client_secret        | required*  | required*          | required*   | required*     |\n| code                 | required   |                    |             |               |\n| redirect_uri         | required   |                    |             |               |\n| username             |            |                    | required    |               |\n| password             |            |                    | required    |               |\n| scope                |            | optional           | optional    |               |\n| refresh_token        |            |                    |             | required      |\n\nThe implicit grant requests, see /oauth/authorize.\n",
+            "security": [],
+            "parameters": [
+              {
+                "name": "grant_type",
+                "in": "formData",
+                "description": "Type of grant",
+                "type": "string",
+                "required": true,
+                "enum": [
+                  "authorization_code",
+                  "password",
+                  "client_credentials",
+                  "refresh_token"
+                ]
+              },
+              {
+                "name": "client_id",
+                "in": "formData",
+                "description": "Application client ID, can be provided in formData or using HTTP Basic Authentication",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "client_secret",
+                "in": "formData",
+                "description": "Application secret, must be provided in formData or using HTTP Basic Authentication",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "code",
+                "in": "formData",
+                "description": "Authorization code provided by the /oauth/authorize endpoint",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "redirect_uri",
+                "in": "formData",
+                "description": "required only if the redirect_uri parameter was included in the authorization request /oauth/authorize; their values MUST be identical.",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "username",
+                "in": "formData",
+                "type": "string",
+                "description": "Resource owner username",
+                "required": false
+              },
+              {
+                "name": "password",
+                "in": "formData",
+                "type": "string",
+                "description": "Resource owner password",
+                "required": false
+              },
+              {
+                "name": "scope",
+                "in": "formData",
+                "type": "string",
+                "description": "Scope being requested",
+                "required": false
+              },
+              {
+                "name": "refresh_token",
+                "in": "formData",
+                "type": "string",
+                "description": "The refresh token that the client wants to exchange for a new access token (refresh_token grant_type)",
+                "required": false
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "json document containing token, etc.",
+                "schema": {
+                  "$ref": "#/definitions/access_token_response"
+                }
+              },
+              "400": {
+                "description": "json document that may contain additional details about the failure"
+              }
+            }
+          }
+        },
+        "/oauth/issued": {
+          "get": {
+            "produces": [
+              "application/json"
+            ],
+            "summary": "Returns list of permission granted to the owner",
+            "description": "This endpoint allows the return of all the issued permission for a given authenticated owner per owner authenti\ndefined in the x-ibm-configuration section\n",
+            "security": [
+              {
+                "clientIdHeader": [],
+                "clientSecretHeader": []
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "json document containing issued information, etc.",
+                "schema": {
+                  "$ref": "#/definitions/issued_responses"
+                }
+              },
+              "400": {
+                "description": "json document that may contain additional details about the failure"
+              }
+            }
+          },
+          "delete": {
+            "consumes": [
+              "application/x-www-form-urlencoded"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "summary": "Revoke an application/client permission by the authorized owner",
+            "description": "Revoke an application/client permission by the authorized owner",
+            "security": [
+              {
+                "clientIdHeader": [],
+                "clientSecretHeader": []
+              }
+            ],
+            "parameters": [
+              {
+                "name": "client-id",
+                "in": "query",
+                "description": "client_id or application id to be revoked",
+                "required": true,
+                "type": "string"
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Cool"
+              }
+            }
+          }
+        }
+      },
+      "x-ibm-configuration": {
+        "testable": true,
+        "enforced": true,
+        "phase": "realized",
+        "oauth2": {
+          "client-type": "confidential",
+          "scopes": {
+            "scope1": "Root Scope",
+            "scope2": "Testing",
+            "/test700": "Testing"
+          },
+          "grants": [
+            "accessCode",
+            "implicit"
+          ],
+          "identity-extraction": {
+            "type": "basic"
+          },
+          "authentication": {
+            "file": ""
+          },
+          "authorization": {
+            "type": "default-form"
+          },
+          "refresh-token": {
+            "count": 1024
+          },
+          "revocation": {
+            "type": "gateway"
+          }
+        },
+        "type": "oauth"
+      },
+      "definitions": {
+        "access_token_response": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "token_type",
+            "access_token",
+            "expires_in"
+          ],
+          "properties": {
+            "token_type": {
+              "enum": [
+                "bearer"
+              ]
+            },
+            "access_token": {
+              "type": "string"
+            },
+            "expires_in": {
+              "type": "integer"
+            },
+            "scope": {
+              "type": "string"
+            },
+            "refresh_token": {
+              "type": "string"
+            }
+          }
+        },
+        "issued_response": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "clientId",
+            "owner",
+            "scope",
+            "issuedAt",
+            "expiredAt",
+            "refreshTokenIssued"
+          ],
+          "properties": {
+            "clientId": {
+              "type": "string"
+            },
+            "clientName": {
+              "type": "string"
+            },
+            "owner": {
+              "type": "string"
+            },
+            "scope": {
+              "type": "string"
+            },
+            "issuedAt": {
+              "type": "string"
+            },
+            "expiredAt": {
+              "type": "string"
+            },
+            "refreshTokenIssued": {
+              "type": "boolean"
+            },
+            "miscInfo": {
+              "type": "string"
+            }
+          }
+        },
+        "issued_responses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/issued_response"
+          }
+        }
+      }
+    }
+  },
+  {
+    "catalog": {
+      "default": false,
+      "id": "catalog007",
+      "name": "sb",
+      "sandbox": true,
+      "title": "Sandbox",
+      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/catalog007"
+    },
+    "id": "api710564b7b3ae4b0869c782eddae",
+    "organization": {
+      "id": "564b48a9e4b0869c782edc24",
+      "name": "apim",
+      "title": "Climb On"
+    },
+    "state": "running",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/api710564b7b3ae4b0869c782eddae",
+    "document": {
+      "swagger": "2.0",
+      "info": {
+        "version": "1.0.0",
+        "title": "OAuth 2.0 Endpoints (former ten02-api102.xml)",
+        "x-ibm-name": "api710"
+      },
+      "schemes": [
+        "https"
+      ],
+      "securityDefinitions": {
+        "clientID": {
+          "description": "application's client_id",
+          "in": "query",
+          "name": "client_id",
+          "type": "apiKey"
+        },
+        "clientIdHeader": {
+          "in": "header",
+          "type": "apiKey",
+          "name": "X-IBM-Client-Id"
+        },
+        "clientSecretHeader": {
+          "in": "header",
+          "type": "apiKey",
+          "name": "X-IBM-Client-Secret"
+        }
+      },
+      "security": [
+        {
+          "clientID": []
+        }
+      ],
+      "basePath": "/test710",
+      "paths": {
+        "/oauth/authorize": {
+          "get": {
+            "produces": [
+              "text/html"
+            ],
+            "summary": "endpoint for Authorization Code and Implicit grants",
+            "description": "description",
+            "parameters": [
+              {
+                "name": "response_type",
+                "in": "query",
+                "description": "request an authorization code or or access token (implicit)",
+                "required": true,
+                "type": "string",
+                "enum": [
+                  "code",
+                  "token"
+                ]
+              },
+              {
+                "name": "client_id",
+                "in": "query",
+                "description": "Application client ID",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "scope",
+                "in": "query",
+                "description": "Scope being requested",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "redirect_uri",
+                "in": "query",
+                "type": "string",
+                "description": "URI where user is redirected to after authorization",
+                "required": false
+              },
+              {
+                "name": "state",
+                "in": "query",
+                "type": "string",
+                "description": "This string will be echoed back to application when user is redirected",
+                "required": false
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "An HTML form for authentication or authorization of this request."
+              },
+              "302": {
+                "description": "Redirect to the clients redirect_uri containing one of the following\n- **authorization code** for Authorization code grant\n- **access token** for Implicity grant\n- **error** in case of errors, such as the user has denied the request\n"
+              }
+            },
+            "security": [
+              {
+                "clientID": []
+              }
+            ]
+          },
+          "post": {
+            "consumes": [
+              "application/x-www-form-urlencoded"
+            ],
+            "produces": [
+              "text/html"
+            ],
+            "summary": "submit approval to authorization code or access token",
+            "description": "Submit resource owners approval (or rejection) for the OAuth2 Server to issue an\nauthorization code or access token to the application.\n",
+            "security": [
+              {
+                "clientID": []
+              }
+            ],
+            "parameters": [
+              {
+                "name": "client_id",
+                "in": "formData",
+                "description": "application requesting the access code or token",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "scope",
+                "in": "formData",
+                "description": "requested scope of this authorization",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "resource-owner",
+                "in": "formData",
+                "description": "resource owners user name",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "redirect_uri",
+                "in": "formData",
+                "description": "URI the application is requesting this code or token to be redirected to",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "original-url",
+                "in": "formData",
+                "description": "URL of the original authorization request",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "dp-state",
+                "in": "formData",
+                "description": "state information provided in the authorization form",
+                "required": true,
+                "type": "string"
+              },
+              {
+                "name": "dp-data",
+                "in": "formData",
+                "description": "state information provided in the authorization form",
+                "required": true,
+                "type": "string"
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK"
+              }
+            }
+          }
+        },
+        "/oauth/token": {
+          "post": {
+            "consumes": [
+              "application/x-www-form-urlencoded"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "summary": "Request Access Tokens",
+            "description": "This endpoint allows requesting an access token following one of the flows below:\n- Authorization Code (exchange code for access token)\n- Client Credentials (2-legged, there isnt resource owner information)\n- Resource Owner Password Credentials (2-legged, client provides resource owner name and password)\n- Refresh Token (exchange refresh token for a new access code)\n\nThe table below indicates the required parameters for each specific grant_type options.\nEmpty cells indicate a parameter is ignored for that specific grant type.\n\nClient authentication:\n- Confidential clients should authenticate using HTTP Basic Authentication. Alternatively, they may post\n  their client_id and client_secret information as a formData parameter.\n- Public clients should send their client_id as formData parameter.\n\n| grant_type           | code       | client_credentials | password    | refresh_token |\n|----------------------|------------|--------------------|-------------|---------------|\n| client_id            | required*  | required*          | required*   | required*     |\n| client_secret        | required*  | required*          | required*   | required*     |\n| code                 | required   |                    |             |               |\n| redirect_uri         | required   |                    |             |               |\n| username             |            |                    | required    |               |\n| password             |            |                    | required    |               |\n| scope                |            | optional           | optional    |               |\n| refresh_token        |            |                    |             | required      |\n\nThe implicit grant requests, see /oauth/authorize.\n",
+            "security": [],
+            "parameters": [
+              {
+                "name": "grant_type",
+                "in": "formData",
+                "description": "Type of grant",
+                "type": "string",
+                "required": true,
+                "enum": [
+                  "authorization_code",
+                  "password",
+                  "client_credentials",
+                  "refresh_token"
+                ]
+              },
+              {
+                "name": "client_id",
+                "in": "formData",
+                "description": "Application client ID, can be provided in formData or using HTTP Basic Authentication",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "client_secret",
+                "in": "formData",
+                "description": "Application secret, must be provided in formData or using HTTP Basic Authentication",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "code",
+                "in": "formData",
+                "description": "Authorization code provided by the /oauth/authorize endpoint",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "redirect_uri",
+                "in": "formData",
+                "description": "required only if the redirect_uri parameter was included in the authorization request /oauth/authorize; their values MUST be identical.",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "name": "username",
+                "in": "formData",
+                "type": "string",
+                "description": "Resource owner username",
+                "required": false
+              },
+              {
+                "name": "password",
+                "in": "formData",
+                "type": "string",
+                "description": "Resource owner password",
+                "required": false
+              },
+              {
+                "name": "scope",
+                "in": "formData",
+                "type": "string",
+                "description": "Scope being requested",
+                "required": false
+              },
+              {
+                "name": "refresh_token",
+                "in": "formData",
+                "type": "string",
+                "description": "The refresh token that the client wants to exchange for a new access token (refresh_token grant_type)",
+                "required": false
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "json document containing token, etc.",
+                "schema": {
+                  "$ref": "#/definitions/access_token_response"
+                }
+              },
+              "400": {
+                "description": "json document that may contain additional details about the failure"
+              }
+            }
+          }
+        }
+      },
+      "x-ibm-configuration": {
+        "testable": true,
+        "enforced": true,
+        "phase": "realized",
+        "oauth2": {
+          "client-type": "confidential",
+          "scopes": {
+            "scope1": "Root Scope",
+            "scope2": "Testing",
+            "/test710": "Testing"
+          },
+          "grants": [
+            "accessCode",
+            "implicit"
+          ],
+          "identity-extraction": {
+            "type": "custom-form",
+            "custom-form": {
+              "url": "http://127.0.0.1:7777/authen"
+            }
+          },
+          "authentication": {
+            "file": ""
+          },
+          "authorization": {
+            "type": "default-form"
+          },
+          "refresh-token": {
+            "count": 1024
+          }
+        },
+        "type": "oauth"
+      },
+      "definitions": {
+        "access_token_response": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "token_type",
+            "access_token",
+            "expires_in"
+          ],
+          "properties": {
+            "token_type": {
+              "enum": [
+                "bearer"
+              ]
+            },
+            "access_token": {
+              "type": "string"
+            },
+            "expires_in": {
+              "type": "integer"
+            },
+            "scope": {
+              "type": "string"
+            },
+            "refresh_token": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "catalog": {
+      "default": false,
+      "id": "catalog007",
+      "name": "sb",
+      "sandbox": true,
+      "title": "Sandbox",
+      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/catalog007"
+    },
+    "id": "api750564b7b3ae4b0869c782eddae",
+    "organization": {
+      "id": "564b48a9e4b0869c782edc24",
+      "name": "apim",
+      "title": "Climb On"
+    },
+    "state": "running",
+    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/api750564b7b3ae4b0869c782eddae",
+    "document": {
+      "swagger": "2.0",
+      "info": {
+        "version": "1.0.0",
+        "title": "API750",
+        "x-ibm-name": "api750",
+        "description": "OAuth Protected API\n  provider = api700.yaml\n"
+      },
+      "host": "host.com",
+      "basePath": "/test700",
+      "paths": {
+        "/res1": {
+          "get": {
+            "responses": {
+              "200": {
+                "description": "200 OK"
+              }
+            }
+          }
+        },
+        "/res2": {
+          "get": {
+            "responses": {
+              "200": {
+                "description": "200 OK"
+              }
+            }
+          }
+        },
+        "/res3": {
+          "get": {
+            "responses": {
+              "200": {
+                "description": "200 OK"
+              }
+            }
+          }
+        },
+        "/res4": {
+          "get": {
+            "responses": {
+              "200": {
+                "description": "200 OK"
+              }
+            }
+          }
+        }
+      },
+      "definitions": {},
+      "schemes": [
+        "https"
+      ],
+      "securityDefinitions": {
+        "ClientID": {
+          "in": "query",
+          "name": "client_id",
+          "type": "apiKey"
+        },
+        "OAuthDef": {
+          "type": "oauth2",
+          "authorizationUrl": "",
+          "flow": "implicit",
+          "scopes": {
+            "/": "default root scope"
+          }
+        }
+      },
+      "security": [
+        {
+          "OAuthDef": [
+            "scope1"
+          ]
+        },
+        {
+          "OAuthDef": [
+            "/test700"
+          ]
         }
       ],
       "x-ibm-configuration": {
