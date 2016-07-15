@@ -73,9 +73,8 @@ describe('oauth2 AZ-server', function() {
             assert(err === null && res.ok === true, 'initial AZ request failed');
             var cookie = res.header['set-cookie'];
             assert(cookie !== undefined, 'no cookie');
-
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
+            var transactionID = /name="transaction_id".*?value="(.*?)"/g;
             var match = actionURL.exec(res.text);
             var match2 = transactionID.exec(res.text);
 
@@ -124,7 +123,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no set-cookie');
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
+            var transactionID = /name="transaction_id".*?value="(.*?)"/g;
             var match = actionURL.exec(res.text);
             var match2 = transactionID.exec(res.text);
 
@@ -312,7 +311,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined);
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
+            var transactionID = /name="transaction_id".*?value="(.*?)"/g;
             var match = actionURL.exec(res.text);
             var match2 = transactionID.exec(res.text);
 
@@ -352,7 +351,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no set-cookie');
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
+            var transactionID = /name="transaction_id".*?value="(.*?)"/g;
             var match = actionURL.exec(res.text);
             var match2 = transactionID.exec(res.text);
 
@@ -627,7 +626,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined);
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
+            var transactionID = /name="transaction_id".*?value="(.*?)"/g;
             var match = actionURL.exec(res.text);
             var match2 = transactionID.exec(res.text);
 
@@ -676,7 +675,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no set-cookie');
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
+            var transactionID = /name="transaction_id".*?value="(.*?)"/g;
             var match = actionURL.exec(res.text);
             var match2 = transactionID.exec(res.text);
 
@@ -841,7 +840,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined);
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
+            var transactionID = /name="transaction_id".*?value="(.*?)"/g;
             var match = actionURL.exec(res.text);
             var match2 = transactionID.exec(res.text);
 
@@ -882,7 +881,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no set-cookie');
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
+            var transactionID = /name="transaction_id".*?value="(.*?)"/g;
             var match = actionURL.exec(res.text);
             var match2 = transactionID.exec(res.text);
 
@@ -922,7 +921,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no set-cookie');
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
+            var transactionID = /name="transaction_id".*?value="(.*?)"/g;
             var match = actionURL.exec(res.text);
             var match2 = transactionID.exec(res.text);
 
@@ -1808,7 +1807,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined);
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
+            var transactionID = /name="transaction_id".*?value="(.*?)"/g;
             var match = actionURL.exec(res.text);
             var match2 = transactionID.exec(res.text);
 
@@ -1880,7 +1879,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no set-cookie');
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
+            var transactionID = /name="transaction_id".*?value="(.*?)"/g;
             var match = actionURL.exec(res.text);
             var match2 = transactionID.exec(res.text);
 
@@ -2070,7 +2069,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined);
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
+            var transactionID = /name="transaction_id".*?value="(.*?)"/g;
             var match = actionURL.exec(res.text);
             var match2 = transactionID.exec(res.text);
 
@@ -2110,7 +2109,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no set-cookie');
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
+            var transactionID = /name="transaction_id".*?value="(.*?)"/g;
             var match = actionURL.exec(res.text);
             var match2 = transactionID.exec(res.text);
 
@@ -2150,7 +2149,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined);
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
+            var transactionID = /name="transaction_id".*?value="(.*?)"/g;
             var match = actionURL.exec(res.text);
             var match2 = transactionID.exec(res.text);
 
@@ -2222,7 +2221,7 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no set-cookie');
 
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
+            var transactionID = /name="transaction_id".*?value="(.*?)"/g;
             var match = actionURL.exec(res.text);
             var match2 = transactionID.exec(res.text);
 
@@ -2289,7 +2288,7 @@ describe('oauth2 AZ-server', function() {
             var cookie = res.header['set-cookie'];
             assert(cookie !== undefined);
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
+            var transactionID = /name="transaction_id".*?value="(.*?)"/g;
             var match = actionURL.exec(res.text);
             var match2 = transactionID.exec(res.text);
             request.post(decodeAMP(match[1]))
@@ -2356,7 +2355,7 @@ describe('oauth2 AZ-server', function() {
             var cookie = res.header['set-cookie'];
             assert(cookie !== undefined);
             var actionURL = /action="(.*?)"/g;
-            var transactionID = /name="transaction_id".*value="(.*?)"/g;
+            var transactionID = /name="transaction_id".*?value="(.*?)"/g;
             var match = actionURL.exec(res.text);
             var match2 = transactionID.exec(res.text);
             request.post(decodeAMP(match[1]))

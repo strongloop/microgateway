@@ -43,7 +43,7 @@ function sendAZRequest(request, done, testCallBack) {
 
           var cookie = res.header['set-cookie'];
           var actionURL = /action="(.*?)"/g;
-          var transactionID = /name="transaction_id".*value="(.*?)"/g;
+          var transactionID = /name="transaction_id".*?value="(.*?)"/g;
           var match = actionURL.exec(res.text);
           var match2 = transactionID.exec(res.text);
 

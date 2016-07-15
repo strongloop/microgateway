@@ -14277,7 +14277,9 @@
             "type": "basic"
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
@@ -14671,7 +14673,9 @@
             }
           },
           "authentication": {
-            "file": ""
+            "x-ibm-authentication-url": {
+              "url": "http://localhost:7000/basic-auth"
+            }
           },
           "authorization": {
             "type": "default-form"
