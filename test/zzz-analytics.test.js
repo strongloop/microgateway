@@ -12,6 +12,7 @@ var backend    = require('./support/invoke-server');
 var analytics  = require('./support/analytics-server');
 var fs         = require('fs');
 var path       = require('path');
+var dsCleanup = require('./support/utils').dsCleanup;
 
 var hasCopiedKeys;
 var privKey = path.resolve(__dirname, '..', 'id_rsa');
@@ -107,6 +108,7 @@ describe('analytics + invoke policy', function() {
     delete process.env.APIMANAGER_CATALOG;
 
     analytics.stop()
+    .then(function() { return dsCleanup(5000); })
     .then(function() { return microgw.stop(); })
     .then(function() { return backend.stop(); })
     .then(function() { return delKeys(); })
