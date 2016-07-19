@@ -15,7 +15,7 @@ html(lang="en")
 
     p
       div(id="radius-msg")
-    form(name="LoginForm", method="post", action=action)
+    form(name="LoginForm", method="post", action!=action)
       p
         strong Please enter your user ID and password.
         br
@@ -26,12 +26,12 @@ html(lang="en")
           tr
             td User ID:
             td
-              input(type="text", size="20", name="j_username")
+              input(type="text", size="20", name!="j_username")
           tr
             td Password:
             td
-              input(type="password", size="20", name="j_password")
+              input(type="password", size="20", name!="j_password")
 
       p
         input(type="submit", name="login", value="Login")
-        input(type="hidden", size="1024", name="transaction_id", value=transaction_id)
+        input(type="hidden", size="1024", name="transaction_id", value!=transaction_id)

@@ -2,13 +2,14 @@ policy: 1.1.0
 
 info:
   title: Throw
-  name: apim-throw
+  name: throw
   version: 1.0.0
   description: Throw policy for the IBM API Connect
   contact:
     name: IBM API Mesh Samples
     url: https://www.ibm.com/apimesh
     email: steve-product-manager@ibm.com
+
 properties:
   type: "object"
   properties:
@@ -23,4 +24,4 @@ properties:
   required:
     - name
   throw:
-    - *
+    - '*'

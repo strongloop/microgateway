@@ -16,9 +16,6 @@ var microgw = require('../lib/microgw');
 var authServer = require('./support/auth-server');
 var apimServer = require('./support/mock-apim-server/apim-server');
 
-var encodedRedirectURI = 
-  encodeURIComponent('https://localhost:5000/use-oauth/getinfo');
-
 describe('oauth2 AZ-server', function() {
 
   describe('default login form - authenticated', function() {
@@ -1369,30 +1366,20 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no cookie');
             var form = parseConsentForm(res.text);
 
-            assert(form.redirectURI === encodedRedirectURI,
+            assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
                 'incorrect redirectURI');
-            assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
+            assert(form.scope === 'scope1 scope2 scope3',
                 'incorrect scope');
             assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                 'incorrect client_id');
             assert(form.resOwner === 'root', 'incorrect resource owner');
             assert(form.dpState !== undefined, 'incorrect dp-state');
 
-            request.post('/security/oauth2/authorize')
-              .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-              .query({response_type: 'token'})
-              .query({scope: 'scope1 scope2 scope3'})
-              .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-              .query({state: 'xyz'})
-              .set('cookie', cookie[0].split(';')[0])
-              .send('dp-state=' + form.dpState)
-              .send('resource-owner=' + form.resOwner)
-              .send('redirect_uri=' + form.redirectURI)
-              .send('scope=' + form.scope)
-              .send('original-url=' + form.originalURL)
-              .send('client_id=' + form.clientID)
-              .send('dp-data=' + form.dpData)
-              .send('approve=true')
+            var actionURL = /action="(.*?)"/g;
+            var match = actionURL.exec(res.text);
+            form.approve = 'true';
+
+            submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
               .end(function (err2, res2) {
                 try {
                   assert(res2.statusCode === 302, 'not 302 redirect');
@@ -1432,30 +1419,20 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no cookie');
             var form = parseConsentForm(res.text);
 
-            assert(form.redirectURI === encodedRedirectURI,
+            assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
                 'incorrect redirectURI');
-            assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
+            assert(form.scope === 'scope1 scope2 scope3',
                 'incorrect scope');
             assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                 'incorrect client_id');
             assert(form.resOwner === 'root', 'incorrect resource owner');
             assert(form.dpState !== undefined, 'incorrect dp-state');
 
-            request.post('/security/oauth2/authorize')
-              .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-              .query({response_type: 'code'})
-              .query({scope: 'scope1 scope2 scope3'})
-              .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-              .query({state: 'xyz'})
-              .set('cookie', cookie[0].split(';')[0])
-              .send('dp-state=' + form.dpState)
-              .send('resource-owner=' + form.resOwner)
-              .send('redirect_uri=' + form.redirectURI)
-              .send('scope=' + form.scope)
-              .send('original-url=' + form.originalURL)
-              .send('client_id=' + form.clientID)
-              .send('dp-data=' + form.dpData)
-              .send('approve=true')
+            var actionURL = /action="(.*?)"/g;
+            var match = actionURL.exec(res.text);
+            form.approve = 'true';
+
+            submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
               .end(function (err2, res2) {
                 try {
                   assert(res2.statusCode === 302, 'not 302 redirect');
@@ -1584,31 +1561,21 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no cookie');
             var form = parseConsentForm(res.text);
 
-            assert(form.redirectURI === encodedRedirectURI,
+            assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
                 'incorrect redirectURI');
-            assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
+            assert(form.scope === 'scope1 scope2 scope3',
                 'incorrect scope');
             assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                 'incorrect client_id');
             assert(form.resOwner === 'root', 'incorrect resource owner');
             assert(form.dpState !== undefined, 'incorrect dp-state');
 
-            request.post('/security/oauth2/authorize')
-              .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-              .query({response_type: 'token'})
-              .query({scope: 'scope1 scope2 scope3'})
-              .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-              .query({state: 'xyz'})
-              .set('cookie', cookie[0].split(';')[0])
-              .send('dp-state=' + form.dpState)
-              .send('resource-owner=' + form.resOwner)
-              .send('redirect_uri=' + form.redirectURI)
-              .send('scope=' + form.scope)
-              .send('original-url=' + form.originalURL)
-              .send('client_id=' + form.clientID)
-              .send('dp-data=' + form.dpData)
-              .send('selectedscope=scope1')
-              .send('approve=true')
+            var actionURL = /action="(.*?)"/g;
+            var match = actionURL.exec(res.text);
+            form.approve = 'true';
+            form.selectedscope = 'scope1';
+
+            submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
               .end(function (err2, res2) {
                 try {
                   assert(res2.statusCode === 302, 'not 302 redirect');
@@ -1648,31 +1615,21 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no cookie');
             var form = parseConsentForm(res.text);
 
-            assert(form.redirectURI === encodedRedirectURI,
+            assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
                 'incorrect redirectURI');
-            assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
+            assert(form.scope === 'scope1 scope2 scope3',
                 'incorrect scope');
             assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                 'incorrect client_id');
             assert(form.resOwner === 'root', 'incorrect resource owner');
             assert(form.dpState !== undefined, 'incorrect dp-state');
 
-            request.post('/security/oauth2/authorize')
-              .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-              .query({response_type: 'code'})
-              .query({scope: 'scope1 scope2 scope3'})
-              .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-              .query({state: 'xyz'})
-              .set('cookie', cookie[0].split(';')[0])
-              .send('dp-state=' + form.dpState)
-              .send('resource-owner=' + form.resOwner)
-              .send('redirect_uri=' + form.redirectURI)
-              .send('scope=' + form.scope)
-              .send('original-url=' + form.originalURL)
-              .send('client_id=' + form.clientID)
-              .send('dp-data=' + form.dpData)
-              .send('selectedscope=scope1')
-              .send('approve=true')
+            var actionURL = /action="(.*?)"/g;
+            var match = actionURL.exec(res.text);
+            form.approve = 'true';
+            form.selectedscope= 'scope1';
+
+            submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
               .end(function (err2, res2) {
                 try {
                   assert(res2.statusCode === 302, 'not 302 redirect');
@@ -1708,30 +1665,20 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no cookie');
             var form = parseConsentForm(res.text);
 
-            assert(form.redirectURI === encodedRedirectURI,
+            assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
                 'incorrect redirectURI');
-            assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
+            assert(form.scope === 'scope1 scope2 scope3',
                 'incorrect scope');
             assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                 'incorrect client_id');
             assert(form.resOwner === 'root', 'incorrect resource owner');
             assert(form.dpState !== undefined, 'incorrect dp-state');
 
-            request.post('/security/oauth2/authorize')
-              .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-              .query({response_type: 'token'})
-              .query({scope: 'scope1 scope2 scope3'})
-              .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-              .query({state: 'xyz'})
-              .set('cookie', cookie[0].split(';')[0])
-              .send('dp-state=' + form.dpState)
-              .send('resource-owner=' + form.resOwner)
-              .send('redirect_uri=' + form.redirectURI)
-              .send('scope=' + form.scope)
-              .send('original-url=' + form.originalURL)
-              .send('client_id=' + form.clientID)
-              .send('dp-data=' + form.dpData)
-              .send('approve=false')
+            var actionURL = /action="(.*?)"/g;
+            var match = actionURL.exec(res.text);
+            form.approve = 'false';
+
+            submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
               .end(function (err2, res2) {
                 try {
                   assert(res2.statusCode === 302, 'not 302 redirect');
@@ -1768,30 +1715,20 @@ describe('oauth2 AZ-server', function() {
             assert(cookie !== undefined, 'no cookie');
             var form = parseConsentForm(res.text);
 
-            assert(form.redirectURI === encodedRedirectURI,
+            assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
                 'incorrect redirectURI');
-            assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
+            assert(form.scope === 'scope1 scope2 scope3',
                 'incorrect scope');
             assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                 'incorrect client_id');
             assert(form.resOwner === 'root', 'incorrect resource owner');
             assert(form.dpState !== undefined, 'incorrect dp-state');
 
-            request.post('/security/oauth2/authorize')
-              .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-              .query({response_type: 'code'})
-              .query({scope: 'scope1 scope2 scope3'})
-              .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-              .query({state: 'xyz'})
-              .set('cookie', cookie[0].split(';')[0])
-              .send('dp-state=' + form.dpState)
-              .send('resource-owner=' + form.resOwner)
-              .send('redirect_uri=' + form.redirectURI)
-              .send('scope=' + form.scope)
-              .send('original-url=' + form.originalURL)
-              .send('client_id=' + form.clientID)
-              .send('dp-data=' + form.dpData)
-              .send('approve=false')
+            var actionURL = /action="(.*?)"/g;
+            var match = actionURL.exec(res.text);
+            form.approve = 'false';
+
+            submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
               .end(function (err2, res2) {
                 try {
                   assert(res2.statusCode === 302, 'not 302 redirect');
@@ -1887,30 +1824,20 @@ describe('oauth2 AZ-server', function() {
                   assert(cookie !== undefined, 'no cookie');
                   var form = parseConsentForm(res2.text);
 
-                  assert(form.redirectURI === encodedRedirectURI,
+                  assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
                       'incorrect redirectURI');
-                  assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
+                  assert(form.scope === 'scope1 scope2 scope3',
                       'incorrect scope');
                   assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                       'incorrect client_id');
                   assert(form.resOwner === 'root', 'incorrect resource owner');
                   assert(form.dpState !== undefined, 'incorrect dp-state');
 
-                  request.post('/security/oauth2/authorize')
-                    .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-                    .query({response_type: 'token'})
-                    .query({scope: 'scope1 scope2 scope3'})
-                    .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-                    .query({state: 'xyz'})
-                    .set('cookie', cookie[0].split(';')[0])
-                    .send('dp-state=' + form.dpState)
-                    .send('resource-owner=' + form.resOwner)
-                    .send('redirect_uri=' + form.redirectURI)
-                    .send('scope=' + form.scope)
-                    .send('original-url=' + form.originalURL)
-                    .send('client_id=' + form.clientID)
-                    .send('dp-data=' + form.dpData)
-                    .send('approve=true')
+                  var actionURL = /action="(.*?)"/g;
+                  var match = actionURL.exec(res2.text);
+                  form.approve = 'true';
+
+                  submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
                     .end(function (err3, res3) {
                       try {
                         assert(res3.statusCode === 302, 'not 302 redirect');
@@ -1969,30 +1896,20 @@ describe('oauth2 AZ-server', function() {
                  assert(cookie !== undefined, 'no cookie');
                  var form = parseConsentForm(res2.text);
 
-                 assert(form.redirectURI === encodedRedirectURI,
+                 assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
                      'incorrect redirectURI');
-                 assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
+                 assert(form.scope === 'scope1 scope2 scope3',
                      'incorrect scope');
                  assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                      'incorrect client_id');
                  assert(form.resOwner === 'root', 'incorrect resource owner');
                  assert(form.dpState !== undefined, 'incorrect dp-state');
 
-                 request.post('/security/oauth2/authorize')
-                   .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-                   .query({response_type: 'code'})
-                   .query({scope: 'scope1 scope2 scope3'})
-                   .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-                   .query({state: 'xyz'})
-                   .set('cookie', cookie[0].split(';')[0])
-                   .send('dp-state=' + form.dpState)
-                   .send('resource-owner=' + form.resOwner)
-                   .send('redirect_uri=' + form.redirectURI)
-                   .send('scope=' + form.scope)
-                   .send('original-url=' + form.originalURL)
-                   .send('client_id=' + form.clientID)
-                   .send('dp-data=' + form.dpData)
-                   .send('approve=true')
+                 var actionURL = /action="(.*?)"/g;
+                 var match = actionURL.exec(res2.text);
+                 form.approve = 'true';
+
+                 submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
                    .end(function (err3, res3) {
                      try {
                        assert(res3.statusCode === 302, 'not 302 redirect');
@@ -2248,31 +2165,21 @@ describe('oauth2 AZ-server', function() {
                   var cookie = res2.header['set-cookie'];
                   assert(cookie !== undefined, 'no cookie');
                   var form = parseConsentForm(res2.text);
-                  assert(form.redirectURI === encodedRedirectURI,
+                  assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
                       'incorrect redirectURI');
-                  assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
+                  assert(form.scope === 'scope1 scope2 scope3',
                       'incorrect scope');
                   assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                       'incorrect client_id');
                   assert(form.resOwner === 'root', 'incorrect resource owner');
                   assert(form.dpState !== undefined, 'incorrect dp-state');
 
-                  request.post('/security/oauth2/authorize')
-                    .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-                    .query({response_type: 'token'})
-                    .query({scope: 'scope1 scope2 scope3'})
-                    .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-                    .query({state: 'xyz'})
-                    .set('cookie', cookie[0].split(';')[0])
-                    .send('dp-state=' + form.dpState)
-                    .send('resource-owner=' + form.resOwner)
-                    .send('redirect_uri=' + form.redirectURI)
-                    .send('scope=' + form.scope)
-                    .send('original-url=' + form.originalURL)
-                    .send('client_id=' + form.clientID)
-                    .send('dp-data=' + form.dpData)
-                    .send('selectedscope=scope1')
-                    .send('approve=true')
+                  var actionURL = /action="(.*?)"/g;
+                  var match = actionURL.exec(res2.text);
+                  form.approve = 'true';
+                  form.selectedscope = 'scope1';
+
+                  submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
                     .end(function (err3, res3) {
                       try {
                         assert(res3.statusCode === 302, 'not 302 redirect');
@@ -2330,31 +2237,21 @@ describe('oauth2 AZ-server', function() {
                   var cookie = res2.header['set-cookie'];
                   assert(cookie !== undefined, 'no cookie');
                   var form = parseConsentForm(res2.text);
-                  assert(form.redirectURI === encodedRedirectURI,
+                  assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
                       'incorrect redirectURI');
-                  assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
+                  assert(form.scope === 'scope1 scope2 scope3',
                       'incorrect scope');
                   assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                       'incorrect client_id');
                   assert(form.resOwner === 'root', 'incorrect resource owner');
                   assert(form.dpState !== undefined, 'incorrect dp-state');
 
-                  request.post('/security/oauth2/authorize')
-                    .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-                    .query({response_type: 'code'})
-                    .query({scope: 'scope1 scope2 scope3'})
-                    .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-                    .query({state: 'xyz'})
-                    .set('cookie', cookie[0].split(';')[0])
-                    .send('dp-state=' + form.dpState)
-                    .send('resource-owner=' + form.resOwner)
-                    .send('redirect_uri=' + form.redirectURI)
-                    .send('scope=' + form.scope)
-                    .send('original-url=' + form.originalURL)
-                    .send('client_id=' + form.clientID)
-                    .send('dp-data=' + form.dpData)
-                    .send('selectedscope=scope1')
-                    .send('approve=true')
+                  var actionURL = /action="(.*?)"/g;
+                  var match = actionURL.exec(res2.text);
+                  form.approve = 'true';
+                  form.selectedscope = 'scope1';
+
+                  submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
                     .end(function (err3, res3) {
                       try {
                         assert(res3.statusCode === 302, 'not 302 redirect');
@@ -2407,30 +2304,20 @@ describe('oauth2 AZ-server', function() {
                   assert(cookie !== undefined, 'no cookie');
                   var form = parseConsentForm(res2.text);
 
-                  assert(form.redirectURI === encodedRedirectURI,
+                  assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
                       'incorrect redirectURI');
-                  assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
+                  assert(form.scope === 'scope1 scope2 scope3',
                     'incorrect scope');
                   assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                       'incorrect client_id');
                   assert(form.resOwner === 'root', 'incorrect resource owner');
                   assert(form.dpState !== undefined, 'incorrect dp-state');
 
-                  request.post('/security/oauth2/authorize')
-                    .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-                    .query({response_type: 'token'})
-                    .query({scope: 'scope1 scope2 scope3'})
-                    .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-                    .query({state: 'xyz'})
-                    .set('cookie', cookie[0].split(';')[0])
-                    .send('dp-state=' + form.dpState)
-                    .send('resource-owner=' + form.resOwner)
-                    .send('redirect_uri=' + form.redirectURI)
-                    .send('scope=' + form.scope)
-                    .send('original-url=' + form.originalURL)
-                    .send('client_id=' + form.clientID)
-                    .send('dp-data=' + form.dpData)
-                    .send('approve=false')
+                  var actionURL = /action="(.*?)"/g;
+                  var match = actionURL.exec(res2.text);
+                  form.approve = 'false';
+
+                  submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
                     .end(function (err3, res3) {
                       try {
                         assert(res3.statusCode === 302, 'not 302 redirect');
@@ -2484,30 +2371,20 @@ describe('oauth2 AZ-server', function() {
                   assert(cookie !== undefined, 'no cookie');
                   var form = parseConsentForm(res2.text);
 
-                  assert(form.redirectURI === encodedRedirectURI,
+                  assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
                       'incorrect redirectURI');
-                  assert(form.scope === encodeURIComponent('scope1 scope2 scope3'),
+                  assert(form.scope === 'scope1 scope2 scope3',
                       'incorrect scope');
                   assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
                       'incorrect client_id');
                   assert(form.resOwner === 'root', 'incorrect resource owner');
                   assert(form.dpState !== undefined, 'incorrect dp-state');
 
-                  request.post('/security/oauth2/authorize')
-                    .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-                    .query({response_type: 'code'})
-                    .query({scope: 'scope1 scope2 scope3'})
-                    .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-                    .query({state: 'xyz'})
-                    .set('cookie', cookie[0].split(';')[0])
-                    .send('dp-state=' + form.dpState)
-                    .send('resource-owner=' + form.resOwner)
-                    .send('redirect_uri=' + form.redirectURI)
-                    .send('scope=' + form.scope)
-                    .send('original-url=' + form.originalURL)
-                    .send('client_id=' + form.clientID)
-                    .send('dp-data=' + form.dpData)
-                    .send('approve=false')
+                  var actionURL = /action="(.*?)"/g;
+                  var match = actionURL.exec(res2.text);
+                  form.approve = 'false';
+
+                  submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
                     .end(function (err3, res3) {
                       try {
                         assert(res3.statusCode === 302, 'not 302 redirect');
@@ -2536,6 +2413,27 @@ describe('oauth2 AZ-server', function() {
   });
 
 });
+
+/*
+ * compose a request to submit an authorization form
+ */
+function submitAuthReq(request, actionUri, cookie, form) {
+  var rev = request.post(actionUri)
+  .set('cookie', cookie)
+  .send('dp-state=' + encodeURIComponent(form.dpState))
+  .send('resource-owner=' + encodeURIComponent(form.resOwner))
+  .send('redirect_uri=' + encodeURIComponent(form.redirectURI))
+  .send('scope=' + encodeURIComponent(form.scope))
+  .send('original-url=' + encodeURIComponent(form.originalURL))
+  .send('client_id=' + encodeURIComponent(form.clientID))
+  .send('dp-data=' + encodeURIComponent(form.dpData));
+
+  if (form.selectedscope) {
+    rev = rev.send('selectedscope=' + encodeURIComponent(form.selectedscope));
+  }
+
+  return rev.send('approve=' + encodeURIComponent(form.approve));
+}
 
 function decodeAMP(url) {
   return decodeURIComponent(url.replace(/&amp;/g, '&'));

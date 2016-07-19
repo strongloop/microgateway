@@ -8,7 +8,7 @@
  */
 var logger = require('apiconnect-cli-logger/logger.js')
                .child({loc: 'microgateway:datastore:apim-pull'});
-var fs = require('fs'),
+var fs = require('fs.extra'),
     request = require('request'),
     async = require('async'),
     extend = require('util')._extend;
@@ -47,8 +47,8 @@ var APIM_CATALOG_ENDP = '/v1/catalogs',
 /**
  * Globals
  */
+var indirFiles = [];
 var response = {};
-var result; 
 
 /**
  * Creates a model type 
@@ -79,9 +79,21 @@ function apimpull (opts, cb) {
     clikey : opts.clikey ? opts.clikey : null,
     clipass : opts.clipass,
     clicert : opts.clicert ? opts.clicert  : null,
+    indir : opts.indir,
     outdir : opts.outdir || 'apim',
     clientid : opts.clientid || '1111-1111'
   };
+
+  if (opts.indir) {
+    try {
+      indirFiles = fs.readdirSync(opts.indir);
+    }
+    catch(e){
+      logger.error(e);
+      // not fatal; continue
+    }
+  }
+
   /* First, start w/ catalogs */
   pullcatalog(options, function(err, catalogs, models) {
       if (err) {
@@ -136,9 +148,9 @@ function pullcatalog (opts, cb) {
               '?' + // filter parms
               APIM_CLIENT_ID_EQ + opts.clientid + '&' + 
               APIM_TYPE_EQ + APIM_TYPE_FILTER;
-  opts.prefix = '/catalogs-';
+  opts.prefix = 'catalogs-';
   opts.suffix = '.json';
-  fetch(opts, function (err, file) {
+  fetch(opts, function (err, result) {
       if (err) {
         cb(err);
       }
@@ -191,7 +203,7 @@ function pullDataFromEndp (opts, catalog, model, cb) {
                 '?' + // filter parms
                 APIM_CLIENT_ID_EQ + opts.clientid + '&' +
                 APIM_TYPE_EQ + APIM_TYPE_FILTER;
-  myopts.prefix = '/' + model.prefix + catalog.org + '-' + catalog.cat + '-';
+  myopts.prefix = model.prefix + catalog.org + '-' + catalog.cat + '-';
   myopts.suffix = '.json';
   fetch(myopts, function (err, result) {
       if (err) {
@@ -212,9 +224,7 @@ function pullDataFromEndp (opts, catalog, model, cb) {
 
 /**
  * Fetches response from APIm endpoint, persists the response to the
- * filesystem '<outdir><prefix><etag><postfix>'
- *
- * TODO - optimize to only fetch if current version is not fresh
+ * filesystem '<outdir>/<prefix><etag><postfix>'
  */
 function fetch (opts, cb) {
 
@@ -229,20 +239,103 @@ function fetch (opts, cb) {
       rejectUnauthorized : false // TODO : remove this
     }
   };
+
+  fetchFromCache(options, opts, function (err, cached) {
+      if (err)
+        cb(err);
+      else if (cached) {
+        cb(null, cached);
+      }
+      else
+        fetchFromServer(options, opts, cb);
+    }
+  );
+
+}
+
+/**
+ * Uses cached configuration if still fresh 
+ */
+function fetchFromCache (options, opts, cb) {
+
+  // look for existing cached resource
+  if (indirFiles.length > 0) {
+    var etag;
+    var regexp = '^' + opts.prefix +
+                 '([A-Za-z0-9]+={0,2})' + // base64 encoded
+                 opts.suffix + '$';
+    var regex = new RegExp(regexp);
+    var i;
+    for(i = 0; i < indirFiles.length; i++) {
+      var file = regex.exec(indirFiles[i]);
+      if (file) {
+        etag = new Buffer(file[1], 'base64').toString();
+        break;
+      }
+    }
+
+    if (etag) {
+      try {
+        var headOpts = JSON.parse(JSON.stringify(options)); // clone options
+        headOpts.headers = {'If-None-Match' : etag};
+        var req = request.head(headOpts, function(err, res, body) {
+            if (err) {
+              logger.error(err);
+              cb();
+              // not fatal; continue
+            }
+            else {
+              if (res.statusCode === 304) {
+                var filename = opts.outdir + '/' + indirFiles[i];
+                fs.copy(opts.indir + '/' + indirFiles[i],
+                        filename,
+                        { replace : false },
+                        function (err) {
+                          if (err)
+                            throw (err);
+                          var body = decryptData(fs.readFileSync(filename));
+                          logger.info('Using cached copy of %s', indirFiles[i]);
+                          var result = {
+                            file : filename,
+                            contents : body
+                          };
+                          cb(null, result);
+                        }
+                );
+              } else
+                cb();
+            }
+          }
+        );
+      } catch (e) {
+        logger.error(e);
+        cb();
+        // not fatal; continue
+      }
+    } else
+      cb();
+  } else
+    cb();
+}
+
+/**
+ * Retrieves resource from server 
+ */
+function fetchFromServer (options, opts, cb) {
   var req = request.get(options, function(err, res, body) {
       if (err) {
         cb(err);
       }
       else if (res.statusCode === 200) {
         var etag = res.headers.etag ? res.headers.etag : '';
-        var filename = opts.outdir + opts.prefix + 
+        var filename = opts.outdir + '/' + opts.prefix + 
                        new Buffer(etag).toString('base64') +
                        opts.suffix;
         var outstream = fs.createWriteStream(filename);        
         outstream.write(encryptData(JSON.stringify(JSON.parse(body),null,4)));
         outstream.end();
         outstream.on('finish', function() {
-            result = {
+            var result = {
               file : filename,
               contents : body
             };

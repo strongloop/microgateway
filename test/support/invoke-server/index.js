@@ -286,8 +286,7 @@ exports.start = function(port) {
     return new Promise(function(resolve, reject) {
         //One http server
         //httpServer = http.createServer(app);
-        httpServer = http.createServer(theApplication);
-        httpServer.listen(port);
+        httpServer = http.createServer(theApplication).listen(port);
         console.log('HTTP server is listening at port %d.', port);
 
         httpServer.on('error', function(e) {
@@ -301,8 +300,8 @@ exports.start = function(port) {
         //Four https servers
         for (var i = 0; i<sslOpts.length; i++) {
             //httpsServers[i] = https.createServer(sslOpts[i][1], app);
-            httpsServers[i] = https.createServer(sslOpts[i][1], theApplication);
-            httpsServers[i].listen(port + 1 + i);
+            httpsServers[i] = https.createServer(sslOpts[i][1], theApplication)
+                .listen(port + 1 + i);
             console.log('HTTPS server (%s) is listening at port %d.',
                 sslOpts[i][0], port + 1 + i);
 
@@ -324,19 +323,22 @@ exports.start = function(port) {
 exports.stop = function() {
     return new Promise(function(resolve, reject) {
         try {
+            var closeCounter = 0;
             if (httpServer)
                 httpServer.close(function() {});
             if (httpsServers && httpsServers.length > 0) {
-                for (var i; i<httpsServers.length; i++) {
-                    httpsServers[i].close(function() {});
+                for (var i=0; i<httpsServers.length; i++) {
+                    httpsServers[i].close(function() {
+                        closeCounter++;
+                        if (closeCounter === httpsServers.length) {
+                            resolve();
+                        }
+                    });
                 }
             }
         }
         catch (error) {
             console.log('Found error when stoping HTTP/HTTPS servers: ', error);
-        }
-        finally {
-            resolve();
         }
     });
 };
