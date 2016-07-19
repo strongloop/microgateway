@@ -1,3 +1,377 @@
+2016-07-19, Version 1.3.0
+=========================
+
+ * use lodash.isString() instead of (yhwang)
+
+ * The values of inputs inside a html form need (yhwang)
+
+ * Unl rate limit issue when combined with others (Daniel Badt)
+
+ * Add logs to the refresh token testcase (juangmj)
+
+ * Use public `loopback-connector-redis` package (Jon Palgon)
+
+ * Correct installation instructions (Jon Palgon)
+
+ * write error status code to ctx.error.status.code (yihongwang)
+
+ * Fix existing UT that's failing (Jon Palgon)
+
+ * fix test failure of resource server by changing the expected status code to 403 (yihongwang)
+
+ * compromize with loopback-connector-redis limitation. The findById query may return an empty object (yihongwang)
+
+ * - remove unecessary data model - compromise with the loopback-connector-redis   not using 'and' operator in where filter (yihongwang)
+
+ * Handle invalid scopes as regressions expect (John Bellessa)
+
+ * Added expected response error handling for OAuth2 resource server (John Bellessa)
+
+ * Makes preflow filterAPIs() defer to error status codes that have already been set when no APIs have passed authentication (John Bellessa)
+
+ * Updated how we handled invalid_token errors (John Bellessa)
+
+ * refine the error to be an error object which contains 'error' for error code and 'message' for error message Then use error===401 to decide if a www-authenticate header is needed (yihongwang)
+
+ * Check the appId of a resource request (juangmj)
+
+ * Reject requests that use multiple authentication schemes (juangmj)
+
+ * add registries for oauth regression also update ldap moc server accordingly (yihongwang)
+
+ * Return invalid_token when access token is not found (juangmj)
+
+ * Updated to handle missing tokens (John Bellessa)
+
+ * Use InvalidTokenError() for cases when tokens cannot be decoded or parsed (John Bellessa)
+
+ * Added InvalidTokenError() type and began using it for expired token errors (John Bellessa)
+
+ * Handle expired tokens with appropriate response (John Bellessa)
+
+ * Return the header WWW-Authenticate when authentication fails (juangmj)
+
+ * Update the mock auth server (juangmj)
+
+ * postpone the response_type check in AZ server after retriving client data, fails the request via redirect_uri if the response_type is invalid (yihongwang)
+
+ * The scope of refresh token must be granted earlier (juangmj)
+
+ * Added accessTokens.findById() (John Bellessa)
+
+ * Make apiId available to resource server and include it in token search (#360) (John Bellessa)
+
+ * Public clients may skip the authentication (juangmj)
+
+ * change the error_code of invalid redirect_uri from 'invalid_client' to 'invalid_request' (yihongwang)
+
+ * remove the next() call in postflow fix redis datasource setting bug when enabling redis as token store note: loopback-connector-redis only can access database 0 (yihongwang)
+
+ * There are public and confidential clients (juangmj)
+
+ * Allow HTTPS authentication without TLS profile (juangmj)
+
+ * handle invalid requests from external AZ/AH redirect. also change the transaction param name from dp-state to rstate which is used by DataPower. (yihongwang)
+
+ * Implement the deleteAZCode() (juangmj)
+
+ * handle the external AZ/AH redirect url with url.parse and adding querystring properly (yihongwang)
+
+ * Add the type 'oauth' (juangmj)
+
+ * Correct the token parameters (juangmj)
+
+ * id extractor still needs to know the login type is basic auth for login form (yihongwang)
+
+ * - when login fails/error, write the error to   response body - invalid redirect_uri, write the error to   response body - modify test case according to the changes   above (yihongwang)
+
+ * authentication error goes to response.body also fix api.id error in apis doc for testing (yihongwang)
+
+ * In AZ server, when redirect uri is unavailable, directly write error code to response body (yhwang)
+
+ * if there is no grant:accessCode|implicit and a request goes to az end point, an unauthorized_client error code is returned (yhwang)
+
+ * Fix scope definitions (juangmj)
+
+ * Fix the undefined redirect_uri (juangmj)
+
+ * Updated APIs for microgateway (John Bellessa)
+
+ * empty 'plan-registration'.apis equals 'all apis' (yhwang)
+
+ * `subscriptions['plan-registration].apis` array (Jon Palgon)
+
+ * use indexOf() instead of startWith() for 0.12 compatible (yhwang)
+
+ * enhance the auth moc server to support multiple users (yihongwang)
+
+ * Changed az-server authentication middleware to get client via models.clients.findById() (fix for #355) (John Bellessa)
+
+ * Renamed resource server test file (John Bellessa)
+
+ * Updated OAuth2 resource server tests (John Bellessa)
+
+ * fix some missing properties in api doc (yihongwang)
+
+ * - support to use redis for session-store and - add default value for TTL properties - add empty scope test case (yihongwang)
+
+ * Add one more testcase (juangmj)
+
+ * test cases for the disabled refresh token (juangmj)
+
+ * add testcases for the grant_type 'authorization code' (juangmj)
+
+ * Update testcases for the scope parameter (juangmj)
+
+ * The scope parameter is required (juangmj)
+
+ * Fix for apimesh/scrum-micro-gw#183: added reference to helpers.isExpired (John Bellessa)
+
+ * add test cases for az-server - default login + default consent (yhwang)
+
+ * Fix the regression in TLS configuration (juangmj)
+
+ * Add more testcases for token endpoint (juangmj)
+
+ * Fix the HTTPS basic authentication (juangmj)
+
+ * Allow the HTTPS auth URL without TLS profile (juangmj)
+
+ * Adding bad token test cases (John Bellessa)
+
+ * Massage subs into format µGW accepts (Jon Palgon)
+
+ * Skipping scope tests for now (John Bellessa)
+
+ * Added support for scopes (John Bellessa)
+
+ * Removed requires for missing/unnecessary packages and unused strategies (John Bellessa)
+
+ * Updating OAuth2 resource tests (John Bellessa)
+
+ * add az test cases - redirect - basic + default consent form (yihongwang)
+
+ * Cleaned up OAuth2 resource server (John Bellessa)
+
+ * Remove the unwanted files (juangmj)
+
+ * Add testcases for refresh tokens (juangmj)
+
+ * Add testcases for the grant type 'password' (juangmj)
+
+ * add az test cases (yihongwang)
+
+ * Added simple resource server test case using token from token endpoint (John Bellessa)
+
+ * Fixed bug in how datasources get cached: cannot use object as property name because it always evaluates to [Object object] (John Bellessa)
+
+ * Read authenticate-bind-admin-password for LDAP password (juangmj)
+
+ * Use registry or auth url for basic authentication (juangmj)
+
+ * Removed swagger-related code from OAuth (resource server) tests (John Bellessa)
+
+ * Removed code held-over from preflow tests (John Bellessa)
+
+ * Removed from oauth definitions (John Bellessa)
+
+ * Added catalog007 (John Bellessa)
+
+ * add test case for az server (yihongwang)
+
+ * Add testcases for the grant type 'client_credential' (juangmj)
+
+ * Return a 302 response for authorization error (juangmj)
+
+ * Added path-to-regexp dependency to package.json (John Bellessa)
+
+ * Update testcases (juangmj)
+
+ * Add initial unit tests for the grant type 'password' (juangmj)
+
+ * add redirect support (yihongwang)
+
+ * Fix the previous commit. We use jwt id as the AZ code (juangmj)
+
+ * For AZ code, the token is used as id (juangmj)
+
+ * Initial unit tests for token endpoint (juangmj)
+
+ * Adding and integrating additional files from loopback-component-oauth2 (John Bellessa)
+
+ * support custom login form (yihongwang)
+
+ * Delete the used refresh token (juangmj)
+
+ * Revoke the refresn token and the AZ code if client provides wrong credential (juangmj)
+
+ * Fix the undefined errors (juangmj)
+
+ * The refresh token can be issued for only 'count' times (juangmj)
+
+ * Fix the compile error (juangmj)
+
+ * Update logs and error messages (juangmj)
+
+ * Fixed bug caused by creating TokenError without required parameters. Other small tweaks (John Bellessa)
+
+ * Added initial JWT access token validation middleware (John Bellessa)
+
+ * Added sample token to test case (John Bellessa)
+
+ * Added files for auth and on-prem testing (John Bellessa)
+
+ * Added ability to convert Swagger YAMLs to JSON for on-prem testing (John Bellessa)
+
+ * Updated reconstructed request properties (John Bellessa)
+
+ * Added utils from loopback-component-oauth2 (John Bellessa)
+
+ * Adding first OAuth2 resource server unit tests (John Bellessa)
+
+ * Setting resource server as OAuth2 security handler (John Bellessa)
+
+ * Wiring auth handler to push faux request through middleware (John Bellessa)
+
+ * Added function to reconstruct relevant parts of the Express request object (John Bellessa)
+
+ * Added resource-server/index.js (John Bellessa)
+
+ * Added mac-token.js (John Bellessa)
+
+ * Initial port of resource server from loopback-component-oauth2 (John Bellessa)
+
+ * Moved generateJWTToken() to oauth2-helper.js (John Bellessa)
+
+ * Validate the received refresh token (juangmj)
+
+ * The jwt token should be returned in the access token. (juangmj)
+
+ * Tidy the grant middlewares (juangmj)
+
+ * Save refresh tokens in its own data model (juangmj)
+
+ * fix rebase error (yihongwang)
+
+ * 1. remove sub from JWT claim (yihongwang)
+
+ * Rename function parameters (juangmj)
+
+ * Tidy the files under lib/oauth2/az-server/exchange/ (juangmj)
+
+ * Rename oauth-token.json to oauth-access-token.json (juangmj)
+
+ * store the grant type into the token model (yihongwang)
+
+ * modify the payload of the generated JWT (yihongwang)
+
+ * when generate token/code, only authorize (yihongwang)
+
+ * handle post request of default consent form (yihongwang)
+
+ * Enable the grant type 'authorization_code' (juangmj)
+
+ * Enable the grant type 'refresh_token' (juangmj)
+
+ * add consent form middleware (yihongwang)
+
+ * support default-form authentication (yihongwang)
+
+ * Purge the expired code/token/permissions (juangmj)
+
+ * Generate error resonse for OAuth2 error (juangmj)
+
+ * Honor the token TTL in the OAuth2 configuraiton (juangmj)
+
+ * The auth middleware should return the user object but not username (juangmj)
+
+ * extract handler functions (yhwang)
+
+ * fix undefined bug in default-form.js (yihongwang)
+
+ * support default-form for login (yihongwang)
+
+ * Support the token endpoint of OAuth2 (juangmj)
+
+ * Rework the exchange of 'application' and 'password' for MicroGateway (juangmj)
+
+ * Rework the token middleware for MicroGateway (juangmj)
+
+ * Add client API to find by cliend id and api id (juangmj)
+
+ * Minor changes to the basic auth codes (juangmj)
+
+ * Refactor the basic auth code (juangmj)
+
+ * [fix] use client["client-id"] property name instead of client.id to align with the data model (yihongwang)
+
+ * load transaction from session correctly (yihongwang)
+
+ * Refactor the basic auth codes (juangmj)
+
+ * missing server param when calling validateClient() (yihongwang)
+
+ * support implicit flow in az-server and add check methods in Server to verify grantType, responseType and scope (yihongwang)
+
+ * modify "oauth2/models" module and get data model by datasource definition (yihongwang)
+
+ * elimit the access of the http.Response object and use req.ctx.message instead (yihongwang)
+
+ * write redirect to ctx instead of response (yihongwang)
+
+ * limit the session enablement to only az path and implement the authorization.type === authenticated case (yihongwang)
+
+ * support id-extration:basic (yihongwang)
+
+ * get application info and call authorization middleware to verify the grant type and redirect-uri (yihongwang)
+
+ * add az-server middleware into the microgateway app and start to process the az requests (yihongwang)
+
+ * pull files from loopback-component-oauth2 (yihongwang)
+
+ * add data models for oauth2 (yihongwang)
+
+ * Change for rate-limits containing only unlimited (Daniel Badt)
+
+ * Sort multi rate limits (Daniel Badt)
+
+ * ratelimit:use async.series versus async.each (Thomas Burke)
+
+ * Fix accepted rate limit units (Daniel Badt)
+
+ * Support for unlimited ratelimits (Daniel Badt)
+
+ * Move rate limit execution within preflow (Daniel Badt)
+
+ * Code changes for multiple rate limits (Daniel Badt)
+
+ * add support for enforced+state (Thomas Burke)
+
+ * Bump version to 1.2.0 (Krishna Raman)
+
+ * skip hanging ComposeUPN tests (Thomas Burke)
+
+ * replace process.exit with logger.exit (Clement)
+
+ * Use latest snapshot directory on refresh (Jon Palgon)
+
+ * Account for `/` basePath and/or path (Jon Palgon)
+
+ * modify copyright statements (Clement)
+
+ * modify copyright statments (Clement)
+
+ * add log for issue#154 (Clement)
+
+ * correct test case expected response (Clement)
+
+ * change regex to support {+...} (Clement)
+
+ * add ut (Thomas Burke)
+
+ * Add logic to disambiguate api in plan (Jon Palgon)
+
+
 2016-05-24, Version 1.1.0
 =========================
 
