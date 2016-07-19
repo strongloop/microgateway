@@ -19,7 +19,7 @@ var apimServer = require('./support/mock-apim-server/apim-server');
 describe('oauth2 AZ-server', function() {
 
   describe('default login form - authenticated', function() {
-    var request, datastoreRequest;
+    var request 
     before(function(done)  {
       //Use production instead of CONFIG_DIR: reading from apim instead of laptop
       process.env.NODE_ENV = 'production';
@@ -37,7 +37,6 @@ describe('oauth2 AZ-server', function() {
           .then(function() { return authServer.start(7000); })
           .then(function() {
               request = supertest('https://localhost:5000');
-              datastoreRequest = supertest('http://localhost:4000');
           })
           .then(done)
           .catch(function(err) {
@@ -322,10 +321,11 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 401, 'not 401');
+                //get login form again with error message
+                assert(res2.statusCode === 200, 'not 200');
                 assert(res2.header['www-authenticate'] === undefined,
                     'extra www-authenticate header');
-                assert(res2.text.indexOf('Failed to authenticate the user') !== -1);
+                assert(res2.text.indexOf('At least one of your entries does not match our records') !== -1);
                 done(err2);
               } catch (e2) {
                 done(e2);
@@ -362,10 +362,11 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 401, 'not 401');
+                //get login form again with error message
+                assert(res2.statusCode === 200, 'not 200');
                 assert(res2.header['www-authenticate'] === undefined,
                     'extra www-authenticate header');
-                assert(res2.text.indexOf('Failed to authenticate the user') !== -1);
+                assert(res2.text.indexOf('At least one of your entries does not match our records') !== -1);
                 done(err2);
               } catch(e2) {
                 done(e2);
@@ -570,7 +571,7 @@ describe('oauth2 AZ-server', function() {
 
 
   describe('custom login form - authenticated', function() {
-    var request, datastoreRequest;
+    var request;
     before(function(done)  {
       //Use production instead of CONFIG_DIR: reading from apim instead of laptop
       process.env.NODE_ENV = 'production';
@@ -588,7 +589,6 @@ describe('oauth2 AZ-server', function() {
           .then(function() { return authServer.start(7000); })
           .then(function() {
               request = supertest('https://localhost:5000');
-              datastoreRequest = supertest('http://localhost:4000');
           })
           .then(done)
           .catch(function(err) {
@@ -624,6 +624,7 @@ describe('oauth2 AZ-server', function() {
             assert(err === null && res.ok === true, 'initial AZ request failed');
             var cookie = res.header['set-cookie'];
             assert(cookie !== undefined);
+            assert(/Custom Login Form/.test(res.text), 'not custom form');
 
             var actionURL = /action="(.*?)"/g;
             var transactionID = /name="transaction_id".*?value="(.*?)"/g;
@@ -673,7 +674,8 @@ describe('oauth2 AZ-server', function() {
             assert(err === null && res.ok === true, 'initial AZ request failed');
             var cookie = res.header['set-cookie'];
             assert(cookie !== undefined, 'no set-cookie');
-
+            assert(/Custom Login Form/.test(res.text), 'not custom form');
+            
             var actionURL = /action="(.*?)"/g;
             var transactionID = /name="transaction_id".*?value="(.*?)"/g;
             var match = actionURL.exec(res.text);
@@ -763,6 +765,7 @@ describe('oauth2 AZ-server', function() {
             assert(err === null && res.ok === true, 'initial AZ request failed');
             var cookie = res.header['set-cookie'];
             assert(cookie !== undefined);
+            assert(/Custom Login Form/.test(res.text), 'not custom form');
 
             var actionURL = /action="(.*?)"/g;
             var match = actionURL.exec(res.text);
@@ -801,6 +804,7 @@ describe('oauth2 AZ-server', function() {
             assert(err === null && res.ok === true, 'initial AZ request failed');
             var cookie = res.header['set-cookie'];
             assert(cookie !== undefined, 'no set-cookie');
+            assert(/Custom Login Form/.test(res.text), 'not custom form');
 
             var actionURL = /action="(.*?)"/g;
             var match = actionURL.exec(res.text);
@@ -838,6 +842,7 @@ describe('oauth2 AZ-server', function() {
             assert(err === null && res.ok === true, 'initial AZ request failed');
             var cookie = res.header['set-cookie'];
             assert(cookie !== undefined);
+            assert(/Custom Login Form/.test(res.text), 'not custom form');
 
             var actionURL = /action="(.*?)"/g;
             var transactionID = /name="transaction_id".*?value="(.*?)"/g;
@@ -851,10 +856,12 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 401, 'not 401');
+                assert(res2.statusCode === 200, 'not 200');
                 assert(res2.header['www-authenticate'] === undefined,
                     'extra www-authenticate header');
-                assert(res2.text.indexOf('Failed to authenticate the user') !== -1);
+                assert(/Custom Login Form/.test(res2.text), 'not custom form');
+                //check the specific string in custom form when login fails
+                assert(res2.text.indexOf('Failed to login! At least one of') !== -1);
                 done(err2);
               } catch (e2) {
                 done(e2);
@@ -879,6 +886,7 @@ describe('oauth2 AZ-server', function() {
             assert(err === null && res.ok === true, 'initial AZ request failed');
             var cookie = res.header['set-cookie'];
             assert(cookie !== undefined, 'no set-cookie');
+            assert(/Custom Login Form/.test(res.text), 'not custom form');
 
             var actionURL = /action="(.*?)"/g;
             var transactionID = /name="transaction_id".*?value="(.*?)"/g;
@@ -892,10 +900,12 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 401, 'not 401');
+                assert(res2.statusCode === 200, 'not 200');
                 assert(res2.header['www-authenticate'] === undefined,
                     'extra www-authenticate header');
-                assert(res2.text.indexOf('Failed to authenticate the user') !== -1);
+                assert(/Custom Login Form/.test(res2.text), 'not custom form');
+                //check the specific string in custom form when login fails
+                assert(res2.text.indexOf('Failed to login! At least one of') !== -1);
                 done(err2);
               } catch(e2) {
                 done(e2);
@@ -919,6 +929,7 @@ describe('oauth2 AZ-server', function() {
             assert(err === null && res.ok === true, 'initial AZ request failed');
             var cookie = res.header['set-cookie'];
             assert(cookie !== undefined, 'no set-cookie');
+            assert(/Custom Login Form/.test(res.text), 'not custom form');
 
             var actionURL = /action="(.*?)"/g;
             var transactionID = /name="transaction_id".*?value="(.*?)"/g;
@@ -932,10 +943,13 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 401, 'not 401');
+                //login failed, get login page again
+                assert(res2.statusCode === 200, 'not 200');
                 assert(res2.header['www-authenticate'] === undefined,
                     'extra www-authenticate header');
-                assert(res2.text.indexOf('Failed to authenticate the user') !== -1);
+                assert(/Custom Login Form/.test(res2.text), 'not custom form');
+                //check the specific string in custom form when login fails
+                assert(res2.text.indexOf('Failed to login! At least one of') !== -1);
                 done(err2);
               } catch(e2) {
                 done(e2);
@@ -2080,10 +2094,11 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 401, 'not 401');
+                //login fails, get login form again
+                assert(res2.statusCode === 200, 'not 200');
                 assert(res2.header['www-authenticate'] === undefined,
                     'extra www-authenticate header');
-                assert(res2.text.indexOf('Failed to authenticate the user') !== -1);
+                assert(res2.text.indexOf('At least one of your entries does not match our records') !== -1);
                 done(err2);
               } catch (e2) {
                 done(e2);
@@ -2120,10 +2135,11 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function (err2, res2) {
               try {
-                assert(res2.statusCode === 401, 'not 401');
+                //login fails, get login form again
+                assert(res2.statusCode === 200, 'not 200');
                 assert(res2.header['www-authenticate'] === undefined,
                     'extra www-authenticate header');
-                assert(res2.text.indexOf('Failed to authenticate the user') !== -1);
+                assert(res2.text.indexOf('At least one of your entries does not match our records') !== -1);
                 done(err2);
               } catch(e2) {
                 done(e2);
@@ -2408,7 +2424,75 @@ describe('oauth2 AZ-server', function() {
         });
     });
 
+  });
 
+  describe('basic - custom consent form', function() {
+    var request;
+    before(function(done)  {
+      //Use production instead of CONFIG_DIR: reading from apim instead of laptop
+      process.env.NODE_ENV = 'production';
+
+      //The apim server and datastore
+      process.env.APIMANAGER = '127.0.0.1';
+      process.env.APIMANAGER_PORT = 8000;
+      process.env.DATASTORE_PORT = 4000;
+
+      apimServer.start(
+              process.env.APIMANAGER,
+              process.env.APIMANAGER_PORT,
+              __dirname + '/definitions/oauth2-az/basic-custom-consent')
+          .then(function() { return microgw.start(5000); })
+          .then(function() { return authServer.start(7000); })
+          .then(function() {
+              request = supertest('https://localhost:5000');
+          })
+          .then(done)
+          .catch(function(err) {
+              done(err);
+              });
+    });
+
+    after(function(done) {
+      delete process.env.NODE_ENV;
+      delete process.env.APIMANAGER;
+      delete process.env.APIMANAGER_PORT;
+      delete process.env.DATASTORE_PORT;
+
+      dsCleanup(4000)
+        .then(function() {return apimServer.stop();})
+        .then(function() { return microgw.stop(); })
+        .then(function() { return authServer.stop(); })
+        .then(done, done)
+        .catch(done);
+    });
+
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+    it('not implemented yet', function(done) {
+      request.get('/security/oauth2/authorize')
+        .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
+        .query({response_type: 'code'})
+        .query({scope: 'scope1 scope2 scope3'})
+        .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
+        .query({state: 'xyz'})
+        .auth('root', 'Hunter2')
+        .end(function(err, res) {
+          try {
+            //use 302 with server_error code
+            assert(res.statusCode === 302, 'not 302 redirect');
+            var location = res.header.location;
+            var uri = url.parse(location, true);
+            assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
+              'incorrect redirect_uri');
+            assert(uri.query.state === 'xyz', 'incorrect state');
+            assert(uri.query.error === 'server_error', 'incorrect error code');
+            assert(uri.query.error_description === 'Not supported', 'incorrect description');
+            done(err);
+          } catch (e) {
+            done(e);
+          }
+        });
+    });
   });
 
 });
