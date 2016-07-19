@@ -660,14 +660,6 @@ function modifyOptDataForTestApp(OptimizedDataEntry, pieces) {
   OptimizedDataEntry['client-id'] = pieces.catalog.testAppCredentials.clientId;
   OptimizedDataEntry['client-secret'] = pieces.catalog.testAppCredentials.clientSecret;
   OptimizedDataEntry['plan-rate-limit'] = undefined;
-  var apiPaths = OptimizedDataEntry['api-paths'];
-  for(var i = 0; i < apiPaths.length; i++) {
-    for(var j = 0; j < apiPaths[i]['path-methods'].length; j++) {
-      var method = apiPaths[i]['path-methods'][j];
-      method['observed-rate-limit'] = undefined;
-      method['rate-limit-scope'] = undefined;
-    }
-  }
 }
 
 function makePathRegex(basePath, apiPath) {
