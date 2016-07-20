@@ -403,9 +403,9 @@
           },
           "authorization": {
             "type": "custom-form",
-            "custom-form": {
-              "url": "http://localhost:7000/custom-form"
-            }
+             "custom-form": {
+               "url": "https://localhost:8000/custom-consent-form.html"
+             }
           },
           "refresh-token": {
             "count": 2048,
