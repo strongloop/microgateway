@@ -4,12 +4,10 @@
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
 'use strict';
-var vm    = require('vm');
-var _     = require('lodash');
-var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'microgateway:policies:javascript'});
+var vm = require('vm');
+var _ = require('lodash');
 
-function consoleProxy (log) {
+function consoleProxy(log) {
   // Create a console API proxy around Bunyan-based flow logger
 
   /*
@@ -21,37 +19,38 @@ function consoleProxy (log) {
    logger.trace()
    */
 
-  function fatal () {
-    log.fatal.apply(log, arguments);
-  }
+  //function fatal() {
+  //  log.fatal.apply(log, arguments);
+  //}
 
-  function error () {
+  function error() {
     log.error.apply(log, arguments);
   }
 
-  function warn () {
+  function warn() {
     log.warn.apply(log, arguments);
   }
 
-  function info () {
+  function info() {
     log.info.apply(log, arguments);
   }
 
-  function debug () {
-    log.debug.apply(log, arguments);
-  }
+  //function debug() {
+  //  log.debug.apply(log, arguments);
+  //}
 
-  function trace () {
+  function trace() {
     log.debug.apply(log, arguments);
   }
 
   return {
-    log: info,
-    info: info,
+    //fatal: fatal,
     error: error,
     warn: warn,
-    trace: trace
-  };
+    log: info,
+    info: info,
+    //debug: debug,
+    trace: trace };
 }
 
 module.exports = function(config) {
@@ -60,7 +59,7 @@ module.exports = function(config) {
     logger.debug('ENTER javascript policy');
 
     if (_.isUndefined(props.source) || !_.isString(props.source)) {
-      flow.fail({name:'JavaScriptError', value: 'Invalid JavaScript code'});
+      flow.fail({ name: 'JavaScriptError', value: 'Invalid JavaScript code' });
       return;
     }
     //need to wrap the code snippet into a function first
@@ -78,10 +77,10 @@ module.exports = function(config) {
       flow.proceed();
     } catch (e) {
       logger.debug('EXIT with an error:%s', e);
-      if ( e.name ) {
+      if (e.name) {
         flow.fail(e);
       } else {
-        flow.fail({name: 'JavaScriptError', message: '' + e});
+        flow.fail({ name: 'JavaScriptError', message: '' + e });
       }
     }
   };

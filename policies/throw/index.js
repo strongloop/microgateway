@@ -5,16 +5,16 @@
 
 'use strict';
 
-module.exports = function (config) {
+module.exports = function(config) {
 
-    return function (props, context, flow) {
-        var error = {
-            'name': (props.name ? props.name + '' : 'ThrowError'),
-            'message': (props.message ? props.message + '' : undefined),
-        };
-
-        var logger  = flow.logger;
-        logger.error('[throw] throwing %j', error);
-        flow.fail(error);
+  return function(props, context, flow) {
+    var error = {
+      name: (props.name ? props.name + '' : 'ThrowError'),
+      message: (props.message ? props.message + '' : undefined),
     };
+
+    var logger = flow.logger;
+    logger.error('[throw] throwing %j', error);
+    flow.fail(error);
+  };
 };

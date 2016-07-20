@@ -8,7 +8,7 @@ var RateLimiter = require('rolling-rate-limiter');
 var redis = require('redis');
 var handleResponse = require('./helper').handleResponse;
 var logger = require('apiconnect-cli-logger/logger.js')
-  .child({loc: 'microgateway:policies:rate-limiting:redis'});
+        .child({ loc: 'microgateway:policies:rate-limiting:redis' });
 
 module.exports = function(options) {
   options = options || {};
@@ -24,16 +24,15 @@ module.exports = function(options) {
     redis: client,
     namespace: options.prefix,
     interval: interval,
-    maxInInterval: limit
-  });
+    maxInInterval: limit });
 
   return function(props, context, flow) {
-
     var key = options.getKey(context);
     logger.debug('Key: %s', key);
     if (!key) {
       return flow.proceed();
     }
+
     var fields = key.split(':');
     var name = fields[fields.length - 2];
     limiter(key, function(err, timeLeft, remaining) {
