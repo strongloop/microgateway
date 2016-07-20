@@ -5,7 +5,7 @@
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
 var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'microgateway:datastore:apim-getcontext'});
+        .child({ loc: 'microgateway:datastore:apim-getcontext' });
 var program = require('commander');
 var apimlookup = require('../../lib/preflow/apim-lookup');
 var contextget = apimlookup.contextget;

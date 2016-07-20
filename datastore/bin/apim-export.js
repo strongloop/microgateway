@@ -5,10 +5,11 @@
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
 var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'microgateway:datastore:apim-export'});
-var sgwapimpull = require('../apim-pull'),
-    program = require('commander'),
-    apimpull = sgwapimpull.pull;
+         .child({ loc: 'microgateway:datastore:apim-export' });
+var program = require('commander');
+
+var sgwapimpull = require('../apim-pull');
+var apimpull = sgwapimpull.pull;
 
 var options = {};
 var exit_flag = false;
@@ -35,18 +36,27 @@ options.clipass = program.pass;
 options.clicert = program.cert;
 options.outdir = program.outdir;
 
-if (options.host == null)  
-{ exit_flag = true; logger.debug('<host> required'); program.outputHelp(); logger.exit(1);}
-if (!exit_flag && program.args[1] != null) 
-{ exit_flag = true; logger.debug('specify one host only'); program.outputHelp(); logger.exit(1);}
+if (options.host == null) {
+  exit_flag = true;
+  logger.debug('<host> required');
+  program.outputHelp();
+  logger.exit(1);
+}
+
+if (!exit_flag && program.args[1] != null) {
+  exit_flag = true;
+  logger.debug('specify one host only');
+  program.outputHelp();
+  logger.exit(1);
+}
 
 if (!exit_flag) {
-  apimpull(options,function(err, response) {
-        if (err) {
-            logger.error(err);
-        }
-        logger.debug(response);
-  }
-});
-
+  apimpull(options, function(err, response) {
+    if (err) {
+      logger.error(err);
+    } else {
+      logger.debug(response);
+    }
+  });
+}
 

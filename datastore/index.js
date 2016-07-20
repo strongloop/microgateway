@@ -7,16 +7,12 @@
 
 var Promise = require('bluebird');
 var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'microgateway:datastore'});
+        .child({ loc: 'microgateway:datastore' });
 var forever = require('forever-monitor');
 var path = require('path');
 
 var child;
 var server;
-var sigtermHandler = function() {
-                       child.kill(true);
-                       logger.exit(0);
-                     };
 
 exports.start = function(fork) {
   return new Promise(function(resolve, reject) {
@@ -36,13 +32,15 @@ exports.start = function(fork) {
         logger.debug('datastore exited');
       });
 
-      var dataStorePort, https = false, loaded = false;
+      var dataStorePort;
+      var https = false;
+      var loaded = false;
       child.on('message', function(msg) {
         if (msg.DATASTORE_PORT != null) {
           dataStorePort = msg.DATASTORE_PORT;
         }
         if (msg.LOADED != null) {
-          if(!msg.LOADED) {
+          if (!msg.LOADED) {
             reject(Error('failed to load datastore'));
             return;
           }
@@ -76,7 +74,7 @@ exports.start = function(fork) {
 
     } else {
       process.send = function(msg) {
-        var https = false, loaded = false;
+        var https = false;
         if (msg.https != null) {
           https = msg.https;
         }
