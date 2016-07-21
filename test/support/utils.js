@@ -13,15 +13,19 @@ var _ = require('lodash');
 function dsCleanup(port) {
   // clean up the directory
   return new Promise(function(resolve, reject) {
-    var expect = {snapshot : {}};
+    var expect = { snapshot: {} };
     var datastoreRequest = supertest('http://localhost:' + port);
     datastoreRequest
       .get('/api/snapshots')
-      .end(function (err, res) {
+      .end(function(err, res) {
+        assert(!err);
+
         var snapshotID = res.body[0].id;
         datastoreRequest
           .get('/api/snapshots/release?id=' + snapshotID)
           .end(function(err, res) {
+            assert(!err);
+
             try {
               assert(_.isEqual(expect, res.body));
               resolve();
@@ -34,5 +38,5 @@ function dsCleanup(port) {
 }
 
 module.exports = {
-  dsCleanup: dsCleanup
-};
+  dsCleanup: dsCleanup };
+

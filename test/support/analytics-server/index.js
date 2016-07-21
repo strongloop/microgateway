@@ -6,20 +6,19 @@
 /*eslint-env node */
 'use strict';
 
-var express   = require('express');
-
-var https     = require('https');
-var logger    = require('apiconnect-cli-logger/logger.js')
-                 .child({loc: 'microgateway:analytics-moc-server'});
-var options   = require('./httpsOptions');
-var fs        = require('fs');
-var path      = require('path');
-var bdParser  = require('body-parser');
-var env       = require('../../../utils/environment');
-var crypto    = require('crypto');
+var express = require('express');
+var https = require('https');
+var logger = require('apiconnect-cli-logger/logger.js')
+        .child({ loc: 'microgateway:analytics-moc-server' });
+var options = require('./httpsOptions');
+var fs = require('fs');
+var path = require('path');
+var bdParser = require('body-parser');
+var env = require('../../../utils/environment');
+var crypto = require('crypto');
 var constants = require('constants');
-var qs        = require('querystring');
-var url       = require('url');
+var qs = require('querystring');
+var url = require('url');
 
 var doneCB;
 
@@ -28,8 +27,8 @@ var server;
 exports.start = function(port, definition) {
   return new Promise(function(resolve) {
     options.rejectUnauthorized = true;
-    var rawParser = bdParser.raw( {'type': '*/*'});
-    var app       = express();
+    var rawParser = bdParser.raw({ type: '*/*' });
+    var app = express();
 
     //for analytics event publish
     app.post('/v1/catalogs/*/analytics', rawParser, function(req, res, next) {
@@ -56,36 +55,31 @@ exports.start = function(port, definition) {
     });
 
     //for handshake
-    var handshakeURI = '/v1/catalogs/' + 
+    var handshakeURI = '/v1/catalogs/' +
         process.env[env.APIMANAGER_CATALOG] + '/handshake/';
 
-    app.post(handshakeURI,function(req, res, next) {
+    app.post(handshakeURI, function(req, res, next) {
       logger.debug('got handshake request, headers:', req.headers);
       //get pub key
       var pubKey = fs.readFileSync(path.resolve(__dirname, '..', '..', '..', env.KEYNAME + '.pub'));
       var encKey = crypto.randomBytes(32);
-      
-      var key = crypto.publicEncrypt(
-        {
-          key: pubKey.toString(),
-          padding: constants.RSA_PKCS1_PADDING
-        },
-        encKey
-      );
 
-      var payload = { 'microGateway' : 
-          { 'cert' : undefined,
-            'key': undefined,
-            'clientID' : 'a-moc-client-id-from-moc-server'
-          }
-      };
-      
+      var key = crypto.publicEncrypt({
+        key: pubKey.toString(),
+        padding: constants.RSA_PKCS1_PADDING }, encKey);
+
+      var payload = {
+        microGateway: {
+          cert: undefined,
+          key: undefined,
+          clientID: 'a-moc-client-id-from-moc-server' } };
+
       var iv = new Buffer(16);
       iv.fill(0);
       var cipher = crypto.createCipheriv('aes-256-cbc', encKey, iv);
       var cipheredText = cipher.update(JSON.stringify(payload), 'utf-8', 'base64');
       cipheredText += cipher.final('base64');
-      var msg = { 'key': key.toString('base64'), 'cipher': cipheredText};
+      var msg = { key: key.toString('base64'), cipher: cipheredText };
 
       res.status(200);
       res.end(JSON.stringify(msg));

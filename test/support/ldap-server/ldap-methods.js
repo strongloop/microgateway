@@ -12,20 +12,22 @@ var ldap = require('ldapjs');
 
 var userfile = path.join(__dirname, 'users.json');
 
-module.exports = function (server, authreq) {
+module.exports = function(server, authreq) {
 
   var users = {};
 
-  function authorize (req, res, next) {
-    if (authreq === false)
+  function authorize(req, res, next) {
+    if (authreq === false) {
       return next();
-    if (!(req.connection.ldap.bindDN.equals('cn=root') || 
-        req.connection.ldap.bindDN.equals('uid=alice, ou=people, dc=sixfour1, dc=com')))
+    }
+    if (!(req.connection.ldap.bindDN.equals('cn=root') ||
+        req.connection.ldap.bindDN.equals('uid=alice, ou=people, dc=sixfour1, dc=com'))) {
       return next(new ldap.InsufficientAccessRightsError());
+    }
     return next();
   }
 
-  function doBind (key, user) {
+  function doBind(key, user) {
     server.bind(user.dn, function(req, res, next) {
       if (req.dn.toString() !== user.dn || req.credentials !== user.pass) {
         return next(new ldap.InvalidCredentialsError());
@@ -36,17 +38,19 @@ module.exports = function (server, authreq) {
     users[key] = user;
   }
 
-  function loadPasswdFile () {
-    return new Promise(function (resolve, reject) {
-      fs.readFile(userfile, 'utf8', function (err, data) {
-        if (err)
+  function loadPasswdFile() {
+    return new Promise(function(resolve, reject) {
+      fs.readFile(userfile, 'utf8', function(err, data) {
+        if (err) {
           return reject(err);
+        }
 
         var userdata = JSON.parse(data);
 
         _.forEach(userdata, function(user, key) {
-          if (typeof user[key] === 'undefined')
+          if (typeof user[key] === 'undefined') {
             doBind(key, user);
+          }
         });
 
         resolve(users);
@@ -55,24 +59,26 @@ module.exports = function (server, authreq) {
   }
 
   return loadPasswdFile().then(function() {
-    server.bind('cn=root', function (req, res, next) {
-      if (req.dn.toString() !== 'cn=root' || req.credentials !== 'secret')
+    server.bind('cn=root', function(req, res, next) {
+      if (req.dn.toString() !== 'cn=root' || req.credentials !== 'secret') {
         return next(new ldap.InvalidCredentialsError());
+      }
       res.end();
       return next();
     });
 
     server.bind('cn=slow,ou=myorg,ou=com', function(req, res, next) {
-      setTimeout(function () {
-        if (req.dn.toString() !== 'cn=slow,ou=myorg,ou=com' || req.credentials !== 'slowpass')
+      setTimeout(function() {
+        if (req.dn.toString() !== 'cn=slow,ou=myorg,ou=com' || req.credentials !== 'slowpass') {
           return next(new ldap.InvalidCredentialsError());
+        }
         res.end();
         next();
       }, 12000);
     });
 
-    server.search('ou=myorg,ou=com', authorize, function (req, res, next) {
-      _.forEach(users, function (user) {
+    server.search('ou=myorg,ou=com', authorize, function(req, res, next) {
+      _.forEach(users, function(user) {
       //for (var user of users.values()) {
         if (req.filter.matches(user.attributes)) {
           res.send(user);
@@ -81,8 +87,8 @@ module.exports = function (server, authreq) {
       res.end();
       return next();
     });
-    server.search('uid=alice,ou=people,dc=sixfour1,dc=com', authorize, function (req, res, next) {
-      _.forEach(users, function (user) {
+    server.search('uid=alice,ou=people,dc=sixfour1,dc=com', authorize, function(req, res, next) {
+      _.forEach(users, function(user) {
       //for (var user of users.values()) {
         if (req.filter.matches(user.attributes) &&
             user.dn === 'uid=alice, ou=people, dc=sixfour1, dc=com') {
