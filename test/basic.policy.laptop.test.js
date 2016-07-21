@@ -8,26 +8,24 @@
 var _ = require('lodash');
 var fs = require('fs');
 var path = require('path');
-var express = require('express');
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var ldap = require('./support/ldap-server');
 var mg = require('../lib/microgw');
 var dsc = require('../datastore/client');
-var should = require('should');
 var apimServer = require('./support/mock-apim-server/apim-server');
 var Promise = require('bluebird');
 
-function cleanup () {
+function cleanup() {
   var rmfile = function(fpath) {
     return new Promise(function(resolve, reject) {
       fs.unlink(fpath, function(err) {
         if (err) {
           console.error('Error removing %s', fpath);
           reject(err);
-        }
-        else
+        } else {
           resolve();
+        }
       });
     });
   };
@@ -38,9 +36,9 @@ function cleanup () {
         if (err) {
           console.error('Error while reading %s', ssdir);
           reject(err);
-        }
-        else
+        } else {
           resolve(files);
+        }
       });
     });
   };
@@ -57,8 +55,9 @@ function cleanup () {
         var p = Promise.all(_.map(files, function(f) { return rmfile(path.resolve(ssdir, f)); }));
         p = p.then(function() {
           fs.rmdir(ssdir, function(err) {
-            if (err)
+            if (err) {
               console.error('Error removing file', err);
+            }
             resolve(p);
           });
         });
@@ -113,32 +112,32 @@ describe('basic auth policy', function() {
       .catch(done);
   });
 
-  describe('Basic Auth with LDAP', function () {
+  describe('Basic Auth with LDAP', function() {
 
-    it('should fail due to missing LDAP registry', function (done) {
+    it('should fail due to missing LDAP registry', function(done) {
       request
       .post('/basic/path-1')
       .auth('root', 'Hunter2')
       .expect(401, done);
     });
 
-    describe('SearchDN', function () {
-      it('should pass with root:Hunter2', function (done) {
+    describe('SearchDN', function() {
+      it('should pass with root:Hunter2', function(done) {
         request
         .get('/basic/path-1')
         .auth('root', 'Hunter2')
         .expect(200, done);
       });
 
-      it('should fail with root:badpass', function (done) {
+      it('should fail with root:badpass', function(done) {
         request
         .get('/basic/path-1')
         .auth('root', 'badpass')
-        .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
     });
 
-    describe('ComposeDN', function () {
+    describe('ComposeDN', function() {
       it('should pass composeDN with jsmith:foobar', function(done) {
         request
         .get('/basic/path-3')
@@ -154,15 +153,15 @@ describe('basic auth policy', function() {
       });
     });
 
-    describe('ComposeUPN', function () {
-      it.skip('should pass with user1:c@pstone123', function (done) {
+    describe('ComposeUPN', function() {
+      it.skip('should pass with user1:c@pstone123', function(done) {
         request
         .get('/basic/compose-upn')
         .auth('user1', 'c@pstone123')
         .expect(200, done);
       });
 
-      it.skip('should fail with user1:capstone123', function (done) {
+      it.skip('should fail with user1:capstone123', function(done) {
         request
         .get('/basic/compose-upn')
         .auth('user1', 'capstone123')
@@ -171,8 +170,8 @@ describe('basic auth policy', function() {
 
     });
 
-    describe('With TLS', function () {
-      it('should pass with root:Hunter2 (tls)', function (done) {
+    describe('With TLS', function() {
+      it('should pass with root:Hunter2 (tls)', function(done) {
         request
         .put('/basic/path-1')
         .auth('root', 'Hunter2')
@@ -180,7 +179,7 @@ describe('basic auth policy', function() {
       });
     });
 
-    //describe('With long reply time', function () {
+    //describe('With long reply time', function() {
     //  it('should timeout', function(done) {
     //    this.timeout(15000);
     //    request
@@ -192,54 +191,54 @@ describe('basic auth policy', function() {
 
   });
 
-  describe('Basic Auth with HTTP', function () {
+  describe('Basic Auth with HTTP', function() {
 
-    it('should pass using http with root:Hunter2', function (done) {
+    it('should pass using http with root:Hunter2', function(done) {
       request
       .get('/basic/path-2')
       .auth('root', 'Hunter2')
       .expect(200, done);
     });
 
-    it('should fail using http with root:badpass', function (done) {
+    it('should fail using http with root:badpass', function(done) {
       request
       .get('/basic/path-2')
       .auth('root', 'badpass')
-      .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+      .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
     });
 
-    //it('should timeout', function (done) {
+    //it('should timeout', function(done) {
     //  this.timeout(150000);
     //  request
     //  .get('/basic/slow-basic-http')
     //  .auth('root', 'Hunter2')
-    //  .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+    //  .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
     //});
 
 
   });
 
-  describe('Basic Auth with HTTPS', function () {
-    it('should pass using http with root:Hunter2', function (done) {
+  describe('Basic Auth with HTTPS', function() {
+    it('should pass using http with root:Hunter2', function(done) {
       request
       .get('/basic/basic-https')
       .auth('root', 'Hunter2')
       .expect(200, done);
     });
 
-    it('should fail using http with root:badpass', function (done) {
+    it('should fail using http with root:badpass', function(done) {
       request
       .get('/basic/basic-https')
       .auth('root', 'badpass')
-      .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+      .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
     });
 
-    //it('should timeout', function (done) {
+    //it('should timeout', function(done) {
     //  this.timeout(15000);
     //  request
     //  .get('/basic/slow-basic-https')
     //  .auth('root', 'Hunter2')
-    //  .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+    //  .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
     //});
   });
 });

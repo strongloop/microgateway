@@ -15,7 +15,7 @@ var apimServer = require('./support/mock-apim-server/apim-server');
 describe('invokePolicy', function() {
 
   var request, datastoreRequest;
-  before(function(done)  {
+  before(function(done) {
     //Use production instead of CONFIG_DIR: reading from apim instead of laptop
     process.env.NODE_ENV = 'production';
 
@@ -31,14 +31,14 @@ describe('invokePolicy', function() {
         .then(function() { return microgw.start(3000); })
         .then(function() { return backend.start(8889); })
         .then(function() {
-            request = supertest('http://localhost:3000');
-            datastoreRequest = supertest('http://localhost:5000');
+          request = supertest('http://localhost:3000');
+          datastoreRequest = supertest('http://localhost:5000');
         })
         .then(done)
         .catch(function(err) {
-            console.error(err);
-            done(err);
-            });
+          console.error(err);
+          done(err);
+        });
   });
 
   after(function(done) {
@@ -70,7 +70,7 @@ describe('invokePolicy', function() {
       .expect(/z-user-agent: APIConnect\/5.0 \(MicroGateway\)/)
       .expect(200, /z-url: \/\/invoke\/basic/)
       .end(function(err, res) {
-          done(err);
+        done(err);
       });
   });
 
@@ -85,13 +85,13 @@ describe('invokePolicy', function() {
       .type('form')
       .send({ foo: 'hello' })
       .send({ bar: 123 })
-      .send({ baz: ['qux', 'quux' ]})
+      .send({ baz: [ 'qux', 'quux' ] })
       .expect(/z-method: POST/)
       .expect(/z-content-type: application\/x-www-form-urlencoded/)
       .expect(200, /body: foo=hello&bar=123&baz%5B0%5D=qux&baz%5B1%5D=quux/)
                         //foo=hello&bar=123&baz[0]=qux&baz[1]=quux
       .end(function(err, res) {
-          done(err);
+        done(err);
       });
   });
 
@@ -105,7 +105,7 @@ describe('invokePolicy', function() {
       .expect('Content-Type', 'application/x-www-form-urlencoded')
       .expect(200, /Found the parameter 'baz'=qux,quux in the message.body/)
       .end(function(err, res) {
-          done(err);
+        done(err);
       });
   });
 
@@ -120,7 +120,7 @@ describe('invokePolicy', function() {
       .expect('Content-Type', 'application/x-www-form-urlencoded')
       .expect(200, /^foo=bar&baz%5B0%5D=qux&baz%5B1%5D=quux&corge=$/)
       .end(function(err, res) {
-          done(err);
+        done(err);
       });
   });
 
@@ -152,10 +152,12 @@ describe('invokePolicy', function() {
       .get('/invoke/dynHost')
       .set('X-TEST-HOSTNAME', 'cannot.be.valid.com')
       .expect(function(res, done) {
-        if (res.res.statusCode !== 500)
-            throw new Error("status code should be 500");
-        if (res.res.statusMessage !== 'URL Open error')
-            throw new Error("status reason should be 'URL Open error'");
+        if (res.res.statusCode !== 500) {
+          throw new Error('status code should be 500');
+        }
+        if (res.res.statusMessage !== 'URL Open error') {
+          throw new Error('status reason should be "URL Open error"');
+        }
       })
       .expect(/"name":"ConnectionError"/)
       .expect(/getaddrinfo ENOTFOUND cannot.be.valid.com/,
@@ -228,10 +230,12 @@ describe('invokePolicy', function() {
       .get('/invoke/ignoreAllErrors')
       .set('X-CODE', '-1')
       .expect(function(res, done) {
-        if (res.res.statusCode !== 500)
-            throw new Error("status code should be 500");
-        if (res.res.statusMessage !== 'URL Open error')
-            throw new Error("status reason should be 'URL Open error'");
+        if (res.res.statusCode !== 500) {
+          throw new Error('status code should be 500');
+        }
+        if (res.res.statusMessage !== 'URL Open error') {
+          throw new Error('status reason should be "URL Open error"');
+        }
       })
       .expect(500,
         /All errors should be ignored, this must be executed after the invoke./,
@@ -348,7 +352,7 @@ describe('invokePolicy', function() {
       .set('X-HTTPS-PORT', '8890')
       .set('X-TLS-PROFILE', 'tls-profile-serverSarah-1')
       .expect(/url: \/\/invoke\/testTLS/)
-      .expect(200, done)
+      .expect(200, done);
   });
 
   //Use Sarah's own certificate to authenticate Sarah. NG
@@ -585,17 +589,18 @@ describe('invokePolicy', function() {
 
   it('cleanup snapshots directory',
     function(done) {
-      var expect = {snapshot : {}};
+      var expect = { snapshot: {} };
       datastoreRequest
         .get('/api/snapshots')
-        .end(function (err, res) {
+        .end(function(err, res) {
+          assert(!err, 'Unexpected rror with cleaning up snapshot directory');
           var snapshotID = res.body[0].id;
           console.log(snapshotID);
           datastoreRequest.get('/api/snapshots/release?id=' + snapshotID)
             .expect(function(res) {
-              assert(_.isEqual(expect, res.body)); 
-            }
-          ).end(done)
+              assert(_.isEqual(expect, res.body));
+            })
+            .end(done);
         });
     }
   );

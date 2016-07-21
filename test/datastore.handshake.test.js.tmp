@@ -1,9 +1,6 @@
 'use strict';
 
 var assert = require('assert');
-var fs = require('fs');
-var path = require('path');
-var echo = require('./support/echo-server');
 var supertest = require('supertest');
 var microgw = require('../lib/microgw');
 var apimServer = require('./support/mock-apim-server2/apim-server');
@@ -46,9 +43,9 @@ describe('handshake', function() {
         .get('/results/test1')
         .expect(200)
         .expect(function(res) {
-            assert(res.body === true); // ID should be same as previous
-          }
-        ).end(done);
+          assert(res.body === true); // ID should be same as previous
+        })
+        .end(done);
     }
   );
 
@@ -58,9 +55,9 @@ describe('handshake', function() {
         .get('/results/test2')
         .expect(200)
         .expect(function(res) {
-            assert(res.body === true); // ID should be same as previous
-          }
-        ).end(done);
+          assert(res.body === true); // ID should be same as previous
+        })
+        .end(done);
     }
   );
 

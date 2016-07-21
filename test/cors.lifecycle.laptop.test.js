@@ -5,9 +5,6 @@
 
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var express = require('express');
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
@@ -48,7 +45,7 @@ describe('cross origin resource sharing policy', function() {
       .expect('Access-Control-Allow-Origin', '*')
       .expect('Access-Control-Allow-Headers', '')
       .expect('Access-Control-Expose-Headers',
-              'APIm-Debug-Trans-Id, X-RateLimit-Limit, ' + 
+              'APIm-Debug-Trans-Id, X-RateLimit-Limit, ' +
               'X-RateLimit-Remaining, X-RateLimit-Reset, ' +
               'X-Global-Transaction-ID')
       .expect('Access-Control-Allow-Methods', 'GET,OPTIONS')
@@ -63,7 +60,7 @@ describe('cross origin resource sharing policy', function() {
       .expect('Access-Control-Allow-Origin', 'myorigin')
       .expect('Access-Control-Allow-Headers', '')
       .expect('Access-Control-Expose-Headers',
-              'APIm-Debug-Trans-Id, X-RateLimit-Limit, ' + 
+              'APIm-Debug-Trans-Id, X-RateLimit-Limit, ' +
               'X-RateLimit-Remaining, X-RateLimit-Reset, ' +
               'X-Global-Transaction-ID')
       .expect('Access-Control-Allow-Methods', 'GET,OPTIONS')
@@ -78,7 +75,7 @@ describe('cross origin resource sharing policy', function() {
       .expect('Access-Control-Allow-Origin', '*')
       .expect('Access-Control-Allow-Headers', 'myreqhdr')
       .expect('Access-Control-Expose-Headers',
-              'APIm-Debug-Trans-Id, X-RateLimit-Limit, ' + 
+              'APIm-Debug-Trans-Id, X-RateLimit-Limit, ' +
               'X-RateLimit-Remaining, X-RateLimit-Reset, ' +
               'X-Global-Transaction-ID')
       .expect('Access-Control-Allow-Methods', 'GET,OPTIONS')
@@ -92,7 +89,7 @@ describe('cross origin resource sharing policy', function() {
       .expect('Access-Control-Allow-Origin', '*')
       .expect('Access-Control-Allow-Headers', '')
       .expect('Access-Control-Expose-Headers',
-              'APIm-Debug-Trans-Id, X-RateLimit-Limit, ' + 
+              'APIm-Debug-Trans-Id, X-RateLimit-Limit, ' +
               'X-RateLimit-Remaining, X-RateLimit-Reset, ' +
               'X-Global-Transaction-ID')
       .expect('Access-Control-Allow-Methods', 'GET,OPTIONS')
@@ -106,7 +103,7 @@ describe('cross origin resource sharing policy', function() {
       .expect('Access-Control-Allow-Origin', '*')
       .expect('Access-Control-Allow-Headers', '')
       .expect('Access-Control-Expose-Headers',
-              'APIm-Debug-Trans-Id, X-RateLimit-Limit, ' + 
+              'APIm-Debug-Trans-Id, X-RateLimit-Limit, ' +
               'X-RateLimit-Remaining, X-RateLimit-Reset, ' +
               'X-Global-Transaction-ID')
       .expect('Access-Control-Allow-Methods', 'GET,OPTIONS')
@@ -119,7 +116,9 @@ describe('cross origin resource sharing policy', function() {
       .get('/cors-disabled/path-cors')
       .expect(200)
       .end(function(err, res) {
-        if (err) return done(err);
+        if (err) {
+          return done(err);
+        }
         var acao = res.header['Access-Control-Allow-Origin'] !== undefined;
         var acah = res.header['Access-Control-Allow-Headers'] !== undefined;
         var aceh = res.header['Access-Control-Expose-Headers'] !== undefined;

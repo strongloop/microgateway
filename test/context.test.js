@@ -28,15 +28,14 @@ describe('Context middleware', function() {
       ctx.set('_.api.path', req.get(API_PATH_HEADER));
 
       var result = {
-        verb:           ctx.get('request.verb'),
-        uri:            ctx.get('request.uri'),
-        path:           ctx.get('request.path'),
-        search:         ctx.get('request.search'),
-        querystring:    ctx.get('request.querystring'),
-        headers:        ctx.get('request.headers'),
+        verb: ctx.get('request.verb'),
+        uri: ctx.get('request.uri'),
+        path: ctx.get('request.path'),
+        search: ctx.get('request.search'),
+        querystring: ctx.get('request.querystring'),
+        headers: ctx.get('request.headers'),
         'content-type': ctx.get('request.content-type'),
-        authorization:  ctx.get('request.authorization')
-      };
+        authorization: ctx.get('request.authorization') };
 
       // the '.' notation should also work the same as getter
       assert.strictEqual(ctx.request.verb, ctx.get('request.verb'));
@@ -55,8 +54,8 @@ describe('Context middleware', function() {
     });
 
     function verifyResponse(res, expected) {
-      var variables = ['verb', 'path', 'search', 'querystring',
-                        'content-type', 'authorization'];
+      var variables = [ 'verb', 'path', 'search', 'querystring',
+          'content-type', 'authorization' ];
       variables.forEach(function(value) {
         assert.strictEqual(res.body[value], expected[value],
                            'request.' + value);
@@ -66,19 +65,18 @@ describe('Context middleware', function() {
       var url = urlParser.parse(res.body.uri);
       assert.ok(url.protocol, 'should have protocol');
       assert.ok(url.hostname, 'should have hostname');
-      assert.strictEqual(url.search? url.pathname + url.search : url.pathname,
+      assert.strictEqual(url.search ? url.pathname + url.search : url.pathname,
                          expected.uri);
 
       // remove the headers not in testing scope
       var headers = res.body.headers;
-      var removeHeader = ['accept-encoding',
+      var removeHeader = [ 'accept-encoding',
                            'connection',
                            'content-length',
                            'content-type',
                            'host',
                            'user-agent',
-                           API_PATH_HEADER.toLowerCase()
-                         ];
+                           API_PATH_HEADER.toLowerCase() ];
       removeHeader.forEach(function(value) {
         delete headers[value];
       });
@@ -95,8 +93,7 @@ describe('Context middleware', function() {
         querystring: '',
         'content-type': undefined,
         authorization: undefined,
-        headers: {}
-      };
+        headers: {} };
       request(app)
         .get('/')
         .set(API_PATH_HEADER, '/')
@@ -115,8 +112,7 @@ describe('Context middleware', function() {
         querystring: '',
         'content-type': undefined,
         authorization: undefined,
-        headers: {}
-      };
+        headers: {} };
       request(app)
         .get('/x/y/z')
         .set(API_PATH_HEADER, '/x/y/z')
@@ -135,8 +131,7 @@ describe('Context middleware', function() {
         querystring: 'param1=1&param2=2',
         'content-type': undefined,
         authorization: undefined,
-        headers: {}
-      };
+        headers: {} };
       request(app)
         .get('/foo/bar?param1=1&param2=2')
         .set(API_PATH_HEADER, '/foo/bar')
@@ -156,9 +151,7 @@ describe('Context middleware', function() {
         'content-type': undefined,
         authorization: undefined,
         headers: {
-          'x-api-gateway': 'foo'
-        }
-      };
+          'x-api-gateway': 'foo' } };
       request(app)
         .get('/foo/bar?param1=1&param2=2')
         .set(expect.headers)
@@ -178,12 +171,11 @@ describe('Context middleware', function() {
         querystring: 'x=1',
         'content-type': 'application/json',
         authorization: undefined,
-        headers: {}
-      };
+        headers: {} };
       request(app)
         .post('/foo?x=1')
         .set(API_PATH_HEADER, '/foo')
-        .send({message: 'Hello World'})
+        .send({ message: 'Hello World' })
         .expect(function(res) {
           verifyResponse(res, expect);
         })
@@ -196,8 +188,7 @@ describe('Context middleware', function() {
            var myapp = loopback();
            myapp.use(context());
            myapp.use(function(req, resp) {
-             resp.send({'request.date':
-                          req.ctx.get('request.date').getTime()});
+             resp.send({ 'request.date': req.ctx.get('request.date').getTime() });
            });
 
            var timeBeforeInvoke = Date.now();
@@ -234,8 +225,7 @@ describe('Context middleware', function() {
         'application/javascript',
         'application/xml',
         'application/soap+xml',
-        'text/xml'
-      ];
+        'text/xml' ];
       var normalizedTypes = [
         'application/json',
         'application/json',
@@ -243,17 +233,15 @@ describe('Context middleware', function() {
         'application/json',
         'application/xml',
         'application/xml',
-        'application/xml'
-      ];
+        'application/xml' ];
       var payload = [
-        {hello: 'world'},
-        JSON.stringify({hello: 'world'}),
+        { hello: 'world' },
+        JSON.stringify({ hello: 'world' }),
         '"use strict;"',
         '"use strict;"',
         '<?xml version="1.0"?><hello/>',
         '<?xml version="1.0"?><hello/>',
-        '<?xml version="1.0"?><hello/>'
-      ];
+        '<?xml version="1.0"?><hello/>' ];
 
       origTypes.forEach(function(type, index) {
         it('should normalize ' + type + ' to ' + normalizedTypes[index],
@@ -271,7 +259,7 @@ describe('Context middleware', function() {
         request(myapp)
           .post('/foo')
           .set('content-type', type)
-          .send(new Buffer([0x01, 0x02]))
+          .send(new Buffer([ 0x01, 0x02 ]))
           .expect(200, type, done);
       });
 
@@ -279,7 +267,7 @@ describe('Context middleware', function() {
         request(myapp)
           .post(removeContentTypeURL)
           .set('content-type', '')
-          .send(new Buffer([0x01, 0x02]))
+          .send(new Buffer([ 0x01, 0x02 ]))
           .expect(200, '', done); // when res.send(undefined), '' is received
       });
 
@@ -321,32 +309,31 @@ describe('Context middleware', function() {
 
       var testData = [
         // basePath is undefined in the swagger
-        { base: undefined, apiPath: '/a/b', request: '/a/b', expect: '/a/b'},
+        { base: undefined, apiPath: '/a/b', request: '/a/b', expect: '/a/b' },
 
         // basePath is '' in the swagger
-        { base: '', apiPath: '/foo', request: '/foo', expect: '/foo'},
-        { base: '', apiPath: '/foo/bar', request: '/foo/bar', expect: '/foo/bar'},
+        { base: '', apiPath: '/foo', request: '/foo', expect: '/foo' },
+        { base: '', apiPath: '/foo/bar', request: '/foo/bar', expect: '/foo/bar' },
 
         // basePath is '/' in the swagger
-        { base: '/', apiPath: '/foo', request: '/foo',      expect: '/foo'},
-        { base: '/', apiPath: '/foo/bar', request: '/foo/bar',  expect: '/foo/bar'},
-        { base: '/', apiPath: '/foo/bar', request: '/foo/bar?name=hello',  expect: '/foo/bar'},
+        { base: '/', apiPath: '/foo', request: '/foo', expect: '/foo' },
+        { base: '/', apiPath: '/foo/bar', request: '/foo/bar', expect: '/foo/bar' },
+        { base: '/', apiPath: '/foo/bar', request: '/foo/bar?name=hello', expect: '/foo/bar' },
 
         // basePath is '/foo' in the swagger (one level)
-        { base: '/foo', apiPath: '/',     request: '/foo',      expect: '/foo'},
-        { base: '/foo', apiPath: '/',     request: '/foo/',     expect: '/foo/'},
-        { base: '/foo', apiPath: '/bar',  request: '/foo/bar',  expect: '/foo/bar'},
-        { base: '/foo', apiPath: '/bar/', request: '/foo/bar/', expect: '/foo/bar/'},
-        { base: '/foo', apiPath: '/bar',  request: '/foo/bar?=hello', expect: '/foo/bar'},
+        { base: '/foo', apiPath: '/', request: '/foo', expect: '/foo' },
+        { base: '/foo', apiPath: '/', request: '/foo/', expect: '/foo/' },
+        { base: '/foo', apiPath: '/bar', request: '/foo/bar', expect: '/foo/bar' },
+        { base: '/foo', apiPath: '/bar/', request: '/foo/bar/', expect: '/foo/bar/' },
+        { base: '/foo', apiPath: '/bar', request: '/foo/bar?=hello', expect: '/foo/bar' },
 
         // basePath is '/v1/test' in the swagger (two levels)
-        { base: '/v1/test', apiPath: '/foo', request: '/v1/test/foo', expect: '/v1/test/foo'},
+        { base: '/v1/test', apiPath: '/foo', request: '/v1/test/foo', expect: '/v1/test/foo' },
 
         // basePath does not start with '/' is invalid
 
         // basePath ends with '/'
-        { base: '/v1/test/', apiPath: '/foo', request: '/v1/test/foo', expect: '/v1/test/foo'}
-      ];
+        { base: '/v1/test/', apiPath: '/foo', request: '/v1/test/foo', expect: '/v1/test/foo' } ];
 
       testData.forEach(function(data) {
         it('$(request.path) should be "' + data.expect +
@@ -389,8 +376,7 @@ describe('Context middleware', function() {
           .expect(200, {
             scheme: 'Basic',
             params: [],
-            token: encoded
-          }, done);
+            token: encoded }, done);
       });
 
       it('should return undefined when no auth header', function(done) {
@@ -415,8 +401,7 @@ describe('Context middleware', function() {
         var ctx = req.ctx;
         resp.send({
           type: typeof ctx.get('request.body'),
-          body: ctx.get('request.body').toString()
-        });
+          body: ctx.get('request.body').toString() });
       });
       app.use(function(error, req, resp, next) {
         debug('receive error: ', error);
@@ -428,10 +413,10 @@ describe('Context middleware', function() {
           .options('/foo')
           .type('text')
           .send('hello world')
-          .expect(200, {type: 'object', body: ''}, done);
+          .expect(200, { type: 'object', body: '' }, done);
       });
 
-      ['GET', 'HEAD', 'DELETE'].forEach(function(method) {
+      [ 'GET', 'HEAD', 'DELETE' ].forEach(function(method) {
         it('should reject ' + method + ' method w/ payload', function(done) {
           request(app)
             .post('/foo')
@@ -494,7 +479,7 @@ describe('Context middleware', function() {
       });
 
       it('should work with HTTP POST method w/ JSON data', function(done) {
-        var payload = {foo: 'bar'};
+        var payload = { foo: 'bar' };
         request(app)
           .post('/foo')
           .set('content-type', 'application/json')
@@ -537,7 +522,7 @@ describe('Context middleware', function() {
     var app = loopback();
     app.use(context());
     app.use(function(req, resp) {
-      var roVars = ['request.verb',
+      var roVars = [ 'request.verb',
                      'request.uri',
                      'request.path',
                      'request.headers',
@@ -554,8 +539,7 @@ describe('Context middleware', function() {
                      'system.date.month',
                      'system.date.year',
                      'system.timezone',
-                     'system'
-                   ];
+                     'system' ];
       var ctx = req.ctx;
 
       roVars.forEach(function(varName) {
@@ -581,7 +565,7 @@ describe('Context middleware', function() {
         .post('/foo')
         .set('X-GATEWAY-FOO', 'bar')
         .set('DATE', new Date())
-        .send({message: 'Hello World'})
+        .send({ message: 'Hello World' })
         .expect(200, 'done', done);
     });
   }); // end of Read-only variables test
@@ -626,22 +610,22 @@ describe('Context middleware', function() {
       ctxTimezoneStr = ctxTimezoneStr.substring(1);
       ctxTimezoneStr.split(':').forEach(function(value, index) {
         if (index === 0) {
-          ctxTimezoneOffset += 60 * parseInt(value);
+          ctxTimezoneOffset += 60 * parseInt(value, 10);
         } else {
-          ctxTimezoneOffset += parseInt(value);
+          ctxTimezoneOffset += parseInt(value, 10);
         }
       });
       ctxTimezoneOffset = isBehindGMT ? ctxTimezoneOffset : -ctxTimezoneOffset;
       assert.equal((new Date()).getTimezoneOffset(), ctxTimezoneOffset);
 
       // 4. Verify system.time should contain hour, minute, and seconds
-      var expectedProperties = ['hour', 'minute', 'seconds'];
+      var expectedProperties = [ 'hour', 'minute', 'seconds' ];
       expectedProperties.every(function(prop) {
         req.ctx.get('system.time').hasOwnProperty(prop);
       });
 
       // 5. system.date should contain day-of-week, day-of-month, month, and year
-      expectedProperties = ['year', 'month', 'day-of-month', 'day-of-week'];
+      expectedProperties = [ 'year', 'month', 'day-of-month', 'day-of-week' ];
       expectedProperties.every(function(prop) {
         req.ctx.get('system.date').hasOwnProperty(prop);
       });
@@ -662,10 +646,7 @@ describe('Context middleware', function() {
       var contextOptions = {
         request: {
           contentTypeMaps: [
-            {'application/json': ['json', '+json']}
-          ]
-        }
-      };
+            { 'application/json': [ 'json', '+json' ] } ] } };
 
       var app = loopback();
       app.use(context(contextOptions));
@@ -687,17 +668,14 @@ describe('Context middleware', function() {
         .send(payload)
         .expect(200, {
           'content-type': contentType,
-          payload: payload
-        }, done);
+          payload: payload }, done);
     });
 
     it('should be able to override date and time format', function(done) {
       var contextOptions = {
         system: {
           datetimeFormat: 'YYYY-MM-DD@HH:mm:ssZ',
-          timezoneFormat: 'ZZ'
-        }
-      };
+          timezoneFormat: 'ZZ' } };
 
       var app = loopback();
       app.use(context(contextOptions));
@@ -719,11 +697,7 @@ describe('Context middleware', function() {
     });
 
     describe('should be able to override request.body filtering', function() {
-      var contextOptions = {
-        request: {
-          bodyFilter: {}
-        }
-      };
+      var contextOptions = { request: { bodyFilter: {} } };
       var payload = 'hello world';
 
       var app = loopback();
@@ -754,7 +728,7 @@ describe('Context middleware', function() {
           .expect(200, done);
       });
 
-      ['GET', 'HEAD', 'DELETE'].forEach(function(method) {
+      [ 'GET', 'HEAD', 'DELETE' ].forEach(function(method) {
         it('should accept ' + method + ' method payload', function(done) {
           request(app)
             .post('/foo')

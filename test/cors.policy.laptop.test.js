@@ -5,9 +5,6 @@
 
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var express = require('express');
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
@@ -59,7 +56,9 @@ describe('cors policy', function() {
       .get('/cors-policy/cors2')
       .expect(200)
       .end(function(err, res) {
-        if (err) return done(err);
+        if (err) {
+          return done(err);
+        }
         var cors = res.header['Access-Control-Allow-Origin'] !== undefined;
         cors.should.be.False();
         cors = res.header['Access-Control-Allow-Headers'] !== undefined;

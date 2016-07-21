@@ -7,12 +7,9 @@
 
 var _ = require('lodash');
 var assert = require('assert');
-var express = require('express');
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
-var path = require('path');
-var fs = require('fs');
 
 describe('preflow and flow-engine integration', function() {
 
@@ -23,8 +20,8 @@ describe('preflow and flow-engine integration', function() {
       process.env.APIMANAGER = '127.0.0.1';
       process.env.NODE_ENV = 'production';
       mg.start(3000)
-        .then(function () { return echo.start(8889); })
-        .then(function () {
+        .then(function() { return echo.start(8889); })
+        .then(function() {
           request = supertest('http://localhost:3000');
         })
         .then(done)
@@ -34,18 +31,18 @@ describe('preflow and flow-engine integration', function() {
         });
     });
 
-    after(function (done) {
+    after(function(done) {
       delete process.env.APIMANAGER;
       delete process.env.NODE_ENV;
       echo.stop()
-        .then(function () { return mg.stop(); })
+        .then(function() { return mg.stop(); })
         .then(done, done);
     });
 
 
     var clientId1 = 'fb82cb59-ba95-4c34-8612-e63697d7b845';
     it('client_id=' + clientId1 + ' (query) should invoke API1 (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/ascents?client_id=' + clientId1)
         .expect(200, '/api1', done);
@@ -53,7 +50,7 @@ describe('preflow and flow-engine integration', function() {
 
     var clientId2 = '612caa59-9649-491f-99b7-d9a941c4bd2e';
     it('client_id=' + clientId2 + ' (query) should invoke API2 (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/forecasts?client_id=' + clientId2)
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
@@ -63,7 +60,7 @@ describe('preflow and flow-engine integration', function() {
 
     it('client_id=' + clientId2 +
       ' (query) should invoke API2 (apim-lookup-defaultcat)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/forecasts?client_id=' + clientId2)
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
@@ -73,7 +70,7 @@ describe('preflow and flow-engine integration', function() {
 
     it('client_id=' + clientId1 +
       ' (query) should not find api - bad org (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/xyz/sb/v1/ascents?client_id=' + clientId1)
         .expect(404, done);
@@ -81,49 +78,49 @@ describe('preflow and flow-engine integration', function() {
 
     it('client_id=' + clientId1 +
       ' (query) should not find api - bad catalog (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/xyz/v1/ascents?client_id=' + clientId1)
-        .expect(404, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(404, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     it('client_id=' + clientId1 +
       ' (query) should not find api - bad base path (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/xyz/ascents?client_id=' + clientId1)
-        .expect(404, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(404, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     it('client_id=' + clientId1 +
       ' (query) should not find api - bad path (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/xyz?client_id=' + clientId1)
-        .expect(404, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(404, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     var clientIdBad = '612caa59-9649-491f-99b7-d9a941c4bd2f';
     it('client_id=' + clientIdBad +
       ' (query) should not find api - bad clientId (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/ascents?client_id=' + clientIdBad)
-        .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     it('client_id=' + clientId1 +
       ' (query) should not find api - bad clientId name (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/ascents?client-id=' + clientIdBad)
-        .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     var clientSecret3a = 'api-level_secret';
     it('client_id=' + clientId2 +
       ' secret=' + clientSecret3a + ' (query) should invoke API3 (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes?client_id=' + clientId2 +
           '&client_secret=' + clientSecret3a)
@@ -134,44 +131,44 @@ describe('preflow and flow-engine integration', function() {
     it('client_id=' + clientId2 +
       ' secret=' + clientSecret3Bad + '(query) should not find api -' +
       ' bad secret (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes?client_id=' + clientId2 +
           '&client_secret=' + clientSecret3Bad)
-        .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     it('client_id=' + clientId2 +
       ' (query) should not find api - missing secret (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes?client_id=' + clientId2)
-        .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     it('client_id=' + clientIdBad +
       ' secret=' + clientSecret3a + '(query) should not find api -' +
       ' bad clientID valid secret (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes?client_id=' + clientIdBad +
           '&client_secret=' + clientSecret3a)
-        .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     it('client_id=' + clientId2 +
       ' secret=' + clientSecret3a + '(query) should not find api -' +
       ' bad secret name (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes?client_id=' + clientId2 +
           '&client_secret_bad=' + clientSecret3a)
-        .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     it('client_id=' + clientId2 + ' secret=' + clientSecret3a +
       ' (query) should invoke API3 with extra parm (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes?client_id=' + clientId2 +
           '&client_secret=' + clientSecret3a +
@@ -180,7 +177,7 @@ describe('preflow and flow-engine integration', function() {
       });
 
     it('client_id=' + clientId1 + ' (header) should invoke API1 (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/ascents')
         .set('X-IBM-Client-Id', clientId1)
@@ -188,7 +185,7 @@ describe('preflow and flow-engine integration', function() {
       });
 
     it('client_id=' + clientId2 + ' (header) should invoke API2 (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/forecasts')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
@@ -199,7 +196,7 @@ describe('preflow and flow-engine integration', function() {
 
     it('client_id=' + clientId2 +
       ' (header) should invoke API2 (apim-lookup-defaultcat)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/forecasts')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
@@ -210,61 +207,61 @@ describe('preflow and flow-engine integration', function() {
 
     it('client_id=' + clientId1 +
       ' (header) should not find api - bad org (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/xyz/sb/v1/ascents')
         .set('X-IBM-Client-Id', clientId1)
-        .expect(404, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(404, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     it('client_id=' + clientId1 +
       ' (header) should not find api - bad catalog (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/apim/xyz/v1/ascents')
         .set('X-IBM-Client-Id', clientId1)
-        .expect(404, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(404, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     it('client_id=' + clientIdBad +
       ' (header) should not find api - bad clientId (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/ascents')
         .set('X-IBM-Client-Id', clientIdBad)
-        .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     it('client_id=' + clientId1 +
       ' (header) should not find api - bad base path (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/xyz/ascents')
         .set('X-IBM-Client-Id', clientId1)
-        .expect(404, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(404, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     it('client_id=' + clientId1 +
       ' (header) should not find api - bad path (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/xyz')
         .set('X-IBM-Client-Id', clientId1)
-        .expect(404, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(404, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     it('client_id=' + clientId1 +
       ' (header) should not find api - bad clientID name (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/ascents')
         .set('X-IBM-Client-Id-bad', clientId1)
-        .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     it('client_id=' + clientId2 +
       ' secret=' + clientSecret3a + ' (header) should invoke API3 (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
@@ -276,52 +273,52 @@ describe('preflow and flow-engine integration', function() {
     it('client_id=' + clientId2 +
       ' secret=' + clientSecret3Bad + '(header) should not find api -' +
       ' bad secret (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
         .set('X-IBM-Client-Secret', clientSecret3Bad)
-        .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     it('client_id=' + clientId2 +
       ' (header) should not find api - missing secret (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
-        .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     it('client_id=' + clientIdBad +
       ' secret=' + clientSecret3a + '(header) should not find api -' +
       ' bad clientID valid secret (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes?')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientIdBad)
         .set('X-IBM-Client-Secret', clientSecret3a)
-        .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     it('client_id=' + clientId2 +
       ' secret=' + clientSecret3a + '(header) should not find api -' +
       ' bad secret name (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
         .set('X-IBM-Client-Secret-Bad', clientSecret3a)
-        .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     it('client_id=' + clientId2 + ' secret=' + clientSecret3a +
       ' (header) should invoke API3 with extra parm (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
@@ -334,7 +331,7 @@ describe('preflow and flow-engine integration', function() {
     it('client_id=' + clientId2 +
       ' secret=' + clientSecret3a + ' (header) should invoke API3 -' +
       ' key only (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes/test1')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
@@ -345,17 +342,17 @@ describe('preflow and flow-engine integration', function() {
     it('client_id=' + clientId2 +
       ' secret=' + clientSecret3a + ' (query) should fail -' +
       ' no query at operation (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes/test1?client_id=' + clientId2 +
           '&client_secret=' + clientSecret3a)
-        .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
     it('client_id=' + clientIdBad +
       ' secret=' + clientSecret3Bad + ' (header) should invoke API3 -' +
       ' no requirements (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes/test2')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
@@ -367,7 +364,7 @@ describe('preflow and flow-engine integration', function() {
     it('client_id=' + clientIdBad +
       ' secret=' + clientSecret3Bad + ' (header) should invoke API3 -' +
       ' bad names/values no requirements (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes/test2')
         .set('x-ibm-plan-id-bad', 'apim:1.0.0:gold')
@@ -377,7 +374,7 @@ describe('preflow and flow-engine integration', function() {
 
     it('client_id=' + clientId2 +
       ' (query) should invoke API3 - last req (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes/test3?client_id=' + clientId2)
         .expect(200, '/api3', done);
@@ -385,7 +382,7 @@ describe('preflow and flow-engine integration', function() {
 
     it('client_secret=' + clientSecret3a +
       ' (header) should invoke API3 - first req (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes/test3')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
@@ -395,7 +392,7 @@ describe('preflow and flow-engine integration', function() {
 
     it('client_id=' + clientId2 +
       ' (header) should not find api - missing req (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes/test3')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
@@ -405,12 +402,12 @@ describe('preflow and flow-engine integration', function() {
 
     it('client_secret=' + clientSecret3a +
       ' (header) should invoke API3 - first scheme (apim-lookup)',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes/test3')
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
-        .expect(401, {name: 'PreFlowError', message: 'unable to process the request'}, done);
+        .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
       });
 
       /*
@@ -469,7 +466,7 @@ describe('preflow and flow-engine integration', function() {
     describe('should inject X-Powered-By header', function() {
       var headerName = 'X-Powered-By';
       var expectedValue = 'IBM API Connect MicroGateway';
-      var payload = { hello: 'world'};
+      var payload = { hello: 'world' };
 
       it('when request is processed', function(done) {
         request
@@ -491,15 +488,15 @@ describe('preflow and flow-engine integration', function() {
     });
 
     describe('should be able to send large response payload', function() {
-      var payloadSize = [ 256, 1024, 2048, 4096];
+      var payloadSize = [ 256, 1024, 2048, 4096 ];
       payloadSize.forEach(function(size) {
         it('' + size + 'kb response payload should work', function(done) {
           size = size * 1000;
           request
-            .get('/v1/assembly/large-payload?size='+size)
+            .get('/v1/assembly/large-payload?size=' + size)
             .expect(function(res) {
               assert.strictEqual(res.body.value.length, size);
-             })
+            })
             .end(done);
         });
       });
@@ -507,11 +504,11 @@ describe('preflow and flow-engine integration', function() {
 
     describe('should process large request payloads', function() {
       var payloadLimit = 4096000;
-      var payloadSize = [ 1024000, 4096000, 4096001, 5120000];
+      var payloadSize = [ 1024000, 4096000, 4096001, 5120000 ];
 
       payloadSize.forEach(function(size) {
         var testCaseName = (size <= payloadLimit) ? 'accept' : 'reject';
-        testCaseName += ' ' + (size/1000) + 'KB request payload';
+        testCaseName += ' ' + (size / 1000) + 'KB request payload';
         it(testCaseName, function(done) {
           var payload = (new Buffer(size).fill('#')).toString();
           if (size <= payloadLimit) {

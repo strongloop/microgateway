@@ -14,7 +14,7 @@ var apimServer = require('./support/mock-apim-server/apim-server');
 describe('preflow-apimeta', function() {
 
   var request, datastoreRequest;
-  before(function(done)  {
+  before(function(done) {
     //Use production instead of CONFIG_DIR: reading from apim instead of laptop
     process.env.NODE_ENV = 'production';
 
@@ -24,19 +24,19 @@ describe('preflow-apimeta', function() {
     process.env.DATASTORE_PORT = 5000;
 
     apimServer.start(
-            process.env.APIMANAGER,
-            process.env.APIMANAGER_PORT,
-            __dirname + '/definitions/preflow-apimeta')
-        .then(function() { return microgw.start(3000); })
-        .then(function() {
-            request = supertest('http://localhost:3000');
-            datastoreRequest = supertest('http://localhost:5000');
-        })
-        .then(done)
-        .catch(function(err) {
-            console.error(err);
-            done(err);
-            });
+        process.env.APIMANAGER,
+        process.env.APIMANAGER_PORT,
+        __dirname + '/definitions/preflow-apimeta')
+      .then(function() { return microgw.start(3000); })
+      .then(function() {
+        request = supertest('http://localhost:3000');
+        datastoreRequest = supertest('http://localhost:5000');
+      })
+      .then(done)
+      .catch(function(err) {
+        console.error(err);
+        done(err);
+      });
   });
 
   after(function(done) {
@@ -61,7 +61,7 @@ describe('preflow-apimeta', function() {
       .send(data)
       .expect(200)
       .end(function(err, res) {
-          done(err);
+        done(err);
       });
   });
 
@@ -73,7 +73,7 @@ describe('preflow-apimeta', function() {
       .send(data)
       .expect(503)
       .end(function(err, res) {
-          done(err);
+        done(err);
       });
   });
 
@@ -85,7 +85,7 @@ describe('preflow-apimeta', function() {
       .send(data)
       .expect(404)
       .end(function(err, res) {
-          done(err);
+        done(err);
       });
   });
 
@@ -97,7 +97,7 @@ describe('preflow-apimeta', function() {
       .send(data)
       .expect(200)
       .end(function(err, res) {
-          done(err);
+        done(err);
       });
   });
 
@@ -109,7 +109,7 @@ describe('preflow-apimeta', function() {
       .send(data)
       .expect(404)
       .end(function(err, res) {
-          done(err);
+        done(err);
       });
   });
 
@@ -121,7 +121,7 @@ describe('preflow-apimeta', function() {
       .send(data)
       .expect(404)
       .end(function(err, res) {
-          done(err);
+        done(err);
       });
   });
 
@@ -133,7 +133,7 @@ describe('preflow-apimeta', function() {
       .send(data)
       .expect(404)
       .end(function(err, res) {
-          done(err);
+        done(err);
       });
   });
 
@@ -145,7 +145,7 @@ describe('preflow-apimeta', function() {
       .send(data)
       .expect(404)
       .end(function(err, res) {
-          done(err);
+        done(err);
       });
   });
 
@@ -157,7 +157,7 @@ describe('preflow-apimeta', function() {
       .send(data)
       .expect(200)
       .end(function(err, res) {
-          done(err);
+        done(err);
       });
   });
 
@@ -169,7 +169,7 @@ describe('preflow-apimeta', function() {
       .send(data)
       .expect(503)
       .end(function(err, res) {
-          done(err);
+        done(err);
       });
   });
 
@@ -181,7 +181,7 @@ describe('preflow-apimeta', function() {
       .send(data)
       .expect(404)
       .end(function(err, res) {
-          done(err);
+        done(err);
       });
   });
 
@@ -193,23 +193,24 @@ describe('preflow-apimeta', function() {
       .send(data)
       .expect(200)
       .end(function(err, res) {
-          done(err);
+        done(err);
       });
   });
 
   it('cleanup snapshots directory',
     function(done) {
-      var expect = {snapshot : {}};
+      var expect = { snapshot: {} };
       datastoreRequest
         .get('/api/snapshots')
-        .end(function (err, res) {
+        .end(function(err, res) {
+          assert(!err, 'Found error when cleaning up snapshot directory');
           var snapshotID = res.body[0].id;
           console.log(snapshotID);
           datastoreRequest.get('/api/snapshots/release?id=' + snapshotID)
             .expect(function(res) {
-              assert(_.isEqual(expect, res.body)); 
-            }
-          ).end(done)
+              assert(_.isEqual(expect, res.body));
+            })
+            .end(done);
         });
     }
   );

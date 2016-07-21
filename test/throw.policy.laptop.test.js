@@ -5,18 +5,14 @@
 
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var express = require('express');
 var supertest = require('supertest');
-var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
 var should = require('should');
 
 describe('throw policy', function() {
 
   var request;
-  before(function(done){
+  before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/throw';
     process.env.NODE_ENV = 'production';
     mg.start(3000)

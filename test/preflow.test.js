@@ -7,14 +7,12 @@
 
 var mg = require('../lib/microgw');
 var supertest = require('supertest');
-var _ = require('lodash');
-var assert = require('assert');
 
 var dsCleanup = require('./support/utils').dsCleanup;
 var apimServer = require('./support/mock-apim-server/apim-server');
 var echo = require('./support/echo-server');
 
-var request, httprequest;
+var request;
 
 describe('preflow testing', function() {
   before(function(done) {
@@ -55,8 +53,10 @@ describe('preflow testing', function() {
   it('should pass with "/rootbasepath/foo/" - rootBasePathVarPathWithSlashAtEnd', rootBasePathVarPathWithSlashAtEnd);
   it('should fail with "/rootbasepath/foo/bar" - rootBasePathVarPathFail', rootBasePathVarPathFail);
   it('should pass with "/rootbasepath/a/b/c/d" - rootBasePathMultiVarPath', rootBasePathMultiVarPath);
-  it('should pass with "/rootbasepath/a/b/c/d/" - rootBasePathMultiVarPathWithSlashAtEnd', rootBasePathMultiVarPathWithSlashAtEnd);
-  it('should fail with "/rootbasepath/a/b" - rootBasePathMultiVarPathFail', rootBasePathMultiVarPathFail);
+  it('should pass with "/rootbasepath/a/b/c/d/" - rootBasePathMultiVarPathWithSlashAtEnd',
+          rootBasePathMultiVarPathWithSlashAtEnd);
+  it('should fail with "/rootbasepath/a/b" - rootBasePathMultiVarPathFail',
+          rootBasePathMultiVarPathFail);
 
 });
 
@@ -84,18 +84,18 @@ describe('ro-context testing', function() {
   });
 
   it('should not able to modify read-only context variables', function(doneCB) {
-    var roCtx = ['client.app.id',
-                 'client.app.name',
-                 'client.app.secret',
-                 'client.org.id',
-                 'client',
-                 'plan.id',
-                 'plan.name',
-                 'plan.version',
-                 'plan.rate-limit',
-                 'plan',
-                 'env.path',
-                 'env'];
+    var roCtx = [ 'client.app.id',
+                  'client.app.name',
+                  'client.app.secret',
+                  'client.org.id',
+                  'client',
+                  'plan.id',
+                  'plan.name',
+                  'plan.version',
+                  'plan.rate-limit',
+                  'plan',
+                  'env.path',
+                  'env' ];
     var failed = [];
     var counter = 0;
     for (var index = 0, len = roCtx.length; index < len; index++) {
@@ -113,7 +113,7 @@ describe('ro-context testing', function() {
           if (failed.length === 0) {
             doneCB();
           } else {
-            doneCB(new Error('the following ctx vars failed:' 
+            doneCB(new Error('the following ctx vars failed: '
                 + JSON.stringify(failed)));
           }
         }
@@ -155,7 +155,7 @@ describe('preflow testing', function() {
   it('should pass with "/api/missingQueryParameterID" - missingQueryParameterID', missingQueryParameterID);
   it('should pass with "/api/twoClientIDs" - twoClientIDs', twoClientIDs);
   it('should pass with "/api/twoClientSecrets" - twoClientSecrets', twoClientSecrets);
-  
+
 });
 
 describe('preflow testing onprem', function() {
@@ -224,6 +224,7 @@ function pathWithNoSlashAtEnd(doneCB) {
     .expect(200, doneCB);
 }
 
+/*
 function simplePathWithSlashAtEnd(doneCB) {
   request
     .get('/api/simple/')
@@ -235,6 +236,7 @@ function simplePathWithNoSlashAtEnd(doneCB) {
     .get('/api/simple')
     .expect(200, doneCB);
 }
+*/
 
 function doesNotExistPathWithSlashAtEnd(doneCB) {
   request

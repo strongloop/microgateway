@@ -7,34 +7,8 @@
 
 var mg;
 var supertest = require('supertest');
-var _ = require('lodash');
-var assert = require('assert');
-var apimServer = require('./support/mock-apim-server/apim-server');
 
-var request, httprequest;
-
-function dsCleanup(port) {
-  // clean up the directory
-  return new Promise(function(resolve, reject) {
-    var expect = {snapshot : {}};
-    var datastoreRequest = supertest('http://localhost:' + port);
-    datastoreRequest
-      .get('/api/snapshots')
-      .end(function (err, res) {
-        var snapshotID = res.body[0].id;
-        datastoreRequest
-          .get('/api/snapshots/release?id=' + snapshotID)
-          .end(function(err, res) {
-            try {
-              assert(_.isEqual(expect, res.body));
-              resolve();
-            } catch (error) {
-              reject(error);
-            }
-          });
-      });
-  });
-}
+var request;
 
 describe('policy loader version support test', function() {
   before(function(done) {

@@ -9,7 +9,6 @@ var _ = require('lodash');
 var assert = require('assert');
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
-var yaml = require('yamljs');
 var apimServer = require('./support/mock-apim-server/apim-server');
 
 var mg = require('../lib/microgw');
@@ -17,17 +16,17 @@ var mg = require('../lib/microgw');
 function dsCleanup(port) {
   // clean up the directory
   return new Promise(function(resolve, reject) {
-    var expect = {snapshot : {}};
+    var expect = { snapshot: {} };
     var datastoreRequest = supertest('http://localhost:' + port);
     datastoreRequest
       .get('/api/snapshots')
-      .end(function (err, res) {
+      .end(function(err, res) {
         var snapshotID = res.body[0].id;
         datastoreRequest
           .get('/api/snapshots/release?id=' + snapshotID)
           .end(function(err, res) {
             try {
-              assert(_.isEqual(expect, res.body)); 
+              assert(_.isEqual(expect, res.body));
               resolve();
             } catch (error) {
               reject(error);
@@ -45,14 +44,14 @@ describe('HTTP and HTTPS in onprem in separate files', function() {
     process.env.APIMANAGER = '127.0.0.1';
     process.env.APIMANAGER_PORT = 8081;
     apimServer.start(
-            process.env.APIMANAGER,
-            process.env.APIMANAGER_PORT,
-            process.env.CONFIG_DIR)
-        .then(done)
-        .catch(function(err) {
-            console.error(err);
-            done(err);
-            });
+        process.env.APIMANAGER,
+        process.env.APIMANAGER_PORT,
+        process.env.CONFIG_DIR)
+      .then(done)
+      .catch(function(err) {
+        console.error(err);
+        done(err);
+      });
   });
 
   after(function(done) {
@@ -83,14 +82,14 @@ describe('HTTP and HTTPS in onprem in same file', function() {
     process.env.APIMANAGER = '127.0.0.1';
     process.env.APIMANAGER_PORT = 8081;
     apimServer.start(
-            process.env.APIMANAGER,
-            process.env.APIMANAGER_PORT,
-            process.env.CONFIG_DIR)
-        .then(done)
-        .catch(function(err) {
-            console.error(err);
-            done(err);
-            });
+        process.env.APIMANAGER,
+        process.env.APIMANAGER_PORT,
+        process.env.CONFIG_DIR)
+      .then(done)
+      .catch(function(err) {
+        console.error(err);
+        done(err);
+      });
   });
 
   after(function(done) {
@@ -114,12 +113,12 @@ describe('HTTP and HTTPS in onprem in same file', function() {
 });
 
 describe('HTTPS in onprem w/ env var', function() {
-
-  var request, httprequest;
+  var request;
+  var httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
     process.env.NODE_ENV = 'production';
-    process.env.TLS_SERVER_CONFIG = __dirname + '/support/https/tlsconfig.json'
+    process.env.TLS_SERVER_CONFIG = __dirname + '/support/https/tlsconfig.json';
     process.env.APIMANAGER = '127.0.0.1';
     process.env.APIMANAGER_PORT = 8081;
     process.env.DATASTORE_PORT = 5000;
@@ -168,7 +167,9 @@ describe('HTTPS in onprem w/ env var', function() {
     httprequest
       .get('/http/http')
       .end(function(err, res) {
-        if (err) return done(); // expect error
+        if (err) {
+          return done(); // expect error
+        }
         done(new Error('expect error'));
       });
   });
@@ -176,12 +177,12 @@ describe('HTTPS in onprem w/ env var', function() {
 });
 
 describe('HTTPS in onprem w/ pfx', function() {
-
-  var request, httprequest;
+  var request;
+  var httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
     process.env.NODE_ENV = 'production';
-    process.env.TLS_SERVER_CONFIG = __dirname + '/support/https/tlsconfig-pfx.json'
+    process.env.TLS_SERVER_CONFIG = __dirname + '/support/https/tlsconfig-pfx.json';
     process.env.APIMANAGER = '127.0.0.1';
     process.env.APIMANAGER_PORT = 8081;
     process.env.DATASTORE_PORT = 5000;
@@ -230,7 +231,9 @@ describe('HTTPS in onprem w/ pfx', function() {
     httprequest
       .get('/http/http')
       .end(function(err, res) {
-        if (err) return done(); // expect error
+        if (err) {
+          return done(); // expect error
+        }
         done(new Error('expect error'));
       });
   });
@@ -238,8 +241,8 @@ describe('HTTPS in onprem w/ pfx', function() {
 });
 
 describe('HTTPS in onprem w/ default TLS', function() {
-
-  var request, httprequest;
+  var request;
+  var httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
     process.env.NODE_ENV = 'production';
@@ -290,7 +293,9 @@ describe('HTTPS in onprem w/ default TLS', function() {
     httprequest
       .get('/http/http')
       .end(function(err, res) {
-        if (err) return done(); // expect error
+        if (err) {
+          return done(); // expect error
+        }
         done(new Error('expect error'));
       });
   });
@@ -298,8 +303,7 @@ describe('HTTPS in onprem w/ default TLS', function() {
 });
 
 describe('HTTP in onprem when HTTPS not specified', function() {
-
-  var request, httprequest;
+  var httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/http';
     process.env.NODE_ENV = 'production';
@@ -349,8 +353,8 @@ describe('HTTP in onprem when HTTPS not specified', function() {
 });
 
 describe('HTTPS in onprem when HTTPS explicitly specified', function() {
-
-  var request, httprequest;
+  var request;
+  var httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
     process.env.NODE_ENV = 'production';
@@ -401,7 +405,9 @@ describe('HTTPS in onprem when HTTPS explicitly specified', function() {
     httprequest
       .get('/http/http')
       .end(function(err, res) {
-        if (err) return done(); // expect error
+        if (err) {
+          return done(); // expect error
+        }
         done(new Error('expect error'));
       });
   });
@@ -409,8 +415,8 @@ describe('HTTPS in onprem when HTTPS explicitly specified', function() {
 });
 
 describe('HTTPS in onprem when schemes not specified', function() {
-
-  var request, httprequest;
+  var request;
+  var httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
     process.env.NODE_ENV = 'production';
@@ -461,7 +467,9 @@ describe('HTTPS in onprem when schemes not specified', function() {
     httprequest
       .get('/http/http')
       .end(function(err, res) {
-        if (err) return done(); // expect error
+        if (err) {
+          return done(); // expect error
+        }
         done(new Error('expect error'));
       });
   });
@@ -470,8 +478,7 @@ describe('HTTPS in onprem when schemes not specified', function() {
 
 /*  NEED ROOT ACCESS
 describe('HTTP no port specified in onprem when HTTPS not specified', function() {
-
-  var request, httprequest;
+  var httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/http';
     process.env.NODE_ENV = 'production';
@@ -517,13 +524,11 @@ describe('HTTP no port specified in onprem when HTTPS not specified', function()
       .get('/http/http')
       .expect(200, done);
   });
-
 });
 */
 
 describe('HTTP port in ENV in onprem when HTTPS not specified', function() {
-
-  var request, httprequest;
+  var httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/http';
     process.env.NODE_ENV = 'production';
@@ -576,8 +581,8 @@ describe('HTTP port in ENV in onprem when HTTPS not specified', function() {
 
 /*  NEED ROOT ACCESS
 describe('HTTPS no port specified in onprem when HTTPS explicitly specified', function() {
-
-  var request, httprequest;
+  var request;
+  var httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
     process.env.NODE_ENV = 'production';
@@ -628,7 +633,9 @@ describe('HTTPS no port specified in onprem when HTTPS explicitly specified', fu
     httprequest
       .get('/http/http')
       .end(function(err, res) {
-        if (err) return done(); // expect error
+        if (err) {
+          return done(); // expect error
+        }
         done(new Error('expect error'));
       });
   });
@@ -637,8 +644,8 @@ describe('HTTPS no port specified in onprem when HTTPS explicitly specified', fu
 */
 
 describe('HTTPS port in ENV in onprem when HTTPS explicitly specified', function() {
-
-  var request, httprequest;
+  var request;
+  var httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
     process.env.NODE_ENV = 'production';
@@ -691,7 +698,9 @@ describe('HTTPS port in ENV in onprem when HTTPS explicitly specified', function
     httprequest
       .get('/http/http')
       .end(function(err, res) {
-        if (err) return done(); // expect error
+        if (err) {
+          return done(); // expect error
+        }
         done(new Error('expect error'));
       });
   });

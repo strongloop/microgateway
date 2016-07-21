@@ -5,9 +5,6 @@
 
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var express = require('express');
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
@@ -53,7 +50,9 @@ describe('ratelimit basic policy', function() {
       .get('/ratelimit/ratelimit')
       .expect('x-ratelimit-limit', '100')
       .end(function(err, res) {
-        if (err) return done(err);
+        if (err) {
+          return done(err);
+        }
         var remaining = Number(res.headers['x-ratelimit-remaining']);
         remaining.should.be.lessThan(100);
         done();
@@ -73,7 +72,7 @@ describe('ratelimit basic policy', function() {
         });
     }, function(err) {
       reject.should.be.eql(
-        {message: 'Rate limit exceeded', name: 'RateLimitExceeded'});
+        { message: 'Rate limit exceeded', name: 'RateLimitExceeded' });
       done(err);
     });
   });
