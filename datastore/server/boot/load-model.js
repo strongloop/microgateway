@@ -43,6 +43,7 @@ var http = false;
 var https = false;
 var models = [];
 var apimanager = {};
+var currentWebhook;
 
 /**
  * Creates a model type
@@ -92,6 +93,7 @@ module.exports = function(app) {
     port: process.env[APIMANAGER_PORT],
     catalog: process.env[APIMANAGER_CATALOG],
     handshakeOk: false,
+    webhooksOk: false,
     startupRefresh: 1000, // 1 second
     maxRefresh: maxRefreshInterval };
 
@@ -188,7 +190,8 @@ function loadData(app, apimanager, models, currdir, reload, uid) {
       logger.debug('apimanager before pullFromAPIm: %j', apimanager);
       if (apimanager.host) {
           // && apimanager.handshakeOk << shouldn't call if handshake failed.. not ready #TODO
-          // don't look for successful handshake currently because UT depends on this
+          // && apimanager.webhooksOk << shouldn't call if handshake failed.. not ready #TODO
+          // don't look for successful handshake/webhooks currently because UT depends on this
         // we have an APIm, handshake succeeded, so try to pull data..
         pullFromAPIm(apimanager, currdir, snapshotID, function(err, dir) {
           if (err) {
@@ -411,7 +414,7 @@ function webhooksSubscribe(app, apimanager, cb) {
         'endpoint': endpointurl,
         'secret': 'notused',
         'subscriptions': [
-          'catalog.*'
+          "catalog"
         ],
         'title': 'This is a webhook subscription for the a catalog, subscribing to all available events specifically'
       };
@@ -453,7 +456,11 @@ function webhooksSubscribe(app, apimanager, cb) {
         logger.debug('statusCode: ' + res.statusCode);
         if (res.statusCode !== 201) {
           logger.error(webhooksSubUrl, ' failed with: ', res.statusCode);
+          currentWebhook = undefined;
           return callback(new Error(webhooksSubUrl + ' failed with: ' + res.statusCode));
+        } else {
+          logger.debug('Webhooks received from  API Connect server, id %s', body.id);
+          currentWebhook = body.id;
         }
 
         callback(null);
@@ -1443,6 +1450,13 @@ function updateSnapshot(app, uid, cb) {
 }
 
 function triggerReload(app, ctx) {
+  if (ctx.instance.webhook_id != currentWebhook) {
+    logger.error('Received webhook ID %s does not match expected webhook ID %s',
+                 ctx.instance.webhook_id, currentWebhook);
+    return;
+  }
+  logger.debug('Received webhook ID %s matches expected webhook ID %s',
+               ctx.instance.webhook_id, currentWebhook);
   loadData(app, apimanager, models, definitionsDir, false);
 }
 
