@@ -1,5 +1,5 @@
 // Copyright IBM Corp. 2016. All Rights Reserved.
-// Node module: apiconnect-microgateway
+// Node module: microgateway
 // US Government Users Restricted Rights - Use, duplication or disclosure
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
@@ -10,7 +10,7 @@ var express   = require('express');
 
 var https     = require('https');
 var logger    = require('apiconnect-cli-logger/logger.js')
-                 .child({loc: 'apiconnect-microgateway:analytics-moc-server'});
+                 .child({loc: 'microgateway:analytics-moc-server'});
 var options   = require('./httpsOptions');
 var fs        = require('fs');
 var path      = require('path');
