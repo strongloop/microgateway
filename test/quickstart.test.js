@@ -20,6 +20,7 @@ describe('quick start', function() {
   runTestAppIgnored('test app not enabled', 'testappenabledfalse');
   runTestAppIgnored('test app not specified', 'testappenablednotspecified');
   runTestAppIgnored('test app enabled for non development catalog', 'testappenabledtruefornondevcat');
+  runTestAppIgnored('test app enabled without credentials', 'testappenablednocredentials');
   runTestAppApplied();
 });
 

@@ -626,7 +626,9 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                   return;
                 }
                 logger.debug('optimizedData created: %j', optimizedData);
-                if (pieces.catalog['test-app-enabled'] && pieces.catalog.sandbox &&
+                if (pieces.catalog['test-app-enabled'] &&
+                  pieces.catalog['test-app-credentials'] &&
+                  pieces.catalog.sandbox &&
                   apiClientidSecurity) {
                   modifyOptDataForTestApp(newOptimizedDataEntry, pieces);
                   app.models.optimizedData.create(
