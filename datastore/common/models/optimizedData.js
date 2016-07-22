@@ -626,7 +626,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                   return;
                 }
                 logger.debug('optimizedData created: %j', optimizedData);
-                if (pieces.catalog.testAppEnabled && pieces.catalog.sandbox &&
+                if (pieces.catalog['test-app-enabled'] && pieces.catalog.sandbox &&
                   apiClientidSecurity) {
                   modifyOptDataForTestApp(newOptimizedDataEntry, pieces);
                   app.models.optimizedData.create(
@@ -657,8 +657,8 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
 
 function modifyOptDataForTestApp(OptimizedDataEntry, pieces) {
   OptimizedDataEntry['test-app-enabled'] = true;
-  OptimizedDataEntry['client-id'] = pieces.catalog.testAppCredentials.clientId;
-  OptimizedDataEntry['client-secret'] = pieces.catalog.testAppCredentials.clientSecret;
+  OptimizedDataEntry['client-id'] = pieces.catalog['test-app-credentials']['client-id'];
+  OptimizedDataEntry['client-secret'] = pieces.catalog['test-app-credentials']['client-secret'];
   OptimizedDataEntry['plan-rate-limit'] = undefined;
 }
 
