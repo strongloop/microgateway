@@ -1,6 +1,6 @@
 {
   "name": "microgateway",
-  "version": "1.3.0",
+  "version": "1.4.2",
   "description": "API Connect MicroGateway",
   "main": "index.js",
   "scripts": {
@@ -27,22 +27,48 @@
     "enforce"
   ],
   "author": {
-    "name" : "IBM Gateway Team"
+    "name": "IBM Gateway Team"
   },
-  "contributors" : [
-    { "name" : "Ally Juang" },
-    { "name" : "Clement Su" },
-    { "name" : "Dan Badt" },
-    { "name" : "Gary Tu" },
-    { "name" : "Jeremy Geddes" },
-    { "name" : "John Bellessa" },
-    { "name" : "Jon Palgon" },
-    { "name" : "Libra Huang" },
-    { "name" : "Raymond Feng" },
-    { "name" : "Thomas Burke" },
-    { "name" : "Tim Smith" },
-    { "name" : "Tony Ffrench" },
-    { "name" : "Yi-hong Wang" }
+  "contributors": [
+    {
+      "name": "Ally Juang"
+    },
+    {
+      "name": "Clement Su"
+    },
+    {
+      "name": "Dan Badt"
+    },
+    {
+      "name": "Gary Tu"
+    },
+    {
+      "name": "Jeremy Geddes"
+    },
+    {
+      "name": "John Bellessa"
+    },
+    {
+      "name": "Jon Palgon"
+    },
+    {
+      "name": "Libra Huang"
+    },
+    {
+      "name": "Raymond Feng"
+    },
+    {
+      "name": "Thomas Burke"
+    },
+    {
+      "name": "Tim Smith"
+    },
+    {
+      "name": "Tony Ffrench"
+    },
+    {
+      "name": "Yi-hong Wang"
+    }
   ],
   "license": "SEE LICENSE IN LICENSE.txt",
   "devDependencies": {

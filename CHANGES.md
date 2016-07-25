@@ -1,4 +1,108 @@
-2016-07-19, Version 1.3.0
+2016-07-25, Version 1.4.2
+=========================
+
+
+
+2016-07-20, Version 1.4.1
+=========================
+
+
+
+2016-07-19, Version 1.4.0
+=========================
+
+ * Updated shrinkwrap and travis files (Krishna Raman)
+
+ * Fix flow-engine version spec (Krishna Raman)
+
+ * Add .apiconnect/config file (Thomas Burke)
+
+ * Remove .apiconnect file (Thomas Burke)
+
+ * Remove node_modules from glob ignore (Thomas Burke)
+
+ * microgateway: support password obfuscation (Behnam Hajian)
+
+ * Update author and contributors (Jon Palgon)
+
+ * remove glob from devDependency (Jon Palgon)
+
+ * Increment flow-engine dependency (Jon Palgon)
+
+ * Cleanup after analytics UT (Jon Palgon)
+
+ * change return status code (Clement)
+
+ * add the reason of validation failure (Clement)
+
+ * use %j instead of %s (Clement)
+
+ * remove tailing space and tab (Clement)
+
+ * fix bug on target to be validated (Clement)
+
+ * REST validate implementation (Clement)
+
+ * Unescaped the values of a form in pug template (yihongwang)
+
+ * Revert urlencode for intput values in a html form (yihongwang)
+
+ * Re-enable policy-loader-runtime tests (Thomas Burke)
+
+ * Fix jsdoc for function PolicyLoader (Thomas Burke)
+
+ * Fix ratelimit and policy-version-runtime tests (Thomas Burke)
+
+ * Temporarily skip new policy version tests (Thomas Burke)
+
+ * remove extraneous change o policy-loadet.test.js (Thomas Burke)
+
+ * restore projectDir test (Thomas Burke)
+
+ * remove chdir from test (Thomas Burke)
+
+ * observe  behavior (Thomas Burke)
+
+ * fix swagger indentation for versions (Thomas Burke)
+
+ * undo more unnecessary changes to policy-loader (Thomas Burke)
+
+ * undo some unnecessary changes to policy-loader (Thomas Burke)
+
+ * add tests for policy-loader version support (Thomas Burke)
+
+ * add env var POLICY_DIR for testing (Thomas Burke)
+
+ * fix test suite (Thomas Burke)
+
+ * fix policy yamls, code cleanup (Thomas Burke)
+
+ * first pass at policy loader enhancements (Thomas Burke)
+
+ * Only enable analytics for valid API request (yihongwang)
+
+ * Revise the payload of analytics event (yihongwang)
+
+ * remove client_id from log msg (yihongwang)
+
+ * use the new API for publishing analytics events. (yihongwang)
+
+ * also check APIMANAGER_PORT before enabling analytics feature (yihongwang)
+
+ * add client_id into the querystring and also validate client_id in moc server (yihongwang)
+
+ * refine try/catch in descryptResponse() (yihongwang)
+
+ * revise analytics moc server and user APIMANAGER_PORT instead of 9443 (yihongwang)
+
+ * close https servers of invoke-server properly (yhwang)
+
+ * use correct env:APIMANAGER and create a https moc server for x2020 (yhwang)
+
+ * Use of ETag part 1 (Jon Palgon)
+
+
+2016-07-18, Version 1.3.0
 =========================
 
  * use lodash.isString() instead of (yhwang)
