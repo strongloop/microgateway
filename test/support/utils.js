@@ -18,13 +18,13 @@ function dsCleanup(port) {
     datastoreRequest
       .get('/api/snapshots')
       .end(function(err, res) {
-        assert(!err);
+        assert(!err, 'Unexpected error with dsCleanup()');
 
         var snapshotID = res.body[0].id;
         datastoreRequest
           .get('/api/snapshots/release?id=' + snapshotID)
           .end(function(err, res) {
-            assert(!err);
+            assert(!err, 'Unexpected error with dsCleanup()');
 
             try {
               assert(_.isEqual(expect, res.body));

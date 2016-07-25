@@ -8,7 +8,6 @@
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
-var should = require('should');
 
 describe('set-variable policy', function() {
 

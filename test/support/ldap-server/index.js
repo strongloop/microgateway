@@ -24,7 +24,7 @@ var tlsserver;
 
 
 exports.start = function(port, tlsport) {
-  if (!!server) {
+  if (server) {
     return Promise.resolve();
   }
 
@@ -53,7 +53,7 @@ exports.stop = function() {
   return new Promise(function(resolve) {
     server.close();
     server = null;
-    if (!!tlsserver) {
+    if (tlsserver) {
       tlsserver.close();
       tlsserver = null;
     }

@@ -20,12 +20,13 @@ module.exports = function(Snapshot) {
 
       var query = { 'snapshot-id': ctx.instance.id };
       models.forEach(function(model) {
-        app.models[model].destroyAll(query, function(err, info) { });
+        app.models[model].destroyAll(query,
+                function(err, info) { if (err) { /* suppress eslint handle-callback-err */ } });
       });
 
       fs.rmrf(
         process.env.ROOTCONFIGDIR + '/' + ctx.instance.id + '/',
-        function(err) {});
+        function(err) { if (err) { /* suppress eslint handle-callback-err */ } });
     }
 
     next();
@@ -72,9 +73,11 @@ module.exports = function(Snapshot) {
       var refCount = parseInt(instance.refcount, 10) - 1;
       if (refCount === 0) {
         // delete if reference count is zero and return empty object
-        instance.destroy(function(err) {
-          cb(null, {});
-        });
+        instance.destroy(
+          function(err) {
+            if (err) { /* suppress eslint handle-callback-err */ }
+            cb(null, {});
+          });
       } else {
         // otherwise, update reference count
         instance.updateAttributes(

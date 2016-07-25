@@ -6,7 +6,7 @@
 'use strict';
 
 var policyLoader = require('../lib/policy-loader');
-var should = require('should');
+var should = require('should'); //eslint-disable-line no-unused-vars
 var path = require('path');
 
 describe('policy-loader', function() {

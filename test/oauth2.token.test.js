@@ -64,7 +64,6 @@ var clientSecret = 'oJ2xB4aM0tB5pP3aS5dF8oS1jB5hA1dI5dR0dW1sJ0gG6nK0xU';
 
 describe('oauth2 token API', function() {
   var request;
-  var datastoreRequest;
   before(function(done) {
     //Use production instead of CONFIG_DIR: reading from apim instead of laptop
     process.env.NODE_ENV = 'production';
@@ -82,7 +81,6 @@ describe('oauth2 token API', function() {
       .then(function() { return authServer.start(8889); })
       .then(function() {
         request = supertest('https://localhost:3000');
-        datastoreRequest = supertest('http://localhost:5000');
       })
       .then(done)
       .catch(function(err) {

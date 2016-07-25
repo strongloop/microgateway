@@ -21,10 +21,12 @@ function dsCleanup(port) {
     datastoreRequest
       .get('/api/snapshots')
       .end(function(err, res) {
+        assert(!err, 'Unexpected error with dsCleanup()');
         var snapshotID = res.body[0].id;
         datastoreRequest
           .get('/api/snapshots/release?id=' + snapshotID)
           .end(function(err, res) {
+            assert(!err, 'Unexpected error with dsCleanup()');
             try {
               assert(_.isEqual(expect, res.body));
               resolve();
@@ -67,8 +69,10 @@ describe('HTTP and HTTPS in onprem in separate files', function() {
   it('should expect failure to load', function(done) {
     mg.start(3000)
       .catch(function(err) {
-        assert(true);
-        done();
+        if (err) {
+          return done(); // expect error
+        }
+        done(new Error('expect error'));
       });
   });
 
@@ -105,8 +109,10 @@ describe('HTTP and HTTPS in onprem in same file', function() {
   it('should expect failure to load', function(done) {
     mg.start(3000)
       .catch(function(err) {
-        assert(true);
-        done();
+        if (err) {
+          return done(); // expect error
+        }
+        done(new Error('expect error'));
       });
   });
 
@@ -163,6 +169,7 @@ describe('HTTPS in onprem w/ env var', function() {
       .get('/https/https')
       .expect(200, done);
   });
+
   it('should expect failure', function(done) {
     httprequest
       .get('/http/http')
@@ -227,6 +234,7 @@ describe('HTTPS in onprem w/ pfx', function() {
       .get('/https/https')
       .expect(200, done);
   });
+
   it('should expect failure', function(done) {
     httprequest
       .get('/http/http')
@@ -289,6 +297,7 @@ describe('HTTPS in onprem w/ default TLS', function() {
       .get('/https/https')
       .expect(200, done);
   });
+
   it('should expect failure', function(done) {
     httprequest
       .get('/http/http')
@@ -401,6 +410,7 @@ describe('HTTPS in onprem when HTTPS explicitly specified', function() {
       .get('/https/https')
       .expect(200, done);
   });
+
   it('should expect failure', function(done) {
     httprequest
       .get('/http/http')
@@ -463,6 +473,7 @@ describe('HTTPS in onprem when schemes not specified', function() {
       .get('/https/https')
       .expect(200, done);
   });
+
   it('should expect failure', function(done) {
     httprequest
       .get('/http/http')
@@ -629,6 +640,7 @@ describe('HTTPS no port specified in onprem when HTTPS explicitly specified', fu
       .get('/https/https')
       .expect(200, done);
   });
+
   it('should expect failure', function(done) {
     httprequest
       .get('/http/http')
@@ -694,6 +706,7 @@ describe('HTTPS port in ENV in onprem when HTTPS explicitly specified', function
       .get('/https/https')
       .expect(200, done);
   });
+
   it('should expect failure', function(done) {
     httprequest
       .get('/http/http')

@@ -381,7 +381,7 @@ describe('oauth2 AZ-server', function() {
   });
 
   describe('basic - authenticated', function() {
-    var request, datastoreRequest;
+    var request;
     before(function(done) {
       //Use production instead of CONFIG_DIR: reading from apim instead of laptop
       process.env.NODE_ENV = 'production';
@@ -399,7 +399,6 @@ describe('oauth2 AZ-server', function() {
         .then(function() { return authServer.start(7000); })
         .then(function() {
           request = supertest('https://localhost:5000');
-          datastoreRequest = supertest('http://localhost:4000');
         })
         .then(done)
         .catch(function(err) {
@@ -966,7 +965,6 @@ describe('oauth2 AZ-server', function() {
 
   describe('redirect', function() {
     var request;
-    var datastoreRequest;
     before(function(done) {
       //Use production instead of CONFIG_DIR: reading from apim instead of laptop
       process.env.NODE_ENV = 'production';
@@ -984,7 +982,6 @@ describe('oauth2 AZ-server', function() {
         .then(function() { return authServer.start(7000); })
         .then(function() {
           request = supertest('https://localhost:5000');
-          datastoreRequest = supertest('http://localhost:4000');
         })
         .then(done)
         .catch(function(err) {
@@ -1128,6 +1125,10 @@ describe('oauth2 AZ-server', function() {
         .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
         .query({ state: 'xyz' })
         .end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+
           try {
             assert(res.statusCode === 302, 'not 302 redirect');
             var cookie = res.header['set-cookie'];
@@ -1177,6 +1178,10 @@ describe('oauth2 AZ-server', function() {
         .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
         .query({ state: 'xyz' })
         .end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+
           try {
             assert(res.statusCode === 302, 'not 302 redirect');
             var cookie = res.header['set-cookie'];
@@ -1226,6 +1231,10 @@ describe('oauth2 AZ-server', function() {
         .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
         .query({ state: 'xyz' })
         .end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+
           try {
             assert(res.statusCode === 302, 'not 302 redirect');
             var cookie = res.header['set-cookie'];
@@ -1278,6 +1287,10 @@ describe('oauth2 AZ-server', function() {
         .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
         .query({ state: 'xyz' })
         .end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+
           try {
             assert(res.statusCode === 302, 'not 302 redirect');
             var cookie = res.header['set-cookie'];
@@ -1324,7 +1337,7 @@ describe('oauth2 AZ-server', function() {
   });
 
   describe('basic - default consent', function() {
-    var request, datastoreRequest;
+    var request;
     before(function(done) {
       //Use production instead of CONFIG_DIR: reading from apim instead of laptop
       process.env.NODE_ENV = 'production';
@@ -1342,7 +1355,6 @@ describe('oauth2 AZ-server', function() {
         .then(function() { return authServer.start(7000); })
         .then(function() {
           request = supertest('https://localhost:5000');
-          datastoreRequest = supertest('http://localhost:4000');
         })
         .then(done)
         .catch(function(err) {
@@ -1768,7 +1780,6 @@ describe('oauth2 AZ-server', function() {
 
   describe('default login form - default consent', function() {
     var request;
-    var datastoreRequest;
     before(function(done) {
       //Use production instead of CONFIG_DIR: reading from apim instead of laptop
       process.env.NODE_ENV = 'production';
@@ -1786,7 +1797,6 @@ describe('oauth2 AZ-server', function() {
         .then(function() { return authServer.start(7000); })
         .then(function() {
           request = supertest('https://localhost:5000');
-          datastoreRequest = supertest('http://localhost:4000');
         })
         .then(done)
         .catch(function(err) {

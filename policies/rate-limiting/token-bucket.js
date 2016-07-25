@@ -34,6 +34,7 @@ module.exports = function(options) {
       }
 
       limiter.removeTokens(1, function(err, remainingRequests) {
+        if (err) { /* suppress eslint handle-callback-err */ }
         logger.debug('Bucket: ', limiter.tokenBucket);
         var remaining = Math.floor(remainingRequests);
         var reset = Math.max(interval - (Date.now() - limiter.curIntervalStart),

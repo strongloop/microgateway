@@ -130,6 +130,7 @@ module.exports = function(app) {
 
       // we have an APIm, and a key so try to handshake with it..
       handshakeWithAPIm(app, apimanager, private_key, function(err) {
+        if (err) { /* suppress eslint handle-callback-err */ }
         callback(); // TODO: treat as error
         //don't treat as error currently because UT depends on this
       });
@@ -162,6 +163,7 @@ function loadData(app, apimanager, models, currdir) {
           // don't look for successful handshake currently because UT depends on this
         // we have an APIm, handshake succeeded, so try to pull data..
         pullFromAPIm(apimanager, currdir, snapshotID, function(err, dir) {
+          if (err) { /* suppress eslint handle-callback-err */ }
           snapdir = dir; // even in case of error, we need to try loading from the file system
           callback();
         });
@@ -198,6 +200,7 @@ function loadData(app, apimanager, models, currdir) {
       if (err) {
         if (populatedSnapshot) {
           releaseSnapshot(app, snapshotID, function(err) {
+            if (err) { /* suppress eslint handle-callback-err */ }
             process.send({ LOADED: false });
           });
         } else {
@@ -691,7 +694,9 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
             fileCallback();
           }
         },
-        function(err) {}
+        function(err) {
+          if (err) { /* suppress eslint handle-callback-err */ }
+        }
       );
       seriesCallback();
     },

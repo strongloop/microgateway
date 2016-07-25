@@ -42,6 +42,8 @@ describe('Context variables in laptop experience', function() {
       .get('/v1/context/api')
       .expect(200)
       .end(function(err, res) {
+        assert(!err, 'Unexpected error with context unit tests');
+
         var result = res.body;
         if (_.isString(result)) {
           result = JSON.parse(result);
@@ -83,6 +85,8 @@ describe('Context variables in laptop experience', function() {
       .get('/v1/context/internal')
       .expect(200)
       .end(function(err, res) {
+        assert(!err, 'Unexpected error with context unit tests');
+
         var result = res.body;
         if (_.isString(result)) {
           result = JSON.parse(result);
@@ -132,6 +136,8 @@ describe('Context variables in laptop experience', function() {
       .set('X-param7', '{"a": 1234, "b": true}')
       .expect(200)
       .end(function(err, res) {
+        assert(!err, 'Unexpected error with context unit tests');
+
         var result = res.body;
         if (_.isString(result)) {
           result = JSON.parse(result);
@@ -186,6 +192,8 @@ describe('Context variables in laptop experience', function() {
       .set('param4', 4444)
       .send(payload)
       .end(function(err, res) {
+        assert(!err, 'Unexpected error with context unit tests');
+
         var result = res.body;
         if (_.isString(result)) {
           result = JSON.parse(result);
@@ -206,6 +214,8 @@ describe('Context variables in laptop experience', function() {
       .type('text/plain')
       .send(payload)
       .end(function(err, res) {
+        assert(!err, 'Unexpected error with context unit tests');
+
         var result = res.body;
         if (_.isString(result)) {
           result = JSON.parse(result);
@@ -223,6 +233,8 @@ describe('Context variables in laptop experience', function() {
       .type('text/plain')
       .send(payload)
       .end(function(err, res) {
+        assert(!err, 'Unexpected error with context unit tests');
+
         var result = res.body;
         if (_.isString(result)) {
           result = JSON.parse(result);
@@ -240,6 +252,8 @@ describe('Context variables in laptop experience', function() {
       .type('text/plain')
       .send(payload)
       .end(function(err, res) {
+        assert(!err, 'Unexpected error with context unit tests');
+
         var result = res.body;
         if (_.isString(result)) {
           result = JSON.parse(result);
@@ -258,6 +272,8 @@ describe('Context variables in laptop experience', function() {
       .type('text/plain')
       .send(payload)
       .end(function(err, res) {
+        assert(!err, 'Unexpected error with context unit tests');
+
         var result = res.body;
         if (_.isString(result)) {
           result = JSON.parse(result);
@@ -280,6 +296,8 @@ describe('Context variables in laptop experience', function() {
       .set('X-PARAM-REF-2', true)
       .expect(200)
       .end(function(err, res) {
+        assert(!err, 'Unexpected error with context unit tests');
+
         var result = res.body;
         if (_.isString(result)) {
           result = JSON.parse(result);
@@ -306,6 +324,8 @@ describe('Context variables in laptop experience', function() {
       .get('/v1/context?name=foo')
       .expect(200)
       .end(function(err, res) {
+        assert(!err, 'Unexpected error with context unit tests');
+
         assert.deepEqual(res.body, {
           name: 'foo',
           value: 'default_foo' });

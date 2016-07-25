@@ -593,7 +593,7 @@ describe('invokePolicy', function() {
       datastoreRequest
         .get('/api/snapshots')
         .end(function(err, res) {
-          assert(!err, 'Unexpected rror with cleaning up snapshot directory');
+          assert(!err, 'Unexpected error with cleaning up snapshot directory');
           var snapshotID = res.body[0].id;
           console.log(snapshotID);
           datastoreRequest.get('/api/snapshots/release?id=' + snapshotID)

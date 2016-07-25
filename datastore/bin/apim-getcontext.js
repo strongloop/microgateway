@@ -24,6 +24,7 @@ options.method = program.method;
 options.clientid = program.clientid;
 
 contextget(options, function(error, response) {
+  if (error) { /* suppress eslint handle-callback-err */ }
   if (logger.debug()) {
     logger.debug('context: %s', JSON.stringify(response, null, 4));
   }

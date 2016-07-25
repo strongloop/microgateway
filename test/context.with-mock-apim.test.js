@@ -295,11 +295,13 @@ describe('Context variables testing with mock apim server', function() {
       datastoreRequest
         .get('/api/snapshots')
         .end(function(err, res) {
+          assert(!err, 'Unexpected error with getting snapshot');
           var snapshotID = res.body[0].id;
           console.log(snapshotID);
           datastoreRequest
             .get('/api/snapshots/release?id=' + snapshotID)
             .end(function(err, res) {
+              assert(!err, 'Unexpected error with getting snapshot');
               try {
                 assert(_.isEqual(expect, res.body));
                 resolve();

@@ -283,6 +283,7 @@ describe('data-store-retry', function() {
             .get('/api/snapshots')
             .expect(200, [])
             .end(function(err, res) {
+              if (err) { /* suppress eslint handle-callback-err */ }
               microgw.stop()
                 .then(done, done)
                 .catch(done);
@@ -309,6 +310,7 @@ describe('data-store-retry', function() {
             .get('/api/snapshots')
             .expect(200, [])
             .end(function(err, res) {
+              if (err) { /* suppress eslint handle-callback-err */ }
               microgw.stop()
                 .then(done, done)
                 .catch(done);

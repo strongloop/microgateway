@@ -5,7 +5,6 @@
 
 'use strict';
 
-var assert = require('assert');
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
 
@@ -27,8 +26,10 @@ describe('HTTP and HTTPS in separate files', function() {
   it('should expect failure to load', function(done) {
     mg.start(3000)
       .catch(function(err) {
-        assert(true);
-        done();
+        if (err) {
+          return done(); // expect error
+        }
+        done(new Error('expect error'));
       });
   });
 
@@ -50,8 +51,10 @@ describe('HTTP and HTTPS in same file', function() {
   it('should expect failure to load', function(done) {
     mg.start(3000)
       .catch(function(err) {
-        assert(true);
-        done();
+        if (err) {
+          return done(); // expect error
+        }
+        done(new Error('expect error'));
       });
   });
 

@@ -120,10 +120,12 @@ function findPlansToAddSubscriptions(app, passed, planid) {
 
   // find optimized entries to create
   app.models.product.find(productquery, function(err, products) {
-    async.forEach(products,
-      function(product, productCallback) {
-        cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, productCallback);
-      });
+    if (!err) {
+      async.forEach(products,
+        function(product, productCallback) {
+          cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, productCallback);
+        });
+    }
   });
 }
 

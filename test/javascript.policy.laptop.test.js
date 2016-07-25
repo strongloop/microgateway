@@ -7,7 +7,6 @@
 
 var supertest = require('supertest');
 var mg = require('../lib/microgw');
-var should = require('should');
 
 describe('javascript policy', function() {
 

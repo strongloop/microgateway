@@ -8,7 +8,7 @@
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
-var should = require('should');
+var should = require('should'); //eslint-disable-line no-unused-vars
 var async = require('async');
 
 describe('ratelimit basic policy', function() {
