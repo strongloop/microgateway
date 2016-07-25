@@ -14,6 +14,7 @@ var crypto    = require('crypto');
 var url       = require('url');
 var request   = require('request');
 var constants = require('constants');
+var wlpnPassword = require('wlpn-password');
 
 
 var version = require('../package.json').version;
@@ -41,8 +42,26 @@ exports.getTLSConfigSync = function() {
         }
         rev[propName] = newValues;
       } else {
-        rev[propName] = fs.readFileSync(path.resolve(baseDir, rev[propName]));
+        var filename = rev[propName];
+        var property;
+        if (filename.indexOf(':')) {
+          var array = filename.split(':');
+          filename = array[0];
+          property = array[1];
+        }
+        var potentialFile = path.resolve(baseDir, filename);
+        stats = fs.statSync(potentialFile);
+        if (stats.isFile()) {
+          rev[propName] = fs.readFileSync(potentialFile);
+          if (property) {
+            var parsedFile = JSON.parse(rev[propName]);
+            rev[propName] = parsedFile[property];
+          }
+        }
       }
+    }
+    if(rev.passphrase){
+      rev.passphrase = wlpnPassword.decode(rev.passphrase);
     }
   } catch (e) {
     log.error(e);
