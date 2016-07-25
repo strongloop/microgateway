@@ -67,12 +67,12 @@ module.exports = function(config) {
       var script = new vm.Script('(function() {' + props.source + '\n})()');
       //use context as this to run the wrapped function
       //and also console for logging
-      var origProto = context.__proto__;
-      var newProto = Object.create(context.__proto__);
+      var origProto = Object.getPrototypeOf(context);
+      var newProto = Object.create(origProto);
       newProto.console = consoleProxy(flow.logger);
-      context.__proto__ = newProto;
+      Object.setPrototypeOf(context, newProto);
       script.runInNewContext(context);
-      context.__proto__ = origProto;
+      Object.setPrototypeOf(context, origProto);
       logger.debug('EXIT');
       flow.proceed();
     } catch (e) {
