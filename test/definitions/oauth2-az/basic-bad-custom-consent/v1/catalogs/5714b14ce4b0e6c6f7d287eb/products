@@ -1,0 +1,81 @@
+[
+  {
+    "id": "575f970ee4b06d109c2859e9",
+    "url": "https://172.16.154.175/v1/catalogs/5714b14ce4b0e6c6f7d287eb/products/575f970ee4b06d109c2859e9",
+    "state": "published",
+    "visibility": {
+      "view": {
+        "enabled": true,
+        "type": "public",
+        "tags": [],
+        "orgs": []
+      },
+      "subscribe": {
+        "enabled": true,
+        "type": "authenticated",
+        "tags": [],
+        "orgs": []
+      }
+    },
+    "organization": {
+      "id": "5714857ee4b0e6c6f7d28767",
+      "name": "microgateway-ut",
+      "title": "microgateway-ut",
+      "tags": [],
+      "members": []
+    },
+    "catalog": {
+      "id": "5714b14ce4b0e6c6f7d287eb",
+      "url": "https://172.16.154.175/v1/catalogs/5714b14ce4b0e6c6f7d287eb",
+      "name": "oauth2-ut",
+      "title": "oauth2-ut",
+      "sandbox": false,
+      "default": false,
+      "custom-portal-url": "https://dpvm176.tw.ibm.com/portal",
+      "portal-type": "ADVANCED",
+      "gateway-url": "https://172.16.154.162:5000",
+      "is-saas": false
+    },
+    "document": {
+      "product": "1.0.0",
+      "info": {
+        "name": "prod-use-oauth",
+        "title": "prod-use-oauth",
+        "version": "1.0.0"
+      },
+      "visibility": {
+        "view": {
+          "enabled": true,
+          "type": "public",
+          "tags": [],
+          "orgs": []
+        },
+        "subscribe": {
+          "enabled": true,
+          "type": "authenticated",
+          "tags": [],
+          "orgs": []
+        }
+      },
+      "apis": {
+        "api-use-oauth": {
+          "name": "api-use-oauth:1.0.0"
+        },
+        "oauth-provider3": {
+          "name": "oauth-provider:1.0.0"
+        }
+      },
+      "plans": {
+        "default": {
+          "title": "Default Plan",
+          "description": "Default Plan",
+          "approval": false,
+          "rate-limit": {
+            "hard-limit": false,
+            "value": "100/hour"
+          }
+        }
+      }
+    }
+  }
+]
