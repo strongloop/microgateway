@@ -12,7 +12,7 @@ var Crypto = require('crypto');
 var Request = require('request');
 var url = require('url');
 var checkSecurity = require('./check-security');
-var ip = require("ip");
+var ip = require('ip');
 var logger = require('apiconnect-cli-logger/logger.js')
         .child({ loc: 'microgateway:datastore:server:boot:load-model' });
 var sgwapimpull = require('../../apim-pull');
@@ -153,14 +153,15 @@ module.exports = function(app) {
         //don't treat as error currently because UT depends on this
       });
     },
-    function (callback) {
+    function(callback) {
       if (!apimanager.host) {
         //if we don't have the APIM contact info, bail out
         return callback();
       }
 
-      webhooksSubscribe(app, apimanager, function (err) {
-        callback(); // TODO: treat as error
+      webhooksSubscribe(app, apimanager, function(err) {
+        if (err) {} // TODO: treat as error
+        callback();
         //don't treat as error currently because UT depends on this
       });
     } ],
@@ -398,31 +399,31 @@ function decryptAPIMResponse(body, private_key) {
  */
 function webhooksSubscribe(app, apimanager, cb) {
   logger.debug('webhooksSubscribe entry');
-  
+
   async.series([
     function(callback) {
 
       var endpointurlObj = {
-            protocol: 'http',
-            hostname: ip.address(),
-            port: process.env.DATASTORE_PORT,
-            pathname: '/api/webhooks',
+        protocol: 'http',
+        hostname: ip.address(),
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/webhooks',
       };
       var endpointurl = url.format(endpointurlObj);
       var body = {
-        'enabled': 'true',
-        'endpoint': endpointurl,
-        'secret': 'notused',
-        'subscriptions': [
-          "catalog"
+        enabled: 'true',
+        endpoint: endpointurl,
+        secret: 'notused',
+        subscriptions: [
+          'catalog',
         ],
-        'title': 'This is a webhook subscription for the a catalog, subscribing to all available events specifically'
+        title: 'This is a webhook subscription for the a catalog, subscribing to all available events specifically',
       };
 
       var headers = {
         'content-type': 'application/json',
         'x-ibm-client-id': apimanager.clientid,
-        accept: 'application/json'
+        accept: 'application/json',
       };
 
       if (logger.debug()) {
@@ -444,9 +445,9 @@ function webhooksSubscribe(app, apimanager, cb) {
         json: body,
         headers: headers,
         agentOptions: {
-          rejectUnauthorized: false //FIXME: need to eventually remove this
-          }
+          rejectUnauthorized: false, //FIXME: need to eventually remove this
         },
+      },
       function(err, res, body) {
         if (err) {
           logger.error('Failed to communicate with %s: %s ', webhooksSubUrl, err);
@@ -464,8 +465,8 @@ function webhooksSubscribe(app, apimanager, cb) {
         }
 
         callback(null);
-        });
-      }],
+      });
+    } ],
     function(err) {
       if (err) {
         apimanager.webhooksOk = false;
@@ -477,7 +478,7 @@ function webhooksSubscribe(app, apimanager, cb) {
       logger.debug('webhooksSubscribe exit');
       cb(err);
     });
-  }
+}
 
 
 /**
@@ -1450,7 +1451,7 @@ function updateSnapshot(app, uid, cb) {
 }
 
 function triggerReload(app, ctx) {
-  if (ctx.instance.webhook_id != currentWebhook) {
+  if (ctx.instance.webhook_id !== currentWebhook) {
     logger.error('Received webhook ID %s does not match expected webhook ID %s',
                  ctx.instance.webhook_id, currentWebhook);
     return;
