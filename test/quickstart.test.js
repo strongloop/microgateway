@@ -7,8 +7,6 @@
 
 var mg = require('../lib/microgw');
 var supertest = require('supertest');
-var _ = require('lodash');
-var assert = require('assert');
 
 var dsCleanup = require('./support/utils').dsCleanup;
 var apimServer = require('./support/mock-apim-server/apim-server');
@@ -53,7 +51,7 @@ function runTestAppIgnored(desc, dir) {
       });
     });
 
-    after(function (done) {
+    after(function(done) {
       dsCleanup(5000)
         .then(function() { return mg.stop(); })
         .then(function() { return apimServer.stop(); })
@@ -79,13 +77,20 @@ function runTestAppIgnored(desc, dir) {
     it('should fail with "/api/qryclientid" - onprem queryClientIdBad', queryClientIdBad);
     it('should fail with "/api/qryclientid" - onprem queryClientIdHeader', queryClientIdHeader);
     it('should pass with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecret', headerClientIdAndSecret);
-    it('should fail with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretBadClient', headerClientIdAndSecretBadClient);
-    it('should fail with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretBadSecret', headerClientIdAndSecretBadSecret);
-    it('should fail with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretQuery', headerClientIdAndSecretQuery);
-    it('should pass with "/api/qryclientidandsecret" - onprem queryClientIdAndSecret', queryClientIdAndSecret);
-    it('should fail with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretBadClient', queryClientIdAndSecretBadClient);
-    it('should fail with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretBadSecret', queryClientIdAndSecretBadSecret);
-    it('should fail with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretHeader', queryClientIdAndSecretHeader);
+    it('should fail with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretBadClient',
+      headerClientIdAndSecretBadClient);
+    it('should fail with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretBadSecret',
+      headerClientIdAndSecretBadSecret);
+    it('should fail with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretQuery',
+      headerClientIdAndSecretQuery);
+    it('should pass with "/api/qryclientidandsecret" - onprem queryClientIdAndSecret',
+      queryClientIdAndSecret);
+    it('should fail with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretBadClient',
+      queryClientIdAndSecretBadClient);
+    it('should fail with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretBadSecret',
+      queryClientIdAndSecretBadSecret);
+    it('should fail with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretHeader',
+      queryClientIdAndSecretHeader);
   });
 }
 
@@ -120,7 +125,7 @@ function runTestAppApplied() {
       });
     });
 
-    after(function (done) {
+    after(function(done) {
       dsCleanup(5000)
         .then(function() { return mg.stop(); })
         .then(function() { return apimServer.stop(); })
@@ -135,26 +140,40 @@ function runTestAppApplied() {
     });
 
     it('should pass with "/api/nosec" - onprem noSecurity', noSecurity);
-    it('should fail rate limit with "/api/nosec" - onprem noSecurityHeaderClientIdRate', noSecurityHeaderClientIdRate);
-    it('should fail rate limit with "/api/nosec" - onprem noSecurityQueryClientIdRate', noSecurityQueryClientIdRate);
-    it('should fail rate limit with "/api/nosec" - onprem noSecurityHeaderClientIdBadRate', noSecurityHeaderClientIdBadRate);
-    it('should fail rate limit with "/api/nosec" - onprem noSecurityQueryClientIdBadRate', noSecurityQueryClientIdBadRate);
+    it('should fail rate limit with "/api/nosec" - onprem noSecurityHeaderClientIdRate',
+      noSecurityHeaderClientIdRate);
+    it('should fail rate limit with "/api/nosec" - onprem noSecurityQueryClientIdRate',
+      noSecurityQueryClientIdRate);
+    it('should fail rate limit with "/api/nosec" - onprem noSecurityHeaderClientIdBadRate',
+      noSecurityHeaderClientIdBadRate);
+    it('should fail rate limit with "/api/nosec" - onprem noSecurityQueryClientIdBadRate',
+      noSecurityQueryClientIdBadRate);
     it('should fail rate limit with "/api/hdrclientid" - onprem headerClientIdRate', headerClientIdRate);
     it('should pass with "/api/hdrclientid" - onprem headerClientIdBadPass', headerClientIdBadPass);
     it('should fail with "/api/hdrclientid" - onprem headerClientIdQuery', headerClientIdQuery);
     it('should fail rate limit with "/api/qryclientid" - onprem queryClientIdRate', queryClientIdRate);
     it('should pass with "/api/qryclientid" - onprem queryClientIdBadPass', queryClientIdBadPass);
     it('should fail with "/api/qryclientid" - onprem queryClientIdHeader', queryClientIdHeader);
-    it('should fail rate limit with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretRate', headerClientIdAndSecretRate);
-    it('should pass with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretBadClientAndSecret', headerClientIdAndSecretBadClientAndSecret);
-    it('should fail with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretBadClient', headerClientIdAndSecretBadClient);
-    it('should fail with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretBadSecret', headerClientIdAndSecretBadSecret);
-    it('should fail with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretQuery', headerClientIdAndSecretQuery);
-    it('should fail rate limit with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretRate', queryClientIdAndSecretRate);
-    it('should pass with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretBadClientAndSecret', queryClientIdAndSecretBadClientAndSecret);
-    it('should fail with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretBadClient', queryClientIdAndSecretBadClient);
-    it('should fail with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretBadSecret', queryClientIdAndSecretBadSecret);
-    it('should fail with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretHeader', queryClientIdAndSecretHeader);
+    it('should fail rate limit with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretRate',
+      headerClientIdAndSecretRate);
+    it('should pass with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretBadClientAndSecret',
+      headerClientIdAndSecretBadClientAndSecret);
+    it('should fail with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretBadClient',
+      headerClientIdAndSecretBadClient);
+    it('should fail with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretBadSecret',
+      headerClientIdAndSecretBadSecret);
+    it('should fail with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretQuery',
+      headerClientIdAndSecretQuery);
+    it('should fail rate limit with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretRate',
+      queryClientIdAndSecretRate);
+    it('should pass with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretBadClientAndSecret',
+      queryClientIdAndSecretBadClientAndSecret);
+    it('should fail with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretBadClient',
+      queryClientIdAndSecretBadClient);
+    it('should fail with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretBadSecret',
+      queryClientIdAndSecretBadSecret);
+    it('should fail with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretHeader',
+      queryClientIdAndSecretHeader);
   });
 }
 
