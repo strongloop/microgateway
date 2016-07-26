@@ -103,8 +103,8 @@
             "description": "blah blah",
             "approval": true,
             "rate-limit": {
-              "hard-limit": false,
-              "value": "1/sec"
+              "hard-limit": true,
+              "value": "1/min"
             },
             "apis": 
               {

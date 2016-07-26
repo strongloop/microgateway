@@ -90,13 +90,15 @@ function runTestAppIgnored(desc, dir) {
 }
 
 function runTestAppApplied() {
-  describe('test app enabled', function() {
+  describe('test app really enabled', function() {
     before(function(done) {
       process.env.APIMANAGER = '127.0.0.1';
       process.env.APIMANAGER_PORT = 8081;
       process.env.NODE_ENV = 'production';
       process.env.CONFIG_DIR = __dirname + '/definitions/quickstart/testappenabled';
       process.env.DATASTORE_PORT = 5000;
+      delete require.cache[require.resolve('../lib/microgw')];
+      mg = require('../lib/microgw');
       apimServer.start(
         process.env.APIMANAGER,
         process.env.APIMANAGER_PORT,
@@ -133,22 +135,22 @@ function runTestAppApplied() {
     });
 
     it('should pass with "/api/nosec" - onprem noSecurity', noSecurity);
-    it('should pass with "/api/nosec" - onprem noSecurityHeaderClientId', noSecurityHeaderClientId);
-    it('should pass with "/api/nosec" - onprem noSecurityQueryClientId', noSecurityQueryClientId);
-    it('should pass with "/api/nosec" - onprem noSecurityHeaderClientIdBad', noSecurityHeaderClientIdBad);
-    it('should pass with "/api/nosec" - onprem noSecurityQueryClientIdBad', noSecurityQueryClientIdBad);
-    it('should pass with "/api/hdrclientid" - onprem headerClientId', headerClientId);
+    it('should fail rate limit with "/api/nosec" - onprem noSecurityHeaderClientIdRate', noSecurityHeaderClientIdRate);
+    it('should fail rate limit with "/api/nosec" - onprem noSecurityQueryClientIdRate', noSecurityQueryClientIdRate);
+    it('should fail rate limit with "/api/nosec" - onprem noSecurityHeaderClientIdBadRate', noSecurityHeaderClientIdBadRate);
+    it('should fail rate limit with "/api/nosec" - onprem noSecurityQueryClientIdBadRate', noSecurityQueryClientIdBadRate);
+    it('should fail rate limit with "/api/hdrclientid" - onprem headerClientIdRate', headerClientIdRate);
     it('should pass with "/api/hdrclientid" - onprem headerClientIdBadPass', headerClientIdBadPass);
     it('should fail with "/api/hdrclientid" - onprem headerClientIdQuery', headerClientIdQuery);
-    it('should pass with "/api/qryclientid" - onprem queryClientId', queryClientId);
+    it('should fail rate limit with "/api/qryclientid" - onprem queryClientIdRate', queryClientIdRate);
     it('should pass with "/api/qryclientid" - onprem queryClientIdBadPass', queryClientIdBadPass);
     it('should fail with "/api/qryclientid" - onprem queryClientIdHeader', queryClientIdHeader);
-    it('should pass with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecret', headerClientIdAndSecret);
+    it('should fail rate limit with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretRate', headerClientIdAndSecretRate);
     it('should pass with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretBadClientAndSecret', headerClientIdAndSecretBadClientAndSecret);
     it('should fail with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretBadClient', headerClientIdAndSecretBadClient);
     it('should fail with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretBadSecret', headerClientIdAndSecretBadSecret);
     it('should fail with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretQuery', headerClientIdAndSecretQuery);
-    it('should pass with "/api/qryclientidandsecret" - onprem queryClientIdAndSecret', queryClientIdAndSecret);
+    it('should fail rate limit with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretRate', queryClientIdAndSecretRate);
     it('should pass with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretBadClientAndSecret', queryClientIdAndSecretBadClientAndSecret);
     it('should fail with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretBadClient', queryClientIdAndSecretBadClient);
     it('should fail with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretBadSecret', queryClientIdAndSecretBadSecret);
@@ -169,10 +171,23 @@ function noSecurityHeaderClientId(doneCB) {
     .expect(200, doneCB);
 }
 
+function noSecurityHeaderClientIdRate(doneCB) {
+  request
+    .get('/api/nosec')
+    .set('X-IBM-Client-Id', 'default')
+    .expect(429, doneCB);
+}
+
 function noSecurityQueryClientId(doneCB) {
   request
     .get('/api/nosec?client_id=default')
     .expect(200, doneCB);
+}
+
+function noSecurityQueryClientIdRate(doneCB) {
+  request
+    .get('/api/nosec?client_id=default')
+    .expect(429, doneCB);
 }
 
 function noSecurityHeaderClientIdBad(doneCB) {
@@ -182,10 +197,23 @@ function noSecurityHeaderClientIdBad(doneCB) {
     .expect(200, doneCB);
 }
 
+function noSecurityHeaderClientIdBadRate(doneCB) {
+  request
+    .get('/api/nosec')
+    .set('X-IBM-Client-Id', 'bad')
+    .expect(429, doneCB);
+}
+
 function noSecurityQueryClientIdBad(doneCB) {
   request
     .get('/api/nosec?client_id=bad')
     .expect(200, doneCB);
+}
+
+function noSecurityQueryClientIdBadRate(doneCB) {
+  request
+    .get('/api/nosec?client_id=bad')
+    .expect(429, doneCB);
 }
 
 function headerClientId(doneCB) {
@@ -193,6 +221,13 @@ function headerClientId(doneCB) {
     .get('/api/hdrclientid')
     .set('X-IBM-Client-Id', 'default')
     .expect(200, doneCB);
+}
+
+function headerClientIdRate(doneCB) {
+  request
+    .get('/api/hdrclientid')
+    .set('X-IBM-Client-Id', 'default')
+    .expect(429, doneCB);
 }
 
 function headerClientIdBad(doneCB) {
@@ -221,6 +256,12 @@ function queryClientId(doneCB) {
     .expect(200, doneCB);
 }
 
+function queryClientIdRate(doneCB) {
+  request
+    .get('/api/qryclientid?client_id=default')
+    .expect(429, doneCB);
+}
+
 function queryClientIdBad(doneCB) {
   request
     .get('/api/qryclientid?client_id=bad')
@@ -246,6 +287,14 @@ function headerClientIdAndSecret(doneCB) {
     .set('X-IBM-Client-Id', 'default')
     .set('X-IBM-Client-Secret', 'SECRET')
     .expect(200, doneCB);
+}
+
+function headerClientIdAndSecretRate(doneCB) {
+  request
+    .get('/api/hdrclientidandsecret')
+    .set('X-IBM-Client-Id', 'default')
+    .set('X-IBM-Client-Secret', 'SECRET')
+    .expect(429, doneCB);
 }
 
 function headerClientIdAndSecretBadClientAndSecret(doneCB) {
@@ -282,6 +331,12 @@ function queryClientIdAndSecret(doneCB) {
   request
     .get('/api/qryclientidandsecret?client_id=default&client_secret=SECRET')
     .expect(200, doneCB);
+}
+
+function queryClientIdAndSecretRate(doneCB) {
+  request
+    .get('/api/qryclientidandsecret?client_id=default&client_secret=SECRET')
+    .expect(429, doneCB);
 }
 
 function queryClientIdAndSecretBadClientAndSecret(doneCB) {

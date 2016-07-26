@@ -38,8 +38,8 @@
       "document": {
          "product": "1.0.0",
          "info": {
-            "name": "uber",
-            "title": "Uber Product",
+            "name": "apim",
+            "title": "ClimbOn",
             "version": "1.0.0"
          },
          "visibility": {
@@ -77,8 +77,8 @@
             "gold": {
                "title": "Gold Plan",
                "rate-limit": {
-                  "hard-limit": false,
-                  "value": "1/sec"
+                  "hard-limit": true,
+                  "value": "1/min"
                },
                "apis": {
                   "nosec": {},
