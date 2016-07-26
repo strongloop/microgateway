@@ -2824,7 +2824,7 @@ describe('oauth2 AZ-server', function() {
 
   describe('basic - bad custom consent', function() {
     var request;
-    before(function(done)  {
+    before(function(done) {
       //Use production instead of CONFIG_DIR: reading from apim instead of laptop
       process.env.NODE_ENV = 'production';
 
@@ -2834,18 +2834,18 @@ describe('oauth2 AZ-server', function() {
       process.env.DATASTORE_PORT = 4000;
 
       apimServer.start(
-              process.env.APIMANAGER,
-              process.env.APIMANAGER_PORT,
-              __dirname + '/definitions/oauth2-az/basic-bad-custom-consent')
-          .then(function() { return microgw.start(5000); })
-          .then(function() { return authServer.start(7000); })
-          .then(function() {
-              request = supertest('https://localhost:5000');
-          })
-          .then(done)
-          .catch(function(err) {
-              done(err);
-              });
+          process.env.APIMANAGER,
+          process.env.APIMANAGER_PORT,
+          __dirname + '/definitions/oauth2-az/basic-bad-custom-consent')
+        .then(function() { return microgw.start(5000); })
+        .then(function() { return authServer.start(7000); })
+        .then(function() {
+          request = supertest('https://localhost:5000');
+        })
+        .then(done)
+        .catch(function(err) {
+          done(err);
+        });
     });
 
     after(function(done) {
@@ -2920,6 +2920,120 @@ describe('oauth2 AZ-server', function() {
 
   });
 
+  describe('custom consent form - non-end-2-end', function() {
+    var customConsentForm = require('../lib/oauth2/az-server/middleware/custom-consent-form');
+    before(function(done) {
+      apimServer.start(
+          '127.0.0.1',
+          '8010',
+          __dirname + '/definitions/oauth2-az/custom-consent-form')
+        .then(done)
+        .catch(function(err) {
+          done(err);
+        });
+      process.on('uncaughtException', function(e) {
+        console.error(e.stack);
+      })
+    });
+
+    after(function(done) {
+
+      apimServer.stop()
+        .then(done, done)
+        .catch(done);
+    });
+
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+    it('no input fields element', function(done) {
+      var server = { _respond : function (oauth2, ctx, cb) {
+        //in this test case, this shouldn't be called
+      }};
+      var handler = customConsentForm(
+          {
+            url: 'https://127.0.0.1:8010/no-input-fields.html',
+            server: server
+          });
+
+      handler({}, {}, function (error) {
+        assert(error && error.code === 'server_error',
+            'should create AuthorizationError');
+        done();
+      });
+    });
+
+    it('no form element', function(done) {
+      var server = { _respond : function (oauth2, ctx, cb) {
+        //in this test case, this shouldn't be called
+      }};
+      var handler = customConsentForm(
+          {
+            url: 'https://127.0.0.1:8010/no-form.html',
+            server: server
+          });
+
+      handler({}, {}, function (error) {
+        assert(error && error.code === 'server_error',
+            'should create AuthorizationError');
+        done();
+      });
+    });
+
+    it('no approve button', function(done) {
+      var server = { _respond : function (oauth2, ctx, cb) {
+        //in this test case, this shouldn't be called
+      }};
+      var handler = customConsentForm(
+          {
+            url: 'https://127.0.0.1:8010/no-approve.html',
+            server: server
+          });
+
+      handler({}, {}, function (error) {
+        assert(error && error.code === 'server_error',
+            'should create AuthorizationError');
+        done();
+      });
+    });
+
+    it('check element replacement', function(done) {
+      var server = { _respond : function (oauth2, ctx, cb) {
+        //in this test case, this shouldn't be called
+      }};
+      var handler = customConsentForm(
+          {
+            url: 'https://127.0.0.1:8010/custom-consent-form.html',
+            server: server
+          });
+      var req = {
+          oauth2: {
+            transactionID: 'transactionID',
+            user: { id: 'USERID'},
+            req: {
+              clientID: 'clientID',
+              redirectURI: 'REDIRECTURI',
+              scope: ['scope1', 'scope2']
+            },
+            client: { title: 'CLIENTTITLE'}
+          },
+          ctx: { 
+            request: { path: 'path', search: 'search' },
+            message: {}
+          }
+      };
+      handler(req, {}, function (error) {
+        var re1 = /Greeting\.\.([\s\S]*)USERID/;
+        var re2 = /This app([\s\S]*)CLIENTTITLE/;
+        var re3 = /redirect URI:REDIRECTURI/;
+        assert(re1.test(req.ctx.message.body), 'missing resource owner');
+        assert(re2.test(req.ctx.message.body), 'missing application name');
+        assert(re3.test(req.ctx.message.body), 'missing redirect uri');
+        done();
+      });
+    });
+
+  });
+  
 });
 
 /*
