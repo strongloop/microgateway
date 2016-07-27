@@ -44,7 +44,7 @@ exports.getTLSConfigSync = function() {
       } else if (rev[propName]) {
         var filename = rev[propName];
         var property;
-        if (filename.indexOf(':')) {
+        if (filename.indexOf(':') !== -1) {
           var array = filename.split(':');
           filename = array[0];
           property = array[1];
