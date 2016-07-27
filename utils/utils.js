@@ -26,19 +26,22 @@ exports.getTLSConfigSync = function() {
   try {
     rev = JSON.parse(fs.readFileSync(cfg));
     var baseDir = path.dirname(cfg); //base dir, used for relative path
-    var props = Object.keys(rev);    //property names
+    var props = [ 'pfx', 'key', 'cert', 'ca', 'dhparam', 'ticketKeys', 'passphrase' ];
     for (var index = 0, length = props.length; index < length; index++) {
       var propName = props[index];
-      if (rev[propName] instanceof Array) {
+      if (rev[propName] instanceof Array) { // ca is capable of being array
         var values = rev[propName];
         var newValues = [];
         for (var valueIndex = 0, valueLength = values.length;
             valueIndex < valueLength; valueIndex++) {
-
-          newValues.push(fs.readFileSync(path.resolve(baseDir, values[valueIndex])));
+          try {
+            newValues.push(fs.readFileSync(path.resolve(baseDir, values[valueIndex])));
+          } catch (e) {
+            newValues.push(values[valueIndex]);
+          }
         }
         rev[propName] = newValues;
-      } else {
+      } else if (rev[propName]) {
         var filename = rev[propName];
         var property;
         if (filename.indexOf(':')) {
@@ -46,14 +49,16 @@ exports.getTLSConfigSync = function() {
           filename = array[0];
           property = array[1];
         }
-        var potentialFile = path.resolve(baseDir, filename);
-        var stats = fs.statSync(potentialFile);
-        if (stats.isFile()) {
-          rev[propName] = fs.readFileSync(potentialFile);
+        try {
+          var contents = fs.readFileSync(path.resolve(baseDir, filename));
           if (property) {
-            var parsedFile = JSON.parse(rev[propName]);
+            var parsedFile = JSON.parse(contents);
             rev[propName] = parsedFile[property];
+          } else {
+            rev[propName] = contents;
           }
+        } catch (e) {
+          // do nothing
         }
       }
     }
