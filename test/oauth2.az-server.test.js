@@ -2482,11 +2482,11 @@ describe('oauth2 AZ-server', function() {
 
     it('green path - token', function(done) {
       request.get('/security/oauth2/authorize')
-        .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-        .query({response_type: 'token'})
-        .query({scope: 'scope1 scope2 scope3'})
-        .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-        .query({state: 'xyz'})
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'token' })
+        .query({ scope: 'scope1 scope2 scope3' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
         .auth('root', 'Hunter2')
         .end(function(err, res) {
           try {
@@ -2510,7 +2510,7 @@ describe('oauth2 AZ-server', function() {
             form.approve = 'true';
 
             submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
-              .end(function (err2, res2) {
+              .end(function(err2, res2) {
                 try {
                   assert(res2.statusCode === 302, 'not 302 redirect');
                   var location = res2.header.location;
@@ -2528,9 +2528,9 @@ describe('oauth2 AZ-server', function() {
                   done(e2);
                 }
               });
-            } catch (e) {
-              done(e);
-            }
+          } catch (e) {
+            done(e);
+          }
         });
     });
 
@@ -2565,12 +2565,12 @@ describe('oauth2 AZ-server', function() {
             form.approve = 'true';
 
             submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
-              .end(function (err2, res2) {
+              .end(function(err2, res2) {
                 try {
                   assert(res2.statusCode === 302, 'not 302 redirect');
                   var location = res2.header.location;
                   var uri = url.parse(location, true);
-  
+
                   assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
                     'incorrect redirect_uri');
                   assert(uri.query.state === 'xyz', 'incorrect state');
@@ -2580,19 +2580,19 @@ describe('oauth2 AZ-server', function() {
                   done(e2);
                 }
               });
-            } catch (e) {
-              done(e);
-            }
+          } catch (e) {
+            done(e);
+          }
         });
     });
 
     it('invalid scope - token', function(done) {
       request.get('/security/oauth2/authorize')
-        .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-        .query({response_type: 'token'})
-        .query({scope: 'invalid'})
-        .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-        .query({state: 'xyz'})
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'token' })
+        .query({ scope: 'invalid' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
         .auth('root', 'Hunter2')
         .end(function(err, res) {
           try {
@@ -2613,11 +2613,11 @@ describe('oauth2 AZ-server', function() {
 
     it('invalid scope - code', function(done) {
       request.get('/security/oauth2/authorize')
-        .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-        .query({response_type: 'code'})
-        .query({scope: 'invalid'})
-        .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-        .query({state: 'xyz'})
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'code' })
+        .query({ scope: 'invalid' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
         .auth('root', 'Hunter2')
         .end(function(err, res) {
           try {
@@ -2637,11 +2637,11 @@ describe('oauth2 AZ-server', function() {
 
     it('user login failed - token', function(done) {
       request.get('/security/oauth2/authorize')
-        .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-        .query({response_type: 'token'})
-        .query({scope: 'scope1'})
-        .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-        .query({state: 'xyz'})
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'token' })
+        .query({ scope: 'scope1' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
         .auth('root', 'wrongpassword')
         .end(function(err, res) {
           try {
@@ -2658,11 +2658,11 @@ describe('oauth2 AZ-server', function() {
 
     it('user login failed - code', function(done) {
       request.get('/security/oauth2/authorize')
-        .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-        .query({response_type: 'code'})
-        .query({scope: 'scope1'})
-        .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-        .query({state: 'xyz'})
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'code' })
+        .query({ scope: 'scope1' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
         .auth('root', 'wrong password')
         .end(function(err, res) {
           try {
@@ -2679,11 +2679,11 @@ describe('oauth2 AZ-server', function() {
 
     it('deny access - token', function(done) {
       request.get('/security/oauth2/authorize')
-        .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-        .query({response_type: 'token'})
-        .query({scope: 'scope1 scope2 scope3'})
-        .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-        .query({state: 'xyz'})
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'token' })
+        .query({ scope: 'scope1 scope2 scope3' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
         .auth('root', 'Hunter2')
         .end(function(err, res) {
           try {
@@ -2708,7 +2708,7 @@ describe('oauth2 AZ-server', function() {
             form.approve = 'false';
 
             submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
-              .end(function (err2, res2) {
+              .end(function(err2, res2) {
                 try {
                   assert(res2.statusCode === 302, 'not 302 redirect');
                   var location = res2.header.location;
@@ -2723,19 +2723,19 @@ describe('oauth2 AZ-server', function() {
                   done(e2);
                 }
               });
-            } catch (e) {
-              done(e);
-            }
+          } catch (e) {
+            done(e);
+          }
         });
     });
 
     it('incorrect dp-state - token', function(done) {
       request.get('/security/oauth2/authorize')
-        .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-        .query({response_type: 'token'})
-        .query({scope: 'scope1 scope2 scope3'})
-        .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-        .query({state: 'xyz'})
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'token' })
+        .query({ scope: 'scope1 scope2 scope3' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
         .auth('root', 'Hunter2')
         .end(function(err, res) {
           try {
@@ -2761,7 +2761,7 @@ describe('oauth2 AZ-server', function() {
             form.dpState = 'incorrect';
 
             submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
-              .end(function (err2, res2) {
+              .end(function(err2, res2) {
                 try {
                   assert(res2.statusCode === 403, 'not 403 forbidden');
                   done(err2);
@@ -2769,19 +2769,19 @@ describe('oauth2 AZ-server', function() {
                   done(e2);
                 }
               });
-            } catch (e) {
-              done(e);
-            }
+          } catch (e) {
+            done(e);
+          }
         });
     });
 
     it('incorrect dp-state - code', function(done) {
       request.get('/security/oauth2/authorize')
-        .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-        .query({response_type: 'code'})
-        .query({scope: 'scope1 scope2 scope3'})
-        .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-        .query({state: 'xyz'})
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'code' })
+        .query({ scope: 'scope1 scope2 scope3' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
         .auth('root', 'Hunter2')
         .end(function(err, res) {
           try {
@@ -2807,7 +2807,7 @@ describe('oauth2 AZ-server', function() {
             form.dpState = 'incorrect';
 
             submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
-              .end(function (err2, res2) {
+              .end(function(err2, res2) {
                 try {
                   assert(res2.statusCode === 403, 'not 403 forbidden');
                   done(err2);
@@ -2815,9 +2815,9 @@ describe('oauth2 AZ-server', function() {
                   done(e2);
                 }
               });
-            } catch (e) {
-              done(e);
-            }
+          } catch (e) {
+            done(e);
+          }
         });
     });
   });
@@ -2855,7 +2855,7 @@ describe('oauth2 AZ-server', function() {
       delete process.env.DATASTORE_PORT;
 
       dsCleanup(4000)
-        .then(function() {return apimServer.stop();})
+        .then(function() { return apimServer.stop(); })
         .then(function() { return microgw.stop(); })
         .then(function() { return authServer.stop(); })
         .then(done, done)
@@ -2866,11 +2866,11 @@ describe('oauth2 AZ-server', function() {
 
     it('unable to load custom form', function(done) {
       request.get('/security/oauth2/authorize')
-        .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-        .query({response_type: 'token'})
-        .query({scope: 'scope1 scope2 scope3'})
-        .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-        .query({state: 'xyz'})
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'token' })
+        .query({ scope: 'scope1 scope2 scope3' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
         .auth('root', 'Hunter2')
         .end(function(err, res) {
           try {
@@ -2893,11 +2893,11 @@ describe('oauth2 AZ-server', function() {
 
     it('unable to load custom form', function(done) {
       request.get('/security/oauth2/authorize')
-        .query({client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f'})
-        .query({response_type: 'token'})
-        .query({scope: 'scope1 scope2 scope3'})
-        .query({redirect_uri: 'https://localhost:5000/use-oauth/getinfo'})
-        .query({state: 'xyz'})
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'token' })
+        .query({ scope: 'scope1 scope2 scope3' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
         .auth('root', 'Hunter2')
         .end(function(err, res) {
           try {
@@ -2933,7 +2933,7 @@ describe('oauth2 AZ-server', function() {
         });
       process.on('uncaughtException', function(e) {
         console.error(e.stack);
-      })
+      });
     });
 
     after(function(done) {
@@ -2946,16 +2946,16 @@ describe('oauth2 AZ-server', function() {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
     it('no input fields element', function(done) {
-      var server = { _respond : function (oauth2, ctx, cb) {
+      var server = { _respond: function(oauth2, ctx, cb) {
         //in this test case, this shouldn't be called
-      }};
+      } };
       var handler = customConsentForm(
-          {
-            url: 'https://127.0.0.1:8010/no-input-fields.html',
-            server: server
-          });
+        {
+          url: 'https://127.0.0.1:8010/no-input-fields.html',
+          server: server,
+        });
 
-      handler({}, {}, function (error) {
+      handler({}, {}, function(error) {
         assert(error && error.code === 'server_error',
             'should create AuthorizationError');
         done();
@@ -2963,16 +2963,16 @@ describe('oauth2 AZ-server', function() {
     });
 
     it('no form element', function(done) {
-      var server = { _respond : function (oauth2, ctx, cb) {
+      var server = { _respond: function(oauth2, ctx, cb) {
         //in this test case, this shouldn't be called
-      }};
+      } };
       var handler = customConsentForm(
-          {
-            url: 'https://127.0.0.1:8010/no-form.html',
-            server: server
-          });
+        {
+          url: 'https://127.0.0.1:8010/no-form.html',
+          server: server,
+        });
 
-      handler({}, {}, function (error) {
+      handler({}, {}, function(error) {
         assert(error && error.code === 'server_error',
             'should create AuthorizationError');
         done();
@@ -2980,16 +2980,16 @@ describe('oauth2 AZ-server', function() {
     });
 
     it('no approve button', function(done) {
-      var server = { _respond : function (oauth2, ctx, cb) {
+      var server = { _respond: function(oauth2, ctx, cb) {
         //in this test case, this shouldn't be called
-      }};
+      } };
       var handler = customConsentForm(
-          {
-            url: 'https://127.0.0.1:8010/no-approve.html',
-            server: server
-          });
+        {
+          url: 'https://127.0.0.1:8010/no-approve.html',
+          server: server,
+        });
 
-      handler({}, {}, function (error) {
+      handler({}, {}, function(error) {
         assert(error && error.code === 'server_error',
             'should create AuthorizationError');
         done();
@@ -2997,43 +2997,43 @@ describe('oauth2 AZ-server', function() {
     });
 
     it('check element replacement', function(done) {
-      var server = { _respond : function (oauth2, ctx, cb) {
+      var server = { _respond: function(oauth2, ctx, cb) {
         //in this test case, this shouldn't be called
-      }};
+      } };
       var handler = customConsentForm(
-          {
-            url: 'https://127.0.0.1:8010/custom-consent-form.html',
-            server: server
-          });
+        {
+          url: 'https://127.0.0.1:8010/custom-consent-form.html',
+          server: server,
+        });
       var req = {
-          oauth2: {
-            transactionID: 'transactionID',
-            user: { id: 'USERID'},
-            req: {
-              clientID: 'clientID',
-              redirectURI: 'REDIRECTURI',
-              scope: ['scope1', 'scope2']
-            },
-            client: { title: 'CLIENTTITLE'}
+        oauth2: {
+          transactionID: 'transactionID',
+          user: { id: 'USERID' },
+          req: {
+            clientID: 'clientID',
+            redirectURI: 'REDIRECTURI',
+            scope: [ 'scope1', 'scope2' ],
           },
-          ctx: { 
-            request: { path: 'path', search: 'search' },
-            message: {}
-          }
+          client: { title: 'CLIENTTITLE' },
+        },
+        ctx: {
+          request: { path: 'path', search: 'search' },
+          message: {},
+        },
       };
-      handler(req, {}, function (error) {
+      handler(req, {}, function(error) {
         var re1 = /Greeting\.\.([\s\S]*)USERID/;
         var re2 = /This app([\s\S]*)CLIENTTITLE/;
         var re3 = /redirect URI:REDIRECTURI/;
         assert(re1.test(req.ctx.message.body), 'missing resource owner');
         assert(re2.test(req.ctx.message.body), 'missing application name');
         assert(re3.test(req.ctx.message.body), 'missing redirect uri');
-        done();
+        done(error === 'route' ? undefined : error);
       });
     });
 
   });
-  
+
 });
 
 /*
