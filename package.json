@@ -4,7 +4,8 @@
   "description": "API Connect MicroGateway",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint ./ && jscs ./",
+    "lint" : "jscs ./",
+    "pretest": "eslint ./",
     "start": "node .",
     "test": "mocha -t 600000"
   },

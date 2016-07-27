@@ -47,7 +47,7 @@ exports.getTLSConfigSync = function() {
           property = array[1];
         }
         var potentialFile = path.resolve(baseDir, filename);
-        stats = fs.statSync(potentialFile);
+        var stats = fs.statSync(potentialFile);
         if (stats.isFile()) {
           rev[propName] = fs.readFileSync(potentialFile);
           if (property) {
@@ -57,7 +57,7 @@ exports.getTLSConfigSync = function() {
         }
       }
     }
-    if(rev.passphrase){
+    if (rev.passphrase) {
       rev.passphrase = wlpnPassword.decode(rev.passphrase);
     }
   } catch (e) {
