@@ -840,7 +840,7 @@ function expandAPIData(apidoc, dir) {
           var replacementvalue;
           // is it an environment var?? $(envVar)
           var regEx = /\$\((.*)\)/;
-          var matches = props[property].match(regEx);
+          var matches = apidoc['x-ibm-configuration'].catalogs['apic-dev'].properties[property].match(regEx);
           var envvar = matches[1];
           if (envvar) {
             if (!process.env[envvar]) {
