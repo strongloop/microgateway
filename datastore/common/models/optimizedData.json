@@ -11,6 +11,7 @@
     "client-name": "string",
     "client-org-id": "string",
     "client-org-name": "string",
+    "test-app-enabled": "boolean",
     "catalog-id": "string",
     "catalog-name": "string",
     "organization-id": "string",

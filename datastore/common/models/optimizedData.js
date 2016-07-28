@@ -415,6 +415,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
           var apiDocument = api['document-resolved'] || api.document;
           var apiState = api.state || 'running';
           var apiEnforced = true;
+          var apiClientidSecurity = false;
 
           var pathsProp = apiDocument.paths;
           logger.debug('pathsProp ', Object.getOwnPropertyNames(pathsProp));
@@ -481,6 +482,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                                   apiDocument.securityDefinitions[securityProp] &&
                                   apiDocument.securityDefinitions[securityProp].type === 'apiKey') {
                                 clientidSecurity = true;
+                                apiClientidSecurity = true;
                               }
                               logger.debug('clientidSecurity: ', clientidSecurity);
                             });
@@ -590,6 +592,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
               pieces.application.developerOrg.id : '',
             'client-org-name': pieces.application.developerOrg ?
               pieces.application.developerOrg.name : '',
+            'test-app-enabled': false,
             'plan-id': pieces.plan.id,
             'plan-name': pieces.plan.name,
             'plan-version': pieces.plan.version,
@@ -623,8 +626,28 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                   return;
                 }
                 logger.debug('optimizedData created: %j', optimizedData);
-                apidone();
-              });
+                if (pieces.catalog['test-app-enabled'] &&
+                  pieces.catalog['test-app-credentials'] &&
+                  pieces.catalog.sandbox &&
+                  apiClientidSecurity) {
+                  modifyOptDataForTestApp(newOptimizedDataEntry, pieces);
+                  app.models.optimizedData.create(
+                    newOptimizedDataEntry,
+                    function(err, testAppOptimizedData) {
+                      if (err) {
+                        apidone(err);
+                        return;
+                      }
+                      logger.debug('testApp optimizedData created: %j',
+                        testAppOptimizedData);
+                      apidone();
+                    }
+                  );
+                } else {
+                  apidone();
+                }
+              }
+            );
           } else {
             apidone();
           }
@@ -632,6 +655,13 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
         function(err) { creddone(err); });
     },
     function(err) { cb(err); });
+}
+
+function modifyOptDataForTestApp(OptimizedDataEntry, pieces) {
+  OptimizedDataEntry['test-app-enabled'] = true;
+  OptimizedDataEntry['client-id'] = pieces.catalog['test-app-credentials']['client-id'];
+  OptimizedDataEntry['client-secret'] = pieces.catalog['test-app-credentials']['client-secret'];
+  OptimizedDataEntry['plan-rate-limit'] = undefined;
 }
 
 function makePathRegex(basePath, apiPath) {
