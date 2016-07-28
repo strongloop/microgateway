@@ -1,0 +1,30 @@
+<html lang="en" xml:lang="en">
+<head>
+<title>Request for permission</title>
+</head>
+<body class="login">
+<div>
+<div>
+<form method="post" enctype="application/x-www-form-urlencoded" action="authorize">
+<input type="hidden" name="dp-state"       value="A"/>
+<input type="hidden" name="resource-owner" value="A"/>
+<input type="hidden" name="dp-data" value="A"/>
+<input type="hidden" name="redirect_uri"   value="A"/>
+<input type="hidden" name="scope" value="A"/>
+<input type="hidden" name="original-url" value="A"/>
+<input type="hidden" name="client_id" value="A"/>
+This is custom consent form
+<p>Greeting..</p>
+<DISPLAY-RESOURCE-OWNER/><p>This app </p>
+<OAUTH-APPLICATION-NAME/>
+<p>would like to access your data.</p>
+<div>
+<button class="cancel" type="submit" name="approve" value="false">No Thanks</button>
+<button class="submit" type="submit" name="approve" value="true">Allow Access</button>
+</div>
+</form>
+</div>
+<AZ-INTERNAL-CUSTOM-FORM-ERROR/>
+</div>
+</body>
+</html>

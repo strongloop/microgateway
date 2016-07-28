@@ -2436,10 +2436,9 @@ describe('oauth2 AZ-server', function() {
           }
         });
     });
-
   });
 
-  describe('basic - custom consent form', function() {
+  describe('basic - custom consent', function() {
     var request;
     before(function(done) {
       //Use production instead of CONFIG_DIR: reading from apim instead of laptop
@@ -2481,7 +2480,61 @@ describe('oauth2 AZ-server', function() {
 
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-    it('not implemented yet', function(done) {
+    it('green path - token', function(done) {
+      request.get('/security/oauth2/authorize')
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'token' })
+        .query({ scope: 'scope1 scope2 scope3' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
+        .auth('root', 'Hunter2')
+        .end(function(err, res) {
+          try {
+            assert(err === null && res.ok === true, 'can not get consent form');
+            var cookie = res.header['set-cookie'];
+            assert(cookie !== undefined, 'no cookie');
+            var form = parseConsentForm(res.text);
+            assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
+                'incorrect redirectURI');
+            assert(form.scope === 'scope1 scope2 scope3',
+                'incorrect scope');
+            assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
+                'incorrect client_id');
+            assert(form.resOwner === 'root', 'incorrect resource owner');
+            assert(form.dpState !== undefined, 'incorrect dp-state');
+            assert(/This is custom consent form/.test(res.text),
+                'not custom consent form');
+
+            var actionURL = /action="(.*?)"/g;
+            var match = actionURL.exec(res.text);
+            form.approve = 'true';
+
+            submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
+              .end(function(err2, res2) {
+                try {
+                  assert(res2.statusCode === 302, 'not 302 redirect');
+                  var location = res2.header.location;
+                  var uri = url.parse(location);
+                  uri.query = qs.parse(uri.hash.substring(1));
+                  assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
+                    'incorrect redirect_uri');
+                  assert(uri.query.scope === 'scope1 scope2 scope3', 'incorrect scope');
+                  assert(uri.query.state === 'xyz', 'incorrect state');
+                  assert(uri.query.expires_in === '3600', 'incorrect expires_in');
+                  assert(location.indexOf('access_token=') !== -1, 'no access_token');
+                  assert(location.indexOf('token_type=') !== -1, 'no token_type');
+                  done(err2);
+                } catch (e2) {
+                  done(e2);
+                }
+              });
+          } catch (e) {
+            done(e);
+          }
+        });
+    });
+
+    it('green path - code', function(done) {
       request.get('/security/oauth2/authorize')
         .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
         .query({ response_type: 'code' })
@@ -2491,21 +2544,494 @@ describe('oauth2 AZ-server', function() {
         .auth('root', 'Hunter2')
         .end(function(err, res) {
           try {
-            //use 302 with server_error code
-            assert(res.statusCode === 302, 'not 302 redirect');
+            assert(err === null && res.ok === true, 'can not get consent form');
+            var cookie = res.header['set-cookie'];
+            assert(cookie !== undefined, 'no cookie');
+            var form = parseConsentForm(res.text);
+
+            assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
+                'incorrect redirectURI');
+            assert(form.scope === 'scope1 scope2 scope3',
+                'incorrect scope');
+            assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
+                'incorrect client_id');
+            assert(form.resOwner === 'root', 'incorrect resource owner');
+            assert(form.dpState !== undefined, 'incorrect dp-state');
+            assert(/This is custom consent form/.test(res.text),
+                'not custom consent form');
+
+            var actionURL = /action="(.*?)"/g;
+            var match = actionURL.exec(res.text);
+            form.approve = 'true';
+
+            submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
+              .end(function(err2, res2) {
+                try {
+                  assert(res2.statusCode === 302, 'not 302 redirect');
+                  var location = res2.header.location;
+                  var uri = url.parse(location, true);
+
+                  assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
+                    'incorrect redirect_uri');
+                  assert(uri.query.state === 'xyz', 'incorrect state');
+                  assert(location.indexOf('code=') !== -1, 'no auth code');
+                  done(err2);
+                } catch (e2) {
+                  done(e2);
+                }
+              });
+          } catch (e) {
+            done(e);
+          }
+        });
+    });
+
+    it('invalid scope - token', function(done) {
+      request.get('/security/oauth2/authorize')
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'token' })
+        .query({ scope: 'invalid' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
+        .auth('root', 'Hunter2')
+        .end(function(err, res) {
+          try {
+            assert(err === null && res.statusCode === 302, 'incorrect status code');
             var location = res.header.location;
-            var uri = url.parse(location, true);
+            var uri = url.parse(location);
+            uri.query = qs.parse(uri.hash.substring(1));
             assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
-              'incorrect redirect_uri');
+                'incorrect redirect_uri');
             assert(uri.query.state === 'xyz', 'incorrect state');
-            assert(uri.query.error === 'server_error', 'incorrect error code');
-            assert(uri.query.error_description === 'Not supported', 'incorrect description');
+            assert(uri.query.error === 'invalid_scope', 'incorrect error code');
             done(err);
           } catch (e) {
             done(e);
           }
         });
     });
+
+    it('invalid scope - code', function(done) {
+      request.get('/security/oauth2/authorize')
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'code' })
+        .query({ scope: 'invalid' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
+        .auth('root', 'Hunter2')
+        .end(function(err, res) {
+          try {
+            assert(err === null && res.statusCode === 302, 'incorrect status code');
+            var location = res.header.location;
+            var uri = url.parse(location, true);
+            assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
+                'incorrect redirect_uri');
+            assert(uri.query.state === 'xyz', 'incorrect state');
+            assert(uri.query.error === 'invalid_scope', 'incorrect error code');
+            done(err);
+          } catch (e) {
+            done(e);
+          }
+        });
+    });
+
+    it('user login failed - token', function(done) {
+      request.get('/security/oauth2/authorize')
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'token' })
+        .query({ scope: 'scope1' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
+        .auth('root', 'wrongpassword')
+        .end(function(err, res) {
+          try {
+            assert(res.statusCode === 401, 'not 401');
+            assert(res.header['www-authenticate'] === 'Basic realm="apim"',
+                'no or incorrect www-authenticate header');
+            assert(res.text.indexOf('Failed to authenticate the user') !== -1);
+            done(err);
+          } catch (e) {
+            done(e);
+          }
+        });
+    });
+
+    it('user login failed - code', function(done) {
+      request.get('/security/oauth2/authorize')
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'code' })
+        .query({ scope: 'scope1' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
+        .auth('root', 'wrong password')
+        .end(function(err, res) {
+          try {
+            assert(res.statusCode === 401, 'not 401');
+            assert(res.header['www-authenticate'] === 'Basic realm="apim"',
+                'no or incorrect www-authenticate header');
+            assert(res.text.indexOf('Failed to authenticate the user') !== -1);
+            done(err);
+          } catch (e) {
+            done(e);
+          }
+        });
+    });
+
+    it('deny access - token', function(done) {
+      request.get('/security/oauth2/authorize')
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'token' })
+        .query({ scope: 'scope1 scope2 scope3' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
+        .auth('root', 'Hunter2')
+        .end(function(err, res) {
+          try {
+            assert(err === null && res.ok === true, 'can not get consent form');
+            var cookie = res.header['set-cookie'];
+            assert(cookie !== undefined, 'no cookie');
+            var form = parseConsentForm(res.text);
+
+            assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
+                'incorrect redirectURI');
+            assert(form.scope === 'scope1 scope2 scope3',
+                'incorrect scope');
+            assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
+                'incorrect client_id');
+            assert(form.resOwner === 'root', 'incorrect resource owner');
+            assert(form.dpState !== undefined, 'incorrect dp-state');
+            assert(/This is custom consent form/.test(res.text),
+                'not custom consent form');
+
+            var actionURL = /action="(.*?)"/g;
+            var match = actionURL.exec(res.text);
+            form.approve = 'false';
+
+            submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
+              .end(function(err2, res2) {
+                try {
+                  assert(res2.statusCode === 302, 'not 302 redirect');
+                  var location = res2.header.location;
+                  var uri = url.parse(location);
+                  uri.query = qs.parse(uri.hash.substring(1));
+                  assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
+                    'incorrect redirect_uri');
+                  assert(uri.query.state === 'xyz', 'incorrect state');
+                  assert(uri.query.error === 'access_denied', 'incorrect error code');
+                  done(err2);
+                } catch (e2) {
+                  done(e2);
+                }
+              });
+          } catch (e) {
+            done(e);
+          }
+        });
+    });
+
+    it('incorrect dp-state - token', function(done) {
+      request.get('/security/oauth2/authorize')
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'token' })
+        .query({ scope: 'scope1 scope2 scope3' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
+        .auth('root', 'Hunter2')
+        .end(function(err, res) {
+          try {
+            assert(err === null && res.ok === true, 'can not get consent form');
+            var cookie = res.header['set-cookie'];
+            assert(cookie !== undefined, 'no cookie');
+            var form = parseConsentForm(res.text);
+
+            assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
+                'incorrect redirectURI');
+            assert(form.scope === 'scope1 scope2 scope3',
+                'incorrect scope');
+            assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
+                'incorrect client_id');
+            assert(form.resOwner === 'root', 'incorrect resource owner');
+            assert(form.dpState !== undefined, 'incorrect dp-state');
+            assert(/This is custom consent form/.test(res.text),
+                'not custom consent form');
+
+            var actionURL = /action="(.*?)"/g;
+            var match = actionURL.exec(res.text);
+            form.approve = 'true';
+            form.dpState = 'incorrect';
+
+            submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
+              .end(function(err2, res2) {
+                try {
+                  assert(res2.statusCode === 403, 'not 403 forbidden');
+                  done(err2);
+                } catch (e2) {
+                  done(e2);
+                }
+              });
+          } catch (e) {
+            done(e);
+          }
+        });
+    });
+
+    it('incorrect dp-state - code', function(done) {
+      request.get('/security/oauth2/authorize')
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'code' })
+        .query({ scope: 'scope1 scope2 scope3' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
+        .auth('root', 'Hunter2')
+        .end(function(err, res) {
+          try {
+            assert(err === null && res.ok === true, 'can not get consent form');
+            var cookie = res.header['set-cookie'];
+            assert(cookie !== undefined, 'no cookie');
+            var form = parseConsentForm(res.text);
+
+            assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
+                'incorrect redirectURI');
+            assert(form.scope === 'scope1 scope2 scope3',
+                'incorrect scope');
+            assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
+                'incorrect client_id');
+            assert(form.resOwner === 'root', 'incorrect resource owner');
+            assert(form.dpState !== undefined, 'incorrect dp-state');
+            assert(/This is custom consent form/.test(res.text),
+                'not custom consent form');
+
+            var actionURL = /action="(.*?)"/g;
+            var match = actionURL.exec(res.text);
+            form.approve = 'true';
+            form.dpState = 'incorrect';
+
+            submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
+              .end(function(err2, res2) {
+                try {
+                  assert(res2.statusCode === 403, 'not 403 forbidden');
+                  done(err2);
+                } catch (e2) {
+                  done(e2);
+                }
+              });
+          } catch (e) {
+            done(e);
+          }
+        });
+    });
+  });
+
+  describe('basic - bad custom consent', function() {
+    var request;
+    before(function(done) {
+      //Use production instead of CONFIG_DIR: reading from apim instead of laptop
+      process.env.NODE_ENV = 'production';
+
+      //The apim server and datastore
+      process.env.APIMANAGER = '127.0.0.1';
+      process.env.APIMANAGER_PORT = 8000;
+      process.env.DATASTORE_PORT = 4000;
+
+      apimServer.start(
+          process.env.APIMANAGER,
+          process.env.APIMANAGER_PORT,
+          __dirname + '/definitions/oauth2-az/basic-bad-custom-consent')
+        .then(function() { return microgw.start(5000); })
+        .then(function() { return authServer.start(7000); })
+        .then(function() {
+          request = supertest('https://localhost:5000');
+        })
+        .then(done)
+        .catch(function(err) {
+          done(err);
+        });
+    });
+
+    after(function(done) {
+      delete process.env.NODE_ENV;
+      delete process.env.APIMANAGER;
+      delete process.env.APIMANAGER_PORT;
+      delete process.env.DATASTORE_PORT;
+
+      dsCleanup(4000)
+        .then(function() { return apimServer.stop(); })
+        .then(function() { return microgw.stop(); })
+        .then(function() { return authServer.stop(); })
+        .then(done, done)
+        .catch(done);
+    });
+
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+    it('unable to load custom form', function(done) {
+      request.get('/security/oauth2/authorize')
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'token' })
+        .query({ scope: 'scope1 scope2 scope3' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
+        .auth('root', 'Hunter2')
+        .end(function(err, res) {
+          try {
+            assert(res.statusCode === 302, 'not 302 redirect');
+            var location = res.header.location;
+            var uri = url.parse(location);
+            uri.query = qs.parse(uri.hash.substring(1));
+            assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
+              'incorrect redirect_uri');
+            assert(uri.query.state === 'xyz', 'incorrect state');
+            assert(uri.query.error === 'server_error', 'incorrect error code');
+            assert(uri.query.error_description.indexOf('Unable to load the custom form') !== -1,
+                'incorrect error description');
+            done(err);
+          } catch (e) {
+            done(e);
+          }
+        });
+    });
+
+    it('unable to load custom form', function(done) {
+      request.get('/security/oauth2/authorize')
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'token' })
+        .query({ scope: 'scope1 scope2 scope3' })
+        .query({ redirect_uri: 'https://localhost:5000/use-oauth/getinfo' })
+        .query({ state: 'xyz' })
+        .auth('root', 'Hunter2')
+        .end(function(err, res) {
+          try {
+            assert(res.statusCode === 302, 'not 302 redirect');
+            var location = res.header.location;
+            var uri = url.parse(location);
+            uri.query = qs.parse(uri.hash.substring(1));
+            assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
+              'incorrect redirect_uri');
+            assert(uri.query.state === 'xyz', 'incorrect state');
+            assert(uri.query.error === 'server_error', 'incorrect error code');
+            assert(uri.query.error_description.indexOf('Unable to load the custom form') !== -1,
+                'incorrect error description');
+            done(err);
+          } catch (e) {
+            done(e);
+          }
+        });
+    });
+
+  });
+
+  describe('custom consent form - non-end-2-end', function() {
+    var customConsentForm = require('../lib/oauth2/az-server/middleware/custom-consent-form');
+    before(function(done) {
+      apimServer.start(
+          '127.0.0.1',
+          '8010',
+          __dirname + '/definitions/oauth2-az/custom-consent-form')
+        .then(done)
+        .catch(function(err) {
+          done(err);
+        });
+      process.on('uncaughtException', function(e) {
+        console.error(e.stack);
+      });
+    });
+
+    after(function(done) {
+
+      apimServer.stop()
+        .then(done, done)
+        .catch(done);
+    });
+
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+    it('no input fields element', function(done) {
+      var server = { _respond: function(oauth2, ctx, cb) {
+        //in this test case, this shouldn't be called
+      } };
+      var handler = customConsentForm(
+        {
+          url: 'https://127.0.0.1:8010/no-input-fields.html',
+          server: server,
+        });
+
+      handler({}, {}, function(error) {
+        assert(error && error.code === 'server_error',
+            'should create AuthorizationError');
+        done();
+      });
+    });
+
+    it('no form element', function(done) {
+      var server = { _respond: function(oauth2, ctx, cb) {
+        //in this test case, this shouldn't be called
+      } };
+      var handler = customConsentForm(
+        {
+          url: 'https://127.0.0.1:8010/no-form.html',
+          server: server,
+        });
+
+      handler({}, {}, function(error) {
+        assert(error && error.code === 'server_error',
+            'should create AuthorizationError');
+        done();
+      });
+    });
+
+    it('no approve button', function(done) {
+      var server = { _respond: function(oauth2, ctx, cb) {
+        //in this test case, this shouldn't be called
+      } };
+      var handler = customConsentForm(
+        {
+          url: 'https://127.0.0.1:8010/no-approve.html',
+          server: server,
+        });
+
+      handler({}, {}, function(error) {
+        assert(error && error.code === 'server_error',
+            'should create AuthorizationError');
+        done();
+      });
+    });
+
+    it('check element replacement', function(done) {
+      var server = { _respond: function(oauth2, ctx, cb) {
+        //in this test case, this shouldn't be called
+      } };
+      var handler = customConsentForm(
+        {
+          url: 'https://127.0.0.1:8010/custom-consent-form.html',
+          server: server,
+        });
+      var req = {
+        oauth2: {
+          transactionID: 'transactionID',
+          user: { id: 'USERID' },
+          req: {
+            clientID: 'clientID',
+            redirectURI: 'REDIRECTURI',
+            scope: [ 'scope1', 'scope2' ],
+          },
+          client: { title: 'CLIENTTITLE' },
+        },
+        ctx: {
+          request: { path: 'path', search: 'search' },
+          message: {},
+        },
+      };
+      handler(req, {}, function(error) {
+        var re1 = /Greeting\.\.([\s\S]*)USERID/;
+        var re2 = /This app([\s\S]*)CLIENTTITLE/;
+        var re3 = /redirect URI:REDIRECTURI/;
+        assert(re1.test(req.ctx.message.body), 'missing resource owner');
+        assert(re2.test(req.ctx.message.body), 'missing application name');
+        assert(re3.test(req.ctx.message.body), 'missing redirect uri');
+        done(error === 'route' ? undefined : error);
+      });
+    });
+
   });
 
 });
