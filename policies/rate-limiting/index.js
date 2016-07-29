@@ -58,23 +58,14 @@ module.exports = function(options) {
 
   /**
    * Build the key for rate limiting from the context object
-   * @param {Context} context The context object
    * @returns {string} The rate limiting key
    */
-  function getKey(context) {
-    context = context || {};
-    var flowContext = context.flowContext || {};
-    var client = flowContext.client || {};
-    var clientApp = client.app || {};
-    var clientId = clientApp.id;
-    if (clientId == null) {
-      return null;
-    }
+  function getKey() {
     // Use the scope as the namespace. The scope contains information about the
     // plan or operation path
     var scope = config.scope;
     scope = scope || '*';
-    return scope + ':' + clientId;
+    return scope;
   }
 
 };

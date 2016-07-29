@@ -27,7 +27,7 @@ module.exports = function(options) {
     maxInInterval: limit });
 
   return function(props, context, flow) {
-    var key = options.getKey(context);
+    var key = options.getKey();
     logger.debug('Key: %s', key);
     if (!key) {
       return flow.proceed();
