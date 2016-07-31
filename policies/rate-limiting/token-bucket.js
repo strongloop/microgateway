@@ -23,7 +23,7 @@ module.exports = function(options) {
     var key = options.getKey();
     logger.debug('Key: %s', key);
     var fields = key.split(':');
-    var name = fields[fields.length - 2];
+    var name = fields[fields.length - 1];
     if (key) {
       limiter = limiters[key];
       if (!limiter) {

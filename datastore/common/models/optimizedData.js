@@ -437,6 +437,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                     var allowOperation = false;
                     var observedRatelimit = pieces.plan.rateLimit;
                     var rateLimitScope = pieces.plan.id;
+                    var usingPlanRateLimit = true;
                     // Does the plan neglect to specify APIs, or is the api listed in the plan
                     // with no operations listed? Then allow any operation
                     if ((pieces.plan.apis === undefined) ||
@@ -458,9 +459,10 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                                opPath.toUpperCase() === propname.toUpperCase())) {
                           allowOperation = true;
                           // Look for some operation scoped ratelimit metadata
-                          observedRatelimit = setRateLimits(planOp['rate-limit'], planOp['rate-limits']) ||
-                                  pieces.plan.rateLimit;
-                          if (observedRatelimit !== undefined) {
+                          var opRateLimit = setRateLimits(planOp['rate-limit'], planOp['rate-limits']);
+                          if (opRateLimit) {
+                            observedRatelimit = opRateLimit;
+                            usingPlanRateLimit = false;
                             if (opId) {
                               rateLimitScope = pieces.plan.id + ':' + opId;
                             } else {
@@ -506,6 +508,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                         // operational lvl Swagger security overrides the API lvl
                         securityReqs: securityEnabledForMethod,
                         'observed-rate-limit': observedRatelimit,
+                        'using-plan-rate-limit': usingPlanRateLimit,
                         'rate-limit-scope': rateLimitScope });
                     }
                   });
@@ -662,6 +665,17 @@ function modifyOptDataForTestApp(OptimizedDataEntry, pieces) {
   OptimizedDataEntry['client-id'] = pieces.catalog['test-app-credentials']['client-id'];
   OptimizedDataEntry['client-secret'] = pieces.catalog['test-app-credentials']['client-secret'];
   OptimizedDataEntry['plan-rate-limit'] = undefined;
+  var apiPaths = OptimizedDataEntry['api-paths'];
+  for (var i = 0; i < apiPaths.length; i++) {
+    for (var j = 0; j < apiPaths[i]['path-methods'].length; j++) {
+      var method = apiPaths[i]['path-methods'][j];
+      if (method['using-plan-rate-limit']) {
+        method['observed-rate-limit'] = undefined;
+        method['rate-limit-scope'] = undefined;
+      }
+      method['using-plan-rate-limit'] = undefined;
+    }
+  }
 }
 
 function makePathRegex(basePath, apiPath) {

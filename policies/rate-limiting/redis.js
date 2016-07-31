@@ -34,7 +34,7 @@ module.exports = function(options) {
     }
 
     var fields = key.split(':');
-    var name = fields[fields.length - 2];
+    var name = fields[fields.length - 1];
     limiter(key, function(err, timeLeft, remaining) {
       if (err) {
         return flow.fail(err);
