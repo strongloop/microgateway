@@ -1560,4 +1560,55 @@ describe('oauth2 token API', function() {
     });
   });
 
+  describe('token endpoint - cors', function() {
+    it('preflight request', function(done) {
+      request.options('/oauth2/token')
+        .set('Origin', 'http://example.com')
+        .set('X-DUMMY-ID', 'dummy')
+        .set('Access-Contro-Request-Method', 'POST')
+        .set('Access-Contro-Request-Headers', 'X-DUMMY-ID, Content-Type')
+        .expect(200)
+        .expect('Access-Control-Allow-Origin', 'http://example.com')
+        .expect('Access-Control-Allow-Methods', 'POST,OPTIONS')
+        //.expect('Access-Control-Allow-Headers', 'X-DUMMY-ID,Content-Type')
+        //.expect('X-Powered-By', 'MicroGateway')
+        .end(function(err, res) {
+          if (res) {
+            assert(res.headers['access-control-expose-headers']
+                .indexOf('X-RateLimit-Limit') !== -1);
+          }
+          done(err);
+        });
+    });
+
+    it('actual request', function(done) {
+      //send the AZ request to the /authorize endpoint
+      request.get('/oauth2/authorize')
+        .set('X-DUMMY-ID', 'dummy')
+        .set('Origin', 'http://myApp.com')
+        .set('Referer', 'http://myApp.com/referer')
+        .set('Cookie', 'someValue=foo')
+        .query({ client_id: clientId })
+        .query({ response_type: 'code' })
+        .query({ scope: 'weather' })
+        .query({ redirect_uri: 'https://myApp.com/foo' })
+        .query({ state: 'blahblah' })
+        .end(function(err, res) {
+          try {
+            assert(err === null && res.ok === true, 'AZ request failed');
+
+            assert(res.statusCode === 200);
+            assert(res.headers['access-control-allow-origin'] === 'http://myApp.com');
+            assert(res.headers['access-control-allow-credentials'] === 'true');
+            assert(res.headers['access-control-expose-headers']
+                .indexOf('X-RateLimit-Limit') !== -1);
+
+            done();
+          } catch (e) {
+            done(e);
+          }
+        });
+    });
+  });
+
 });
