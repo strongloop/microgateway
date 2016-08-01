@@ -93,6 +93,7 @@ module.exports = function(app) {
     startupRefresh: 1000, // 1 second
     maxRefresh: maxRefreshInterval };
 
+  var uid;
   async.series([
     function(callback) {
       // get CONFIG_DIR.. two basic paths APIm load or local
@@ -101,10 +102,16 @@ module.exports = function(app) {
       //    if apimanager specified, dir = 'last known config'..
       //    if no apimanager specified, dir will be loaded..
       if (process.env[CONFIGDIR]) {
+        process.env.ORIG_CONFIG_DIR = process.env[CONFIGDIR];
         definitionsDir = process.env[CONFIGDIR];
       } else if (getPreviousSnapshotDir()) {
         definitionsDir = getPreviousSnapshotDir();
         process.env[CONFIGDIR] = definitionsDir;
+        var tempid = path.basename(definitionsDir);
+        var tempidint = parseInt(tempid, 10);
+        if (tempidint >= 0 && tempidint <= 65536) {
+          uid = tempid;
+        }
       }
       process.env.ROOTCONFIGDIR = path.dirname(definitionsDir);
       callback();
@@ -144,7 +151,7 @@ module.exports = function(app) {
     // load the data into the models
     function(err) {
       if (!err) {
-        loadData(app, apimanager, models, definitionsDir);
+        loadData(app, apimanager, models, definitionsDir, uid);
       }
     });
 };
@@ -156,9 +163,9 @@ module.exports = function(app) {
  * @param {Array} models - instances of ModelType to populate with data
  * @param {string} currdir - current snapshot symbolic link path
  */
-function loadData(app, apimanager, models, currdir) {
+function loadData(app, apimanager, models, currdir, uid) {
   var snapdir;
-  var snapshotID = getSnapshotID();
+  var snapshotID = uid || getSnapshotID();
   var populatedSnapshot = false;
 
   async.series([

@@ -247,6 +247,143 @@ describe('data-store', function() {
     });
 });
 
+describe('data-store restart', function() {
+  var request;
+  var snapshotID;
+  before(function(done) {
+    process.env.DATASTORE_PORT = 5000;
+    process.env.APIMANAGER_PORT = 8890;
+    process.env.APIMANAGER = '127.0.0.1';
+    process.env.APIMANAGER_REFRESH_INTERVAL = 15 * 1000; // 15 seconds
+    process.env.NODE_ENV = 'production';
+    echo.start(8889)
+      .then(function() { return apimServer.start('127.0.0.1', 8890); })
+      .then(function() { return microgw.start(3000); })
+      .then(function() {
+        request = supertest('http://localhost:5000');
+      })
+      .then(done)
+      .catch(function(err) {
+        console.error(err);
+        done(err);
+      });
+  });
+
+  after(function(done) {
+    dsCleanupFile();
+    delete process.env.DATASTORE_PORT;
+    delete process.env.APIMANAGER_PORT;
+    delete process.env.APIMANAGER;
+    delete process.env.APIMANAGER_REFRESH_INTERVAL;
+    delete process.env.NODE_ENV;
+    microgw.stop()
+      .then(function() { echo.stop(); })
+      .then(function() { apimServer.stop(); })
+      .then(done, done)
+      .catch(done);
+  });
+
+  function verifyResponseArray(res, expected) {
+    assert.strictEqual(res.length, expected.length);
+    var current = -1;
+    var usedvalues = new Array(res.length);
+    _.fill(usedvalues, false);
+
+    for (var i = 0; i < expected.length; i++) {
+      var expect = expected[i];
+      for (var j = 0; j < res.length; j++) {
+        if (usedvalues[j] === true) {
+          continue;
+        }
+        if (_.isMatch(res[j], expect)) {
+          var actual = res[j];
+          usedvalues[j] = true;
+          for (var prop in expect) {
+            if (expect.hasOwnProperty(prop)) {
+              assert.strictEqual(actual[prop], expect[prop]);
+            }
+          }
+          if (current === -1 && actual.current === true) {
+            current = j;
+          }
+        }
+      }
+    }
+    for (var k = 0; k < usedvalues.length; k++) {
+      assert(usedvalues[k] === true);
+    }
+    return current;
+  }
+
+  it('snapshots should have single current entry with ref count of 1',
+    function(done) {
+      var expect = [ { refcount: '1', current: true } ];
+      request
+        .get('/api/snapshots')
+        .expect(function(res) {
+          verifyResponseArray(res.body, expect);
+          snapshotID = res.body[0].id;
+          assert(snapshotID.length === 5); // ID's are strings of 5 characters
+          assert(parseInt(snapshotID, 10) >= 0); // ID's are >= 0
+          assert(parseInt(snapshotID, 10) < 65536); // ID's are < 65536
+        })
+        .end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+          microgw.stop()
+            .then(function() { apimServer.stop(); })
+            .then(done, done)
+            .catch(done);
+        });
+    });
+
+  it('snapshot should not have changed on restart',
+    function(done) {
+      microgw.start(3000)
+        .then(function() {
+          var expect = [ { refcount: '1', current: true } ];
+          request
+            .get('/api/snapshots')
+            .expect(function(res) {
+              verifyResponseArray(res.body, expect);
+              assert(res.body[0].id === snapshotID);
+            })
+            .end(done);
+        })
+        .catch(done);
+    });
+
+  it('release should remove current snapshot and decrement ref count and cleanup dir',
+    function(done) {
+      var expect = { snapshot: {} };
+      request
+        .get('/api/snapshots/release?id=' + snapshotID)
+        .expect(function(res) {
+          assert(_.isEqual(expect, res.body));
+        })
+        .end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+          setTimeout(
+            function() {
+              // check for non existence of directory
+              try {
+                fs.statSync(process.env['ROOTCONFIGDIR'] + snapshotID);
+              } catch (e) {
+                if (e.code === 'ENOENT') {
+                  return done(); // expected
+                }
+              }
+              done(new Error('Snapshot directory still exists'));
+            },
+            1500 // 1.5 seconds to cleanup
+          );
+        });
+    });
+});
+
 describe('data-store-retry', function() {
   var request;
   before(function(done) {
