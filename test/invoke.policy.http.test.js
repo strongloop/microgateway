@@ -5,16 +5,15 @@
 
 'use strict';
 
-var _ = require('lodash');
-var assert = require('assert');
 var supertest = require('supertest');
 var microgw = require('../lib/microgw');
 var backend = require('./support/invoke-server');
 var apimServer = require('./support/mock-apim-server/apim-server');
+var dsCleanup = require('./support/utils').dsCleanup;
 
 describe('invokePolicy', function() {
 
-  var request, datastoreRequest;
+  var request;
   before(function(done) {
     //Use production instead of CONFIG_DIR: reading from apim instead of laptop
     process.env.NODE_ENV = 'production';
@@ -32,7 +31,6 @@ describe('invokePolicy', function() {
         .then(function() { return backend.start(8889); })
         .then(function() {
           request = supertest('http://localhost:3000');
-          datastoreRequest = supertest('http://localhost:5000');
         })
         .then(done)
         .catch(function(err) {
@@ -47,7 +45,8 @@ describe('invokePolicy', function() {
     delete process.env.APIMANAGER_PORT;
     delete process.env.DATASTORE_PORT;
 
-    apimServer.stop()
+    dsCleanup(5000)
+      .then(function() { return apimServer.stop(); })
       .then(function() { return microgw.stop(); })
       .then(function() { return backend.stop(); })
       .then(done, done)
@@ -587,21 +586,4 @@ describe('invokePolicy', function() {
       .expect(200, /The quantity is 150 and the price is 23/, done);
   });
 
-  it('cleanup snapshots directory',
-    function(done) {
-      var expect = { snapshot: {} };
-      datastoreRequest
-        .get('/api/snapshots')
-        .end(function(err, res) {
-          assert(!err, 'Unexpected error with cleaning up snapshot directory');
-          var snapshotID = res.body[0].id;
-          console.log(snapshotID);
-          datastoreRequest.get('/api/snapshots/release?id=' + snapshotID)
-            .expect(function(res) {
-              assert(_.isEqual(expect, res.body));
-            })
-            .end(done);
-        });
-    }
-  );
 });

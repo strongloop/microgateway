@@ -5,15 +5,14 @@
 
 'use strict';
 
-var _ = require('lodash');
-var assert = require('assert');
 var supertest = require('supertest');
 var microgw = require('../lib/microgw');
 var apimServer = require('./support/mock-apim-server/apim-server');
+var dsCleanup = require('./support/utils').dsCleanup;
 
 describe('preflow-apimeta', function() {
 
-  var request, datastoreRequest;
+  var request;
   before(function(done) {
     //Use production instead of CONFIG_DIR: reading from apim instead of laptop
     process.env.NODE_ENV = 'production';
@@ -30,7 +29,6 @@ describe('preflow-apimeta', function() {
       .then(function() { return microgw.start(3000); })
       .then(function() {
         request = supertest('http://localhost:3000');
-        datastoreRequest = supertest('http://localhost:5000');
       })
       .then(done)
       .catch(function(err) {
@@ -45,7 +43,8 @@ describe('preflow-apimeta', function() {
     delete process.env.APIMANAGER_PORT;
     delete process.env.DATASTORE_PORT;
 
-    apimServer.stop()
+    dsCleanup(5000)
+      .then(function() { return apimServer.stop(); })
       .then(function() { return microgw.stop(); })
       .then(done, done)
       .catch(done);
@@ -197,21 +196,4 @@ describe('preflow-apimeta', function() {
       });
   });
 
-  it('cleanup snapshots directory',
-    function(done) {
-      var expect = { snapshot: {} };
-      datastoreRequest
-        .get('/api/snapshots')
-        .end(function(err, res) {
-          assert(!err, 'Found error when cleaning up snapshot directory');
-          var snapshotID = res.body[0].id;
-          console.log(snapshotID);
-          datastoreRequest.get('/api/snapshots/release?id=' + snapshotID)
-            .expect(function(res) {
-              assert(_.isEqual(expect, res.body));
-            })
-            .end(done);
-        });
-    }
-  );
 });

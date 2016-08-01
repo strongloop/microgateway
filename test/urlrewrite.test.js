@@ -8,6 +8,7 @@
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
+var dsCleanupFile = require('./support/utils').dsCleanupFile;
 
 describe('urlrewrite', function() {
 
@@ -30,6 +31,7 @@ describe('urlrewrite', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     delete process.env.APIMANAGER;
     delete process.env.NODE_ENV;
     echo.stop()

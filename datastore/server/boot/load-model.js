@@ -17,6 +17,9 @@ var logger = require('apiconnect-cli-logger/logger.js')
 var sgwapimpull = require('../../apim-pull');
 var apimpull = sgwapimpull.pull;
 var apimdecrypt = sgwapimpull.decrypt;
+var utils = require('../../common/utils/utils');
+var getPreviousSnapshotDir = utils.getPreviousSnapshotDir;
+var setPreviousSnapshotDir = utils.setPreviousSnapshotDir;
 var environment = require('../../../utils/environment');
 var APIMANAGER = environment.APIMANAGER;
 var APIMANAGER_PORT = environment.APIMANAGER_PORT;
@@ -99,6 +102,9 @@ module.exports = function(app) {
       //    if no apimanager specified, dir will be loaded..
       if (process.env[CONFIGDIR]) {
         definitionsDir = process.env[CONFIGDIR];
+      } else if (getPreviousSnapshotDir()) {
+        definitionsDir = getPreviousSnapshotDir();
+        process.env[CONFIGDIR] = definitionsDir;
       }
       process.env.ROOTCONFIGDIR = path.dirname(definitionsDir);
       callback();
@@ -526,6 +532,7 @@ function loadConfig(app, apimanager, models, currdir, snapdir, uid, cb) {
         // when latest configuration successful loaded
         if (snapdir === dirToLoad) {
           process.env[CONFIGDIR] = snapdir;
+          setPreviousSnapshotDir(snapdir);
         }
 
         logger.debug('loadConfig exit');

@@ -10,6 +10,7 @@ var assert = require('assert');
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
+var dsCleanupFile = require('./support/utils').dsCleanupFile;
 
 describe('preflow and flow-engine integration', function() {
 
@@ -32,6 +33,7 @@ describe('preflow and flow-engine integration', function() {
     });
 
     after(function(done) {
+      dsCleanupFile();
       delete process.env.APIMANAGER;
       delete process.env.NODE_ENV;
       echo.stop()
@@ -439,6 +441,7 @@ describe('preflow and flow-engine integration', function() {
     });
 
     after(function(done) {
+      dsCleanupFile();
       mg.stop()
         .then(done, done)
         .catch(done);

@@ -9,6 +9,7 @@ var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
 var should = require('should'); //eslint-disable-line no-unused-vars
+var dsCleanupFile = require('./support/utils').dsCleanupFile;
 
 describe('cors policy', function() {
 
@@ -31,6 +32,7 @@ describe('cors policy', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)

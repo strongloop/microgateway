@@ -16,6 +16,7 @@ var apimServer = require('./support/mock-apim-server/apim-server');
 var dsc = require('../datastore/client/index.js');
 var glob = require('glob');
 var touch = require('touch');
+var dsCleanupFile = require('./support/utils').dsCleanupFile;
 
 describe('data-store', function() {
   var request;
@@ -40,6 +41,7 @@ describe('data-store', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     delete process.env.DATASTORE_PORT;
     delete process.env.APIMANAGER_PORT;
     delete process.env.APIMANAGER;
@@ -257,6 +259,7 @@ describe('data-store-retry', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     delete process.env.DATASTORE_PORT;
     delete process.env.APIMANAGER_PORT;
     delete process.env.APIMANAGER;
@@ -344,6 +347,7 @@ describe('data-store-etags', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     delete process.env.DATASTORE_PORT;
     delete process.env.APIMANAGER_PORT;
     delete process.env.APIMANAGER;

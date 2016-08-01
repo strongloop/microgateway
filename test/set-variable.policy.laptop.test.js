@@ -8,6 +8,7 @@
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
+var dsCleanupFile = require('./support/utils').dsCleanupFile;
 
 describe('set-variable policy', function() {
 
@@ -30,6 +31,7 @@ describe('set-variable policy', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)

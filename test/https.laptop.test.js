@@ -7,7 +7,7 @@
 
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
-
+var dsCleanupFile = require('./support/utils').dsCleanupFile;
 var mg = require('../lib/microgw');
 
 describe('HTTP and HTTPS in separate files', function() {
@@ -27,6 +27,7 @@ describe('HTTP and HTTPS in separate files', function() {
     mg.start(3000)
       .catch(function(err) {
         if (err) {
+          dsCleanupFile();
           return done(); // expect error
         }
         done(new Error('expect error'));
@@ -52,6 +53,7 @@ describe('HTTP and HTTPS in same file', function() {
     mg.start(3000)
       .catch(function(err) {
         if (err) {
+          dsCleanupFile();
           return done(); // expect error
         }
         done(new Error('expect error'));
@@ -83,6 +85,7 @@ describe('HTTPS in laptop experience w/ env var', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -133,6 +136,7 @@ describe('HTTPS in laptop experience w/ pfx', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -183,6 +187,7 @@ describe('HTTPS in laptop experience w/ pfx obfuscated password', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -233,6 +238,7 @@ describe('HTTPS in laptop experience w/ default TLS', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -279,6 +285,7 @@ describe('HTTP in laptop experience when HTTPS not specified', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -317,6 +324,7 @@ describe('HTTPS in laptop experience when HTTPS explicitly specified', function(
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -365,6 +373,7 @@ describe('HTTPS in laptop experience when schemes not specified', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -413,6 +422,7 @@ describe('HTTP no port specified in laptop experience when HTTPS not specified',
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -451,6 +461,7 @@ describe('HTTP port in ENV in laptop experience when HTTPS not specified', funct
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -491,6 +502,7 @@ describe('HTTPS no port specified in laptop experience when HTTPS explicitly spe
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -541,6 +553,7 @@ describe('HTTPS port in ENV in laptop experience when HTTPS explicitly specified
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
