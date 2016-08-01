@@ -101,17 +101,15 @@ function cycleThroughPlansInProduct(app, locals, isWildcard, product, planid, pr
 }
 
 function determineNeededSubscriptionOptimizedEntries(app, ctx) {
-  if (ctx && ctx.instance && (ctx.instance.active === true || ctx.instance.active === undefined)) {
-    var locals;
-    locals = ripCTX(ctx);
-    if (!process.env.APIMANAGER) {
-      var planid = ctx.instance['plan-registration'].id;
-      findPlansToAddSubscriptions(app, locals, planid);
-    } else {
-      //specific subscription from APIm
-      var isWildcard = false;
-      gatherDataCreateOptimizedEntry(app, locals, isWildcard);
-    }
+  var locals;
+  locals = ripCTX(ctx);
+  if (!process.env.APIMANAGER) {
+    var planid = ctx.instance['plan-registration'].id;
+    findPlansToAddSubscriptions(app, locals, planid);
+  } else {
+    //specific subscription from APIm
+    var isWildcard = false;
+    gatherDataCreateOptimizedEntry(app, locals, isWildcard);
   }
 }
 
@@ -135,8 +133,10 @@ function ripCTX(ctx) {
   var locals = {};
   locals.subscription = {};
   locals.subscription.id = ctx.instance.id;
+  locals.subscription.active = ctx.instance.active;
   locals.application = {
     title: ctx.instance.application.title,
+    state: ctx.instance.application.state,
     credentials: ctx.instance.application['app-credentials'],
     developerOrg: ctx.instance['developer-organization'] };
 
@@ -588,8 +588,11 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             apiAssembly = { assembly: {} };
             apiType = 'REST';
           }
+
           var newOptimizedDataEntry = {
             'subscription-id': pieces.subscription.id,
+            'subscription-active': false || pieces.subscription.active, //pieces.subscription.active,
+            'subscription-app-state': pieces.application.state || 'ACTIVE', //pieces.application.state,
             'client-id': credential['client-id'],
             'client-secret': credential['client-secret'],
             'client-name': pieces.application.title,
