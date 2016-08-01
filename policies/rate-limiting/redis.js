@@ -27,14 +27,14 @@ module.exports = function(options) {
     maxInInterval: limit });
 
   return function(props, context, flow) {
-    var key = options.getKey(context);
+    var key = options.getKey();
     logger.debug('Key: %s', key);
     if (!key) {
       return flow.proceed();
     }
 
     var fields = key.split(':');
-    var name = fields[fields.length - 2];
+    var name = fields[fields.length - 1];
     limiter(key, function(err, timeLeft, remaining) {
       if (err) {
         return flow.fail(err);

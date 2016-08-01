@@ -195,7 +195,7 @@ function noSecurityHeaderClientIdRate(doneCB) {
   request
     .get('/api/nosec')
     .set('X-IBM-Client-Id', 'default')
-    .expect(200 /*429*/, doneCB);
+    .expect(429, doneCB);
 }
 
 function noSecurityQueryClientId(doneCB) {
@@ -207,7 +207,7 @@ function noSecurityQueryClientId(doneCB) {
 function noSecurityQueryClientIdRate(doneCB) {
   request
     .get('/api/nosec?client_id=default')
-    .expect(200 /*429*/, doneCB);
+    .expect(429, doneCB);
 }
 
 function noSecurityHeaderClientIdBad(doneCB) {
@@ -221,7 +221,7 @@ function noSecurityHeaderClientIdBadRate(doneCB) {
   request
     .get('/api/nosec')
     .set('X-IBM-Client-Id', 'bad')
-    .expect(200 /*429*/, doneCB);
+    .expect(429, doneCB);
 }
 
 function noSecurityQueryClientIdBad(doneCB) {
@@ -233,7 +233,7 @@ function noSecurityQueryClientIdBad(doneCB) {
 function noSecurityQueryClientIdBadRate(doneCB) {
   request
     .get('/api/nosec?client_id=bad')
-    .expect(200 /*429*/, doneCB);
+    .expect(429, doneCB);
 }
 
 function headerClientId(doneCB) {

@@ -47,7 +47,7 @@ exports.handleResponse =
         resMsg.headers = resMsgHeaders;
       }
       name = name || 'RateLimit';
-      var dispRemaining = remaining + 1;
+      var dispRemaining = remaining;
       logger.debug('Name %s Limit: %d Remaining: %d Reset: %d', name, limit, dispRemaining, reset);
       var prefix;
       if (reject && remaining < 0 && resMsgHeaders['X-RateLimit-Limit']) {
