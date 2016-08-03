@@ -2820,6 +2820,59 @@ describe('oauth2 AZ-server', function() {
           }
         });
     });
+
+    it('no redirect_uri - token', function(done) {
+      request.get('/security/oauth2/authorize')
+        .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
+        .query({ response_type: 'token' })
+        .query({ scope: 'scope1 scope2 scope3' })
+        .query({ state: 'xyz' })
+        .auth('root', 'Hunter2')
+        .end(function(err, res) {
+          try {
+            assert(err === null && res.ok === true, 'can not get consent form');
+            var cookie = res.header['set-cookie'];
+            assert(cookie !== undefined, 'no cookie');
+            var form = parseConsentForm(res.text);
+            assert(form.redirectURI === 'https://localhost:5000/use-oauth/getinfo',
+                'incorrect redirectURI');
+            assert(form.scope === 'scope1 scope2 scope3',
+                'incorrect scope');
+            assert(form.clientID === '2609421b-4a69-40d7-8f13-44bdf3edd18f',
+                'incorrect client_id');
+            assert(form.resOwner === 'root', 'incorrect resource owner');
+            assert(form.dpState !== undefined, 'incorrect dp-state');
+            assert(/This is custom consent form/.test(res.text),
+                'not custom consent form');
+
+            var actionURL = /action="(.*?)"/g;
+            var match = actionURL.exec(res.text);
+            form.approve = 'true';
+
+            submitAuthReq(request, match[1], cookie[0].split(';')[0], form)
+              .end(function(err2, res2) {
+                try {
+                  assert(res2.statusCode === 302, 'not 302 redirect');
+                  var location = res2.header.location;
+                  var uri = url.parse(location);
+                  uri.query = qs.parse(uri.hash.substring(1));
+                  assert(location.indexOf('https://localhost:5000/use-oauth/getinfo') === 0,
+                    'incorrect redirect_uri');
+                  assert(uri.query.scope === 'scope1 scope2 scope3', 'incorrect scope');
+                  assert(uri.query.state === 'xyz', 'incorrect state');
+                  assert(uri.query.expires_in === '3600', 'incorrect expires_in');
+                  assert(location.indexOf('access_token=') !== -1, 'no access_token');
+                  assert(location.indexOf('token_type=') !== -1, 'no token_type');
+                  done(err2);
+                } catch (e2) {
+                  done(e2);
+                }
+              });
+          } catch (e) {
+            done(e);
+          }
+        });
+    });
   });
 
   describe('basic - bad custom consent', function() {
@@ -3011,9 +3064,9 @@ describe('oauth2 AZ-server', function() {
           user: { id: 'USERID' },
           req: {
             clientID: 'clientID',
-            redirectURI: 'REDIRECTURI',
             scope: [ 'scope1', 'scope2' ],
           },
+          redirectURI: 'REDIRECTURI',
           client: { title: 'CLIENTTITLE' },
         },
         ctx: {
