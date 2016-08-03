@@ -586,7 +586,7 @@ describe('preflow and flow-engine integration', function() {
       ' (query) arbitrary id/secret invalid client secret name should fail API3 (apim-lookup)',
       function(done) {
         request
-        .get('/v1/routes/test6?' + clientIdBadName + '=' + clientId2 +
+        .get('/v1/routes/test6?myQueryId=' + clientId2 +
           '&' + clientSecretBadName + '=' + clientSecret3a)
         .expect(401, done);
       });
@@ -597,7 +597,7 @@ describe('preflow and flow-engine integration', function() {
       function(done) {
         request
         .get('/v1/routes/test6')
-        .set(clientIdBadName, clientId2)
+        .set('myHeaderId', clientId2)
         .set(clientSecretBadName, clientSecret3a)
         .expect(401, done);
       });
