@@ -7,13 +7,9 @@
 
 var loopback = require('loopback');
 var boot = require('loopback-boot');
-var fs = require('fs');
-var path = require('path');
-var environment = require('../../utils/environment');
 var logger = require('apiconnect-cli-logger/logger.js')
          .child({ loc: 'microgateway:datastore:server:server' });
-var cliConfig = require('apiconnect-cli-config');
-var CONFIGDIR = environment.CONFIGDIR;
+var storeDataStorePort = require('../common/utils/utils').storeDataStorePort;
 
 // if the parent get killed we need to bite the bullet
 process.on('disconnect', function() {
@@ -31,7 +27,7 @@ app.start = function() {
     process.env.DATASTORE_PORT = port;
     logger.debug('Web server listening at: %s port: %s', baseUrl, port);
     // save to file for explorer
-    storeDatastorePort(port);
+    storeDataStorePort(port);
     // send to gateway
     process.send({ DATASTORE_PORT: port });
 
@@ -58,17 +54,3 @@ boot(app, __dirname, function(err) {
     app.start();
   }
 });
-
-function storeDatastorePort(port) {
-  var localPath = '.datastore';
-  if (process.env[CONFIGDIR]) {
-    var projectInfo = cliConfig.inspectPath(process.env[CONFIGDIR]);
-    localPath = path.join(projectInfo.basePath, localPath);
-  }
-  logger.debug('.datastore path:', localPath);
-  fs.writeFile(localPath, JSON.stringify({ port: port }), 'utf8', function(err) {
-    if (err) {
-      throw err;
-    }
-  });
-}

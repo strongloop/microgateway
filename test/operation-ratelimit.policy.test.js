@@ -9,6 +9,7 @@ var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
 var async = require('async');
+var dsCleanupFile = require('./support/utils').dsCleanupFile;
 
 describe('operation rate limiting test', function() {
 
@@ -29,6 +30,7 @@ describe('operation rate limiting test', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     delete process.env.APIMANAGER;
     delete process.env.NODE_ENV;
     echo.stop()

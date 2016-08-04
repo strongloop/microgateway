@@ -17,6 +17,9 @@ var logger = require('apiconnect-cli-logger/logger.js')
 var sgwapimpull = require('../../apim-pull');
 var apimpull = sgwapimpull.pull;
 var apimdecrypt = sgwapimpull.decrypt;
+var utils = require('../../common/utils/utils');
+var getPreviousSnapshotDir = utils.getPreviousSnapshotDir;
+var setPreviousSnapshotDir = utils.setPreviousSnapshotDir;
 var environment = require('../../../utils/environment');
 var APIMANAGER = environment.APIMANAGER;
 var APIMANAGER_PORT = environment.APIMANAGER_PORT;
@@ -28,11 +31,11 @@ var LAPTOP_RATELIMIT = environment.LAPTOP_RATELIMIT;
 
 var cliConfig = require('apiconnect-cli-config');
 
-var rootConfigPath = __dirname + '/../../../config/';
-var definitionsDir = rootConfigPath + 'default';
+var rootConfigPath = path.join(__dirname, '../../../config');
+var definitionsDir = path.join(rootConfigPath, 'default');
 
-var gatewayMain = __dirname + '/../../../';
-var keyFile = gatewayMain + KEYNAME;
+var gatewayMain = path.join(__dirname, '../../..');
+var keyFile = path.join(gatewayMain, KEYNAME);
 var version = '1.0.0';
 var mixedProtocols = false;
 var http = false;
@@ -90,6 +93,7 @@ module.exports = function(app) {
     startupRefresh: 1000, // 1 second
     maxRefresh: maxRefreshInterval };
 
+  var uid;
   async.series([
     function(callback) {
       // get CONFIG_DIR.. two basic paths APIm load or local
@@ -97,8 +101,18 @@ module.exports = function(app) {
       // if ENV var,
       //    if apimanager specified, dir = 'last known config'..
       //    if no apimanager specified, dir will be loaded..
+      delete process.env.ORIG_CONFIG_DIR;
       if (process.env[CONFIGDIR]) {
+        process.env.ORIG_CONFIG_DIR = process.env[CONFIGDIR];
         definitionsDir = process.env[CONFIGDIR];
+      } else if (getPreviousSnapshotDir()) {
+        definitionsDir = getPreviousSnapshotDir();
+        process.env[CONFIGDIR] = definitionsDir;
+        var tempid = path.basename(definitionsDir);
+        var tempidint = parseInt(tempid, 10);
+        if (tempidint >= 0 && tempidint <= 65536) {
+          uid = tempid;
+        }
       }
       process.env.ROOTCONFIGDIR = path.dirname(definitionsDir);
       callback();
@@ -138,7 +152,7 @@ module.exports = function(app) {
     // load the data into the models
     function(err) {
       if (!err) {
-        loadData(app, apimanager, models, definitionsDir);
+        loadData(app, apimanager, models, definitionsDir, uid);
       }
     });
 };
@@ -150,9 +164,9 @@ module.exports = function(app) {
  * @param {Array} models - instances of ModelType to populate with data
  * @param {string} currdir - current snapshot symbolic link path
  */
-function loadData(app, apimanager, models, currdir) {
+function loadData(app, apimanager, models, currdir, uid) {
   var snapdir;
-  var snapshotID = getSnapshotID();
+  var snapshotID = uid || getSnapshotID();
   var populatedSnapshot = false;
 
   async.series([
@@ -437,7 +451,7 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
 function pullFromAPIm(apimanager, currdir, uid, cb) {
   logger.debug('pullFromAPIm entry');
   // Have an APIm, grab latest if we can..
-  var snapdir = process.env.ROOTCONFIGDIR + '/' + uid + '/';
+  var snapdir = path.join(process.env.ROOTCONFIGDIR, uid);
 
   fs.mkdir(snapdir, function(err) {
     if (err) {
@@ -501,7 +515,7 @@ function pullFromAPIm(apimanager, currdir, uid, cb) {
  */
 function loadConfig(app, apimanager, models, currdir, snapdir, uid, cb) {
   logger.debug('loadConfig entry');
-  var dirToLoad = (snapdir === '') ? (currdir + '/') : snapdir;
+  var dirToLoad = (snapdir === '') ? currdir : snapdir;
 
   loadConfigFromFS(app, apimanager, models, dirToLoad, uid, function(err) {
     if (err) {
@@ -526,6 +540,7 @@ function loadConfig(app, apimanager, models, currdir, snapdir, uid, cb) {
         // when latest configuration successful loaded
         if (snapdir === dirToLoad) {
           process.env[CONFIGDIR] = snapdir;
+          setPreviousSnapshotDir(snapdir);
         }
 
         logger.debug('loadConfig exit');
@@ -552,10 +567,12 @@ function loadConfigFromFS(app, apimanager, models, dir, uid, cb) {
   );
 
   if (apimanager.host) {
-    var files;
+    var files = [];
     logger.debug('loadConfigFromFS entry');
     try {
-      files = fs.readdirSync(dir);
+      if (dir !== '') {
+        files = fs.readdirSync(dir);
+      }
     } catch (e) {
       logger.error('Failed to read directory: ', dir);
       cb(e);

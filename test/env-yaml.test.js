@@ -10,7 +10,7 @@ var YAML = require('yamljs');
 var path = require('path');
 var should = require('should');
 var childproc = require('child_process');
-
+var dsCleanupFile = require('./support/utils').dsCleanupFile;
 var ENVPATH = path.resolve(__dirname, '../env.yaml');
 var ORIG_ENVFILE = null;
 var CHILD_ENV = null;
@@ -73,6 +73,7 @@ describe('Setting environment variables', function() {
   });
 
   after(function() {
+    dsCleanupFile();
     child.kill();
     fs.unlinkSync(ENVPATH);
     restoreEnvFile();

@@ -5,68 +5,12 @@
 
 'use strict';
 
-var _ = require('lodash');
-var fs = require('fs');
-var path = require('path');
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var ldap = require('./support/ldap-server');
 var mg = require('../lib/microgw');
-var dsc = require('../datastore/client');
 var apimServer = require('./support/mock-apim-server/apim-server');
-var Promise = require('bluebird');
-
-function cleanup() {
-  var rmfile = function(fpath) {
-    return new Promise(function(resolve, reject) {
-      fs.unlink(fpath, function(err) {
-        if (err) {
-          console.error('Error removing %s', fpath);
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
-  };
-
-  var readdir = function(dir) {
-    return new Promise(function(resolve, reject) {
-      fs.readdir(ssdir, function(err, files) {
-        if (err) {
-          console.error('Error while reading %s', ssdir);
-          reject(err);
-        } else {
-          resolve(files);
-        }
-      });
-    });
-  };
-
-  var ssdir;
-
-  return dsc.getCurrentSnapshot()
-    .then(function(id) {
-      ssdir = path.resolve(__dirname, path.dirname(process.env.CONFIG_DIR), id);
-      return readdir(ssdir);
-    })
-    .then(function(files) {
-      return new Promise(function(resolve) {
-        var p = Promise.all(_.map(files, function(f) { return rmfile(path.resolve(ssdir, f)); }));
-        p = p.then(function() {
-          fs.rmdir(ssdir, function(err) {
-            if (err) {
-              console.error('Error removing file', err);
-            }
-            resolve(p);
-          });
-        });
-      });
-    })
-    .catch(function(err) {
-      console.error('cleanup() failed due to error', err);
-    });
-}
+var dsCleanup = require('./support/utils').dsCleanup;
 
 describe('basic auth policy', function() {
 
@@ -96,7 +40,7 @@ describe('basic auth policy', function() {
   });
 
   after(function(done) {
-    cleanup()
+    dsCleanup(5000)
       .then(function() { return mg.stop(); })
       .then(function() { return ldap.stop(); })
       .then(function() { return echo.stop(); })

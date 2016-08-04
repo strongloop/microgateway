@@ -9,7 +9,7 @@ var _ = require('lodash');
 var assert = require('assert');
 var supertest = require('supertest');
 var yaml = require('yamljs');
-
+var dsCleanupFile = require('./support/utils').dsCleanupFile;
 var mg = require('../lib/microgw');
 
 describe('Context variables in laptop experience', function() {
@@ -30,6 +30,7 @@ describe('Context variables in laptop experience', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(done, done)
       .catch(done);

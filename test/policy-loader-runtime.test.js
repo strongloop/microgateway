@@ -7,6 +7,7 @@
 
 var mg;
 var supertest = require('supertest');
+var dsCleanupFile = require('./support/utils').dsCleanupFile;
 
 var request;
 
@@ -29,6 +30,7 @@ describe('policy loader version support test', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(done, done)
       .catch(done);

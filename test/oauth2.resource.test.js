@@ -10,42 +10,17 @@ Promise.longStackTraces();
 var path = require('path');
 var mg = require('../lib/microgw');
 var supertest = require('supertest');
-var _ = require('lodash');
 var jws = require('jws');
 var assert = require('assert');
 var debug = require('debug')('tests:oauth');
 var apimServer = require('./support/mock-apim-server/apim-server');
 var echo = require('./support/echo-server');
+var dsCleanup = require('./support/utils').dsCleanup;
 
 //var configDir = path.join(__dirname, 'definitions', 'oauth');
 var configDir = path.join(__dirname, 'definitions', 'oauth2-resource');
 
 var request, NODE_TLS_REJECT_UNAUTHORIZED;
-
-function dsCleanup(port) {
-  // clean up the directory
-  return new Promise(function(resolve, reject) {
-    var expect = { snapshot: {} };
-    var datastoreRequest = supertest('http://localhost:' + port);
-    datastoreRequest
-      .get('/api/snapshots')
-      .end(function(err, res) {
-        assert(!err, 'Unexpected error with dsCleanup()');
-        var snapshotID = res.body[0].id;
-        datastoreRequest
-          .get('/api/snapshots/release?id=' + snapshotID)
-          .end(function(err, res) {
-            assert(!err, 'Unexpected error with dsCleanup()');
-            try {
-              assert(_.isEqual(expect, res.body));
-              resolve();
-            } catch (error) {
-              reject(error);
-            }
-          });
-      });
-  });
-}
 
 describe('oauth testing onprem', function() {
 

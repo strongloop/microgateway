@@ -9,6 +9,7 @@ var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var ldap = require('./support/ldap-server');
 var mg = require('../lib/microgw');
+var dsCleanupFile = require('./support/utils').dsCleanupFile;
 
 describe('basic auth policy', function() {
 
@@ -34,6 +35,7 @@ describe('basic auth policy', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     delete process.env.APIMANAGER;
     delete process.env.NODE_ENV;
     mg.stop()

@@ -7,6 +7,7 @@
 
 var supertest = require('supertest');
 var mg = require('../lib/microgw');
+var dsCleanupFile = require('./support/utils').dsCleanupFile;
 
 describe('throw policy', function() {
 
@@ -26,6 +27,7 @@ describe('throw policy', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(done, done)
       .catch(done);

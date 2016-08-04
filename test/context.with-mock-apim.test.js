@@ -11,12 +11,12 @@ var assert = require('assert');
 var debug = require('debug')('context-test');
 var fs = require('fs');
 var microgw = require('../lib/microgw');
-var Promise = require('bluebird');
 var supertest = require('supertest');
+var dsCleanup = require('./support/utils').dsCleanup;
 
 
 describe('Context variables testing with mock apim server', function() {
-  var request, datastoreRequest, path, apiDocuments;
+  var request, path, apiDocuments;
 
   before(function() {
     process.env.DATASTORE_PORT = 5000;
@@ -25,7 +25,6 @@ describe('Context variables testing with mock apim server', function() {
     process.env.NODE_ENV = 'production';
 
     request = supertest('http://localhost:3000');
-    datastoreRequest = supertest('http://localhost:5000');
     path = __dirname + '/definitions/context';
     apiDocuments = getAPIDefinitions();
   });
@@ -50,7 +49,7 @@ describe('Context variables testing with mock apim server', function() {
     });
 
     after(function(done) {
-      cleanup()
+      dsCleanup(5000)
         .then(function() { return microgw.stop(); })
         .then(function() { return apimServer.stop(); })
         .then(done)
@@ -180,6 +179,7 @@ describe('Context variables testing with mock apim server', function() {
   describe('with organization / catalog shortname in path', function() {
     before(function(done) {
       process.env.WLPN_APP_ROUTE = 'http:///apim/sb';
+      process.env.DATASTORE_PORT = 5000;
       apimServer.start('127.0.0.1', 8081, path)
         .then(function() { return microgw.start(3000); })
         .then(done)
@@ -191,8 +191,9 @@ describe('Context variables testing with mock apim server', function() {
 
     after(function(done) {
       delete process.env.WLPN_APP_ROUTE;
+      delete process.env.DATASTORE_PORT;
 
-      cleanup()
+      dsCleanup(5000)
         .then(function() { return microgw.stop(); })
         .then(function() { return apimServer.stop(); })
         .then(done)
@@ -286,31 +287,6 @@ describe('Context variables testing with mock apim server', function() {
       result.push(item);
     });
     return result;
-  }
-
-  function cleanup() {
-    // clean up the directory
-    return new Promise(function(resolve, reject) {
-      var expect = { snapshot: {} };
-      datastoreRequest
-        .get('/api/snapshots')
-        .end(function(err, res) {
-          assert(!err, 'Unexpected error with getting snapshot');
-          var snapshotID = res.body[0].id;
-          console.log(snapshotID);
-          datastoreRequest
-            .get('/api/snapshots/release?id=' + snapshotID)
-            .end(function(err, res) {
-              assert(!err, 'Unexpected error with getting snapshot');
-              try {
-                assert(_.isEqual(expect, res.body));
-                resolve();
-              } catch (error) {
-                reject(error);
-              }
-            });
-        });
-    });
   }
 
 });

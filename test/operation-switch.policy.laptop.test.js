@@ -7,6 +7,7 @@
 
 var mg = require('../lib/microgw');
 var supertest = require('supertest');
+var dsCleanupFile = require('./support/utils').dsCleanupFile;
 
 var request;
 
@@ -26,6 +27,7 @@ describe('switchPolicyTesting', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(done, done)
       .catch(done);

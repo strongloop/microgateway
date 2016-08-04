@@ -5,38 +5,13 @@
 
 'use strict';
 
-var _ = require('lodash');
-var assert = require('assert');
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var apimServer = require('./support/mock-apim-server/apim-server');
+var dsCleanup = require('./support/utils').dsCleanup;
+var dsCleanupFile = require('./support/utils').dsCleanupFile;
 
 var mg = require('../lib/microgw');
-
-function dsCleanup(port) {
-  // clean up the directory
-  return new Promise(function(resolve, reject) {
-    var expect = { snapshot: {} };
-    var datastoreRequest = supertest('http://localhost:' + port);
-    datastoreRequest
-      .get('/api/snapshots')
-      .end(function(err, res) {
-        assert(!err, 'Unexpected error with dsCleanup()');
-        var snapshotID = res.body[0].id;
-        datastoreRequest
-          .get('/api/snapshots/release?id=' + snapshotID)
-          .end(function(err, res) {
-            assert(!err, 'Unexpected error with dsCleanup()');
-            try {
-              assert(_.isEqual(expect, res.body));
-              resolve();
-            } catch (error) {
-              reject(error);
-            }
-          });
-      });
-  });
-}
 
 describe('HTTP and HTTPS in onprem in separate files', function() {
 
@@ -70,6 +45,7 @@ describe('HTTP and HTTPS in onprem in separate files', function() {
     mg.start(3000)
       .catch(function(err) {
         if (err) {
+          dsCleanupFile();
           return done(); // expect error
         }
         done(new Error('expect error'));
@@ -110,6 +86,7 @@ describe('HTTP and HTTPS in onprem in same file', function() {
     mg.start(3000)
       .catch(function(err) {
         if (err) {
+          dsCleanupFile();
           return done(); // expect error
         }
         done(new Error('expect error'));

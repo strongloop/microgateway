@@ -6,6 +6,8 @@
 var supertest = require('supertest');
 var assert = require('assert');
 var _ = require('lodash');
+var fs = require('fs');
+var path = require('path');
 
 /**
  * clean up the directory after running the test suite
@@ -15,6 +17,7 @@ function dsCleanup(port) {
   return new Promise(function(resolve, reject) {
     var expect = { snapshot: {} };
     var datastoreRequest = supertest('http://localhost:' + port);
+    dsCleanupFile();
     datastoreRequest
       .get('/api/snapshots')
       .end(function(err, res) {
@@ -37,6 +40,19 @@ function dsCleanup(port) {
   });
 }
 
+/**
+ * clean up the temporary file
+ */
+function dsCleanupFile(port) {
+  try {
+    var myPath = process.env.CONFIG_DIR || './';
+    fs.unlinkSync(path.resolve(myPath, '.datastore'));
+  } catch (e) {
+    // ignore error;
+  }
+}
+
 module.exports = {
-  dsCleanup: dsCleanup };
+  dsCleanup: dsCleanup,
+  dsCleanupFile: dsCleanupFile };
 

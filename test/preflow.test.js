@@ -9,6 +9,7 @@ var mg = require('../lib/microgw');
 var supertest = require('supertest');
 
 var dsCleanup = require('./support/utils').dsCleanup;
+var dsCleanupFile = require('./support/utils').dsCleanupFile;
 var apimServer = require('./support/mock-apim-server/apim-server');
 var echo = require('./support/echo-server');
 
@@ -30,6 +31,7 @@ describe('preflow testing', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(done, done)
       .catch(done);
@@ -76,6 +78,7 @@ describe('ro-context testing', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(done, done)
       .catch(done);
@@ -139,6 +142,7 @@ describe('preflow testing', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(done, done)
       .catch(done);

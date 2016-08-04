@@ -9,6 +9,7 @@
 var logger = require('apiconnect-cli-logger/logger.js')
         .child({ loc: 'microgateway:datastore:apim-pull' });
 var fs = require('fs.extra');
+var path = require('path');
 var request = require('request');
 var async = require('async');
 var extend = require('util')._extend;
@@ -18,9 +19,9 @@ var Crypto = require('crypto');
 var environment = require('../utils/environment');
 var KEYNAME = environment.KEYNAME;
 var PASSWORD = environment.PASSWORD;
-var gatewayMain = __dirname + '/../';
-var keyFile = gatewayMain + KEYNAME;
-var passFile = gatewayMain + PASSWORD;
+var gatewayMain = path.join(__dirname, '..');
+var keyFile = path.join(gatewayMain, KEYNAME);
+var passFile = path.join(gatewayMain, PASSWORD);
 
 /**
  * Module exports
@@ -260,8 +261,8 @@ function fetchFromCache(options, opts, cb) {
             cb();
             // not fatal; continue
           } else if (res.statusCode === 304) {
-            var filename = opts.outdir + '/' + indirFiles[i];
-            fs.copy(opts.indir + '/' + indirFiles[i],
+            var filename = path.join(opts.outdir, indirFiles[i]);
+            fs.copy(path.join(opts.indir, indirFiles[i]),
                     filename,
                     { replace: false },
                     function(err) {
@@ -301,8 +302,8 @@ function fetchFromServer(options, opts, cb) {
       cb(err);
     } else if (res.statusCode === 200) {
       var etag = res.headers.etag ? res.headers.etag : '';
-      var filename = opts.outdir + '/' + opts.prefix +
-                     new Buffer(etag).toString('base64') + opts.suffix;
+      var filename = path.join(opts.outdir, opts.prefix +
+                     new Buffer(etag).toString('base64') + opts.suffix);
       var outstream = fs.createWriteStream(filename);
       outstream.write(encryptData(JSON.stringify(JSON.parse(body), null, 4)));
       outstream.end();
