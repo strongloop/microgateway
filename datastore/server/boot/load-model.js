@@ -101,6 +101,7 @@ module.exports = function(app) {
       // if ENV var,
       //    if apimanager specified, dir = 'last known config'..
       //    if no apimanager specified, dir will be loaded..
+      delete process.env.ORIG_CONFIG_DIR;
       if (process.env[CONFIGDIR]) {
         process.env.ORIG_CONFIG_DIR = process.env[CONFIGDIR];
         definitionsDir = process.env[CONFIGDIR];
