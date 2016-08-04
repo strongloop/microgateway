@@ -7,7 +7,7 @@ var supertest = require('supertest');
 var assert = require('assert');
 var _ = require('lodash');
 var fs = require('fs');
-var dsutils = require('../../datastore/common/utils/utils');
+var path = require('path');
 
 /**
  * clean up the directory after running the test suite
@@ -45,7 +45,8 @@ function dsCleanup(port) {
  */
 function dsCleanupFile(port) {
   try {
-    fs.unlinkSync(dsutils.getDataStorePath());
+    var myPath = process.env.CONFIG_DIR || './';
+    fs.unlinkSync(path.resolve(myPath, '.datastore'));
   } catch (e) {
     // ignore error;
   }
