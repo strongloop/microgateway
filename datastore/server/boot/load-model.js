@@ -31,11 +31,11 @@ var LAPTOP_RATELIMIT = environment.LAPTOP_RATELIMIT;
 
 var cliConfig = require('apiconnect-cli-config');
 
-var rootConfigPath = __dirname + '/../../../config/';
-var definitionsDir = rootConfigPath + 'default';
+var rootConfigPath = path.join(__dirname, '../../../config');
+var definitionsDir = path.join(rootConfigPath, 'default');
 
-var gatewayMain = __dirname + '/../../../';
-var keyFile = gatewayMain + KEYNAME;
+var gatewayMain = path.join(__dirname, '../../..');
+var keyFile = path.join(gatewayMain, KEYNAME);
 var version = '1.0.0';
 var mixedProtocols = false;
 var http = false;
@@ -450,7 +450,7 @@ function handshakeWithAPIm(app, apimanager, private_key, cb) {
 function pullFromAPIm(apimanager, currdir, uid, cb) {
   logger.debug('pullFromAPIm entry');
   // Have an APIm, grab latest if we can..
-  var snapdir = process.env.ROOTCONFIGDIR + '/' + uid + '/';
+  var snapdir = path.join(process.env.ROOTCONFIGDIR, uid);
 
   fs.mkdir(snapdir, function(err) {
     if (err) {
@@ -514,7 +514,7 @@ function pullFromAPIm(apimanager, currdir, uid, cb) {
  */
 function loadConfig(app, apimanager, models, currdir, snapdir, uid, cb) {
   logger.debug('loadConfig entry');
-  var dirToLoad = (snapdir === '') ? (currdir + '/') : snapdir;
+  var dirToLoad = (snapdir === '') ? currdir : snapdir;
 
   loadConfigFromFS(app, apimanager, models, dirToLoad, uid, function(err) {
     if (err) {
@@ -566,10 +566,12 @@ function loadConfigFromFS(app, apimanager, models, dir, uid, cb) {
   );
 
   if (apimanager.host) {
-    var files;
+    var files = [];
     logger.debug('loadConfigFromFS entry');
     try {
-      files = fs.readdirSync(dir);
+      if (dir !== '') {
+        files = fs.readdirSync(dir);
+      }
     } catch (e) {
       logger.error('Failed to read directory: ', dir);
       cb(e);

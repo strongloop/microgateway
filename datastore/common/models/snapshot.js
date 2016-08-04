@@ -5,6 +5,7 @@
 
 var app = require('../../server/server');
 var fs = require('fs.extra');
+var path = require('path');
 
 module.exports = function(Snapshot) {
   Snapshot.observe('after delete', function(ctx, next) {
@@ -25,7 +26,7 @@ module.exports = function(Snapshot) {
       });
 
       fs.rmrf(
-        process.env.ROOTCONFIGDIR + '/' + ctx.instance.id + '/',
+        path.join(process.env.ROOTCONFIGDIR, ctx.instance.id),
         function(err) { if (err) { /* suppress eslint handle-callback-err */ } });
     }
 
