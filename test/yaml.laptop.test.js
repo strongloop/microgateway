@@ -5,14 +5,9 @@
 
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var express = require('express');
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
-var should = require('should');
-var async = require('async');
 
 describe('general laptop', function() {
 
