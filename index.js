@@ -5,6 +5,8 @@
 
 var path = require('path');
 var YAML = require('yamljs');
+var logger = require('apiconnect-cli-logger/logger.js')
+                        .child({ loc: 'microgateway:index' });
 
 var env = {
   NODE_ENV: 'production',
@@ -18,7 +20,7 @@ try {
     env[k] = envjson[k];
   });
 } catch (e) {
-  // Would probably be good to log this somehow...
+  logger.error('Fail to load environment variables: ', e);
 }
 
 Object.keys(env).forEach(function(k) {
