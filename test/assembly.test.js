@@ -43,12 +43,76 @@ describe('preflow and flow-engine integration', function() {
 
 
     var clientId1 = 'fb82cb59-ba95-4c34-8612-e63697d7b845';
-    it('client_id=' + clientId1 + ' (query) should invoke API1 (apim-lookup)',
+    it('client_id=' + clientId1 + ' (query) should invoke API1 (apim-lookup) active=true, state=ACTIVE',
       function(done) {
         request
         .get('/v1/ascents?client_id=' + clientId1)
         .expect(200, '/api1', done);
       });
+
+    // var clientId101 = 'fb82cb59-ba95-4c34-8612-e63697d7b84501';
+    // it('client_id=' + clientId101 + ' (query) should invoke API1 (apim-lookup) active=false, state=ACTIVE',
+    //   function(done) {
+    //     request
+    //     .get('/v1/ascents?client_id=' + clientId101)
+    //     .expect(200, '/api1', done);
+    //   });
+    //
+    // var clientId102 = 'fb82cb59-ba95-4c34-8612-e63697d7b84502';
+    // it('client_id=' + clientId102 + ' (query) should invoke API1 (apim-lookup) active=undefined, state=ACTIVE',
+    //   function(done) {
+    //     request
+    //     .get('/v1/ascents?client_id=' + clientId102)
+    //     .expect(200, '/api1', done);
+    //   });
+    //
+    // var clientId103 = 'fb82cb59-ba95-4c34-8612-e63697d7b84503';
+    // it('client_id=' + clientId103 + ' (query) should invoke API1 (apim-lookup) active=true, state=SUSPENDED',
+    //   function(done) {
+    //     request
+    //     .get('/v1/ascents?client_id=' + clientId103)
+    //     .expect(200, '/api1', done);
+    //   });
+    //
+    // var clientId104 = 'fb82cb59-ba95-4c34-8612-e63697d7b84504';
+    // it('client_id=' + clientId104 + ' (query) should invoke API1 (apim-lookup) active=false, state=SUSPENDED',
+    //   function(done) {
+    //     request
+    //     .get('/v1/ascents?client_id=' + clientId104)
+    //     .expect(200, '/api1', done);
+    //   });
+    //
+    // var clientId105 = 'fb82cb59-ba95-4c34-8612-e63697d7b84505';
+    // it('client_id=' + clientId105 + ' (query) should invoke API1 (apim-lookup) active=undefined, state=SUSPENDED',
+    //   function(done) {
+    //     request
+    //     .get('/v1/ascents?client_id=' + clientId105)
+    //     .expect(200, '/api1', done);
+    //   });
+    //
+    // var clientId106 = 'fb82cb59-ba95-4c34-8612-e63697d7b8450106';
+    // it('client_id=' + clientId106 + ' (query) should invoke API1 (apim-lookup) active=true, state=undefined',
+    //   function(done) {
+    //     request
+    //     .get('/v1/ascents?client_id=' + clientId106)
+    //     .expect(200, '/api1', done);
+    //   });
+    //
+    // var clientId107 = 'fb82cb59-ba95-4c34-8612-e63697d7b8450107';
+    // it('client_id=' + clientId107 + ' (query) should invoke API1 (apim-lookup) active=false, state=undefined',
+    //   function(done) {
+    //     request
+    //     .get('/v1/ascents?client_id=' + clientId107)
+    //     .expect(200, '/api1', done);
+    //   });
+    //
+    // var clientId108 = 'fb82cb59-ba95-4c34-8612-e63697d7b84508';
+    // it('client_id=' + clientId108 + ' (query) should invoke API1 (apim-lookup) active=undefined, state=undefined',
+    //   function(done) {
+    //     request
+    //     .get('/v1/ascents?client_id=' + clientId108)
+    //     .expect(200, '/api1', done);
+    //   });
 
     var clientId2 = '612caa59-9649-491f-99b7-d9a941c4bd2e';
     it('client_id=' + clientId2 + ' (query) should invoke API2 (apim-lookup)',
@@ -542,4 +606,3 @@ describe('preflow and flow-engine integration', function() {
   });  // end of 'test using test/assembly configuration' test block
 
 });
-
