@@ -47,8 +47,9 @@ exports.handleResponse =
         resMsg.headers = resMsgHeaders;
       }
       name = name || 'RateLimit';
-      var dispRemaining = remaining;
-      logger.debug('Name %s Limit: %d Remaining: %d Reset: %d', name, limit, dispRemaining, reset);
+      var dispRemaining = remaining >= 0 ? remaining : 0;
+      var dispReset = Math.floor(reset / 1000);
+      logger.debug('Name %s Limit: %d Remaining: %d Reset: %d', name, limit, dispRemaining, dispReset);
       var prefix;
       if (reject && remaining < 0 && resMsgHeaders['X-RateLimit-Limit']) {
         // On reject we only want the rateLimit that caused it
@@ -66,7 +67,9 @@ exports.handleResponse =
         // First item in list, "<value>" for single, "name=<name>,<value>" for multi-level
         resMsgHeaders['X-RateLimit-Limit'] = prefix + limit;
         resMsgHeaders['X-RateLimit-Remaining'] = prefix + dispRemaining;
-        resMsgHeaders['X-RateLimit-Reset'] = prefix + reset;
+        if (remaining < 0) {
+          resMsgHeaders['X-RateLimit-Reset'] = prefix + dispReset;
+        }
       } else if (name === 'x-ibm-unnamed-rate-limit') {
         // Insert single value at beginning: "<value>; "
         resMsgHeaders['X-RateLimit-Limit'] =
@@ -77,16 +80,20 @@ exports.handleResponse =
             splice(resMsgHeaders['X-RateLimit-Remaining'],
                    resMsgHeaders['X-RateLimit-Remaining'].indexOf('=') + 1,
                    dispRemaining + '; ');
-        resMsgHeaders['X-RateLimit-Reset'] =
-            splice(resMsgHeaders['X-RateLimit-Reset'],
-                   resMsgHeaders['X-RateLimit-Reset'].indexOf('=') + 1,
-                   reset + '; ');
+        if (remaining < 0) {
+          resMsgHeaders['X-RateLimit-Reset'] =
+              splice(resMsgHeaders['X-RateLimit-Reset'],
+                     resMsgHeaders['X-RateLimit-Reset'].indexOf('=') + 1,
+                     dispReset + '; ');
+        }
       } else {
         // Append multi-level value at end: "; name=<name>,<value>"
         prefix = '; name=' + name + ',';
         resMsgHeaders['X-RateLimit-Limit'] += prefix + limit;
         resMsgHeaders['X-RateLimit-Remaining'] += prefix + dispRemaining;
-        resMsgHeaders['X-RateLimit-Reset'] += prefix + reset;
+        if (remaining < 0) {
+          resMsgHeaders['X-RateLimit-Reset'] += prefix + dispReset;
+        }
       }
       return resMsg;
     }
