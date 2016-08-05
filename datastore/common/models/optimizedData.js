@@ -589,10 +589,11 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             apiType = 'REST';
           }
 
+
           var newOptimizedDataEntry = {
             'subscription-id': pieces.subscription.id,
-            'subscription-active': false || pieces.subscription.active, //pieces.subscription.active,
-            'subscription-app-state': pieces.application.state || 'ACTIVE', //pieces.application.state,
+            'subscription-active': (pieces.subscription.active !== undefined) ? pieces.subscription.active : true,
+            'subscription-app-state': pieces.application.state || 'ACTIVE',
             'client-id': credential['client-id'],
             'client-secret': credential['client-secret'],
             'client-name': pieces.application.title,

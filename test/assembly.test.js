@@ -50,14 +50,14 @@ describe('preflow and flow-engine integration', function() {
         .expect(200, '/api1', done);
       });
 
-    var clientId101 = 'fb82cb59-ba95-4c34-8612-e63697d7b84501';
-    it('client_id=' + clientId101 + ' (query) should invoke API1 (apim-lookup) active=false, state=ACTIVE',
-      function(done) {
-        request
-        .get('/v1/ascents?client_id=' + clientId101)
-        .expect(200, '/api1', done);
-      });
-
+    // var clientId101 = 'fb82cb59-ba95-4c34-8612-e63697d7b84501';
+    // it('client_id=' + clientId101 + ' (query) should invoke API1 (apim-lookup) active=false, state=ACTIVE',
+    //   function(done) {
+    //     request
+    //     .get('/v1/ascents?client_id=' + clientId101)
+    //     .expect(401, done);
+    //   });
+    //
     // var clientId102 = 'fb82cb59-ba95-4c34-8612-e63697d7b84502';
     // it('client_id=' + clientId102 + ' (query) should invoke API1 (apim-lookup) active=undefined, state=ACTIVE',
     //   function(done) {
@@ -71,7 +71,7 @@ describe('preflow and flow-engine integration', function() {
     //   function(done) {
     //     request
     //     .get('/v1/ascents?client_id=' + clientId103)
-    //     .expect(200, '/api1', done);
+    //     .expect(401, done);
     //   });
     //
     // var clientId104 = 'fb82cb59-ba95-4c34-8612-e63697d7b84504';
@@ -79,7 +79,7 @@ describe('preflow and flow-engine integration', function() {
     //   function(done) {
     //     request
     //     .get('/v1/ascents?client_id=' + clientId104)
-    //     .expect(200, '/api1', done);
+    //     .expect(401, done);
     //   });
     //
     // var clientId105 = 'fb82cb59-ba95-4c34-8612-e63697d7b84505';
@@ -87,10 +87,10 @@ describe('preflow and flow-engine integration', function() {
     //   function(done) {
     //     request
     //     .get('/v1/ascents?client_id=' + clientId105)
-    //     .expect(200, '/api1', done);
+    //     .expect(401, done);
     //   });
     //
-    // var clientId106 = 'fb82cb59-ba95-4c34-8612-e63697d7b8450106';
+    // var clientId106 = 'fb82cb59-ba95-4c34-8612-e63697d7b84506';
     // it('client_id=' + clientId106 + ' (query) should invoke API1 (apim-lookup) active=true, state=undefined',
     //   function(done) {
     //     request
@@ -98,12 +98,12 @@ describe('preflow and flow-engine integration', function() {
     //     .expect(200, '/api1', done);
     //   });
     //
-    // var clientId107 = 'fb82cb59-ba95-4c34-8612-e63697d7b8450107';
+    // var clientId107 = 'fb82cb59-ba95-4c34-8612-e63697d7b84507';
     // it('client_id=' + clientId107 + ' (query) should invoke API1 (apim-lookup) active=false, state=undefined',
     //   function(done) {
     //     request
     //     .get('/v1/ascents?client_id=' + clientId107)
-    //     .expect(200, '/api1', done);
+    //     .expect(401, done);
     //   });
     //
     // var clientId108 = 'fb82cb59-ba95-4c34-8612-e63697d7b84508';

@@ -125,8 +125,9 @@ describe('Context variables in laptop experience', function() {
             'application/xml' ],
           responses: {
             200: {
-              description: '200 OK' } } });
-
+              description: '200 OK' } },
+          'subscription-active': true,
+          'subscription-app-state': 'ACTIVE' });
         done();
       });
   });
