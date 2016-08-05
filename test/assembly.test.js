@@ -50,14 +50,14 @@ describe('preflow and flow-engine integration', function() {
         .expect(200, '/api1', done);
       });
 
-    // var clientId101 = 'fb82cb59-ba95-4c34-8612-e63697d7b84501';
-    // it('client_id=' + clientId101 + ' (query) should invoke API1 (apim-lookup) active=false, state=ACTIVE',
-    //   function(done) {
-    //     request
-    //     .get('/v1/ascents?client_id=' + clientId101)
-    //     .expect(200, '/api1', done);
-    //   });
-    //
+    var clientId101 = 'fb82cb59-ba95-4c34-8612-e63697d7b84501';
+    it('client_id=' + clientId101 + ' (query) should invoke API1 (apim-lookup) active=false, state=ACTIVE',
+      function(done) {
+        request
+        .get('/v1/ascents?client_id=' + clientId101)
+        .expect(200, '/api1', done);
+      });
+
     // var clientId102 = 'fb82cb59-ba95-4c34-8612-e63697d7b84502';
     // it('client_id=' + clientId102 + ' (query) should invoke API1 (apim-lookup) active=undefined, state=ACTIVE',
     //   function(done) {
