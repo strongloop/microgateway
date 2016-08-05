@@ -588,8 +588,6 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             apiAssembly = { assembly: {} };
             apiType = 'REST';
           }
-
-
           var newOptimizedDataEntry = {
             'subscription-id': pieces.subscription.id,
             'subscription-active': (pieces.subscription.active !== undefined) ? pieces.subscription.active : true,
