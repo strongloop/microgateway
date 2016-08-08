@@ -490,13 +490,6 @@ function noSubHeaderClientIdRate(doneCB) {
     .expect(401, doneCB);
 }
 
-function noSubHeaderClientIdBad(doneCB) {
-  request
-    .get('/api/hdrclientid')
-    .set('X-IBM-Client-Id', 'bad')
-    .expect(200, doneCB);
-}
-
 function noSubQueryClientIdRate(doneCB) {
   request
     .get('/api/qryclientid?client_id=default')
