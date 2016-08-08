@@ -6,6 +6,8 @@
   },
   "properties": {
     "subscription-id": "string",
+    "subscription-active": "boolean",
+    "subscription-app-state": "string",
     "client-id": "string",
     "client-secret": "string",
     "client-name": "string",

@@ -133,8 +133,10 @@ function ripCTX(ctx) {
   var locals = {};
   locals.subscription = {};
   locals.subscription.id = ctx.instance.id;
+  locals.subscription.active = ctx.instance.active;
   locals.application = {
     title: ctx.instance.application.title,
+    state: ctx.instance.application.state,
     credentials: ctx.instance.application['app-credentials'],
     developerOrg: ctx.instance['developer-organization'] };
 
@@ -588,6 +590,8 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
           }
           var newOptimizedDataEntry = {
             'subscription-id': pieces.subscription.id,
+            'subscription-active': (pieces.subscription.active !== undefined) ? pieces.subscription.active : true,
+            'subscription-app-state': pieces.application.state || 'ACTIVE',
             'client-id': credential['client-id'],
             'client-secret': credential['client-secret'],
             'client-name': pieces.application.title,
