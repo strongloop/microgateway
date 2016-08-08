@@ -381,6 +381,10 @@ function annotateAPIs(listOfApis, callback) {
 }
 
 function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
+  var createTestApp = pieces.catalog['test-app-enabled'] &&
+                      pieces.catalog['test-app-credentials'] &&
+                      pieces.catalog.sandbox;
+
   async.each(
     pieces.application.credentials,
     function(credential, creddone) { //each clientid
@@ -388,6 +392,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
         pieces.apis,
         function(api, apidone) {  // each api
           var apiPaths = [];
+          var apiPathsTestApp = [];
           var apiName = api.document.info['x-ibm-name'] || api.document.info['title'];
           var apiVersion = api.document.info['version'];
           var apiNameVer = apiName + ':' + apiVersion;
@@ -424,6 +429,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
           Object.getOwnPropertyNames(pathsProp).forEach(
             function(propname) {
               var method = [];
+              var methodTestApp = [];
               if (propname.indexOf('/') > -1) {
                 logger.debug('propname: ', propname);
                 var propnames = apiDocument.paths[propname];
@@ -510,7 +516,26 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                         // operational lvl Swagger security overrides the API lvl
                         securityReqs: securityEnabledForMethod,
                         'observed-rate-limit': observedRatelimit,
-                        'using-plan-rate-limit': usingPlanRateLimit,
+                        'rate-limit-scope': rateLimitScope });
+                    }
+
+                    if (createTestApp) {
+                      if (usingPlanRateLimit) {
+                        observedRatelimit = undefined;
+                        rateLimitScope = undefined;
+                      }
+                      methodTestApp.push({
+                        consumes: operation.consumes || apiDocument.consumes,
+                        method: methodname.toUpperCase(),
+                        operationId: operation.operationId,
+                        parameters: getOpParams(
+                                apiDocument.paths[propname].parameters, operation.parameters),
+                        produces: operation.produces || apiDocument.produces,
+                        responses: operation.responses,
+                        securityDefs: apiDocument.securityDefinitions,
+                        // operational lvl Swagger security overrides the API lvl
+                        securityReqs: securityEnabledForMethod,
+                        'observed-rate-limit': observedRatelimit,
                         'rate-limit-scope': rateLimitScope });
                     }
                   });
@@ -523,6 +548,16 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                     'path-regex': regexPath,
                     'path-methods': method };
                   apiPaths.push(apiPath);
+                }
+
+                if (createTestApp && methodTestApp.length !== 0) { // no methods, no apiPaths
+                  var regexPathTestApp = makePathRegex(apiDocument.basePath, propname);
+                  var apiPathTestApp = {
+                    path: propname,
+                    'matching-score': calculateMatchingScore(propname),
+                    'path-regex': regexPathTestApp,
+                    'path-methods': methodTestApp };
+                  apiPathsTestApp.push(apiPathTestApp);
                 }
               }
             });
@@ -624,37 +659,44 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'snapshot-id': pieces.snapshot };
 
           // no paths, no entry..
-          if (apiPaths.length !== 0 && apiEnforced === true && apiState !== 'stopped') {
-            app.models.optimizedData.create(
-              newOptimizedDataEntry,
-              function(err, optimizedData) {
-                if (err) {
-                  apidone(err);
-                  return;
-                }
-                logger.debug('optimizedData created: %j', optimizedData);
-                if (pieces.catalog['test-app-enabled'] &&
-                  pieces.catalog['test-app-credentials'] &&
-                  pieces.catalog.sandbox &&
-                  apiClientidSecurity) {
-                  modifyOptDataForTestApp(newOptimizedDataEntry, pieces);
-                  app.models.optimizedData.create(
-                    newOptimizedDataEntry,
-                    function(err, testAppOptimizedData) {
-                      if (err) {
-                        apidone(err);
-                        return;
+          if (apiEnforced === true && apiState !== 'stopped') {
+            if (apiPaths.length !== 0) {
+              app.models.optimizedData.create(
+                newOptimizedDataEntry,
+                function(err, optimizedData) {
+                  if (err) {
+                    apidone(err);
+                    return;
+                  }
+                  logger.debug('optimizedData created: %j', optimizedData);
+                  if (createTestApp && apiClientidSecurity) {
+                    createTestData(app, newOptimizedDataEntry, pieces, apiPathsTestApp,
+                      function(err) {
+                        if (err) {
+                          apidone(err);
+                          return;
+                        }
+                        apidone();
                       }
-                      logger.debug('testApp optimizedData created: %j',
-                        testAppOptimizedData);
-                      apidone();
-                    }
-                  );
-                } else {
+                    );
+                  } else {
+                    apidone();
+                  }
+                }
+              );
+            } else if (apiPathsTestApp.length !== 0 && createTestApp && apiClientidSecurity) {
+              createTestData(app, newOptimizedDataEntry, pieces, apiPathsTestApp,
+                function(err) {
+                  if (err) {
+                    apidone(err);
+                    return;
+                  }
                   apidone();
                 }
-              }
-            );
+              );
+            } else {
+              apidone();
+            }
           } else {
             apidone();
           }
@@ -664,22 +706,23 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
     function(err) { cb(err); });
 }
 
-function modifyOptDataForTestApp(OptimizedDataEntry, pieces) {
+function createTestData(app, OptimizedDataEntry, pieces, apiPaths, cb) {
   OptimizedDataEntry['test-app-enabled'] = true;
   OptimizedDataEntry['client-id'] = pieces.catalog['test-app-credentials']['client-id'];
   OptimizedDataEntry['client-secret'] = pieces.catalog['test-app-credentials']['client-secret'];
+  OptimizedDataEntry['api-paths'] = apiPaths;
   OptimizedDataEntry['plan-rate-limit'] = undefined;
-  var apiPaths = OptimizedDataEntry['api-paths'];
-  for (var i = 0; i < apiPaths.length; i++) {
-    for (var j = 0; j < apiPaths[i]['path-methods'].length; j++) {
-      var method = apiPaths[i]['path-methods'][j];
-      if (method['using-plan-rate-limit']) {
-        method['observed-rate-limit'] = undefined;
-        method['rate-limit-scope'] = undefined;
+  app.models.optimizedData.create(
+    OptimizedDataEntry,
+    function(err, testAppOptimizedData) {
+      if (err) {
+        cb(err);
+        return;
       }
-      method['using-plan-rate-limit'] = undefined;
+      logger.debug('testApp optimizedData created: %j', testAppOptimizedData);
+      cb();
     }
-  }
+  );
 }
 
 function makePathRegex(basePath, apiPath) {
