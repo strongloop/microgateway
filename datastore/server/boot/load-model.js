@@ -690,8 +690,7 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
               model.name = 'api';
               if (entry.document.info['x-ibm-name']) {
                 apis[entry.document.info['x-ibm-name']] = entry.document;
-              }
-              else {
+              } else {
                 apis[entry.document.info['title']] = entry.document;
               }
             }

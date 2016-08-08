@@ -20,6 +20,7 @@ describe('quick start', function() {
   runTestAppIgnored('test app enabled for non development catalog', 'testappenabledtruefornondevcat');
   runTestAppIgnored('test app enabled without credentials', 'testappenablednocredentials');
   runTestAppApplied();
+  runTestAppAppliedNoSub();
 });
 
 function runTestAppIgnored(desc, dir) {
@@ -176,6 +177,96 @@ function runTestAppApplied() {
     it('should fail with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretHeader',
       queryClientIdAndSecretHeader);
   });
+}
+
+function runTestAppAppliedNoSub() {
+  describe('test app really enabled no subscription', function() {
+    before(function(done) {
+      process.env.APIMANAGER = '127.0.0.1';
+      process.env.APIMANAGER_PORT = 8081;
+      process.env.NODE_ENV = 'production';
+      process.env.CONFIG_DIR = __dirname + '/definitions/quickstart/testappenablednosub';
+      process.env.DATASTORE_PORT = 5000;
+      delete require.cache[require.resolve('../lib/microgw')];
+      mg = require('../lib/microgw');
+      apimServer.start(
+        process.env.APIMANAGER,
+        process.env.APIMANAGER_PORT,
+        process.env.CONFIG_DIR
+      )
+      .then(function() {
+        return mg.start(3000);
+      })
+      .then(function() {
+        return echo.start(8889);
+      })
+      .then(function() {
+        request = supertest('http://localhost:3000');
+      })
+      .then(done)
+      .catch(function(err) {
+        console.error(err);
+        done(err);
+      });
+    });
+
+    after(function(done) {
+      dsCleanup(5000)
+        .then(function() { return mg.stop(); })
+        .then(function() { return apimServer.stop(); })
+        .then(function() { return echo.stop(); })
+        .then(done, done)
+        .catch(done);
+      delete process.env.CONFIG_DIR;
+      delete process.env.NODE_ENV;
+      delete process.env.APIMANAGER;
+      delete process.env.APIMAMANGER_PORT;
+      delete process.env.DATASTORE_PORT;
+    });
+
+    it('should pass with "/api/nosec" - onprem noSecurity', noSecurityTemp);
+    it('should fail rate limit with "/api/nosec" - onprem noSecurityHeaderClientIdRate',
+      noSecurityHeaderClientIdRate);
+    it('should fail rate limit with "/api/nosec" - onprem noSecurityQueryClientIdRate',
+      noSecurityQueryClientIdRate);
+    it('should fail rate limit with "/api/nosec" - onprem noSecurityHeaderClientIdBadRate',
+      noSecurityHeaderClientIdBadRate);
+    it('should fail rate limit with "/api/nosec" - onprem noSecurityQueryClientIdBadRate',
+      noSecurityQueryClientIdBadRate);
+    it('should fail with "/api/hdrclientid" - onprem noSubHeaderClientId', noSubHeaderClientId);
+    it('should fail rate limit with "/api/hdrclientid" - onprem noSubHeaderClientIdRate', noSubHeaderClientIdRate);
+    it('should pass with "/api/hdrclientid" - onprem headerClientIdBadPass', headerClientIdBadPass);
+    it('should fail with "/api/hdrclientid" - onprem headerClientIdQuery', headerClientIdQuery);
+    it('should fail rate limit with "/api/qryclientid" - onprem noSubQueryClientIdRate', noSubQueryClientIdRate);
+    it('should pass with "/api/qryclientid" - onprem queryClientIdBadPass', queryClientIdBadPass);
+    it('should fail with "/api/qryclientid" - onprem queryClientIdHeader', queryClientIdHeader);
+    it('should fail rate limit with "/api/hdrclientidandsecret" - onprem noSubHeaderClientIdAndSecretRate',
+      noSubHeaderClientIdAndSecretRate);
+    it('should pass with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretBadClientAndSecret',
+      headerClientIdAndSecretBadClientAndSecret);
+    it('should fail with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretBadClient',
+      headerClientIdAndSecretBadClient);
+    it('should fail with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretBadSecret',
+      headerClientIdAndSecretBadSecret);
+    it('should fail with "/api/hdrclientidandsecret" - onprem headerClientIdAndSecretQuery',
+      headerClientIdAndSecretQuery);
+    it('should fail with "/api/qryclientidandsecret" - onprem noSubQueryClientIdAndSecretRate',
+      noSubQueryClientIdAndSecretRate);
+    it('should pass with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretBadClientAndSecret',
+      queryClientIdAndSecretBadClientAndSecret);
+    it('should fail with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretBadClient',
+      queryClientIdAndSecretBadClient);
+    it('should fail with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretBadSecret',
+      queryClientIdAndSecretBadSecret);
+    it('should fail with "/api/qryclientidandsecret" - onprem queryClientIdAndSecretHeader',
+      queryClientIdAndSecretHeader);
+  });
+}
+
+function noSecurityTemp(doneCB) {
+  request
+    .get('/api/nosec')
+    .expect(429 /*200*/, doneCB);
 }
 
 function noSecurity(doneCB) {
@@ -382,5 +473,39 @@ function queryClientIdAndSecretHeader(doneCB) {
     .get('/api/qryclientidandsecret')
     .set('X-IBM-Client-Id', 'default')
     .set('X-IBM-Client-Secret', 'SECRET')
+    .expect(401, doneCB);
+}
+
+function noSubHeaderClientId(doneCB) {
+  request
+    .get('/api/hdrclientid')
+    .set('X-IBM-Client-Id', 'default')
+    .expect(401, doneCB);
+}
+
+function noSubHeaderClientIdRate(doneCB) {
+  request
+    .get('/api/hdrclientid')
+    .set('X-IBM-Client-Id', 'default')
+    .expect(401, doneCB);
+}
+
+function noSubQueryClientIdRate(doneCB) {
+  request
+    .get('/api/qryclientid?client_id=default')
+    .expect(401, doneCB);
+}
+
+function noSubHeaderClientIdAndSecretRate(doneCB) {
+  request
+    .get('/api/hdrclientidandsecret')
+    .set('X-IBM-Client-Id', 'default')
+    .set('X-IBM-Client-Secret', 'SECRET')
+    .expect(401, doneCB);
+}
+
+function noSubQueryClientIdAndSecretRate(doneCB) {
+  request
+    .get('/api/qryclientidandsecret?client_id=default&client_secret=SECRET')
     .expect(401, doneCB);
 }
