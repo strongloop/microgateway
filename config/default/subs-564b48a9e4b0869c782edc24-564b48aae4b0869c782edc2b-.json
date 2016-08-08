@@ -468,17 +468,7 @@
       }
     ]
   }
-},
-
-
-
-
-
-
-
-
-
-{
+}, {
   "id": "564bbfe3e4b0869c782ee3fa01",
   "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/subscriptions/564bbfe3e4b0869c782ee3fa",
   "organization": {
@@ -559,8 +549,7 @@
       "name": "trial"
     }
   }
-},
-{
+}, {
   "id": "564bbfe3e4b0869c782ee3fa02",
   "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/subscriptions/564bbfe3e4b0869c782ee3fa",
   "organization": {
@@ -640,8 +629,7 @@
       "name": "trial"
     }
   }
-},
-{
+}, {
   "id": "564bbfe3e4b0869c782ee3fa03",
   "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/subscriptions/564bbfe3e4b0869c782ee3fa",
   "organization": {
@@ -722,8 +710,7 @@
       "name": "trial"
     }
   }
-},
-{
+}, {
   "id": "564bbfe3e4b0869c782ee3fa04",
   "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/subscriptions/564bbfe3e4b0869c782ee3fa",
   "organization": {
@@ -804,8 +791,7 @@
       "name": "trial"
     }
   }
-},
-{
+}, {
   "id": "564bbfe3e4b0869c782ee3fa05",
   "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/subscriptions/564bbfe3e4b0869c782ee3fa",
   "organization": {
@@ -885,8 +871,7 @@
       "name": "trial"
     }
   }
-},
-{
+}, {
   "id": "564bbfe3e4b0869c782ee3fa06",
   "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/subscriptions/564bbfe3e4b0869c782ee3fa",
   "organization": {
@@ -966,8 +951,7 @@
       "name": "trial"
     }
   }
-},
-{
+}, {
   "id": "564bbfe3e4b0869c782ee3fa07",
   "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/subscriptions/564bbfe3e4b0869c782ee3fa",
   "organization": {
@@ -1047,8 +1031,7 @@
       "name": "trial"
     }
   }
-},
-{
+}, {
   "id": "564bbfe3e4b0869c782ee3fa08",
   "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/subscriptions/564bbfe3e4b0869c782ee3fa",
   "organization": {
@@ -1127,21 +1110,7 @@
       "name": "trial"
     }
   }
-},
-
-
-
-
-
-
-
-
-
-
-
-
-
- {
+}, {
   "id": "564bc01be4b0869c782ee45c",
   "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/subscriptions/564bc01be4b0869c782ee45c",
   "organization": {
