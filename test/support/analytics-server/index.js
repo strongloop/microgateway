@@ -8,6 +8,7 @@
 
 var express = require('express');
 var https = require('https');
+var Promise = require('bluebird');
 var logger = require('apiconnect-cli-logger/logger.js')
         .child({ loc: 'microgateway:analytics-moc-server' });
 var options = require('./httpsOptions');

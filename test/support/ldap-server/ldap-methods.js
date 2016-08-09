@@ -9,6 +9,7 @@ var _ = require('lodash');
 var fs = require('fs');
 var path = require('path');
 var ldap = require('ldapjs');
+var Promise = require('bluebird');
 
 var userfile = path.join(__dirname, 'users.json');
 
