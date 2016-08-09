@@ -47,7 +47,7 @@
       "from": "anymatch@>=1.3.0 <2.0.0"
     },
     "apiconnect-cli-config": {
-      "version": "2.2.0",
+      "version": "2.2.1",
       "from": "apiconnect-cli-config@>=2.0.0 <3.0.0",
       "dependencies": {
         "js-yaml": {
@@ -65,7 +65,7 @@
       "from": "apiconnect-cli-logger@>=1.0.0 <2.0.0"
     },
     "apiconnect-validate": {
-      "version": "2.1.0",
+      "version": "2.1.1",
       "from": "apiconnect-validate@>=2.0.0 <3.0.0"
     },
     "append-field": {
