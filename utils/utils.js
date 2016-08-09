@@ -6,6 +6,7 @@
 var env = require('./environment');
 var path = require('path');
 var fs = require('fs');
+var Promise = require('bluebird');
 var log = require('apiconnect-cli-logger/logger.js')
                   .child({ loc: 'microgateway:utils' });
 var crypto = require('crypto');

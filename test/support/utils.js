@@ -8,6 +8,7 @@ var assert = require('assert');
 var _ = require('lodash');
 var fs = require('fs');
 var path = require('path');
+var Promise = require('bluebird');
 
 /**
  * clean up the directory after running the test suite

@@ -7,6 +7,7 @@
 'use strict';
 
 var supertest = require('supertest');
+var Promise = require('bluebird');
 var microgw;
 var backend = require('./support/invoke-server');
 var analytics = require('./support/analytics-server');
