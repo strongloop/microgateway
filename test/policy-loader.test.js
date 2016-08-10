@@ -11,14 +11,12 @@ var path = require('path');
 
 describe('policy-loader', function() {
   describe('load default policy', function() {
-    it('should contain cors, invoke, redaction set-variable', function() {
+    it('should contain invoke, redaction set-variable', function() {
       var pl = policyLoader.create(path.resolve(__dirname, '..', 'policies'));
       pl.should.be.a.Object();
       var policies = pl.getPolicies();
-      policies.should.have.property('cors');
       policies.should.have.property('invoke');
       policies.should.have.property('set-variable');
-      policies['cors'].should.be.a.Function();
       policies['invoke'].should.be.a.Function();
       policies['set-variable'].should.be.a.Function();
     });
@@ -93,10 +91,8 @@ describe('policy-loader', function() {
     it('should load user policies in config correctly', function(done) {
       var loader = policyLoader.createMGLoader();
       var policies = loader.getPolicies();
-      policies.should.have.property('cors');
       policies.should.have.property('invoke');
       policies.should.have.property('set-variable');
-      policies['cors'].should.be.a.Function();
       policies['invoke'].should.be.a.Function();
       policies['set-variable'].should.be.a.Function();
       policies.should.have.property('mypolicy1');
@@ -119,10 +115,8 @@ describe('policy-loader', function() {
     it('should load user policies in config and disable override', function(done) {
       var loader = policyLoader.createMGLoader({ override: false });
       var policies = loader.getPolicies();
-      policies.should.have.property('cors');
       policies.should.have.property('invoke');
       policies.should.have.property('set-variable');
-      policies['cors'].should.be.a.Function();
       policies['invoke'].should.be.a.Function();
       policies['set-variable'].should.be.a.Function();
       policies.should.have.property('mypolicy1');
@@ -159,10 +153,8 @@ describe('policy-loader', function() {
     it('should load user policies in config correctly', function(done) {
       var loader = policyLoader.createMGLoader();
       var policies = loader.getPolicies();
-      policies.should.have.property('cors');
       policies.should.have.property('invoke');
       policies.should.have.property('set-variable');
-      policies['cors'].should.be.a.Function();
       policies['invoke'].should.be.a.Function();
       policies['set-variable'].should.be.a.Function();
       policies.should.have.property('mypolicy1');
