@@ -245,7 +245,6 @@ function gatherDataCreateOptimizedEntry(app, locals, isWildcard, gatherCallback)
 }
 
 function grabCatalog(app, snapshot, product, cb) {
-  var catalog = {};
   var query = {
     where: {
       'snapshot-id': snapshot,
@@ -256,9 +255,18 @@ function grabCatalog(app, snapshot, product, cb) {
       cb(err);
       return;
     }
-    logger.debug('grabCatalog found: %j', myproduct);
-    catalog = myproduct.catalog;
-    cb(null, catalog);
+    var query = {
+      where: {
+        'snapshot-id': snapshot,
+        id: myproduct.catalog.id } };
+    app.models.catalog.findOne(query, function(err, catalog) {
+      if (err) {
+        cb(err);
+        return;
+      }
+      logger.debug('grabCatalog found: %j', catalog);
+      cb(null, catalog);
+    });
   });
 }
 
