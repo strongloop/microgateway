@@ -361,13 +361,15 @@ function encryptData(data) {
 
 function getOrCreatePass() {
   var pass_key = '';
+  var private_key;
   try {
     fs.statSync(passFile);
     // file found
+    private_key = getKey(keyFile);
     pass_key = Crypto.privateDecrypt(private_key, new Buffer(getKey(passFile)));
   } catch (err) {
     // no file.. create it..
-    var private_key = getKey(keyFile);
+    private_key = getKey(keyFile);
     // no key, can't crate it..
     if (private_key !== '') {
       var password = Crypto.createHash('sha256').update('apimanager').digest();
