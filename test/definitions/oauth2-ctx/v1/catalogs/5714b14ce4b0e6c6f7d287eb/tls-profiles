@@ -1,0 +1,24 @@
+[
+  {
+    "id": "57457d40e4b06d109c274e71",
+    "url": "https://172.16.154.175/v1/catalogs/5714b14ce4b0e6c6f7d287eb/tls-profiles/57457d40e4b06d109c274e71",
+    "name": "new-tls-profile-1",
+    "title": "New TLS profile 1",
+    "description": "",
+    "public": false,
+    "ciphers": [
+      "SSL_RSA_WITH_AES_256_CBC_SHA",
+      "SSL_RSA_WITH_AES_128_CBC_SHA",
+      "SSL_RSA_WITH_3DES_EDE_CBC_SHA",
+      "SSL_RSA_WITH_RCA_128_SHA",
+      "SSL_RSA_WITH_RCA_128_MD5"
+    ],
+    "protocols": [
+      "TLSv11",
+      "TLSv12"
+    ],
+    "certs": [],
+    "org-id": "5714857ee4b0e6c6f7d28767",
+    "mutual-auth": false
+  }
+]
