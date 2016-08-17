@@ -166,7 +166,7 @@ module.exports = function(app) {
  */
 function loadData(app, apimanager, models, currdir, uid) {
   var snapdir;
-  var snapshotID = uid || getSnapshotID();
+  var snapshotID = getSnapshotID();
   var populatedSnapshot = false;
 
   async.series([
@@ -177,7 +177,11 @@ function loadData(app, apimanager, models, currdir, uid) {
           // don't look for successful handshake currently because UT depends on this
         // we have an APIm, handshake succeeded, so try to pull data..
         pullFromAPIm(apimanager, currdir, snapshotID, function(err, dir) {
-          if (err) { /* suppress eslint handle-callback-err */ }
+          if (err) {
+            if (uid) {
+              snapshotID = uid;
+            } // in case of error, try the previous snapshot
+          }
           snapdir = dir; // even in case of error, we need to try loading from the file system
           callback();
         });
@@ -457,7 +461,7 @@ function pullFromAPIm(apimanager, currdir, uid, cb) {
     if (err) {
       logger.warn('Failed to create snapshot directory');
       logger.debug('pullFromAPIm exit(1)');
-      cb(null, '');
+      cb(err, '');
       return;
     }
     /*
@@ -498,7 +502,7 @@ function pullFromAPIm(apimanager, currdir, uid, cb) {
       }
       logger.debug(response);
       logger.debug('pullFromAPIm exit(2)');
-      cb(null, snapdir);
+      cb(err, snapdir);
     });
   });
 }
