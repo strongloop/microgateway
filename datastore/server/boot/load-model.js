@@ -3,7 +3,7 @@
 // US Government Users Restricted Rights - Use, duplication or disclosure
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
-var fs = require('fs');
+var fs = require('fs.extra');
 var path = require('path');
 var async = require('async');
 var YAML = require('yamljs');
@@ -210,6 +210,15 @@ function loadData(app, apimanager, models, currdir, uid) {
       // if no error and APIs specified, do not agressively reload config
       if (!err && apimanager.host && (http || https)) {
         apimanager.startupRefresh = interval;
+        // if the previous snapshot hasn't be loaded, delete it
+        if (uid && snapshotID !== uid) {
+          try {
+            fs.rmrfSync(currdir);
+          } catch (e) {
+            logger.error(e);
+            //continue
+          }
+        }
       } else if (apimanager.startupRefresh < apimanager.maxRefresh) {
         // try agressively at first, and slowly back off
         interval = apimanager.startupRefresh;
