@@ -1,3 +1,165 @@
+2016-08-18, Version 1.5.0
+=========================
+
+ * Remove config dir if prev snapshot not loaded (Jon Palgon)
+
+ * Skip token verification if oauth ctx exists (yihongwang)
+
+ * Add test cases for oauth context vars (yihongwang)
+
+ * Add OAuth context vars (yihongwang)
+
+ * Only attempt to load prev snapshot if fail to load current (Jon Palgon)
+
+ * Use real catalog instead of the one in product (Daniel Badt)
+
+ * Remove CORS policy tests (Jon Palgon)
+
+ * Remove unsupported CORS policy (Jon Palgon)
+
+ * Use bluebird module for Promise (Jon Palgon)
+
+ * Move to eslint 2.x (Krishna Raman)
+
+ * Fix lint warning/error (Daniel Badt)
+
+ * Fix quick-start when no subscription available (Daniel Badt)
+
+ * Remove extraneous whitespace in subs (Thomas Burke)
+
+ * Enable all tests (Thomas Burke)
+
+ * Enable remaining tests, fix ctx breakage (Thomas Burke)
+
+ * Enable one test case (Thomas Burke)
+
+ * Fix tests (Thomas Burke)
+
+ * Add check for active and state props (Thomas Burke)
+
+ * Add logic to enforce active (Thomas Burke)
+
+ * Make rate limit headers consistent w/edge (Daniel Badt)
+
+ * remove un-used var in test script (Clement)
+
+ * add UT test case (Clement)
+
+ * use title if x-ibm-name is not available (Clement)
+
+ * add error message (Clement)
+
+ * Cleanup .datastore during `npm test` (Jon Palgon)
+
+ * Cleanup env variable (Jon Palgon)
+
+ * Use path module (Jon Palgon)
+
+ * Add UT and required changes to support datastore restart (Jon Palgon)
+
+ * Initial stab at loading previous directory on restart (Jon Palgon)
+
+ * change default timeout to 300s (Clement)
+
+ * Use the validated redirectURI (yihongwang)
+
+ * testcases for oauth2 with cors (juangmj)
+
+ * temporarily expect incorrect response (Jon Palgon)
+
+ * Fix plan-level rate limiting (Daniel Badt)
+
+ * Remove some temporary changes (Jon Palgon)
+
+ * Fix rate limiting for multiple api matches (Daniel Badt)
+
+ * Add missing test and temporarily force rate limit UT to pass (Jon Palgon)
+
+ * Address lint failures (Jon Palgon)
+
+ * Plan rate limiting UT w/ automatic subscription (Jon Palgon)
+
+ * Add UT & fix for test app w/o credentials (Jon Palgon)
+
+ * Fix test app names (Daniel Badt)
+
+ * Initial set of quick start UT (Jon Palgon)
+
+ * Fix operation rate-limit, make test-app visible (Daniel Badt)
+
+ * Eliminate status 403 logic for testApp (Daniel Badt)
+
+ * Initial changes to ugw for quick-start (Daniel Badt)
+
+ * Check the params of the internal util function (yihongwang)
+
+ * Added no-op defaultCallback to resource server (John Bellessa)
+
+ * Fix eslint errors (yihongwang)
+
+ * Add non-end2end test cases (yihongwang)
+
+ * Add test case for bad custom consent form (yihongwang)
+
+ * Support custom consent form in az-server (yihongwang)
+
+ * Check for return from indexOf (Jon Palgon)
+
+ * eslint failure (Jon Palgon)
+
+ * Use common function for loading TLS config (Jon Palgon)
+
+ * address apiconnect-cli-pm failure (Jon Palgon)
+
+ * Correct jscs configuration file (Jon Palgon)
+
+ * Resolve lint failures (Jon Palgon)
+
+ * Enable Lint (Jon Palgon)
+
+ * Fix no-proto, no-throw-literal, no-undef (juangmj)
+
+ * fix eslint errors (juangmj)
+
+ * eslint lib/ (juangmj)
+
+ * eslint lib/preflow/ lib/urlrewrite/ (juangmj)
+
+ * eslint datastore/ (juangmj)
+
+ * eslint test/definitions/* test/support/* (juangmj)
+
+ * eslint test/*.js (juangmj)
+
+ * eslint index.js (juangmj)
+
+ * eslint policies/ (juangmj)
+
+ * eslint utils/ (juangmj)
+
+ * change module name to 'microgateway' (Clement)
+
+ * Skip the LDAP testcases for OAuth2 authentication (juangmj)
+
+ * Add API docs for test cases (yihongwang)
+
+ * Render login form again after failed login (yihongwang)
+
+ * Add more hidden inputs for custom login form (yihongwang)
+
+ * Handle socket error when retriving custom form (yhwang)
+
+ * Update the default login/consent form template (yhwang)
+
+ * Add api505,api506,api555,api556,api700,api710,api750 (juangmj)
+
+ * Eliminate the warning from express-session (yihongwang)
+
+ * Add logic for handling property ref within file (Jon Palgon)
+
+ * Remove blank lines (Jon Palgon)
+
+
 2016-07-25, Version 1.4.2
 =========================
 
