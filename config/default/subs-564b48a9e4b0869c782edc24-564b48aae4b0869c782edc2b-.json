@@ -1330,6 +1330,8 @@
                   {"operationId": "routes.test1"},
                   {"operationId": "routes.test2"},
                   {"operationId": "routes.test3"},
+                  {"operationId": "routes.test5"},
+                  {"operationId": "routes.test6"},
                   {"operationId": "routes.find"},
                   {"operationId": "routes.create"},
                   {"operationId": "routes.upsert"},

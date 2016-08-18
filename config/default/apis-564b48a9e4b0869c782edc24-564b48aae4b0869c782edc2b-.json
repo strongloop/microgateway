@@ -1501,6 +1501,94 @@
                         ]
                     }
                 },
+                "/routes/test5": {
+                    "get": {
+                        "deprecated": false,
+                        "description": "",
+                        "operationId": "routes.test5",
+                        "parameters": [
+                            {
+                                "description": "Criteria to match model instances",
+                                "format": "JSON",
+                                "in": "query",
+                                "name": "where",
+                                "required": false,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Request was successful",
+                                "schema": {
+                                    "type": "object"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Test purposes.",
+                        "tags": [
+                            "routes"
+                        ],
+                        "security": [
+                            {
+                                "apikeyQueryArbId": []
+                            },
+                            {
+                                "apikeyHeaderArbId": []
+                            }
+                        ]
+                    }
+                },
+                "/routes/test6": {
+                    "get": {
+                        "deprecated": false,
+                        "description": "",
+                        "operationId": "routes.test6",
+                        "parameters": [
+                            {
+                                "description": "Criteria to match model instances",
+                                "format": "JSON",
+                                "in": "query",
+                                "name": "where",
+                                "required": false,
+                                "type": "string"
+                            }
+                        ],
+                        "responses": {
+                            "200": {
+                                "description": "Request was successful",
+                                "schema": {
+                                    "type": "object"
+                                }
+                            },
+                            "default": {
+                                "description": "Unexpected error",
+                                "schema": {
+                                    "$ref": "#/definitions/Error"
+                                }
+                            }
+                        },
+                        "summary": "Test purposes.",
+                        "tags": [
+                            "routes"
+                        ],
+                        "security": [
+                            {
+                                "apikeyQueryArbId": [],
+                                "apikeyQueryArbSecret": []
+                            },
+                            {
+                                "apikeyHeaderArbId": [],
+                                "apikeyHeaderArbSecret": []
+                            }
+                        ]
+                    }
+                },
                 "/routes": {
                     "get": {
                         "deprecated": false,
@@ -2114,6 +2202,30 @@
                     "in": "header",
                     "name": "BogusId",
                     "type": "apiKey"
+                },
+                "apikeyQueryArbId": {
+                    "in": "query",
+                    "name": "myQueryId",
+                    "type": "apiKey",
+                    "x-ibm-apikey": "clientid"
+                },
+                "apikeyQueryArbSecret": {
+                    "in": "query",
+                    "name": "myQuerySecret",
+                    "type": "apiKey",
+                    "x-ibm-apikey": "clientsecret"
+                },
+                "apikeyHeaderArbId": {
+                    "in": "header",
+                    "name": "myHeaderId",
+                    "type": "apiKey",
+                    "x-ibm-apikey": "clientid"
+                },
+                "apikeyHeaderArbSecret": {
+                    "in": "header",
+                    "name": "myHeaderSecret",
+                    "type": "apiKey",
+                    "x-ibm-apikey": "clientsecret"
                 },
                 "basicAuthentication": {
                     "type": "basic",
