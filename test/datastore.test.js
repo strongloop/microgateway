@@ -204,7 +204,7 @@ describe('data-store', function() {
             function() {
               // check for non existence of directory
               try {
-                fs.statSync(process.env['ROOTCONFIGDIR'] + oldSnapshotID);
+                fs.statSync(path.resolve(__dirname, '../config', oldSnapshotID));
               } catch (e) {
                 if (e.code === 'ENOENT') {
                   return done(); // expected
@@ -233,7 +233,7 @@ describe('data-store', function() {
             function() {
               // check for non existence of directory
               try {
-                fs.statSync(process.env['ROOTCONFIGDIR'] + snapshotID);
+                fs.statSync(path.resolve(__dirname, '../config', snapshotID));
               } catch (e) {
                 if (e.code === 'ENOENT') {
                   return done(); // expected
@@ -332,10 +332,46 @@ describe('data-store restart', function() {
             return done(err);
           }
           microgw.stop()
-            .then(function() { apimServer.stop(); })
             .then(done, done)
             .catch(done);
         });
+    });
+
+  it('snapshots should have single current entry with ref count of 1',
+    function(done) {
+      microgw.start(3000)
+        .then(function() {
+          var expect = [ { refcount: '1', current: true } ];
+          request
+            .get('/api/snapshots')
+            .expect(function(res) {
+              verifyResponseArray(res.body, expect);
+              var tmpSnapshotID = res.body[0].id;
+              assert(tmpSnapshotID !== snapshotID);
+              assert(tmpSnapshotID.length === 5); // ID's are strings of 5 characters
+              assert(parseInt(tmpSnapshotID, 10) >= 0); // ID's are >= 0
+              assert(parseInt(tmpSnapshotID, 10) < 65536); // ID's are < 65536
+              try {
+                fs.statSync(path.resolve(__dirname, '../config', snapshotID));
+                assert(false);
+              } catch (e) {
+                if (e.code !== 'ENOENT') {
+                  assert(false);
+                }
+              }
+              snapshotID = tmpSnapshotID;
+            })
+            .end(function(err, res) {
+              if (err) {
+                return done(err);
+              }
+              microgw.stop()
+                .then(function() { apimServer.stop(); })
+                .then(done, done)
+                .catch(done);
+            });
+        })
+        .catch(done);
     });
 
   it('snapshot should not have changed on restart',
@@ -370,7 +406,7 @@ describe('data-store restart', function() {
             function() {
               // check for non existence of directory
               try {
-                fs.statSync(process.env['ROOTCONFIGDIR'] + snapshotID);
+                fs.statSync(path.resolve(__dirname, '../config', snapshotID));
               } catch (e) {
                 if (e.code === 'ENOENT') {
                   return done(); // expected
@@ -648,7 +684,7 @@ describe('data-store-etags', function() {
             function() {
               // check for non existence of directory
               try {
-                fs.statSync(process.env['ROOTCONFIGDIR'] + snapshotID);
+                fs.statSync(path.resolve(__dirname, '../config', snapshotID));
               } catch (e) {
                 if (e.code === 'ENOENT') {
                   return done(); // expected
