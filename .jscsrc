@@ -61,7 +61,7 @@
      "checkTypes": "strictNativeCase",
      "checkRedundantAccess": true,
      "requireNewlineAfterDescription": true
-  }
+  },
 
   "disallowArrowFunctions": true
 }

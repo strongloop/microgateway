@@ -5,11 +5,9 @@
 
 //var app = require('../../server/server');
 var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'microgateway:models:datastore:webhook'});
-
+        .child({ loc: 'microgateway:models:datastore:webhook' });
 
 module.exports = function(Webhooks) {
-
   Webhooks.observe(
     'after save',
     function(ctx, next) {

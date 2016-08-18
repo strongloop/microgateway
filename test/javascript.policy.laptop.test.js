@@ -5,18 +5,14 @@
 
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var express = require('express');
 var supertest = require('supertest');
-var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
-var should = require('should');
+var dsCleanupFile = require('./support/utils').dsCleanupFile;
 
 describe('javascript policy', function() {
 
   var request;
-  before(function(done){
+  before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/javascript';
     process.env.NODE_ENV = 'production';
     mg.start(3000)
@@ -31,6 +27,7 @@ describe('javascript policy', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(done, done)
       .catch(done);

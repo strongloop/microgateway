@@ -1,5 +1,5 @@
 // Copyright IBM Corp. 2016. All Rights Reserved.
-// Node module: apiconnect-microgateway
+// Node module: microgateway
 // US Government Users Restricted Rights - Use, duplication or disclosure
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
@@ -7,44 +7,20 @@
 
 var Promise = require('bluebird');
 Promise.longStackTraces();
-var fs = require('fs');
 var path = require('path');
 var mg = require('../lib/microgw');
 var supertest = require('supertest');
-var _ = require('lodash');
 var jws = require('jws');
 var assert = require('assert');
-var debug  = require('debug')('tests:oauth');
+var debug = require('debug')('tests:oauth');
 var apimServer = require('./support/mock-apim-server/apim-server');
 var echo = require('./support/echo-server');
+var dsCleanup = require('./support/utils').dsCleanup;
 
 //var configDir = path.join(__dirname, 'definitions', 'oauth');
 var configDir = path.join(__dirname, 'definitions', 'oauth2-resource');
 
-var request, httprequest, NODE_TLS_REJECT_UNAUTHORIZED;
-
-function dsCleanup(port) {
-  // clean up the directory
-  return new Promise(function(resolve, reject) {
-    var expect = {snapshot : {}};
-    var datastoreRequest = supertest('http://localhost:' + port);
-    datastoreRequest
-      .get('/api/snapshots')
-      .end(function (err, res) {
-        var snapshotID = res.body[0].id;
-        datastoreRequest
-          .get('/api/snapshots/release?id=' + snapshotID)
-          .end(function(err, res) {
-            try {
-              assert(_.isEqual(expect, res.body));
-              resolve();
-            } catch (error) {
-              reject(error);
-            }
-          });
-      });
-  });
-}
+var request, NODE_TLS_REJECT_UNAUTHORIZED;
 
 describe('oauth testing onprem', function() {
 
@@ -66,7 +42,7 @@ describe('oauth testing onprem', function() {
       .then(function() {
         request = supertest('https://localhost:3000');
       })
-      .then(done, function (err) {
+      .then(done, function(err) {
         debug(err);
         done(err);
       });
@@ -86,8 +62,8 @@ describe('oauth testing onprem', function() {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = NODE_TLS_REJECT_UNAUTHORIZED;
   });
 
-  it('Access resource with token', function (done) {
-    requestAccessTokenClientCredentials().then(function (tokens) {
+  it('Access resource with token', function(done) {
+    requestAccessTokenClientCredentials().then(function(tokens) {
       request.get('/stock/quote?symbol=IBM')
         .set('authorization', 'Bearer ' + tokens.access_token)
         .expect(200, /{ "IBM": 123 }/)
@@ -95,8 +71,8 @@ describe('oauth testing onprem', function() {
     }, done);
   });
 
-  it('Access resource with token - extra scope', function (done) {
-    requestAccessTokenClientCredentials('stock:quote stock:info').then(function (tokens) {
+  it('Access resource with token - extra scope', function(done) {
+    requestAccessTokenClientCredentials('stock:quote stock:info').then(function(tokens) {
       request.get('/stock/quote?symbol=IBM')
         .set('authorization', 'Bearer ' + tokens.access_token)
         .expect(200, /{ "IBM": 123 }/)
@@ -104,10 +80,10 @@ describe('oauth testing onprem', function() {
     }, done);
   });
 
-  describe('Bad tokens', function () {
+  describe('Bad tokens', function() {
 
-    it('Attempt to access resource - wrong scope', function (done) {
-      requestAccessTokenClientCredentials('stock:info').then(function (tokens) {
+    it('Attempt to access resource - wrong scope', function(done) {
+      requestAccessTokenClientCredentials('stock:info').then(function(tokens) {
         request.get('/stock/quote?symbol=IBM')
           .set('authorization', 'Bearer ' + tokens.access_token)
           //.expect(401)
@@ -117,7 +93,7 @@ describe('oauth testing onprem', function() {
     });
 
 
-    it('Attempt to access resource with expired token', function (done) {
+    it('Attempt to access resource with expired token', function(done) {
       var access_token = 'eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJMRjJtMVdXQTVHQURrRFA5MjgzTXFwMVh3Y0dId' +
         'Wd2V2NWQ1FXbWQ0cW1VIiwiYXVkIjoiNmE3NmMyN2YtZjNmMC00N2RkLThlNTgtNTA5MjR' +
         'lNGExYmFiIiwiaWF0IjoxNDY1OTk3MDgwMDIwLCJleHAiOjE0NjU5OTcwODcwMjB9.FKc8' +
@@ -129,7 +105,7 @@ describe('oauth testing onprem', function() {
         .end(done);
     });
 
-    it('Invalid token', function (done) {
+    it('Invalid token', function(done) {
       request.get('/stock/quote?symbol=IBM')
         .set('authorization', 'Bearer BADTOKEN')
         .expect(401)
@@ -137,8 +113,8 @@ describe('oauth testing onprem', function() {
         .end(done);
     });
 
-    it('Corrupted signature', function (done) {
-      requestAccessTokenClientCredentials().then(function (tokens) {
+    it('Corrupted signature', function(done) {
+      requestAccessTokenClientCredentials().then(function(tokens) {
         request.get('/stock/quote?symbol=IBM')
           .set('authorization', 'Bearer ' + tokens.access_token + 'foobar')
           .expect(401)
@@ -146,7 +122,7 @@ describe('oauth testing onprem', function() {
       }, done);
     });
 
-    it('Fabricated token', function (done) {
+    it('Fabricated token', function(done) {
       var token = {
         header: { alg: 'HS256' },
         payload: {
@@ -154,17 +130,15 @@ describe('oauth testing onprem', function() {
           aud: '6a76c27f-f3f0-47dd-8e58-50924e4a1bab',
           iat: '2016-06-02T08:07:57.392Z',
           exp: '2100-01-01T00:00:00.000Z',
-          scope: ['/']
-        },
-        secret: 'foobar'
-      };
+          scope: [ '/' ] },
+        secret: 'foobar' };
       request.get('/stock/quote?symbol=IBM')
         .set('authorization', 'Bearer ' + jws.sign(token))
         .expect(401)
         .end(done);
     });
 
-    it('Valid token id (jti) with fabricated token', function (done) {
+    it('Valid token id (jti) with fabricated token', function(done) {
       var token = {
         header: { alg: 'HS256' },
         payload: {
@@ -172,11 +146,9 @@ describe('oauth testing onprem', function() {
           aud: '6a76c27f-f3f0-47dd-8e58-50924e4a1bab',
           iat: '2016-06-02T08:07:57.392Z',
           exp: '2100-01-01T00:00:00.000Z',
-          scope: ['/']
-        },
-        secret: 'foobar'
-      };
-      requestAccessTokenClientCredentials().then(function (tokens) {
+          scope: [ '/' ] },
+        secret: 'foobar' };
+      requestAccessTokenClientCredentials().then(function(tokens) {
         var access_token = JSON.parse(jws.decode(tokens.access_token).payload);
         token.payload.jti = access_token.jti;
         request.get('/stock/quote?symbol=IBM')
@@ -186,8 +158,8 @@ describe('oauth testing onprem', function() {
       }, done);
     });
 
-    it('Refresh token as Access token', function (done) {
-      requestAccessTokenClientCredentials().then(function (tokens) {
+    it('Refresh token as Access token', function(done) {
+      requestAccessTokenClientCredentials().then(function(tokens) {
         request.get('/stock/quote?symbol=IBM')
           .set('authorization', 'Bearer ' + tokens.refresh_token)
           .expect(401)
@@ -195,14 +167,14 @@ describe('oauth testing onprem', function() {
       }, done);
     });
 
-    it('Missing token', function (done) {
+    it('Missing token', function(done) {
       request.get('/stock/quote?symbol=IBM')
         .set('authorization', 'Bearer ')
         .expect(401)
         .end(done);
     });
 
-    it('Missing authorization header', function (done) {
+    it('Missing authorization header', function(done) {
       request.get('/stock/quote?symbol=IBM')
         .expect(401)
         .end(done);
@@ -211,7 +183,7 @@ describe('oauth testing onprem', function() {
   });
 });
 
-function requestAccessTokenClientCredentials (scope) {
+function requestAccessTokenClientCredentials(scope) {
   scope = scope || 'stock:quote';
 
   // Client data
@@ -220,13 +192,12 @@ function requestAccessTokenClientCredentials (scope) {
 
   // Form data
   var data = {
-    'grant_type': 'client_credentials',
-    'client_id': clientId,
-    'client_secret': clientSecret,
-    'scope': scope
-  };
+    grant_type: 'client_credentials',
+    client_id: clientId,
+    client_secret: clientSecret,
+    scope: scope };
 
-  return new Promise(function (resolve, reject) {
+  return new Promise(function(resolve, reject) {
     request.post('/oauth2/token')
       .type('form')
       .send(data)
@@ -236,7 +207,7 @@ function requestAccessTokenClientCredentials (scope) {
         assert(res.body.access_token);
         assert(res.body.refresh_token);
       })
-      .end(function (err, res) {
+      .end(function(err, res) {
         if (err) {
           console.log(res);
           return reject(err);
@@ -245,12 +216,4 @@ function requestAccessTokenClientCredentials (scope) {
       });
   });
 }
-
-
-
-
-
-
-
-
 

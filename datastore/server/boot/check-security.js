@@ -4,7 +4,8 @@
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
 var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'microgateway:datastore:server:boot:check-security'});
+        .child({ loc: 'microgateway:datastore:server:boot:check-security' });
+
 /**
  * Validates that apiKey swagger security requirements meet APIConnect specs.
  * Input is a swagger doc, output is true (valid) or false (invalid).
@@ -14,26 +15,30 @@ module.exports = function checkSecurity(apidoc) {
   var securityReqs = apidoc.security;
   if (!securityReqs) {
     return true;
-  } 
+  }
   var securityDefs = apidoc.securityDefinitions;
   var name = (apidoc.info && apidoc.info['x-ibm-name']) || 'unnamed';
   logger.debug(name + ': checkSecurity securityReqs:', securityReqs);
   logger.debug(name + ': checkSecurity securityDefs:', securityDefs);
-  
+
   var result = true;
-  
+
   // Iterate over the security req's, they are OR'ed together and the checking
   // is applied to each one separately
   for (var req = 0; req < securityReqs.length; req++) {
     var securityReq = securityReqs[req];
     logger.debug(name + ': checkSecurity securityReq:', securityReq);
-    
+
     // Iterate over each security scheme within this requirement.  They are
     // AND'ed together when the requirement is evaluated
     var keys = Object.keys(securityReq);
-    var nQueryIds = 0, nQuerySecrets = 0, nHeaderIds = 0, nHeaderSecrets = 0;
-    var nQueryOther = 0, nHeaderOther = 0;
-    
+    var nQueryIds = 0;
+    var nQuerySecrets = 0;
+    var nHeaderIds = 0;
+    var nHeaderSecrets = 0;
+    var nQueryOther = 0;
+    var nHeaderOther = 0;
+
     for (var def = 0; def < keys.length; def++) {
       var securityDefName = keys[def];
       logger.debug(name + ': checkSecurity securityDefName:', securityDefName);

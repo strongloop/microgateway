@@ -1,27 +1,25 @@
 // Copyright IBM Corp. 2016. All Rights Reserved.
-// Node module: apiconnect-microgateway
+// Node module: microgateway
 // US Government Users Restricted Rights - Use, duplication or disclosure
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
-/*eslint-env node */
-
-var env       = require('./environment');
-var path      = require('path');
-var fs        = require('fs');
-var log       = require('apiconnect-cli-logger/logger.js')
-                  .child({loc: 'apiconnect-microgateway:utils'});
-var crypto    = require('crypto');
-var url       = require('url');
-var request   = require('request');
+var env = require('./environment');
+var path = require('path');
+var fs = require('fs');
+var Promise = require('bluebird');
+var log = require('apiconnect-cli-logger/logger.js')
+                  .child({ loc: 'microgateway:utils' });
+var crypto = require('crypto');
+var url = require('url');
+var request = require('request');
 var constants = require('constants');
 var wlpnPassword = require('wlpn-password');
-
 
 var version = require('../package.json').version;
 
 exports.getTLSConfigSync = function() {
   var rev;
-  var cfg = process.env[env.TLS_SERVER_CONFIG] ? 
+  var cfg = process.env[env.TLS_SERVER_CONFIG] ?
       //the env value should be a relative path to parent directory
       path.resolve(__dirname, '..', process.env[env.TLS_SERVER_CONFIG]) :
       path.resolve(__dirname, '..', 'config', 'defaultTLS.json');
@@ -29,38 +27,43 @@ exports.getTLSConfigSync = function() {
   try {
     rev = JSON.parse(fs.readFileSync(cfg));
     var baseDir = path.dirname(cfg); //base dir, used for relative path
-    var props = Object.keys(rev);    //property names
+    var props = [ 'pfx', 'key', 'cert', 'ca', 'dhparam', 'ticketKeys', 'passphrase' ];
     for (var index = 0, length = props.length; index < length; index++) {
       var propName = props[index];
-      if (rev[propName] instanceof Array) {
+      if (rev[propName] instanceof Array) { // ca is capable of being array
         var values = rev[propName];
         var newValues = [];
         for (var valueIndex = 0, valueLength = values.length;
             valueIndex < valueLength; valueIndex++) {
-
-          newValues.push(fs.readFileSync(path.resolve(baseDir,values[valueIndex])));
+          try {
+            newValues.push(fs.readFileSync(path.resolve(baseDir, values[valueIndex])));
+          } catch (e) {
+            newValues.push(values[valueIndex]);
+          }
         }
         rev[propName] = newValues;
-      } else {
+      } else if (rev[propName]) {
         var filename = rev[propName];
         var property;
-        if (filename.indexOf(':')) {
+        if (filename.indexOf(':') !== -1) {
           var array = filename.split(':');
           filename = array[0];
           property = array[1];
         }
-        var potentialFile = path.resolve(baseDir, filename);
-        stats = fs.statSync(potentialFile);
-        if (stats.isFile()) {
-          rev[propName] = fs.readFileSync(potentialFile);
+        try {
+          var contents = fs.readFileSync(path.resolve(baseDir, filename));
           if (property) {
-            var parsedFile = JSON.parse(rev[propName]);
+            var parsedFile = JSON.parse(contents);
             rev[propName] = parsedFile[property];
+          } else {
+            rev[propName] = contents;
           }
+        } catch (e) {
+          // do nothing
         }
       }
     }
-    if(rev.passphrase){
+    if (rev.passphrase) {
       rev.passphrase = wlpnPassword.decode(rev.passphrase);
     }
   } catch (e) {
@@ -97,7 +100,7 @@ function hashMsg(msg, alg) {
  *   "key": "base64(encrypted_with_public_key(aes_256_symmetric_key))"
  *   "cipher": "base64(encrypted_with_aes_256_key(json_payload_as_string))"
  * }
- * @param body   
+ * @param body
  * @param private_key
  *
  */
@@ -108,10 +111,8 @@ function decryptAPIMResponse(body, private_key) {
   }
 
   var key = crypto.privateDecrypt(
-    {
-      key: private_key,
-      padding: constants.RSA_PKCS1_PADDING
-    },
+    { key: private_key,
+      padding: constants.RSA_PKCS1_PADDING },
     new Buffer(body.key, 'base64')
   );
 
@@ -154,12 +155,12 @@ function addSignatureHeaders(body, headers, keyId, key) {
   }
 
 
-  var combine = function (names, headers) {
+  var combine = function(names, headers) {
     var parts = [];
-    names.forEach(function (e) {
-      parts.push(e + ": " + headers[e]);
+    names.forEach(function(e) {
+      parts.push(e + ': ' + headers[e]);
     });
-    return parts.join("\n");
+    return parts.join('\n');
   };
 
   headers.authorization = 'Signature ' +
@@ -167,7 +168,7 @@ function addSignatureHeaders(body, headers, keyId, key) {
     'headers="date digest", ' +
     'algorithm="rsa-sha256", ' +
     'signature="' +
-    signMsg(combine(['date', 'digest'], headers), key, 'RSA-SHA256')
+    signMsg(combine([ 'date', 'digest' ], headers), key, 'RSA-SHA256')
       .toString('base64') + '"';
 
   return headers;
@@ -178,9 +179,9 @@ function addSignatureHeaders(body, headers, keyId, key) {
  * Attempt to handshake from APIm server
  * @param {Object} apim - configuration pointing to APIm server
  * @param {string} privKey - private key to be used for handshake
- * @param {callback} doneCB - done callback 
+ * @param {callback} doneCB - done callback
  */
-exports.handshakeWithAPIm = function (apim, privKey, doneCB) {
+exports.handshakeWithAPIm = function(apim, privKey, doneCB) {
   log.debug('handshakeWithAPIm entry');
 
   if (privKey instanceof Function) {
@@ -194,16 +195,12 @@ exports.handshakeWithAPIm = function (apim, privKey, doneCB) {
   }
 
   new Promise(function(resolve, reject) {
-    var body = JSON.stringify({
-      gatewayVersion: version
-    });
+    var body = JSON.stringify({ gatewayVersion: version });
 
-    var headers = {
-      'content-type': 'application/json'
-    };
+    var headers = { 'content-type': 'application/json' };
 
     addSignatureHeaders(body, headers,
-        "micro-gw-catalog/" + apim.catalog, privKey);
+        'micro-gw-catalog/' + apim.catalog, privKey);
 
     if (log.debug()) {
       log.debug(JSON.stringify(headers, null, 2));
@@ -213,19 +210,19 @@ exports.handshakeWithAPIm = function (apim, privKey, doneCB) {
       protocol: 'https',
       hostname: apim.host,
       port: apim.port,
-      pathname: '/v1/catalogs/' + apim.catalog + '/handshake/'
-    };
+      pathname: '/v1/catalogs/' + apim.catalog + '/handshake/' };
+
     var targetURL = url.format(apimHandshakeUrlObj);
 
-    request({
+    var options = {
       url: targetURL,
       method: 'POST',
       json: body,
       headers: headers,
-      agentOptions: {
-        rejectUnauthorized: false //FIXME: need to eventually remove this
-        }
-      },
+      //FIXME: need to eventually remove this
+      agentOptions: { rejectUnauthorized: false } };
+
+    request(options,
       function(err, res, body) {
         if (err) {
           reject(new Error(
@@ -258,7 +255,7 @@ exports.handshakeWithAPIm = function (apim, privKey, doneCB) {
   })
   .then(function(result) {
     log.info('Successful handshake with API Connect server');
-    doneCB(undefined, {'clientID': result.clientID });
+    doneCB(undefined, { clientID: result.clientID });
     log.debug('handshakeWithAPIm exit');
   })
   .catch(function(error) {

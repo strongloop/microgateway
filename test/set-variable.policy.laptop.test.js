@@ -5,18 +5,15 @@
 
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var express = require('express');
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
-var should = require('should');
+var dsCleanupFile = require('./support/utils').dsCleanupFile;
 
 describe('set-variable policy', function() {
 
   var request;
-  before(function(done){
+  before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/set-variable';
     process.env.NODE_ENV = 'production';
     mg.start(3000)
@@ -34,6 +31,7 @@ describe('set-variable policy', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -64,7 +62,9 @@ describe('set-variable policy', function() {
       .set('set-variable-case', 'clear')
       .set('to-be-deleted', 'test-value')
       .expect(function(res) {
-        if (res.headers['to-be-deleted']) return 'context variable not deleted';
+        if (res.headers['to-be-deleted']) {
+          return 'context variable not deleted';
+        }
       })
       .expect(200, done);
   });
@@ -83,7 +83,9 @@ describe('set-variable policy', function() {
       .set('set-variable-case', 'set')
       .set('custom-status-reason', 'Foobar')
       .expect(function(res, done) {
-        if (res.res.statusMessage !== 'Foobar') throw new Error("status reason should be 'Foobar'");
+        if (res.res.statusMessage !== 'Foobar') {
+          throw new Error("status reason should be 'Foobar'");
+        }
       })
       .expect(200, done);
   });
@@ -95,7 +97,9 @@ describe('set-variable policy', function() {
       .set('custom-status-code', '303')
       .set('custom-status-reason', 'Foobar')
       .expect(function(res, done) {
-        if (res.res.statusMessage !== 'Foobar') throw new Error("status reason should be 'Foobar'");
+        if (res.res.statusMessage !== 'Foobar') {
+          throw new Error("status reason should be 'Foobar'");
+        }
       })
       .expect(303, done);
   });

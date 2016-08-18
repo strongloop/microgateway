@@ -5,12 +5,10 @@
 
 'use strict';
 
-var express = require('express');
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
-var path = require('path');
-var fs = require('fs');
+var dsCleanupFile = require('./support/utils').dsCleanupFile;
 
 describe('matching score test', function() {
 
@@ -22,7 +20,7 @@ describe('matching score test', function() {
       .then(function() { return echo.start(8889); })
       .then(function() {
         request = supertest('http://localhost:3000');
-        console.log ('setup test1');
+        console.log('setup test1');
       })
       .then(done)
       .catch(function(err) {
@@ -32,6 +30,7 @@ describe('matching score test', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     delete process.env.APIMANAGER;
     delete process.env.NODE_ENV;
     echo.stop()
@@ -47,7 +46,7 @@ describe('matching score test', function() {
     it('client_id=' + clientId1 +
       ' secret=' + clientSecret1 + ' "/routes/foo/bar" should not -' +
       ' match "/routes/{id}"',
-      function (done) {
+      function(done) {
         request
         .get('/v1/routes/foo/bar?client_id=' + clientId1 +
           '&client_secret=' + clientSecret1)
@@ -57,7 +56,7 @@ describe('matching score test', function() {
     it('client_id=' + clientId1 +
       ' secret=' + clientSecret1 + ' "/test4/id/exists" not authorized -' +
       ' for "/test4/id/{exists}"',
-      function (done) {
+      function(done) {
         request
         .get('/v1/test4/id/exists?client_id=' + clientId1 +
           '&client_secret=' + clientSecret1)
@@ -67,7 +66,7 @@ describe('matching score test', function() {
     it('client_id=' + clientId1 +
       ' secret=' + clientSecret2 + ' "/test4/id/exists" not authorized -' +
       ' for "/test4/id/{exists}"',
-      function (done) {
+      function(done) {
         request
         .get('/v1/test4/id/exists?client_id=' + clientId1 +
           '&client_secret=' + clientSecret2)
@@ -77,7 +76,7 @@ describe('matching score test', function() {
     it('client_id=' + clientId1 +
       ' secret=' + clientSecret2 + ' "/test4//exists" does not match -' +
       ' for "/test4/id/{exists}"',
-      function (done) {
+      function(done) {
         request
         .get('/v1/test4//exists?client_id=' + clientId1 +
           '&client_secret=' + clientSecret2)
@@ -87,7 +86,7 @@ describe('matching score test', function() {
     it('client_id=' + clientId1 +
       ' secret=' + clientSecret1 + ' "/test4/id/foo" does not match -' +
       ' for "/test4/id/{exists}"',
-      function (done) {
+      function(done) {
         request
         .get('/v1/test4/foo/exists?client_id=' + clientId1 +
           '&client_secret=' + clientSecret1)

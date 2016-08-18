@@ -85,7 +85,7 @@
           }
         },
         "apis":
-          { 
+          {
           "ascents": {"name": "ascents:1.0.0"},
           "forecasts": {"name": "forecasts:1.0.0"},
           "routes": {"name": "routes:1.0.0"}
@@ -99,7 +99,7 @@
               "hard-limit": true,
               "value": "60/hour"
             },
-            "apis": 
+            "apis":
               {
               "ascents": {}
               }
@@ -112,7 +112,7 @@
               "hard-limit": false,
               "value": "100/min"
             },
-            "apis": 
+            "apis":
               {
               "ascents": {},
               "forecasts": {}
@@ -126,7 +126,7 @@
               "hard-limit": false,
               "value": "1000/min"
             },
-            "apis": 
+            "apis":
               {
               "ascents": {},
               "forecasts": {},
@@ -485,7 +485,7 @@
     "sandbox": true,
     "default": false
   },
-  "active": false,
+  "active": true,
   "application": {
     "id": "564b7d37e4b0869c782ee083",
     "title": "Prod App",
@@ -556,7 +556,7 @@
           }
         },
         "apis":
-          { 
+          {
           "ascents": {"name": "ascents:1.0.0"},
           "forecasts": {"name": "forecasts:1.0.0"},
           "routes": {"name": "routes:1.0.0"}
@@ -570,7 +570,7 @@
               "hard-limit": true,
               "value": "60/hour"
             },
-          "apis": 
+          "apis":
             {
             "ascents": {}
             }
@@ -583,7 +583,7 @@
               "hard-limit": false,
               "value": "100/min"
             },
-          "apis": 
+          "apis":
             {
             "ascents": {},
             "forecasts": {}
@@ -597,7 +597,7 @@
               "hard-limit": false,
               "value": "1000/min"
             },
-          "apis": 
+          "apis":
             {
             "ascents": {},
             "forecasts": {},
@@ -937,7 +937,7 @@
             }
           }
         }
-      }, 
+      },
     {
       "id": "564b7b44e4b0869c782eddd5",
       "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b44e4b0869c782eddd5",
@@ -1242,7 +1242,7 @@
           }
         }
       }
-    }, 
+    },
     {
       "id": "564b7b44e4b0869c782ede0a",
       "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b44e4b0869c782ede0a",
@@ -1813,7 +1813,7 @@
     "sandbox": true,
     "default": false
   },
-  "active": false,
+  "active": true,
   "application": {
     "id": "564b7d27e4b0869c782ee079",
     "title": "SilverApp",
@@ -1884,7 +1884,7 @@
           }
         },
         "apis":
-          { 
+          {
           "ascents": {"name": "ascents:1.0.0"},
           "forecasts": {"name": "forecasts:1.0.0"},
           "routes": {"name": "routes:1.0.0"}
@@ -1898,7 +1898,7 @@
               "hard-limit": true,
               "value": "60/hour"
             },
-            "apis": 
+            "apis":
               {
               "ascents": {}
               }
@@ -1911,7 +1911,7 @@
               "hard-limit": false,
               "value": "100/min"
             },
-            "apis": 
+            "apis":
               {
               "ascents": {},
               "forecasts": {}
@@ -1925,7 +1925,7 @@
               "hard-limit": false,
               "value": "1000/min"
             },
-            "apis": 
+            "apis":
               {
               "ascents": {},
               "forecasts": {},
@@ -2265,7 +2265,7 @@
             }
           }
         }
-      }, 
+      },
     {
       "id": "564b7b44e4b0869c782eddd5",
       "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b44e4b0869c782eddd5",

@@ -1,0 +1,207 @@
+<html lang="en" xml:lang="en">
+<head>
+<title>API Connect - OAuth Authorization Server Login</title>
+<meta http-equiv="Cache-Control" content="no-cache"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="-1"/>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="SHORTCUT ICON" href="/images/login/favicon.ico"/>
+
+<style media="screen" type="text/css">
+body {
+	background-color: #cccccc;
+	padding: 0;
+	margin: 0;
+}
+.page {
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+}
+h1 {
+	font-family: Helvetica, Arial !important;
+	font-weight: 200 !important;
+	font-size: 22px;
+	color: #767676;
+	margin-bottom: 30px;
+}
+.white-box {
+	background: #ffffff;
+	box-shadow: 0 0 5px #333;
+	position: relative;
+	top: 50%;
+	left: 50%;
+	margin-left: -200px;
+	-webkit-transform: translateY(-50%);
+	transform: translateY(-50%);
+	width: 400px;
+	padding: 10px 40px;
+	font-family: Arial, Tahoma, Verdana;
+	font-size: 13px;
+	font-weight: 200 !important;
+	box-sizing: border-box;
+}
+.legacy .white-box {
+	margin-top: -125px;
+}
+.inputContainer {
+	margin-bottom: 30px;
+	position: relative;
+}
+.inputContainer label {
+	display: block;
+	position: absolute;
+	top: 8px;
+	left: 0;
+	color: #cccccc;
+	font-style: italic;
+	transition: top 0.3s, color 0.3s;
+}
+.inputContainer input {
+	padding: 4px 0;
+	border-width: 0 0 1px 0;
+	border-style: solid;
+	border-color: #dddddd;
+	width: 100%;
+	outline: none;
+}
+.inputContainer input:focus + label,
+.inputContainer input:valid + label {
+	top: -14px;
+	color: #767676;
+	font-style: normal;
+}
+.legacy .inputContainer label {
+	top: -14px;
+	color: #767676;
+	font-style: normal;
+}
+.inputContainer input:focus + label {
+	color: #0080e9;
+}
+.internalError {
+  color: red;
+}
+.inputWrapper p {
+	color: #767676;
+}
+button {
+	border: 1px solid #0080e9;
+	cursor: pointer;
+	font-family: Arial, Verdana, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	padding: 5px 11px;
+	color: #0080e9;
+	background-color: #ffffff;
+	transition: background-color 0.2s;
+}
+button:disabled {
+	border-color: #cccccc;
+	cursor: not-allowed;
+	color: #767676;
+}
+button:hover:not(:disabled),
+button:focus {
+	background-color: #0080e9;
+	border-color: #0080e9;
+	color: #ffffff;
+}
+@media all and (max-width: 400px) {
+	.white-box {
+		width: 100%;
+		left: 0;
+		margin-left: 0;
+	}
+}
+@media all and (min-width: 2000px) {
+	.page {
+		zoom: 2;
+	}
+}
+</style>
+<!--[if lte IE 9]>
+<style media="screen" type="text/css">
+.page .inputContainer label {
+	top: -14px;
+	color: #767676;
+	font-style: normal;
+}
+</style>
+<![endif]-->
+<script type="text/javascript">
+<![CDATA[
+var startup = function() {
+	var userInput = document.getElementById("input_username");
+	// detect older browsers
+	var legacy = false;
+	if (userInput.style["transform"] === undefined) {
+		document.body.className = "login legacy";
+		legacy = true;
+	}
+	if (!legacy) {
+		var passInput = document.getElementById("input_password");
+		var loginButton = document.getElementById("login_button");
+		loginButton.disabled = true;
+		var validate = function(evt) {
+			if (userInput.value && passInput.value) {
+				loginButton.disabled = false;
+			} else {
+				loginButton.disabled = true;
+			}
+		};
+		if (window.addEventListener) {
+			userInput.addEventListener("input", validate);
+			passInput.addEventListener("input", validate);
+		} else {
+			userInput.attachEvent("oninput", validate);
+			passInput.attachEvent("oninput", validate);
+		}
+	}
+	setTimeout(function() {
+		userInput.focus();
+	},0);
+};
+if (window.addEventListener) {
+	window.addEventListener("load", startup);
+} else {
+	window.attachEvent("onload", startup);
+}
+]]>
+</script>
+</head>
+<body class="login">
+  <div class="page">
+    <div id="box" class="white-box">
+      <form method="POST" enctype="application/x-www-form-urlencoded" action="authorize">
+        <h1>Custom Login Please sign in</h1>
+        <div class="inputWrapper">
+          <div class="inputContainer">
+            <input type="text" name="username" id="input_username" autofocus="autofocus" required="required" autocomplete="off"/>
+            <label for="input_username">User name</label>
+          </div>
+          <div class="inputContainer">
+            <input type="password" name="password" id="input_password" required="required" autocomplete="off"/>
+            <label for="input_password">Password</label>
+          </div>
+          <EI-INJECT-HIDDEN-INPUT-FIELDS/>
+          <button id="login_button" type="submit" name="login" value="true">Log in</button>
+          <EI-LOGINFIRSTTIME>
+            <p>If you have forgotten your user name or password, contact your system administrator.</p>
+          </EI-LOGINFIRSTTIME>
+          <EI-LOGINFAILED>
+            <p style = "color: red">At least one of your entries does not match our records. 
+               If you have forgotten your user name or password, contact your system administrator.</p>
+          </EI-LOGINFAILED>
+        </div>
+        <div class="internalError">
+          <EI-INTERNAL-CUSTOM-FORM-ERROR />
+        </div>
+      </form>
+    </div> <!-- white box -->
+  </div>
+</body>
+</html>

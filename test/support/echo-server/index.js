@@ -3,7 +3,7 @@
 // US Government Users Restricted Rights - Use, duplication or disclosure
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
-'use strict'
+'use strict';
 
 var Promise = require('bluebird');
 var express = require('express');
@@ -14,7 +14,7 @@ var ah = require('auth-header');
 app.get('/auth', function(req, resp) {
   var results = ah.parse(req.get('authorization')).values;
   var auth = results.length === 1 ? results[0] : null;
-  if (auth && auth.scheme == 'Basic') {
+  if (auth && auth.scheme === 'Basic') {
     var t = (new Buffer(auth.token, 'base64')).toString('utf-8');
     var user = t.split(':');
     if (user[0] === 'root' && user[1] === 'Hunter2') {
@@ -31,7 +31,7 @@ app.get('/slowauth', function(req, resp) {
   var results = ah.parse(req.get('authorization')).values;
   var auth = results.length === 1 ? results[0] : null;
   setTimeout(function() {
-    if (auth && auth.scheme == 'Basic') {
+    if (auth && auth.scheme === 'Basic') {
       var t = (new Buffer(auth.token, 'base64')).toString('utf-8');
       var user = t.split(':');
       if (user[0] === 'root' && user[1] === 'Hunter2') {
@@ -67,8 +67,7 @@ exports.start = function(port) {
       var tls = require('./tls')[0];
       tlsserver = https.createServer({
         key: tls['private-key'],
-        cert: tls.certs[0].cert
-      }, app).listen(61801);
+        cert: tls.certs[0].cert }, app).listen(61801);
       resolve();
     });
   });

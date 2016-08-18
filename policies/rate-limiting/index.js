@@ -4,12 +4,10 @@
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
 'use strict';
-var moment = require('moment');
 var redisLimiter = require('./redis');
 var tokenBucketLimiter = require('./token-bucket');
 var logger = require('apiconnect-cli-logger/logger.js')
-  .child({loc: 'microgateway:policies:rate-limiting'});
-var assert = require('assert');
+        .child({ loc: 'microgateway:policies:rate-limiting' });
 var env = require('../../utils/environment');
 var getInterval = require('./get-interval');
 
@@ -33,8 +31,7 @@ module.exports = function(options) {
     reject: reject,
     prefix: options.prefix || ('ibm-microgateway-' + Date.now()),
     redis: options.redis,
-    getKey: getKey
-  };
+    getKey: getKey };
 
   for (var i in options) {
     if (config[i] === undefined) {
@@ -48,8 +45,7 @@ module.exports = function(options) {
      Format: [redis:]//[[user][:password@]][host][:port][/db-number][?db=db-number[&password=bar[&option=value]]]
      */
     config.redis = {
-      url: process.env[env.RATELIMIT_REDIS]
-    };
+      url: process.env[env.RATELIMIT_REDIS] };
   }
 
   if (config.redis) {
@@ -62,23 +58,14 @@ module.exports = function(options) {
 
   /**
    * Build the key for rate limiting from the context object
-   * @param {Context} context The context object
    * @returns {string} The rate limiting key
    */
-  function getKey(context) {
-    context = context || {};
-    var flowContext = context.flowContext || {};
-    var client = flowContext.client || {};
-    var clientApp = client.app || {};
-    var clientId = clientApp.id;
-    if (clientId == null) {
-      return null;
-    }
+  function getKey() {
     // Use the scope as the namespace. The scope contains information about the
     // plan or operation path
     var scope = config.scope;
     scope = scope || '*';
-    return scope + ':' + clientId;
+    return scope;
   }
 
 };

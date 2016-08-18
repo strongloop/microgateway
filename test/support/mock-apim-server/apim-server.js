@@ -3,13 +3,10 @@
 // US Government Users Restricted Rights - Use, duplication or disclosure
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
-var Promise = require('bluebird')
-  , fs = require('fs')
-  , https = require('https')
-  , static = require('node-static')
-  , port = 8080
-  , host = '127.0.0.1';
-
+var Promise = require('bluebird');
+var fs = require('fs');
+var https = require('https');
+var static = require('node-static');
 
 var server;
 
@@ -22,26 +19,24 @@ var server;
  * @param port {integer} port number
  * @param path {string} optional, specifying the path to load apim config files
  */
-exports.start = function (host, port, path) {
+exports.start = function(host, port, path) {
   return new Promise(function(resolve, reject) {
     path = path || __dirname;
 
     var options = {
       key: fs.readFileSync(__dirname + '/key.pem'),
-      cert: fs.readFileSync(__dirname + '/cert.pem')
-    };
+      cert: fs.readFileSync(__dirname + '/cert.pem') };
 
     var files = new static.Server(path);
 
     function serveFiles(request, response) {
-      files.serve(request, response, function (err, res) {
-          if (err) {
-            console.error('> Error serving ' + request.url + ' - ' + err.message);
-            response.writeHead(err.status, err.headers);
-            response.end();
-          }
+      files.serve(request, response, function(err, res) {
+        if (err) {
+          console.error('> Error serving ' + request.url + ' - ' + err.message);
+          response.writeHead(err.status, err.headers);
+          response.end();
         }
-      );
+      });
     }
 
     server = https.createServer(options, serveFiles);

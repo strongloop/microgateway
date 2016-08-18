@@ -6,7 +6,7 @@
 'use strict';
 var moment = require('moment');
 var logger = require('apiconnect-cli-logger/logger.js')
-  .child({loc: 'microgateway:policies:rate-limiting:get-interval'});
+        .child({ loc: 'microgateway:policies:rate-limiting:get-interval' });
 var assert = require('assert');
 
 module.exports = function getInterval(limit, period, unit, unparsed) {
@@ -20,7 +20,7 @@ module.exports = function getInterval(limit, period, unit, unparsed) {
      */
     var parts;
     if (unparsed.toUpperCase() === 'UNLIMITED') {
-      parts = [unparsed, Number.MAX_SAFE_INTEGER/1000, 1, 'seconds'];
+      parts = [ unparsed, Number.MAX_SAFE_INTEGER / 1000, 1, 'seconds' ];
     } else {
       var pattern = /^([\d\s]+)(?:\/([\d\s]*)([a-zA-Z\s]*))?$/;
       parts = pattern.exec(unparsed);
@@ -71,5 +71,5 @@ module.exports = function getInterval(limit, period, unit, unparsed) {
 
   logger.debug('Limit: %d/%d%s', limit, period, unit);
   var interval = moment.duration(period, unit).asMilliseconds();
-  return {"limit": limit, "interval": interval};
+  return { limit: limit, interval: interval };
 };

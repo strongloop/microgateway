@@ -5,17 +5,12 @@
 
 'use strict';
 
-var _ = require('lodash');
-var assert = require('assert');
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
-var yaml = require('yamljs');
-
+var dsCleanupFile = require('./support/utils').dsCleanupFile;
 var mg = require('../lib/microgw');
 
 describe('HTTP and HTTPS in separate files', function() {
-
-  var request, httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/combined1';
     process.env.NODE_ENV = 'production';
@@ -31,16 +26,17 @@ describe('HTTP and HTTPS in separate files', function() {
   it('should expect failure to load', function(done) {
     mg.start(3000)
       .catch(function(err) {
-        assert(true);
-        done();
+        if (err) {
+          dsCleanupFile();
+          return done(); // expect error
+        }
+        done(new Error('expect error'));
       });
   });
 
 });
 
 describe('HTTP and HTTPS in same file', function() {
-
-  var request, httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/combined2';
     process.env.NODE_ENV = 'production';
@@ -56,8 +52,11 @@ describe('HTTP and HTTPS in same file', function() {
   it('should expect failure to load', function(done) {
     mg.start(3000)
       .catch(function(err) {
-        assert(true);
-        done();
+        if (err) {
+          dsCleanupFile();
+          return done(); // expect error
+        }
+        done(new Error('expect error'));
       });
   });
 
@@ -69,7 +68,7 @@ describe('HTTPS in laptop experience w/ env var', function() {
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
     process.env.NODE_ENV = 'production';
-    process.env.TLS_SERVER_CONFIG = __dirname + '/support/https/tlsconfig.json'
+    process.env.TLS_SERVER_CONFIG = __dirname + '/support/https/tlsconfig.json';
     mg.start(3000)
       .then(function() {
         return echo.start(8889);
@@ -86,6 +85,7 @@ describe('HTTPS in laptop experience w/ env var', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -104,7 +104,9 @@ describe('HTTPS in laptop experience w/ env var', function() {
     httprequest
       .get('/http/http')
       .end(function(err, res) {
-        if (err) return done(); // expect error
+        if (err) {
+          return done(); // expect error
+        }
         done(new Error('expect error'));
       });
   });
@@ -117,7 +119,7 @@ describe('HTTPS in laptop experience w/ pfx', function() {
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
     process.env.NODE_ENV = 'production';
-    process.env.TLS_SERVER_CONFIG = __dirname + '/support/https/tlsconfig-pfx.json'
+    process.env.TLS_SERVER_CONFIG = __dirname + '/support/https/tlsconfig-pfx.json';
     mg.start(3000)
       .then(function() {
         return echo.start(8889);
@@ -134,6 +136,7 @@ describe('HTTPS in laptop experience w/ pfx', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -152,7 +155,9 @@ describe('HTTPS in laptop experience w/ pfx', function() {
     httprequest
       .get('/http/http')
       .end(function(err, res) {
-        if (err) return done(); // expect error
+        if (err) {
+          return done(); // expect error
+        }
         done(new Error('expect error'));
       });
   });
@@ -165,7 +170,7 @@ describe('HTTPS in laptop experience w/ pfx obfuscated password', function() {
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
     process.env.NODE_ENV = 'production';
-    process.env.TLS_SERVER_CONFIG = __dirname + '/support/https/tlsconfig-pfx-obfuscated.json'
+    process.env.TLS_SERVER_CONFIG = __dirname + '/support/https/tlsconfig-pfx-obfuscated.json';
     mg.start(3000)
       .then(function() {
         return echo.start(8889);
@@ -182,6 +187,7 @@ describe('HTTPS in laptop experience w/ pfx obfuscated password', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -200,7 +206,9 @@ describe('HTTPS in laptop experience w/ pfx obfuscated password', function() {
     httprequest
       .get('/http/http')
       .end(function(err, res) {
-        if (err) return done(); // expect error
+        if (err) {
+          return done(); // expect error
+        }
         done(new Error('expect error'));
       });
   });
@@ -230,6 +238,7 @@ describe('HTTPS in laptop experience w/ default TLS', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -247,7 +256,9 @@ describe('HTTPS in laptop experience w/ default TLS', function() {
     httprequest
       .get('/http/http')
       .end(function(err, res) {
-        if (err) return done(); // expect error
+        if (err) {
+          return done(); // expect error
+        }
         done(new Error('expect error'));
       });
   });
@@ -255,8 +266,7 @@ describe('HTTPS in laptop experience w/ default TLS', function() {
 });
 
 describe('HTTP in laptop experience when HTTPS not specified', function() {
-
-  var request, httprequest;
+  var httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/http';
     process.env.NODE_ENV = 'production';
@@ -275,6 +285,7 @@ describe('HTTP in laptop experience when HTTPS not specified', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -313,6 +324,7 @@ describe('HTTPS in laptop experience when HTTPS explicitly specified', function(
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -330,7 +342,9 @@ describe('HTTPS in laptop experience when HTTPS explicitly specified', function(
     httprequest
       .get('/http/http')
       .end(function(err, res) {
-        if (err) return done(); // expect error
+        if (err) {
+          return done(); // expect error
+        }
         done(new Error('expect error'));
       });
   });
@@ -359,6 +373,7 @@ describe('HTTPS in laptop experience when schemes not specified', function() {
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -376,7 +391,9 @@ describe('HTTPS in laptop experience when schemes not specified', function() {
     httprequest
       .get('/http/http')
       .end(function(err, res) {
-        if (err) return done(); // expect error
+        if (err) {
+          return done(); // expect error
+        }
         done(new Error('expect error'));
       });
   });
@@ -405,6 +422,7 @@ describe('HTTP no port specified in laptop experience when HTTPS not specified',
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -423,8 +441,7 @@ describe('HTTP no port specified in laptop experience when HTTPS not specified',
 */
 
 describe('HTTP port in ENV in laptop experience when HTTPS not specified', function() {
-
-  var request, httprequest;
+  var httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/http';
     process.env.NODE_ENV = 'production';
@@ -444,6 +461,7 @@ describe('HTTP port in ENV in laptop experience when HTTPS not specified', funct
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -463,8 +481,8 @@ describe('HTTP port in ENV in laptop experience when HTTPS not specified', funct
 
 /*  NEED ROOT ACCESS
 describe('HTTPS no port specified in laptop experience when HTTPS explicitly specified', function() {
-
-  var request, httprequest;
+  var request;
+  var httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
     process.env.NODE_ENV = 'production';
@@ -484,6 +502,7 @@ describe('HTTPS no port specified in laptop experience when HTTPS explicitly spe
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -497,15 +516,17 @@ describe('HTTPS no port specified in laptop experience when HTTPS explicitly spe
       .get('/https/https')
       .expect(200, done);
   });
+
   it('should expect failure', function(done) {
     httprequest
       .get('/http/http')
       .end(function(err, res) {
-        if (err) return done(); // expect error
+        if (err) {
+          return done(); // expect error
+        }
         done(new Error('expect error'));
       });
   });
-
 });
 */
 
@@ -532,6 +553,7 @@ describe('HTTPS port in ENV in laptop experience when HTTPS explicitly specified
   });
 
   after(function(done) {
+    dsCleanupFile();
     mg.stop()
       .then(function() { return echo.stop(); })
       .then(done, done)
@@ -550,7 +572,9 @@ describe('HTTPS port in ENV in laptop experience when HTTPS explicitly specified
     httprequest
       .get('/http/http')
       .end(function(err, res) {
-        if (err) return done(); // expect error
+        if (err) {
+          return done(); // expect error
+        }
         done(new Error('expect error'));
       });
   });

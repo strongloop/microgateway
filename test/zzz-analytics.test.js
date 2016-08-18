@@ -6,17 +6,18 @@
 /*eslint-env node, mocha*/
 'use strict';
 
-var supertest  = require('supertest');
+var supertest = require('supertest');
+var Promise = require('bluebird');
 var microgw;
-var backend    = require('./support/invoke-server');
-var analytics  = require('./support/analytics-server');
-var fs         = require('fs');
-var path       = require('path');
+var backend = require('./support/invoke-server');
+var analytics = require('./support/analytics-server');
+var fs = require('fs');
+var path = require('path');
 var dsCleanup = require('./support/utils').dsCleanup;
 
 var hasCopiedKeys;
 var privKey = path.resolve(__dirname, '..', 'id_rsa');
-var pubKey  = path.resolve(__dirname, '..', 'id_rsa.pub');
+var pubKey = path.resolve(__dirname, '..', 'id_rsa.pub');
 var srcPrivKey = path.resolve(__dirname, 'definitions',
          'analytics', 'id_rsa');
 var srcPubKey = path.resolve(__dirname, 'definitions',
@@ -34,7 +35,7 @@ function copyKeys() {
         return;
       }
     } catch (e) {}
-    
+
     try {
       //need to copy keys
       var buf1 = fs.readFileSync(srcPrivKey);
@@ -68,7 +69,7 @@ function delKeys() {
 describe('analytics + invoke policy', function() {
 
   var request;
-  before(function(done)  {
+  before(function(done) {
     //Use production instead of CONFIG_DIR: reading from apim instead of laptop
     process.env.NODE_ENV = 'production';
 
@@ -78,7 +79,7 @@ describe('analytics + invoke policy', function() {
     process.env.APIMANAGER_CATALOG = '564b48aae4b0869c782edc2b';
     process.env.DATASTORE_PORT = 5000;
     delete require.cache[require.resolve('../lib/microgw')];
-    
+
     copyKeys()
     .then(function() {
       return analytics.start(
@@ -86,7 +87,7 @@ describe('analytics + invoke policy', function() {
             __dirname + '/definitions/invoke/v1');
     })
     .then(function() { return backend.start(8889); })
-    .then(function() { 
+    .then(function() {
       microgw = require('../lib/microgw');
       return microgw.start(3000);
     })
@@ -123,16 +124,16 @@ describe('analytics + invoke policy', function() {
     this.timeout(10000);
 
     //pass the done cb to analytics moc server
-    analytics.setOneTimeDoneCB(function (event) {
+    analytics.setOneTimeDoneCB(function(event) {
       //may check the payload if needed
       event = event || '';
-      var records = event.trim().split("\n").filter(function(item) {
+      var records = event.trim().split('\n').filter(function(item) {
         if (item && item.length === 0) {
           return false;
         }
         return true;
       });
-      done(records.length === 2 ? 
+      done(records.length === 2 ?
         undefined : new Error('record number mismatched'));
     });
 
@@ -147,21 +148,21 @@ describe('analytics + invoke policy', function() {
         }
       });
   });
-  
+
   it('multiple records', function(done) {
     this.timeout(10000);
 
     //pass the done cb to analytics moc server
-    analytics.setOneTimeDoneCB(function (event) {
+    analytics.setOneTimeDoneCB(function(event) {
       //may check the payload if needed
       event = event || '';
-      var records = event.trim().split("\n").filter(function(item) {
+      var records = event.trim().split('\n').filter(function(item) {
         if (item && item.length === 0) {
           return false;
         }
         return true;
       });
-      done(records.length >= 3 ? 
+      done(records.length >= 3 ?
         undefined : new Error('record number mismatched'));
     });
 
@@ -177,7 +178,7 @@ describe('analytics + invoke policy', function() {
           done(err);
         }
       });
-      
+
     request
       .post('/invoke/basic')
       .send(data)
@@ -188,7 +189,7 @@ describe('analytics + invoke policy', function() {
           done(err);
         }
       });
-      
+
     request
       .post('/invoke/basic')
       .send(data)

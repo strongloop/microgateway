@@ -6,6 +6,6 @@
 'use strict';
 
 require('../../');
-setTimeout(function () {
+setTimeout(function() {
   process.send(process.env);
 }, 5000);

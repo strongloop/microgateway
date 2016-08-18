@@ -8,7 +8,7 @@ var Promise = require('bluebird');
 var request = require('request');
 var url = require('url');
 var logger = require('apiconnect-cli-logger/logger.js')
-               .child({loc: 'microgateway:datastore:client'});
+        .child({ loc: 'microgateway:datastore:client' });
 var host = '127.0.0.1'; // data-store's listening interface
 
 /**
@@ -22,23 +22,19 @@ exports.apimGetDefaultCatalog = function(snapshot, orgName) {
   var snapshotFilter = '{"snapshot-id": "' + snapshot + '"}';
   var orgNameFilter = '{"organization.name": "' + orgName + '"}';
   var defaultOrgFilter = '{"default": "true"}';
-  var queryfilter =
-      '{"where": { "and":[' +
-      snapshotFilter + ',' +
-      orgNameFilter + ',' +
-      defaultOrgFilter + ']}}';
+  var queryfilter = '{"where": {"and": [' +
+      snapshotFilter + ',' + orgNameFilter + ',' + defaultOrgFilter + ']}}';
 
   var queryurlObj = {
-        protocol: 'http',
-        hostname: host,
-        port: process.env.DATASTORE_PORT,
-        pathname: '/api/catalogs',
-        query: {filter : queryfilter}
-  };
+    protocol: 'http',
+    hostname: host,
+    port: process.env.DATASTORE_PORT,
+    pathname: '/api/catalogs',
+    query: { filter: queryfilter } };
   var queryurl = url.format(queryurlObj);
 
   return new Promise(function(resolve, reject) {
-    request({url: queryurl, json: true}, function(error, response, body) {
+    request({ url: queryurl, json: true }, function(error, response, body) {
       logger.debug('error: ', error);
       //logger.debug('body: %j', body);
       //logger.debug('response: %j', response);
@@ -68,25 +64,19 @@ exports.grabAPI = function(context, callback) {
   logger.debug('grabAPI entry');
   var snapshotFilter = '{"snapshot-id": "' + context.snapshot + '"}';
   var apiFilter = '{"id": "' + context.api.id + '"}';
-  var queryfilter =
-      '{"where": { "and":[' +
-      snapshotFilter + ',' +
-      apiFilter + ']}}';
+  var queryfilter = '{"where": {"and": [' +
+      snapshotFilter + ',' + apiFilter + ']}}';
   var queryurlObj = {
-        protocol: 'http',
-        hostname: host,
-        port: process.env.DATASTORE_PORT,
-        pathname: '/api/apis',
-        query: {filter : queryfilter}
-  };
+    protocol: 'http',
+    hostname: host,
+    port: process.env.DATASTORE_PORT,
+    pathname: '/api/apis',
+    query: { filter: queryfilter } };
   var queryurl = url.format(queryurlObj);
   var api = {};
 
   request(
-    {
-      url : queryurl,
-      json: true
-    },
+    { url: queryurl, json: true },
     function(error, response, body) {
       logger.debug('error: ', error);
       // logger.debug('body: %j' , body);
@@ -99,8 +89,7 @@ exports.grabAPI = function(context, callback) {
       api = body;
       logger.debug('grabAPI request exit');
       callback(null, api[0]); // there should only be one result
-    }
-  );
+    });
   logger.debug('grabAPI exit');
 };
 
@@ -108,16 +97,15 @@ exports.getCurrentSnapshot = function() {
   logger.debug('getCurrentSnapshot entry');
   // build request to send to data-store
   var queryurlObj = {
-        protocol: 'http',
-        hostname: host,
-        port: process.env.DATASTORE_PORT,
-        pathname: '/api/snapshots/current'
-  };
+    protocol: 'http',
+    hostname: host,
+    port: process.env.DATASTORE_PORT,
+    pathname: '/api/snapshots/current' };
   var queryurl = url.format(queryurlObj);
   // send request to optimizedData model from data-store
   // for matching API(s)
   return new Promise(function(resolve, reject) {
-    request({url: queryurl, json: true}, function(error, response, body) {
+    request({ url: queryurl, json: true }, function(error, response, body) {
       logger.debug('error: ', error);
       //logger.debug('body: %j', body);
       //logger.debug('response: %j', response);
@@ -137,18 +125,17 @@ exports.releaseCurrentSnapshot = function(id) {
   logger.debug('releaseCurrentSnapshot entry');
   // build request to send to data-store
   var queryurlObj = {
-        protocol: 'http',
-        hostname: host,
-        port: process.env.DATASTORE_PORT,
-        pathname: '/api/snapshots/release',
-        query: {id : id}
-  };
+    protocol: 'http',
+    hostname: host,
+    port: process.env.DATASTORE_PORT,
+    pathname: '/api/snapshots/release',
+    query: { id: id } };
   var queryurl = url.format(queryurlObj);
 
   // send request to optimizedData model from data-store
   // for matching API(s)
   return new Promise(function(resolve, reject) {
-    request({url: queryurl}, function(error, response, body) {
+    request({ url: queryurl }, function(error, response, body) {
       logger.debug('error: ', error);
       logger.debug('body: %j', body);
       logger.debug('response: %j', response);
@@ -165,31 +152,23 @@ exports.releaseCurrentSnapshot = function(id) {
 };
 
 exports.getTlsProfile = function(snapshot, tlsProfleName) {
-  logger.debug('getTlsProfile entry snapshot:', snapshot,
-                              '\n tlsProfleName:', tlsProfleName );
+  logger.debug('getTlsProfile entry snapshot:', snapshot, '\n tlsProfleName:', tlsProfleName);
   // build request to send to data-store
   var queryfilter = JSON.stringify({
-    where: {
-      and: [
-        { 'snapshot-id': snapshot},
-        { name: tlsProfleName}
-      ]
-    }
-  });
+    where: { and: [ { 'snapshot-id': snapshot }, { name: tlsProfleName } ] } });
 
   var queryurlObj = {
-        protocol: 'http',
-        hostname: host,
-        port: process.env.DATASTORE_PORT,
-        pathname: '/api/tlsprofiles',
-        query: {filter : queryfilter}
-  };
+    protocol: 'http',
+    hostname: host,
+    port: process.env.DATASTORE_PORT,
+    pathname: '/api/tlsprofiles',
+    query: { filter: queryfilter } };
   var queryurl = url.format(queryurlObj);
 
   // send request to data-store to get the reqiested TLS Profile
   // for matching API(s)
   return new Promise(function(resolve, reject) {
-    request({url: queryurl, json: true}, function (error, response, body) {
+    request({ url: queryurl, json: true }, function(error, response, body) {
       logger.debug('error: ', error);
       logger.debug('body: %j', body);
       logger.debug('response: %j', response);
@@ -199,37 +178,28 @@ exports.getTlsProfile = function(snapshot, tlsProfleName) {
         return;
       }
       resolve(body);
-
     });
   });
 };
 
 exports.getRegistry = function(snapshot, registryName) {
-  logger.debug('getRegistry entry snapshot:', snapshot,
-                              '\n registryName:', registryName );
+  logger.debug('getRegistry entry snapshot:', snapshot, '\n registryName:', registryName);
   // build request to send to data-store
   var queryfilter = JSON.stringify({
-    where: {
-      and: [
-        { 'snapshot-id': snapshot},
-        { name: registryName}
-      ]
-    }
-  });
+    where: { and: [ { 'snapshot-id': snapshot }, { name: registryName } ] } });
 
   var queryurlObj = {
-        protocol: 'http',
-        hostname: host,
-        port: process.env.DATASTORE_PORT,
-        pathname: '/api/registries',
-        query: {filter : queryfilter}
-  };
+    protocol: 'http',
+    hostname: host,
+    port: process.env.DATASTORE_PORT,
+    pathname: '/api/registries',
+    query: { filter: queryfilter } };
   var queryurl = url.format(queryurlObj);
 
   // send request to data-store to get the requested Registry Profile
   // for matching API(s)
   return new Promise(function(resolve, reject) {
-    request({url: queryurl, json: true}, function (error, response, body) {
+    request({ url: queryurl, json: true }, function(error, response, body) {
       logger.debug('error: ', error);
       logger.debug('body: %j', body);
       logger.debug('response: %j', response);
@@ -239,7 +209,6 @@ exports.getRegistry = function(snapshot, registryName) {
         return;
       }
       resolve(body);
-
     });
   });
 };
@@ -248,26 +217,19 @@ exports.getAppInfo = function(snapshot, subscriptionId, clientId, done) {
   logger.debug('getAppInfo entry');
   //searching for the application info for the specific clientId
   var queryfilter = JSON.stringify({
-    where: {
-      and: [
-        { 'snapshot-id': snapshot},
-        { id: subscriptionId }
-      ]
-    }
-  });
-  
+    where: { and: [ { 'snapshot-id': snapshot }, { id: subscriptionId } ] } });
+
   var queryurlObj = {
-        protocol: 'http',
-        hostname: host,
-        port: process.env.DATASTORE_PORT,
-        pathname: '/api/subscriptions',
-        query: {filter : queryfilter}
-  };
+    protocol: 'http',
+    hostname: host,
+    port: process.env.DATASTORE_PORT,
+    pathname: '/api/subscriptions',
+    query: { filter: queryfilter } };
 
   var queryurl = url.format(queryurlObj);
   // send request to optimizedData model from data-store
   // for matching API(s)
-  request({url: queryurl, json: true}, function(error, response, body) {
+  request({ url: queryurl, json: true }, function(error, response, body) {
     logger.debug('error: ', error);
     // exit early on error
     if (error) {
@@ -275,8 +237,7 @@ exports.getAppInfo = function(snapshot, subscriptionId, clientId, done) {
       return;
     }
     var subscriptions = body;
-    //TODO: double check the clientId in the 
-    //body.application['app-credentials'] ????
+    //TODO: double check the clientId in the body.application['app-credentials'] ????
     if (!subscriptions || subscriptions.length === 0) {
       done(new Error('no matched application'));
       return;
@@ -303,23 +264,23 @@ exports.getClientById = function(snapshot, clientId, apiId, done) {
   queryfilter.where.and[2] = { 'client-id': clientId };
 
   var queryurlObj = {
-      protocol: 'http',
-      hostname: host,
-      port: process.env.DATASTORE_PORT,
-      pathname: '/api/optimizedData',
-      query: { filter : JSON.stringify(queryfilter) }
-  };
+    protocol: 'http',
+    hostname: host,
+    port: process.env.DATASTORE_PORT,
+    pathname: '/api/optimizedData',
+    query: { filter: JSON.stringify(queryfilter) } };
   var queryurl = url.format(queryurlObj);
 
-  request({ url: queryurl, json: true }, function (error, response, body) {
+  request({ url: queryurl, json: true }, function(error, response, body) {
     if (error) {
       logger.debug('error: ', error);
-      return done (error);
+      return done(error);
     }
 
     var optimizedData = body;
-    if (!optimizedData || optimizedData.length === 0)
-        return done('no matched client');
+    if (!optimizedData || optimizedData.length === 0) {
+      return done('no matched client');
+    }
 
     done(undefined, optimizedData);
   });
@@ -336,20 +297,19 @@ exports.getClientCredsById = function(snapshot, clientId, apiId, done) {
   var queryfilter = { where: { and: [] }, fields: {} };
   queryfilter.where.and[0] = { 'snapshot-id': snapshot };
   queryfilter.fields['application'] = true;
-  queryfilter.fields['plan-registration']= true;
+  queryfilter.fields['plan-registration'] = true;
 
   var queryurlObj = {
-      protocol: 'http',
-      hostname: host,
-      port: process.env.DATASTORE_PORT,
-      pathname: '/api/subscriptions',
-      query: { filter : JSON.stringify(queryfilter) }
-  };
+    protocol: 'http',
+    hostname: host,
+    port: process.env.DATASTORE_PORT,
+    pathname: '/api/subscriptions',
+    query: { filter: JSON.stringify(queryfilter) } };
   var queryurl = url.format(queryurlObj);
 
-  request({ url: queryurl, json: true }, function (error, response, results) {
+  request({ url: queryurl, json: true }, function(error, response, results) {
     if (error || !results) {
-      return done (error);
+      return done(error);
     }
 
     //lookup in the returned subscriptions

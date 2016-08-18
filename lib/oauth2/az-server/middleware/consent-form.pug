@@ -8,39 +8,109 @@ head
   meta(http-equiv="Cache-Control", content="no-cache")
   meta(http-equiv="Pragma", content="no-cache")
   meta(http-equiv="Expires", content="-1")
-  meta(http-equiv="X-UA-Compatible", content="IE=8")
+  meta(http-equiv="Content-type", content="text/html;charset=UTF-8")
+  style(media="screen", type="text/css").
+    body {
+      background-color: #cccccc;
+      padding: 0;
+      margin: 0;
+    }
+    .page {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      margin: 0;
+    }
+    h1 {
+      font-family: Helvetica, Arial !important;
+      font-weight: 200 !important;
+      font-size: 27px;
+      color: #767676;
+    }
+    .white-box {
+      background: #ffffff;
+      box-shadow: 0 0 15px #333;
+      position: relative;
+      top: 50%;
+      left: 50%;
+      margin-left: -300px;
+      -webkit-transform: translateY(-50%);
+      transform: translateY(-50%);
+      width: 600px;
+      height: 250px;
+      padding: 10px 40px;
+      font-family: Arial, Tahoma, Verdana;
+      font-size: 13px;
+      font-weight: 200 !important;
+      box-sizing: border-box;
+    }
+    .buttonBar {
+      text-align: right;
+      position: absolute;
+      bottom: 20px;
+      right: 40px;
+    }
+    button {
+      border-radius: 3px;
+      border: none;
+      cursor: pointer;
+      font-family: Arial, Verdana, Helvetica, sans-serif;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 5px 11px;
+      height: 27px;
+      background-color: #ffffff;
+    }
+    .cancel {
+      color: #767676;
+    }
+    .cancel:hover,
+    .submit:hover {
+      background: rgba(158,158,158,0.2);
+    }
+    .cancel:hover {
+      color: #333;
+    }
+    .submit {
+      color: #106cc8;
+    }
+    @media all and (max-width: 600px) {
+      .white-box {
+        width: 100%;
+        height: auto;
+        left: 0;
+          margin-left: 0;
+      }
+      .buttonBar {
+        text-align: right;
+          position: inherit;
+      }
+    }
 
-body
-  form(method="POST", style="display: inline;", enctype="application/x-www-form-urlencoded", action!=action)
-    h2 Request for Permission
-    p Welcome 
-      span(style="font-weight:bold;")= resource_owner
+body(class="login")
+  div(class="page")
+    div(id="box", class="white-box")
+      form(method="POST", style="display: inline;", enctype="application/x-www-form-urlencoded", action!=action)
+        h1 Request for Permission
+        div(id="deviceName") Welcome 
+          span(style="font-weight:bold;")= resource_owner
+        div(class="inputWrapper")
+          p
+            span(style="font-weight:bold;")= client_title
+            |  is requesting your permission to access: 
+            span(style="font-weight:bold;")= scope
+            br
+            | Select "Allow Access" to grant the request or "No Thanks" to reject it.
+          p Clicking "Allow Access" will redirect you to 
+            span(style="font-weight:bold;")= redirect_uri
 
-    p
-      if scope
-        font(size="3") Do you allow #{client_title} access to:
-        br
-        font(size="2" color="grey") Choosing "Allow access" with no scope selected, MicroGateway will interpret it as the resource owner grants permission to all the requested scope(s)
-        br
-        each val in scope
-          input(type="checkbox", checked="yes", name="selectedscope", value!=val)
-          font(size="3")= val
-          br
-      else
-        font(size="3") Do you allow #{client_title} access the resource?
-
-    input(type="hidden", name="dp-state",value!=transaction_id)
-    input(type="hidden", name="resource-owner", value!=resource_owner)
-    input(type="hidden", name="redirect_uri", value!=redirect_uri)
-    input(type="hidden", name="scope", value!=scopeStr)
-    input(type="hidden", name="original-url", value!=original_url)
-    input(type="hidden", name="client_id", value!=client_id)
-    input(type="hidden", name="dp-data", value!=dp_data)
-    input(type="radio" name="approve" value="true")
-    label Allow access
-    input(type="radio", name="approve", value="false", checked="checked")
-    label No thanks
-    br
-    input(type="submit", name="submit", value="Submit")
-    font(size="2" color="grey") Clicking Submit will redirect you to 
-      span(style="font-weight:bold;")= redirect_uri
+          input(type="hidden", name="dp-state",value!=transaction_id)
+          input(type="hidden", name="resource-owner", value!=resource_owner)
+          input(type="hidden", name="redirect_uri", value!=redirect_uri)
+          input(type="hidden", name="scope", value!=scopeStr)
+          input(type="hidden", name="original-url", value!=original_url)
+          input(type="hidden", name="client_id", value!=client_id)
+          input(type="hidden", name="dp-data", value!=dp_data)
+          div(class="buttonBar")
+            button(class="cancel", type="submit", name="approve", value="false") No Thanks
+            button(class="submit", type="submit", name="approve", value="true") Allow Access

@@ -5,11 +5,9 @@
 
 'use strict';
 
-var assert = require('assert');
-
 module.exports = function(config) {
-    return function(props, context, flow) {
-        context.set('message.headers.x-policy-100', 'true');
-        flow.proceed();
-    }
+  return function(props, context, flow) {
+    context.set('message.headers.x-policy-100', 'true');
+    flow.proceed();
+  };
 };
