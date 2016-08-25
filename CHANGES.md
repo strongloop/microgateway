@@ -1,5 +1,9 @@
-2016-08-18, Version 1.5.0
+
+
+2016-08-22, Version 1.5.0
 =========================
+
+ * Update travis.yml (Jon Palgon)
 
  * Remove config dir if prev snapshot not loaded (Jon Palgon)
 
