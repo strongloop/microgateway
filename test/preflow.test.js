@@ -10,6 +10,7 @@ var supertest = require('supertest');
 
 var dsCleanup = require('./support/utils').dsCleanup;
 var dsCleanupFile = require('./support/utils').dsCleanupFile;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 var apimServer = require('./support/mock-apim-server/apim-server');
 var echo = require('./support/echo-server');
 
@@ -19,6 +20,8 @@ describe('preflow testing', function() {
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/preflow';
     process.env.NODE_ENV = 'production';
+
+    resetLimiterCache();
     mg.start(3000)
       .then(function() {
         request = supertest(mg.app);

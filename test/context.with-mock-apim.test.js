@@ -13,6 +13,7 @@ var fs = require('fs');
 var microgw = require('../lib/microgw');
 var supertest = require('supertest');
 var dsCleanup = require('./support/utils').dsCleanup;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 
 describe('Context variables testing with mock apim server', function() {
@@ -25,6 +26,7 @@ describe('Context variables testing with mock apim server', function() {
     process.env.APIMANAGER = '127.0.0.1';
     process.env.NODE_ENV = 'production';
 
+    resetLimiterCache();
     request = supertest('http://localhost:3000');
     path = __dirname + '/definitions/context';
     apiDocuments = getAPIDefinitions();

@@ -11,6 +11,7 @@ var mg = require('../lib/microgw');
 var should = require('should'); //eslint-disable-line no-unused-vars
 var async = require('async');
 var dsCleanupFile = require('./support/utils').dsCleanupFile;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 describe('ratelimit basic policy', function() {
 
@@ -18,6 +19,8 @@ describe('ratelimit basic policy', function() {
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/ratelimit';
     process.env.NODE_ENV = 'production';
+
+    resetLimiterCache();
     mg.start(3000)
       .then(function() {
         return echo.start(8889);
@@ -40,11 +43,6 @@ describe('ratelimit basic policy', function() {
     delete process.env.APIMANAGER;
     delete process.env.CONFIG_DIR;
     delete process.env.NODE_ENV;
-    // A hacky way to reset rate limiters
-    var limiters = require('../lib/preflow/apim-lookup').rateLimiters;
-    for (var i in limiters) {
-      delete limiters[i];
-    }
   });
 
   it('should expect ratelimit header', function(done) {

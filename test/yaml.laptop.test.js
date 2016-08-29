@@ -8,6 +8,7 @@
 var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 describe('general laptop', function() {
 
@@ -15,6 +16,8 @@ describe('general laptop', function() {
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/yaml';
     process.env.NODE_ENV = 'production';
+
+    resetLimiterCache();
     mg.start(3000)
       .then(function() {
         return echo.start(8889);

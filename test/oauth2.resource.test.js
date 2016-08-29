@@ -16,6 +16,7 @@ var debug = require('debug')('tests:oauth');
 var apimServer = require('./support/mock-apim-server/apim-server');
 var echo = require('./support/echo-server');
 var dsCleanup = require('./support/utils').dsCleanup;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 //var configDir = path.join(__dirname, 'definitions', 'oauth');
 var configDir = path.join(__dirname, 'definitions', 'oauth2-resource');
@@ -33,6 +34,8 @@ describe('oauth testing onprem', function() {
 
     NODE_TLS_REJECT_UNAUTHORIZED = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+    resetLimiterCache();
     apimServer.start(
             process.env.APIMANAGER,
             process.env.APIMANAGER_PORT,

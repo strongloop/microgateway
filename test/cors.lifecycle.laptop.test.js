@@ -10,6 +10,7 @@ var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
 var should = require('should'); //eslint-disable-line no-unused-vars
 var dsCleanupFile = require('./support/utils').dsCleanupFile;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 describe('cross origin resource sharing policy', function() {
 
@@ -17,6 +18,8 @@ describe('cross origin resource sharing policy', function() {
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/cors';
     process.env.NODE_ENV = 'production';
+
+    resetLimiterCache();
     mg.start(3000)
       .then(function() {
         return echo.start(8889);

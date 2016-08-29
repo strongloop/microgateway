@@ -9,6 +9,7 @@ var mg = require('../lib/microgw');
 var supertest = require('supertest');
 
 var dsCleanup = require('./support/utils').dsCleanup;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 var apimServer = require('./support/mock-apim-server/apim-server');
 var echo = require('./support/echo-server');
 
@@ -31,6 +32,8 @@ function runTestAppIgnored(desc, dir) {
       process.env.NODE_ENV = 'production';
       process.env.CONFIG_DIR = __dirname + '/definitions/quickstart/' + dir;
       process.env.DATASTORE_PORT = 5000;
+
+      resetLimiterCache();
       apimServer.start(
         process.env.APIMANAGER,
         process.env.APIMANAGER_PORT,

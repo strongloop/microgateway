@@ -12,6 +12,7 @@ var url = require('url');
 var qs = require('querystring');
 
 var dsCleanup = require('./support/utils').dsCleanup;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 var microgw = require('../lib/microgw');
 var authServer = require('./support/auth-server');
 var apimServer = require('./support/mock-apim-server/apim-server');
@@ -29,6 +30,7 @@ describe('oauth2 AZ-server', function() {
       process.env.APIMANAGER_PORT = 8000;
       process.env.DATASTORE_PORT = 4000;
 
+      resetLimiterCache();
       apimServer.start(
           process.env.APIMANAGER,
           process.env.APIMANAGER_PORT,

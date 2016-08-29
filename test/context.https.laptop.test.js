@@ -10,6 +10,7 @@ var assert = require('assert');
 var supertest = require('supertest');
 var yaml = require('yamljs');
 var dsCleanupFile = require('./support/utils').dsCleanupFile;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 var mg = require('../lib/microgw');
 
 describe('Context variables in laptop experience', function() {
@@ -19,6 +20,8 @@ describe('Context variables in laptop experience', function() {
     process.env.CONFIG_DIR = __dirname + '/definitions/context/https';
     process.env.NODE_ENV = 'production';
     process.env.TLS_SERVER_CONFIG = __dirname + '/support/https/tlsconfig.json';
+
+    resetLimiterCache();
     mg.start(3000)
       .then(function() {
         request = supertest(mg.app);

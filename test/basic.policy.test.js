@@ -10,6 +10,7 @@ var echo = require('./support/echo-server');
 var ldap = require('./support/ldap-server');
 var mg = require('../lib/microgw');
 var dsCleanupFile = require('./support/utils').dsCleanupFile;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 describe('basic auth policy', function() {
 
@@ -18,6 +19,8 @@ describe('basic auth policy', function() {
     process.env.CONFIG_DIR = __dirname + '/definitions/default';
     process.env.APIMANAGER = '127.0.0.1';
     process.env.NODE_ENV = 'production';
+
+    resetLimiterCache();
     mg.start(3000)
       .then(function() {
         return ldap.start(1389);

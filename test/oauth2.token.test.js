@@ -13,6 +13,7 @@ var microgw = require('../lib/microgw');
 var authServer = require('./support/auth-server');
 var apimServer = require('./support/mock-apim-server/apim-server');
 var dsCleanup = require('./support/utils').dsCleanup;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 function decodeToken(token) {
   //decode the access token into jwt token
@@ -73,6 +74,7 @@ describe('oauth2 token API', function() {
     process.env.APIMANAGER_PORT = 8081;
     process.env.DATASTORE_PORT = 5000;
 
+    resetLimiterCache();
     apimServer.start(
         process.env.APIMANAGER,
         process.env.APIMANAGER_PORT,
@@ -1574,6 +1576,9 @@ describe('oauth2 token API', function() {
         //.expect('X-Powered-By', 'MicroGateway')
         .end(function(err, res) {
           if (res) {
+            //empty body
+            assert(res.headers['content-length'] === '0');
+
             assert(res.headers['access-control-expose-headers']
                 .indexOf('X-RateLimit-Limit') !== -1);
           }
