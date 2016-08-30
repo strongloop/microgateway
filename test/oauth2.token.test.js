@@ -1577,7 +1577,7 @@ describe('oauth2 token API', function() {
         .end(function(err, res) {
           if (res) {
             //empty body
-            assert(res.headers['content-length'] === '0');
+            assert(!res.headers['content-length'] || res.headers['content-length'] === '0');
 
             assert(res.headers['access-control-expose-headers']
                 .indexOf('X-RateLimit-Limit') !== -1);
