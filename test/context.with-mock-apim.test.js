@@ -19,6 +19,7 @@ describe('Context variables testing with mock apim server', function() {
   var request, path, apiDocuments;
 
   before(function() {
+    process.env.CONFIG_DIR = __dirname + '/definitions/default';
     process.env.DATASTORE_PORT = 5000;
     process.env.APIMANAGER_PORT = 8081;
     process.env.APIMANAGER = '127.0.0.1';
@@ -31,6 +32,7 @@ describe('Context variables testing with mock apim server', function() {
 
   after(function() {
     // delete environment variables
+    delete process.env.CONFIG_DIR;
     delete process.env.DATASTORE_PORT;
     delete process.env.APIMANAGER_PORT;
     delete process.env.APIMANAGER;

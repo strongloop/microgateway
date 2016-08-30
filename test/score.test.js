@@ -14,6 +14,7 @@ describe('matching score test', function() {
 
   var request;
   before(function(done) {
+    process.env.CONFIG_DIR = __dirname + '/definitions/default';
     process.env.APIMANAGER = '127.0.0.1';
     process.env.NODE_ENV = 'production';
     mg.start(3000)
@@ -31,6 +32,7 @@ describe('matching score test', function() {
 
   after(function(done) {
     dsCleanupFile();
+    delete process.env.CONFIG_DIR;
     delete process.env.APIMANAGER;
     delete process.env.NODE_ENV;
     echo.stop()

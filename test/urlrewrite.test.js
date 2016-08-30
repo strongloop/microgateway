@@ -14,6 +14,7 @@ describe('urlrewrite', function() {
 
   var request;
   before(function(done) {
+    process.env.CONFIG_DIR = __dirname + '/definitions/default';
     process.env.APIMANAGER = '127.0.0.1';
     process.env.NODE_ENV = 'production';
     process.env.WLPN_APP_ROUTE = 'http:///apim/sb';
@@ -32,6 +33,7 @@ describe('urlrewrite', function() {
 
   after(function(done) {
     dsCleanupFile();
+    delete process.env.CONFIG_DIR;
     delete process.env.APIMANAGER;
     delete process.env.NODE_ENV;
     echo.stop()
