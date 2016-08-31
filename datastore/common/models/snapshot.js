@@ -4,7 +4,7 @@
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
 var app = require('../../server/server');
-var fs = require('fs.extra');
+var fs = require('fs-extra');
 var path = require('path');
 
 module.exports = function(Snapshot) {
@@ -25,7 +25,7 @@ module.exports = function(Snapshot) {
                 function(err, info) { if (err) { /* suppress eslint handle-callback-err */ } });
       });
 
-      fs.rmrf(
+      fs.remove(
         path.join(process.env.ROOTCONFIGDIR, ctx.instance.id),
         function(err) { if (err) { /* suppress eslint handle-callback-err */ } });
     }
