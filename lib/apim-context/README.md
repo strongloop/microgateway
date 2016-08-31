@@ -1,5 +1,7 @@
 Create the APIM related context variables to be accessed in the following
-middlewares and assembly.
+middlewares and assembly. The responsibility of the `apim-context` middleware is
+to populate any context variables that may be needed by the flow-engine, the
+policies it enforces, or subsequent middlewares.
 
 ## API
 ```js

@@ -1,6 +1,6 @@
-This middleware checks and loads the latest APIs from the data store and save
-them under the context object, so that the following middlewares can access the
-APIs, Plans, or Subscribptions directly.
+This middleware checks and loads the latest APIs from the data store, so that
+the subsequent middlewares can access the data models, including APIs, Plans,
+Subscribptions and so on, directly.
 
 ## API
 ```js
