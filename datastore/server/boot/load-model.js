@@ -3,7 +3,7 @@
 // US Government Users Restricted Rights - Use, duplication or disclosure
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
-var fs = require('fs.extra');
+var fs = require('fs-extra');
 var path = require('path');
 var async = require('async');
 var YAML = require('yamljs');
@@ -213,7 +213,7 @@ function loadData(app, apimanager, models, currdir, uid) {
         // if the previous snapshot hasn't be loaded, delete it
         if (uid && snapshotID !== uid) {
           try {
-            fs.rmrfSync(currdir);
+            fs.removeSync(currdir);
           } catch (e) {
             logger.error(e);
             //continue
@@ -466,7 +466,7 @@ function pullFromAPIm(apimanager, currdir, uid, cb) {
   // Have an APIm, grab latest if we can..
   var snapdir = path.join(process.env.ROOTCONFIGDIR, uid);
 
-  fs.mkdir(snapdir, function(err) {
+  fs.mkdirs(snapdir, function(err) {
     if (err) {
       logger.warn('Failed to create snapshot directory');
       logger.debug('pullFromAPIm exit(1)');
@@ -498,7 +498,7 @@ function pullFromAPIm(apimanager, currdir, uid, cb) {
       if (err) {
         logger.error(err);
         try {
-          fs.rmdirSync(snapdir);
+          fs.removeSync(snapdir);
         } catch (e) {
           logger.error(e);
           //continue

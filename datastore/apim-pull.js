@@ -8,7 +8,7 @@
  */
 var logger = require('apiconnect-cli-logger/logger.js')
         .child({ loc: 'microgateway:datastore:apim-pull' });
-var fs = require('fs.extra');
+var fs = require('fs-extra');
 var path = require('path');
 var request = require('request');
 var async = require('async');
@@ -264,7 +264,7 @@ function fetchFromCache(options, opts, cb) {
             var filename = path.join(opts.outdir, indirFiles[i]);
             fs.copy(path.join(opts.indir, indirFiles[i]),
                     filename,
-                    { replace: false },
+                    { preserveTimestamps: true },
                     function(err) {
                       if (err) {
                         throw (err);
