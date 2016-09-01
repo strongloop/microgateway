@@ -1,13 +1,13 @@
 [
   {
     "id": "574ea9c7e4b076e106cb4432",
-    "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/registries/574ea9c7e4b076e106cb4432",
+    "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad/registries/574ea9c7e4b076e106cb4432",
     "name": "userauth-ldap",
     "type": "ldap",
     "title": "UserAuth LDAP",
     "description": "",
     "ldap-config": {
-      "host": "dpautosrv1.dp.rtp.raleigh.ibm.com",
+      "host": "example.com",
       "port": 389,
       "ssl": false,
       "protocol-version": "3",

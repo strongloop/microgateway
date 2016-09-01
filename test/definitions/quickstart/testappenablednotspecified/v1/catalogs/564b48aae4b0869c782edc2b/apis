@@ -6,7 +6,7 @@
       "name": "sb",
       "sandbox": true,
       "title": "Sandbox",
-      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+      "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b"
     },
     "document": {
       "swagger": "2.0",
@@ -57,7 +57,7 @@
       "title": "Climb On"
     },
     "state": "running",
-    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+    "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
   },
   {
     "catalog": {
@@ -66,7 +66,7 @@
       "name": "sb",
       "sandbox": true,
       "title": "Sandbox",
-      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+      "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b"
     },
     "document": {
       "swagger": "2.0",
@@ -127,7 +127,7 @@
       "title": "Climb On"
     },
     "state": "running",
-    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+    "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
   },
   {
     "catalog": {
@@ -136,7 +136,7 @@
       "name": "sb",
       "sandbox": true,
       "title": "Sandbox",
-      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+      "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b"
     },
     "document": {
       "swagger": "2.0",
@@ -197,7 +197,7 @@
       "title": "Climb On"
     },
     "state": "running",
-    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+    "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
   },
   {
     "catalog": {
@@ -206,7 +206,7 @@
       "name": "sb",
       "sandbox": true,
       "title": "Sandbox",
-      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+      "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b"
     },
     "document": {
       "swagger": "2.0",
@@ -273,7 +273,7 @@
       "title": "Climb On"
     },
     "state": "running",
-    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+    "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
   },
   {
     "catalog": {
@@ -282,7 +282,7 @@
       "name": "sb",
       "sandbox": true,
       "title": "Sandbox",
-      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+      "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b"
     },
     "document": {
       "swagger": "2.0",
@@ -349,6 +349,6 @@
       "title": "Climb On"
     },
     "state": "running",
-    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+    "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
   }
 ]

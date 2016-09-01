@@ -24,9 +24,9 @@ app.use(function(req, res) {
 ```
 
 The `ctx` object provides getter and setter functions to access context
-variables. See https://github.ibm.com/apimesh/flow-engine for `ctx` API.
+variables. See https://github.com/ibm-apiconnect/flow-engine/README.md for `ctx` API.
 
-See https://github.ibm.com/apimesh/collab/blob/master/design/gateway/context.md
+See https://github.com/ibm-apiconnect/microgateway/README.md
 for avaiable APIm context variables.
 
 ### options
@@ -36,7 +36,7 @@ to customize this middleware's behavior.
 #### request.contentTypeMaps
 an array of content-type normalization rule objects.
 
-See https://github.ibm.com/apimesh/collab/blob/master/design/gateway/context.md
+See https://github.com/ibm-apiconnect/microgateway/README.md
 for detailed usage.
 
 ```js
@@ -62,7 +62,7 @@ For content-type not defined in this option, the default parsing method is
 Currently, the underlying implementation uses parsers from 
 `body-parser` https://github.com/expressjs/body-parser to parse payload.
 
-See https://github.ibm.com/apimesh/collab/blob/master/design/gateway/context.md
+See https://github.com/ibm-apiconnect/microgateway/README.md
 for detailed usage.
 
 ```js
@@ -84,7 +84,7 @@ app.use(contextMiddlewareFactory(options));
 #### request.bodyFilter
 an object defines when to reject or ignore payload of specific HTTP methods.
 
-See https://github.ibm.com/apimesh/collab/blob/master/design/gateway/context.md
+See https://github.com/ibm-apiconnect/microgateway/README.md
 for detailed usage.
 
 ```js

@@ -1,6 +1,6 @@
 [{
   "id": "564b48aae4b0869c782edc2b",
-  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+  "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b",
   "name": "sb",
   "title": "Sandbox",
   "sandbox": true,
@@ -13,11 +13,11 @@
   "gateway-cluster": {
     "id": "564b45c1e4b0869c782ed85b",
     "title": "Gateway",
-    "host-name": "sjsldev251.dev.ciondemand.com"
+    "host-name": "example.com"
   }
 }, {
   "id": "564b48b6e4b0869c782edc3b",
-  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48b6e4b0869c782edc3b",
+  "url": "https://example.com/v1/catalogs/564b48b6e4b0869c782edc3b",
   "name": "sb",
   "title": "Sandbox",
   "sandbox": true,
@@ -30,11 +30,11 @@
   "gateway-cluster": {
     "id": "564b45c1e4b0869c782ed85b",
     "title": "Gateway",
-    "host-name": "sjsldev251.dev.ciondemand.com"
+    "host-name": "example.com"
   }
 }, {
   "id": "564b48bae4b0869c782edc42",
-  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48bae4b0869c782edc42",
+  "url": "https://example.com/v1/catalogs/564b48bae4b0869c782edc42",
   "name": "qa",
   "title": "Quality Assurance",
   "sandbox": false,
@@ -47,11 +47,11 @@
   "gateway-cluster": {
     "id": "564b45c1e4b0869c782ed85b",
     "title": "Gateway",
-    "host-name": "sjsldev251.dev.ciondemand.com"
+    "host-name": "example.com"
   }
 }, {
   "id": "564b48bee4b0869c782edc45",
-  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48bee4b0869c782edc45",
+  "url": "https://example.com/v1/catalogs/564b48bee4b0869c782edc45",
   "name": "staging",
   "title": "Staging",
   "sandbox": true,
@@ -64,11 +64,11 @@
   "gateway-cluster": {
     "id": "564b45c1e4b0869c782ed85b",
     "title": "Gateway",
-    "host-name": "sjsldev251.dev.ciondemand.com"
+    "host-name": "example.com"
   }
 }, {
   "id": "564b48c1e4b0869c782edc48",
-  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48c1e4b0869c782edc48",
+  "url": "https://example.com/v1/catalogs/564b48c1e4b0869c782edc48",
   "name": "qa",
   "title": "Quality Assurance",
   "sandbox": false,
@@ -81,11 +81,11 @@
   "gateway-cluster": {
     "id": "564b45c1e4b0869c782ed85b",
     "title": "Gateway",
-    "host-name": "sjsldev251.dev.ciondemand.com"
+    "host-name": "example.com"
   }
   }, {
     "id": "564b48c1e4b0869c782edc52",
-    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48c1e4b0869c782edc52",
+    "url": "https://example.com/v1/catalogs/564b48c1e4b0869c782edc52",
     "name": "prod",
     "title": "Production",
     "sandbox": false,
@@ -98,6 +98,6 @@
     "gateway-cluster": {
       "id": "564b45c1e4b0869c782ed85b",
       "title": "Gateway",
-      "host-name": "sjsldev251.dev.ciondemand.com"
+      "host-name": "example.com"
     }
 }]
