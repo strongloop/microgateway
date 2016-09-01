@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "policy-loader test",
   "main": "index.js",
-  "author": "IBM Gateway Team",
-  "license": "SEE LICENSE IN LICENSE.txt",
+  "author": "IBM",
+  "license": "MIT",
   "dependencies": {
     "loopback": "^2.26.2"
   }
