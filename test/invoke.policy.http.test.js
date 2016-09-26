@@ -73,6 +73,28 @@ describe('invokePolicy', function() {
       });
   });
 
+
+  //invoke policy to get a request
+  it('get', function(done) {
+    this.timeout(10000);
+
+    //Two things are tested:
+    //1. a GET request with data should not be rejected by microgateway
+    //2. The invoke policy should not forward the Content-Length of a GET request
+    request
+      .get('/invoke/basic')
+      .set('Content-Length', '5')
+      .send('dummy')
+      .expect(/z-method: GET/)
+      .expect(/z-content-length: undefined/)
+      .expect(/z-transfer-encoding: undefined/)
+      .expect(/body: \n/)
+      .expect(200)
+      .end(function(err, res) {
+        done(err);
+      });
+  });
+
   //This testcase is to verify the invoke policy will urlencode the form data
   //before sending them to the api server
   it('form-urlencoded-1', function(done) {

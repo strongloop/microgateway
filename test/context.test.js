@@ -417,7 +417,8 @@ describe('Context middleware', function() {
       });
 
       [ 'GET', 'HEAD', 'DELETE' ].forEach(function(method) {
-        it('should reject ' + method + ' method w/ payload', function(done) {
+        //microgateway issue #4: should not reject a GET request with payload
+        it.skip('should reject ' + method + ' method w/ payload', function(done) {
           request(app)
             .post('/foo')
             .set('X-METHOD-NAME', method)
