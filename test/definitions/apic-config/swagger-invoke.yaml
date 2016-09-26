@@ -1,0 +1,31 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Invoke
+  x-ibm-name: invoke
+host: $(catalog.host)
+basePath: /invoke
+paths:
+  /:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+securityDefinitions: {}
+security: []
+schemes:
+  - http
+produces:
+  - application/json
+x-ibm-configuration:
+  assembly:
+    execute:
+      - invoke:
+          target-url: "https://localhost:8890/"
+          tls-profile: "theTlsProfile-bob"
+  enforced: true
+  testable: true
+  phase: realized
+  cors:
+    enabled: true
+

@@ -1,0 +1,58 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Weather
+  x-ibm-name: weather
+host: $(catalog.host)
+basePath: /weather
+paths:
+  /wind:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+  /temperature:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+securityDefinitions: {}
+security: []
+schemes:
+  - http
+produces:
+  - application/json
+x-ibm-configuration:
+  assembly:
+    execute:
+      - operation-switch:
+          title: operation-switch
+          case:
+            - operations:
+                - verb: get
+                  path: /wind
+              execute:
+                - set-variable:
+                    title: set-variable
+                    actions:
+                      - set: message.body
+                        value: '{ "wind": "17km/h" }'
+                      - set: message.headers.content-type
+                        value: application/json
+            - operations:
+                - verb: get
+                  path: /temperature
+              execute:
+                - set-variable:
+                    title: set-variable
+                    actions:
+                      - set: message.body
+                        value: '{ "temperature": "27C" }'
+                      - set: message.headers.content-type
+                        value: application/json
+  enforced: true
+  testable: true
+  phase: realized
+  cors:
+    enabled: true
+

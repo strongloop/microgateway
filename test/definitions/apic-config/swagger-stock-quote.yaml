@@ -1,0 +1,53 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: StockQuote
+  x-ibm-name: stock-quote
+host: $(catalog.host)
+basePath: /stock/quote
+paths:
+  /:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+    parameters:
+      - name: symbol
+        type: string
+        required: true
+        in: query
+        description: stock symbol
+securityDefinitions:
+  api-key-client-secret:
+    type: apiKey
+    description: ''
+    in: header
+    name: X-IBM-Client-Secret
+  api-key-client-d:
+    type: apiKey
+    description: ''
+    in: header
+    name: X-IBM-Client-Id
+security:
+  - api-key-client-secret: []
+    api-key-client-d: []
+schemes:
+  - http
+produces:
+  - application/json
+x-ibm-configuration:
+  assembly:
+    execute:
+      - set-variable:
+          title: set-variable
+          actions:
+            - set: message.body
+              value: '{ "$(request.parameters.symbol)": 129 }'
+            - set: message.headers.content-type
+              value: application/json
+  enforced: true
+  testable: true
+  phase: realized
+  cors:
+    enabled: true
+

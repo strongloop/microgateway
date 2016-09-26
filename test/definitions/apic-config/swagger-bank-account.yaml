@@ -1,0 +1,47 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: BankAccount
+  x-ibm-name: bank-account
+host: $(catalog.host)
+basePath: /account
+paths:
+  /balance:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+securityDefinitions:
+  api-key-client-secret:
+    type: apiKey
+    description: ''
+    in: header
+    name: X-IBM-Client-Secret
+  api-key-client-d:
+    type: apiKey
+    description: ''
+    in: header
+    name: X-IBM-Client-Id
+security:
+  - api-key-client-secret: []
+    api-key-client-d: []
+schemes:
+  - http
+produces:
+  - application/json
+x-ibm-configuration:
+  assembly:
+    execute:
+      - set-variable:
+          title: set-variable
+          actions:
+            - set: message.body
+              value: '{ "id": "$(client.app.id)", "balance": 23501 }'
+            - set: message.headers.content-type
+              value: application/json
+  enforced: true
+  testable: true
+  phase: realized
+  cors:
+    enabled: true
+
