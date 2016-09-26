@@ -6,9 +6,67 @@ The data store is a loopback application for the data model of all API Connect a
 ## How does it work?
 The artifacts consumed by the data store are created one of the following ways:
 - In a laptop scenario by using the API Connect CLI. 
-- In an on-premises scenario by downloading from the API Connect management server.  
+- In an on-premises scenario by downloading from the API Connect management server.
 
 Once created, the data store loads these artifacts into an in-memory database on startup.  In the on-premises scenario, the in-memory database is periodically updated at run time (every 15 minutes by default).  Once the raw data is populated into the in-memory database, a specific view of the information is generated that is optimized for performant runtime lookup of the appropriate behavior for a specific request to the Micro Gateway.  The data store exposes information to the Micro Gateway using a REST interface.
+
+### The configuration files
+In the end-to-end (or the laptop) scenario, the default application and plan will be created into the datastore. If developers want to configure their own applications, plans, or TLS profiles, they can take advantage of the two configuration files, `apic.json` and `apic-tls-profiles.json`. They should be created under the `definitions` folder where the YAML files are generated.
+
+Here's an example of `apic.json` to configure applications and plans. Two clients `foo` and `bar`, and two plans `plan-a` and `plan-b` are added to the datastore. The `foo` subscribes the `plan-a`, which includes APIs `stock-quote` and `weather` while the `bar` subscribes the `plan-b`, which includes only `bank-account`. And both plans got their own rate-limit settings.
+```
+{
+    "applications": {
+        "foo": {
+            "client-secret": "fooSecret",
+            "oauth-redirection-uri": "http://foo.com/redirect",
+            "subscription": "plan-b"
+        },
+        "bar": { "client-secret": "barSecret",
+            "oauth-redirection-uri": "http://bar.com/redirect",
+            "subscription": "plan-a"
+        }
+    },
+    "plans": {
+        "plan-a": {
+            "apis": [
+                "stock-quote",
+                "weather"
+            ],
+            "hard-limit": false,
+            "rate-limit": "100/minute"
+        },
+        "plan-b": {
+            "apis": [
+                "bank-account"
+            ],
+            "hard-limit": true,
+            "rate-limit": "1/second"
+        }
+    }
+}
+
+```
+
+Here's an example of `apic-tls-profiles.json` which is used to configure TLS profiles. Developers may specify the key, certificate, and other options to create a TLS profile. A TLS profile is used in the secure connections. For example, the created TLS profile can be used in an invoke policy.
+```
+{
+    "theTlsProfile-bob: {
+        "ca": [
+            "root.crt",
+            "root2.crt"
+        ],
+        "cert": "bob.crt",
+        "key": "bob.key",
+        "rejectUnauthorized": true,
+        "secureProtocols": [
+            "TLSv1_1_method",
+            "TLSv1_2_method"
+        ]
+    }
+}
+
+```
 
 ## Do I need to start it explicitly?
 In most cases, no.  By default, each Micro Gateway starts its own instance of the data store.  The data store can either be started within the same process space as the Micro Gateway or as its own process.  It makes sense to start the data store explicitly in certain scenarios where differing numbers of Micro Gateways and data stores are needed for optimal scaling of a solution.
@@ -28,3 +86,4 @@ The data store could contain sensitive information 'in the clear' so access to t
   By default, the data store binds to port 0, causing an ephemeral port listen
   If set before startup, the data store listens on that port
 - LAPTOP_RATELIMIT : Rate limit (defaults to 100/hour) to apply for all requests (laptop only)
+
