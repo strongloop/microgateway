@@ -7,7 +7,7 @@ info:
   description: Operation-Switch policy for the IBM API Connect
   contact:
     name: IBM API Mesh Samples
-    url: https://www.ibm.com/apimesh
+    url: https://www.ibm.com/apiconnect
     email: steve-product-manager@ibm.com
 properties:
   type: "object"

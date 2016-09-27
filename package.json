@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.ibm.com:apimesh/microgateway.git"
+    "url": "git@github.com:ibm-apiconnect/microgateway.git"
   },
   "keywords": [
     "ibm",

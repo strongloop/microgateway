@@ -6,7 +6,7 @@
       "name": "foo-catalog",
       "sandbox": true,
       "title": "fooCatalog",
-      "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+      "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
       "portal-type": "BASIC",
       "gateway-url": "https://<gateway-cluster-address>/myOrg/foo-catalog",
       "is-saas": false
@@ -94,7 +94,7 @@
       "members": []
     },
     "state": "published",
-    "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/products/5762173fe4b076e106cb624c",
+    "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad/products/5762173fe4b076e106cb624c",
     "visibility": {
       "view": {
         "enabled": true,

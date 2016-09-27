@@ -1,6 +1,6 @@
 [{
   "id": "564bbfe3e4b0869c782ee3fa",
-  "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/subscriptions/564bbfe3e4b0869c782ee3fa",
+  "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/subscriptions/564bbfe3e4b0869c782ee3fa",
   "organization": {
     "id": "564b48a9e4b0869c782edc24",
     "name": "apim",
@@ -8,7 +8,7 @@
   },
   "catalog": {
     "id": "564b48aae4b0869c782edc2b",
-    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+    "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b",
     "name": "sb",
     "title": "Sandbox",
     "sandbox": true,
@@ -120,7 +120,7 @@
     "apis": [
       {
         "id": "564b7b3ae4b0869c782eddae",
-        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae",
+        "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae",
         "state": "running",
         "organization": {
           "id": "564b48a9e4b0869c782edc24",
@@ -129,7 +129,7 @@
         },
         "catalog": {
           "id": "564b48aae4b0869c782edc2b",
-          "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+          "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b",
           "name": "sb",
           "title": "Sandbox",
           "sandbox": true,
@@ -184,7 +184,7 @@
       },
       {
         "id": "564b7b3ae4b0869c782eddae",
-        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae",
+        "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae",
         "state": "running",
         "organization": {
           "id": "564b48a9e4b0869c782edc24",
@@ -193,7 +193,7 @@
         },
         "catalog": {
           "id": "564b48aae4b0869c782edc2b",
-          "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+          "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b",
           "name": "sb",
           "title": "Sandbox",
           "sandbox": true,
@@ -248,7 +248,7 @@
       },
       {
         "id": "564b7b3ae4b0869c782eddae",
-        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae",
+        "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae",
         "state": "running",
         "organization": {
           "id": "564b48a9e4b0869c782edc24",
@@ -257,7 +257,7 @@
         },
         "catalog": {
           "id": "564b48aae4b0869c782edc2b",
-          "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+          "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b",
           "name": "sb",
           "title": "Sandbox",
           "sandbox": true,
@@ -312,7 +312,7 @@
       },
       {
         "id": "564b7b3ae4b0869c782eddae",
-        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae",
+        "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae",
         "state": "running",
         "organization": {
           "id": "564b48a9e4b0869c782edc24",
@@ -321,7 +321,7 @@
         },
         "catalog": {
           "id": "564b48aae4b0869c782edc2b",
-          "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+          "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b",
           "name": "sb",
           "title": "Sandbox",
           "sandbox": true,
@@ -376,7 +376,7 @@
       },
       {
         "id": "564b7b3ae4b0869c782eddae",
-        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae",
+        "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae",
         "state": "running",
         "organization": {
           "id": "564b48a9e4b0869c782edc24",
@@ -385,7 +385,7 @@
         },
         "catalog": {
           "id": "564b48aae4b0869c782edc2b",
-          "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+          "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b",
           "name": "sb",
           "title": "Sandbox",
           "sandbox": true,

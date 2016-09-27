@@ -8,7 +8,7 @@ info:
   contact:
     name: IBM API Management
     email: ibmapi@us.ibm.com
-    url: http://www.ibm.com/apimanagement
+    url: http://www.ibm.com/apiconnect
 
 attach:
   - rest

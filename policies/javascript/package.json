@@ -17,5 +17,5 @@
     "lodash": "^4.5.1"
   },
   "author": "IBM",
-  "license": "ISC"
+  "license": "MIT"
 }

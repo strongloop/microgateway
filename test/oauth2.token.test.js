@@ -1,7 +1,6 @@
-// Copyright IBM Corp. 2016. All Rights Reserved.
+// Copyright (c) IBM Corp. 2016. All Rights Reserved.
 // Node module: microgateway
-// US Government Users Restricted Rights - Use, duplication or disclosure
-// restricted by GSA ADP Schedule Contract with IBM Corp.
+// This project is licensed under the MIT License, see LICENSE.txt
 
 'use strict';
 
@@ -468,7 +467,7 @@ describe('oauth2 token API', function() {
         });
     });
 
-    //skip this for the LDAP server "dpautosrv1.dp.rtp.raleigh.ibm.com" is
+    //skip this for the LDAP server is
     //sometimes not reachable.
     it.skip('user registry (LDAP) ok', function(done) {
       var data = {
@@ -497,7 +496,7 @@ describe('oauth2 token API', function() {
         });
     });
 
-    //skip this for the LDAP server "dpautosrv1.dp.rtp.raleigh.ibm.com" is
+    //skip this for the LDAP server is
     //sometimes not reachable.
     it.skip('user registry (LDAP) incorrect password', function(done) {
       var data = {

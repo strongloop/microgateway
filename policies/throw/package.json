@@ -11,7 +11,7 @@
     "throw"
   ],
   "author": "IBM",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "debug": "^2.x"
   },
