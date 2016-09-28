@@ -8,6 +8,7 @@
 var supertest = require('supertest');
 var mg = require('../lib/microgw');
 var dsCleanupFile = require('./support/utils').dsCleanupFile;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 describe('javascript policy', function() {
 
@@ -15,6 +16,7 @@ describe('javascript policy', function() {
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/javascript';
     process.env.NODE_ENV = 'production';
+    resetLimiterCache();
     mg.start(3000)
       .then(function() {
         request = supertest('http://localhost:3000');
@@ -27,6 +29,7 @@ describe('javascript policy', function() {
   });
 
   after(function(done) {
+    resetLimiterCache();
     dsCleanupFile();
     mg.stop()
       .then(done, done)

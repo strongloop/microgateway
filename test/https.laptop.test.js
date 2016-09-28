@@ -10,6 +10,8 @@ var echo = require('./support/echo-server');
 var dsCleanupFile = require('./support/utils').dsCleanupFile;
 var mg = require('../lib/microgw');
 
+require('../lib/rate-limit/util').resetLimiterCache();
+
 describe('HTTP and HTTPS in separate files', function() {
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/combined1';

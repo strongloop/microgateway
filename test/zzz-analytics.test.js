@@ -14,6 +14,7 @@ var analytics = require('./support/analytics-server');
 var fs = require('fs');
 var path = require('path');
 var dsCleanup = require('./support/utils').dsCleanup;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 var hasCopiedKeys;
 var privKey = path.resolve(__dirname, '..', 'id_rsa');
@@ -81,6 +82,7 @@ describe('analytics + invoke policy', function() {
     process.env.DATASTORE_PORT = 5000;
     delete require.cache[require.resolve('../lib/microgw')];
 
+    resetLimiterCache();
     copyKeys()
     .then(function() {
       return analytics.start(

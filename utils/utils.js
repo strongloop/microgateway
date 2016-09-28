@@ -70,7 +70,7 @@ exports.getTLSConfigSync = function() {
     log.error(e);
   }
 
-  return rev;
+  return rev || {};
 };
 
 

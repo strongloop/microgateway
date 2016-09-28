@@ -11,6 +11,7 @@ var ldap = require('./support/ldap-server');
 var mg = require('../lib/microgw');
 var apimServer = require('./support/mock-apim-server/apim-server');
 var dsCleanup = require('./support/utils').dsCleanup;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 describe('basic auth policy', function() {
 
@@ -21,6 +22,8 @@ describe('basic auth policy', function() {
     process.env.APIMANAGER_PORT = 8081;
     process.env.APIMANAGER = '127.0.0.1';
     process.env.NODE_ENV = 'production';
+
+    resetLimiterCache();
     apimServer.start('127.0.0.1', 8081)
       .then(function() { return mg.start(3000); })
       .then(function() {

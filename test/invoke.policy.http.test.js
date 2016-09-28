@@ -10,6 +10,7 @@ var microgw = require('../lib/microgw');
 var backend = require('./support/invoke-server');
 var apimServer = require('./support/mock-apim-server/apim-server');
 var dsCleanup = require('./support/utils').dsCleanup;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 describe('invokePolicy', function() {
 
@@ -23,6 +24,7 @@ describe('invokePolicy', function() {
     process.env.APIMANAGER_PORT = 8081;
     process.env.DATASTORE_PORT = 5000;
 
+    resetLimiterCache();
     apimServer.start(
             process.env.APIMANAGER,
             process.env.APIMANAGER_PORT,
@@ -45,6 +47,7 @@ describe('invokePolicy', function() {
     delete process.env.APIMANAGER_PORT;
     delete process.env.DATASTORE_PORT;
 
+    resetLimiterCache();
     dsCleanup(5000)
       .then(function() { return apimServer.stop(); })
       .then(function() { return microgw.stop(); })
