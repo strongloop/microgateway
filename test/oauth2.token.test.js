@@ -1616,4 +1616,31 @@ describe('oauth2 token API', function() {
     });
   });
 
+  var testAppId = '0af99e4b-8d76-4add-bdc5-3aac1c374f21';
+  var testAppSecret = 'cB3eU4wQ4dF0oG5iK4dP4nU2wT6iE6kP8hF5rP8oK1iL4yD7pL';
+  //the 'test-app' should be able to call the oauth2 API
+  it('test-app-enabled', function(done) {
+    var data = {
+      grant_type: 'client_credentials',
+      client_id: testAppId,
+      client_secret: testAppSecret,
+      scope: 'weather stock' };
+
+    request.post('/oauth2/token/no_refresh')
+      .set('X-DUMMY-ID', 'foo')
+      .type('form')
+      .send(data)
+      .expect('Cache-Control', 'no-store')
+      .expect('Pragma', 'no-cache')
+      .expect('Content-Type', /application\/json/)
+      .expect(200)
+      .expect(function(res) {
+        assert(res.body.access_token);
+        assert(!res.body.refresh_token);
+      })
+      .end(function(err, res) {
+        done(err);
+      });
+  });
+
 });
