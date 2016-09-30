@@ -643,6 +643,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'client-org-name': pieces.application.developerOrg ?
               pieces.application.developerOrg.name : '',
             'test-app-enabled': false,
+            'test-app-cid-sec': true,
             'plan-id': pieces.plan.id,
             'plan-name': pieces.plan.name,
             'plan-version': pieces.plan.version,
@@ -677,8 +678,8 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                     return;
                   }
                   logger.debug('optimizedData created: %j', optimizedData);
-                  if (createTestApp && apiClientidSecurity) {
-                    createTestData(app, newOptimizedDataEntry, pieces, apiPathsTestApp,
+                  if (createTestApp) {
+                    createTestData(app, newOptimizedDataEntry, pieces, apiPathsTestApp, apiClientidSecurity,
                       function(err) {
                         if (err) {
                           apidone(err);
@@ -692,8 +693,8 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                   }
                 }
               );
-            } else if (apiPathsTestApp.length !== 0 && createTestApp && apiClientidSecurity) {
-              createTestData(app, newOptimizedDataEntry, pieces, apiPathsTestApp,
+            } else if (apiPathsTestApp.length !== 0 && createTestApp) {
+              createTestData(app, newOptimizedDataEntry, pieces, apiPathsTestApp, apiClientidSecurity,
                 function(err) {
                   if (err) {
                     apidone(err);
@@ -714,10 +715,11 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
     function(err) { cb(err); });
 }
 
-function createTestData(app, OptimizedDataEntry, pieces, apiPaths, cb) {
+function createTestData(app, OptimizedDataEntry, pieces, apiPaths, apiSecurity, cb) {
   OptimizedDataEntry['test-app-enabled'] = true;
   OptimizedDataEntry['client-id'] = pieces.catalog['test-app-credentials']['client-id'];
   OptimizedDataEntry['client-secret'] = pieces.catalog['test-app-credentials']['client-secret'];
+  OptimizedDataEntry['test-app-cid-sec'] = apiSecurity;
   OptimizedDataEntry['api-paths'] = apiPaths;
   OptimizedDataEntry['plan-rate-limit'] = undefined;
   app.models.optimizedData.create(
