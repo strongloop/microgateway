@@ -643,6 +643,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'client-org-name': pieces.application.developerOrg ?
               pieces.application.developerOrg.name : '',
             'test-app-enabled': false,
+            'test-app-cid-sec': true,
             'plan-id': pieces.plan.id,
             'plan-name': pieces.plan.name,
             'plan-version': pieces.plan.version,
@@ -718,7 +719,7 @@ function createTestData(app, OptimizedDataEntry, pieces, apiPaths, apiSecurity, 
   OptimizedDataEntry['test-app-enabled'] = true;
   OptimizedDataEntry['client-id'] = pieces.catalog['test-app-credentials']['client-id'];
   OptimizedDataEntry['client-secret'] = pieces.catalog['test-app-credentials']['client-secret'];
-  OptimizedDataEntry['api-client-id-security'] = apiSecurity;
+  OptimizedDataEntry['test-app-cid-sec'] = apiSecurity;
   OptimizedDataEntry['api-paths'] = apiPaths;
   OptimizedDataEntry['plan-rate-limit'] = undefined;
   app.models.optimizedData.create(
