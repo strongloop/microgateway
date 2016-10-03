@@ -29,6 +29,8 @@ var CONFIGDIR = environment.CONFIGDIR;
 var KEYNAME = environment.KEYNAME;
 
 var LAPTOP_RATELIMIT = environment.LAPTOP_RATELIMIT;
+var WH_SUBSCRIBE = 0;
+var WH_UNSUBSCRIBE = 1;
 
 var cliConfig = require('apiconnect-cli-config');
 
@@ -159,7 +161,19 @@ module.exports = function(app) {
         return callback();
       }
 
-      webhooksSubscribe(app, apimanager, function(err) {
+      webhooksSubscribe(app, apimanager, WH_UNSUBSCRIBE, function(err) {
+        if (err) {} // TODO: treat as error
+        callback();
+        //don't treat as error currently because UT depends on this
+      });
+    },
+    function(callback) {
+      if (!apimanager.host) {
+        //if we don't have the APIM contact info, bail out
+        return callback();
+      }
+
+      webhooksSubscribe(app, apimanager, WH_SUBSCRIBE, function(err) {
         if (err) {} // TODO: treat as error
         callback();
         //don't treat as error currently because UT depends on this
@@ -395,10 +409,30 @@ function decryptAPIMResponse(body, private_key) {
  * Webhooks subscription with APIm server
  * @param {???} app - loopback application
  * @param {Object} apimanager - configuration pointing to APIm server
+ * @param {Object} operation - either WH_SUBSCRIBE or WH_UNSUBSCRIBE
  * @param {callback} cb - callback that handles error
  */
-function webhooksSubscribe(app, apimanager, cb) {
+function webhooksSubscribe(app, apimanager, operation, cb) {
   logger.debug('webhooksSubscribe entry');
+
+  var whMethod, whTitle, whVerb, whStatusCode;
+  switch (operation) {
+    case WH_SUBSCRIBE:
+      whMethod = 'POST';
+      whTitle = 'This is a webhook subscription for the a catalog, subscribing to all available events specifically';
+      whVerb = 'subscribe';
+      whStatusCode = 201;
+      break;
+    case WH_UNSUBSCRIBE:
+      whMethod = 'DELETE';
+      whTitle = 'This is a webhook unsubscribe for the a catalog, unsubscribing to all available events specifically';
+      whVerb = 'unsubscribe';
+      whStatusCode = 200;
+      break;
+    default:
+      cb(new Error('Internal error during webhooks subscribe/unsubscribe'));
+      return;
+  }
 
   async.series([
     function(callback) {
@@ -417,7 +451,7 @@ function webhooksSubscribe(app, apimanager, cb) {
         subscriptions: [
           'catalog',
         ],
-        title: 'This is a webhook subscription for the a catalog, subscribing to all available events specifically',
+        title: whTitle,
       };
 
       var headers = {
@@ -441,7 +475,7 @@ function webhooksSubscribe(app, apimanager, cb) {
 
       Request({
         url: webhooksSubUrl,
-        method: 'POST',
+        method: whMethod,
         json: body,
         headers: headers,
         agentOptions: {
@@ -455,7 +489,7 @@ function webhooksSubscribe(app, apimanager, cb) {
         }
 
         logger.debug('statusCode: ' + res.statusCode);
-        if (res.statusCode !== 201) {
+        if (res.statusCode !== whStatusCode) {
           logger.error(webhooksSubUrl, ' failed with: ', res.statusCode);
           currentWebhook = undefined;
           return callback(new Error(webhooksSubUrl + ' failed with: ' + res.statusCode));
@@ -470,10 +504,10 @@ function webhooksSubscribe(app, apimanager, cb) {
     function(err) {
       if (err) {
         apimanager.webhooksOk = false;
-        logger.error('Unsuccessful webhooks subscribe with API Connect server');
+        logger.error('Unsuccessful webhooks ' + whVerb + ' with API Connect server');
       } else {
         apimanager.webhooksOk = true;
-        logger.info('Successful webhooks subscribe with API Connect server');
+        logger.info('Successful webhooks ' + whVerb + ' with API Connect server');
       }
       logger.debug('webhooksSubscribe exit');
       cb(err);
