@@ -1,0 +1,609 @@
+[
+    {
+        "catalog": {
+            "default": false,
+            "id": "564b48aae4b0869c782edc2b",
+            "name": "sb",
+            "sandbox": true,
+            "title": "Sandbox",
+            "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b"
+        },
+        "document": {
+         "info": {
+            "version": "1.0.0",
+            "title": "invoke",
+            "x-ibm-name": "invoke"
+         },
+         "securityDefinitions": null,
+         "basePath": "/invoke",
+         "swagger": "2.0",
+         "schemes": [
+                "http"
+            ],
+         "paths": {
+            "/basic": {
+               "post": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               },
+               "get": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               },
+               "head": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/encode": {
+               "post": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/decode": {
+               "get": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/dynHost": {
+               "get": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/testStatusCode": {
+               "get": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/testTLS": {
+               "get": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/testCompression": {
+               "post": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/useChunks": {
+               "post": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/timeout5Sec": {
+               "get": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/testInput": {
+               "post": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/testOutput": {
+               "get": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/testContentLength": {
+               "get": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/testJSON": {
+               "get": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/ignoreAllErrors": {
+               "get": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            },
+            "/stopOnOperationError": {
+               "get": {
+                  "responses": {
+                     "200": {
+                        "description": "200 OK"
+                     }
+                  }
+               }
+            }
+         },
+         "x-ibm-configuration": {
+            "assembly": {
+               "execute": [
+                  {
+                     "operation-switch": {
+                        "case": [
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/basic",
+                                    "verb": "POST"
+                                 },
+                                 {
+                                    "path": "/basic",
+                                    "verb": "HEAD"
+                                 },
+                                 {
+                                    "path": "/basic",
+                                    "verb": "GET"
+                                 },
+                                 {
+                                    "path": "/encode",
+                                    "verb": "POST"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://localhost:8889/$(request.path)"
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/decode",
+                                    "verb": "GET"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://localhost:8889/form-urlencoded"
+                                    }
+                                 },
+                                 {
+                                    "if": {
+                                       "condition": "request.headers['x-test-postflow'] !== 'yes'",
+                                       "execute": [
+                                          {
+                                             "set-variable": {
+                                                "actions": [
+                                                   {
+                                                      "set": "message.body",
+                                                      "value": "Found the parameter 'baz'=$(message.body.baz) in the message.body"
+                                                   }
+                                                ]
+                                             }
+                                          }
+                                       ]
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/dynHost",
+                                    "verb": "GET"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://$(request.headers.x-test-hostname):8889/$(request.path)"
+                                    }
+                                 },
+                                 {
+                                    "set-variable": {
+                                       "actions": [
+                                          {
+                                             "set": "message.status.code",
+                                             "value": 200
+                                          },
+                                          {
+                                             "set": "message.body",
+                                             "value": "Overwrite the invoke response"
+                                          }
+                                       ]
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/testStatusCode",
+                                    "verb": "GET"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://localhost:8889/?status=$(request.headers.x-code)"
+                                    }
+                                 },
+                                 {
+                                    "set-variable": {
+                                       "actions": [
+                                          {
+                                             "add": "message.headers.x-after-invoke",
+                                             "value": "this is the post-invoke header"
+                                          }
+                                       ]
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/ignoreAllErrors",
+                                    "verb": "GET"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://localhost:8889/?status=$(request.headers.x-code)",
+                                       "timeout": 5,
+                                       "stop-on-error": []
+                                    }
+                                 },
+                                 {
+                                    "set-variable": {
+                                       "actions": [
+                                          {
+                                             "set": "message.body",
+                                             "value": "All errors should be ignored, this must be executed after the invoke."
+                                          }
+                                       ]
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/stopOnOperationError",
+                                    "verb": "GET"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://localhost:8889/?status=$(request.headers.x-code)",
+                                       "stop-on-error": [ "SOAPError", "OperationError" ]
+                                    }
+                                 },
+                                 {
+                                    "set-variable": {
+                                       "actions": [
+                                          {
+                                             "set": "message.body",
+                                             "value": "Only non-operationError can reach here!"
+                                          }
+                                       ]
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/testTLS",
+                                    "verb": "POST"
+                                 },
+                                 {
+                                    "path": "/testTLS",
+                                    "verb": "GET"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "https://localhost:$(request.headers.x-https-port)/$(request.path)",
+                                       "tls-profile": "$(request.headers.x-tls-profile)"
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/testCompression",
+                                    "verb": "POST"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "set-variable": {
+                                       "actions": [
+                                          {
+                                             "set": "message.body",
+                                             "value": "$(request.headers.x-raw-data)"
+                                          }
+                                       ]
+                                    }
+                                 },
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://localhost:8889/$(request.path)",
+                                       "compression": true
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/useChunks",
+                                    "verb": "POST"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://localhost:8889/$(request.path)",
+                                       "chunked-upload": true
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/timeout5Sec",
+                                    "verb": "GET"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://localhost:8889/$(request.path)",
+                                       "timeout": 5
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/testInput",
+                                    "verb": "POST"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "set-variable": {
+                                       "actions": [
+                                          {
+                                             "set": "foo.bar",
+                                             "value": {
+                                                 "body" : "This is a custom body message for the invoke policy",
+                                                 "headers" : {
+                                                     "X-SECRET-MSG1": "test 123",
+                                                     "X-SECRET-MSG2": "hello amigo"
+                                                 }
+                                             }
+                                          }
+                                       ]
+                                    }
+                                 },
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://localhost:8889/$(request.path)",
+                                       "input": "foo.bar"
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/testOutput",
+                                    "verb": "GET"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://localhost:8889/testOutput",
+                                       "output": "foo.bar"
+                                    }
+                                 },
+                                 {
+                                    "set-variable": {
+                                       "actions": [
+                                          {
+                                             "set": "message.body",
+                                             "value": "$(foo.bar.body)"
+                                          },
+                                          {
+                                             "set": "message.headers",
+                                             "value": "$(foo.bar.headers)"
+                                          },
+                                          {
+                                             "set": "message.status.code",
+                                             "value": "$(foo.bar.status.code)"
+                                          },
+                                          {
+                                             "set": "message.status.reason",
+                                             "value": "$(foo.bar.status.reason)"
+                                          }
+                                       ]
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/testContentLength",
+                                    "verb": "GET"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://localhost:8889/noChunks",
+                                       "output": "foo"
+                                    }
+                                 },
+                                 {
+                                    "set-variable": {
+                                       "actions": [
+                                          {
+                                             "set": "message.body",
+                                             "value": "This is a very long message, longer than the foo.body. Just to test the mismatch Content-Length"
+                                          },
+                                          {
+                                             "set": "message.headers",
+                                             "value": "$(foo.headers)"
+                                          }
+                                       ]
+                                    }
+                                 }
+                             ]
+                           },
+                           {
+                              "operations": [
+                                 {
+                                    "path": "/testJSON",
+                                    "verb": "GET"
+                                 }
+                              ],
+                              "execute": [
+                                 {
+                                    "invoke": {
+                                       "target-url": "http://localhost:8889/json",
+                                       "output": "foo"
+                                    }
+                                 },
+                                 {
+                                    "set-variable": {
+                                       "actions": [
+                                          {
+                                             "set": "message.body",
+                                             "value": "The quantity is $(foo.body.qty) and the price is $(foo.body.price)"
+                                          }
+                                       ]
+                                    }
+                                 }
+                              ]
+                           }
+                        ]
+                     }
+                  }
+               ],
+               "catch": [
+                  {
+                     "errors": [ "OperationError" ],
+                     "execute": [
+                        {
+                           "set-variable": {
+                              "actions": [
+                                 {
+                                    "set": "message.body",
+                                    "value": "'$(error.name)' $(error.message) is caught!"
+                                 }
+                              ]
+                           }
+                        }
+                     ]
+                  },
+                  {
+                     "errors": [ "PropertyError" ],
+                     "execute": [
+                        {
+                           "set-variable": {
+                              "actions": [
+                                 {
+                                    "set": "message.body",
+                                    "value": "Unexpect '$(error.name)' $(error.message)"
+                                 },
+                                 {
+                                    "set": "message.status.code",
+                                    "value": 299
+                                 }
+                              ]
+                           }
+                        }
+                     ]
+                  }
+               ]
+            }
+         }        },
+        "id": "564b7b3ae4b0869c782eddae",
+        "organization": {
+            "id": "564b48a9e4b0869c782edc24",
+            "name": "apim",
+            "title": "Climb On"
+        },
+        "state": "running",
+        "spaces": [
+          {
+            "id": "57e06e0dd4c6430588e566a6",
+            "name": "new-space",
+            "description": "Automatically created space",
+            "title": "New Space"
+          }
+        ],
+        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/apis/564b7b3ae4b0869c782eddae"
+    }
+]
