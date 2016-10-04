@@ -4,16 +4,16 @@
 The data store is a loopback application for the data model of all API Connect artifacts needed by the Micro Gateway at runtime.  The data store is essential to proper API enforcement by the Micro Gateway, as the Micro Gateway queries the data store with each received request to determine the proper behavior where the desired behavior is defined by the content of the artifacts.
 
 ## How does it work?
-The artifacts consumed by the data store are created one of the following ways:
+The artifacts consumed by the data store are created in one of the following ways:
 - In a laptop scenario by using the API Connect CLI. 
 - In an on-premises scenario by downloading from the API Connect management server.
 
 Once created, the data store loads these artifacts into an in-memory database on startup.  In the on-premises scenario, the in-memory database is periodically updated at run time (every 15 minutes by default).  Once the raw data is populated into the in-memory database, a specific view of the information is generated that is optimized for performant runtime lookup of the appropriate behavior for a specific request to the Micro Gateway.  The data store exposes information to the Micro Gateway using a REST interface.
 
 ### The configuration files
-In the end-to-end (or the laptop) scenario, the default application and plan will be created into the datastore. If developers want to configure their own applications, plans, or TLS profiles, they can take advantage of the two configuration files, `apic.json` and `apic-tls-profiles.json`. They should be created under the `definitions` folder where the YAML files are generated.
+In the end-to-end (or the laptop) scenario, the default application and plan will be created into the datastore. If developers want to configure their own applications, plans, or TLS profiles, they can take advantage of the two configuration files, `apic.json` and `apic-tls-profiles.json`, which should be created in the `definitions` directory where the YAML files are generated.
 
-Here's an example of `apic.json` to configure applications and plans. Two clients `foo` and `bar`, and two plans `plan-a` and `plan-b` are added to the datastore. The `foo` subscribes the `plan-a`, which includes APIs `stock-quote` and `weather` while the `bar` subscribes the `plan-b`, which includes only `bank-account`. And both plans got their own rate-limit settings.
+Here's an example of `apic.json` to configure applications and plans. Two clients `foo` and `bar`, and two plans `plan-a` and `plan-b` are added to the datastore. The `foo` subscribes the `plan-a`, which includes APIs `stock-quote` and `weather` while the `bar` subscribes the `plan-b`, which includes only `bank-account`. Each plan stores an independent rate-limit setting.
 ```
 {
     "applications": {
