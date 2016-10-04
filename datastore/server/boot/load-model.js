@@ -493,9 +493,14 @@ function webhooksSubscribe(app, apimanager, operation, cb) {
           logger.error(webhooksSubUrl, ' failed with: ', res.statusCode);
           currentWebhook = undefined;
           return callback(new Error(webhooksSubUrl + ' failed with: ' + res.statusCode));
-        } else {
-          logger.debug('Webhooks received from  API Connect server, id %s', body.id);
+        } else if (whMethod === WH_SUBSCRIBE) {
+          logger.debug('Webhooks subscribe received response %u from API Connect server, id %s',
+                       res.statusCode, body.id);
           currentWebhook = body.id;
+        } else if (whMethod === WH_UNSUBSCRIBE) {
+          logger.debug('Webhooks unsubscribe received response %u from API Connect server',
+                       res.statusCode);
+          currentWebhook = undefined;
         }
 
         callback(null);
