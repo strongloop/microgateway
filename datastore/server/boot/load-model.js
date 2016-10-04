@@ -427,7 +427,7 @@ function webhooksSubscribe(app, apimanager, operation, cb) {
       whMethod = 'DELETE';
       whTitle = 'This is a webhook unsubscribe for the a catalog, unsubscribing to all available events specifically';
       whVerb = 'unsubscribe';
-      whStatusCode = 200;
+      whStatusCode = 204;
       break;
     default:
       cb(new Error('Internal error during webhooks subscribe/unsubscribe'));
