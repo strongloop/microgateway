@@ -12,6 +12,7 @@ var Crypto = require('crypto');
 var Request = require('request');
 var url = require('url');
 var checkSecurity = require('./check-security');
+var ip = require('ip');
 var logger = require('apiconnect-cli-logger/logger.js')
         .child({ loc: 'microgateway:datastore:server:boot:load-model' });
 var sgwapimpull = require('../../apim-pull');
@@ -28,6 +29,8 @@ var CONFIGDIR = environment.CONFIGDIR;
 var KEYNAME = environment.KEYNAME;
 
 var LAPTOP_RATELIMIT = environment.LAPTOP_RATELIMIT;
+var WH_SUBSCRIBE = 0;
+var WH_UNSUBSCRIBE = 1;
 
 var cliConfig = require('apiconnect-cli-config');
 
@@ -40,6 +43,9 @@ var version = '1.0.0';
 var mixedProtocols = false;
 var http = false;
 var https = false;
+var models = [];
+var apimanager = {};
+var currentWebhook;
 
 /**
  * Creates a model type
@@ -70,7 +76,6 @@ module.exports = function(app) {
   // to populate the relevant model(s)
   // This section would need to be updated whenever new models are added
   // to the data-store
-  var models = [];
   models.push(new ModelType('catalog', 'catalogs-'));
   models.push(new ModelType('api', 'apis-'));
   models.push(new ModelType('product', 'products-'));
@@ -85,11 +90,12 @@ module.exports = function(app) {
   if (process.env.APIMANAGER_REFRESH_INTERVAL) {
     maxRefreshInterval = process.env.APIMANAGER_REFRESH_INTERVAL;
   }
-  var apimanager = {
+  apimanager = {
     host: process.env[APIMANAGER],
     port: process.env[APIMANAGER_PORT],
     catalog: process.env[APIMANAGER_CATALOG],
     handshakeOk: false,
+    webhooksOk: false,
     startupRefresh: 1000, // 1 second
     maxRefresh: maxRefreshInterval };
 
@@ -148,11 +154,35 @@ module.exports = function(app) {
         callback(); // TODO: treat as error
         //don't treat as error currently because UT depends on this
       });
+    },
+    function(callback) {
+      if (!apimanager.host) {
+        //if we don't have the APIM contact info, bail out
+        return callback();
+      }
+
+      webhooksSubscribe(app, apimanager, WH_UNSUBSCRIBE, function(err) {
+        if (err) {} // TODO: treat as error
+        callback();
+        //don't treat as error currently because UT depends on this
+      });
+    },
+    function(callback) {
+      if (!apimanager.host) {
+        //if we don't have the APIM contact info, bail out
+        return callback();
+      }
+
+      webhooksSubscribe(app, apimanager, WH_SUBSCRIBE, function(err) {
+        if (err) {} // TODO: treat as error
+        callback();
+        //don't treat as error currently because UT depends on this
+      });
     } ],
     // load the data into the models
     function(err) {
       if (!err) {
-        loadData(app, apimanager, models, definitionsDir, uid);
+        loadData(app, apimanager, models, definitionsDir, true, uid);
       }
     });
 };
@@ -163,8 +193,9 @@ module.exports = function(app) {
  * @param {Object} config - configuration pointing to APIm server
  * @param {Array} models - instances of ModelType to populate with data
  * @param {string} currdir - current snapshot symbolic link path
+ * @param {bool} reload - set a timer to trigger a future reload
  */
-function loadData(app, apimanager, models, currdir, uid) {
+function loadData(app, apimanager, models, currdir, reload, uid) {
   var snapdir;
   var snapshotID = getSnapshotID();
   var populatedSnapshot = false;
@@ -174,7 +205,8 @@ function loadData(app, apimanager, models, currdir, uid) {
       logger.debug('apimanager before pullFromAPIm: %j', apimanager);
       if (apimanager.host) {
           // && apimanager.handshakeOk << shouldn't call if handshake failed.. not ready #TODO
-          // don't look for successful handshake currently because UT depends on this
+          // && apimanager.webhooksOk << shouldn't call if handshake failed.. not ready #TODO
+          // don't look for successful handshake/webhooks currently because UT depends on this
         // we have an APIm, handshake succeeded, so try to pull data..
         pullFromAPIm(apimanager, currdir, snapshotID, function(err, dir) {
           if (err) {
@@ -206,6 +238,9 @@ function loadData(app, apimanager, models, currdir, uid) {
                  callback);
     } ],
     function(err, results) {
+      if (!reload) {
+        return;
+      }
       var interval = apimanager.maxRefresh;
       // if no error and APIs specified, do not agressively reload config
       if (!err && apimanager.host && (http || https)) {
@@ -249,7 +284,7 @@ function loadData(app, apimanager, models, currdir, uid) {
 
 function scheduleLoadData(app, interval, apimanager, models, dir) {
   if (apimanager.host) {
-    setTimeout(loadData, interval, app, apimanager, models, dir);
+    setTimeout(loadData, interval, app, apimanager, models, dir, true);
   }
 }
 
@@ -367,6 +402,116 @@ function decryptAPIMResponse(body, private_key) {
   plainText += decipher.final('utf8');
 
   return JSON.parse(plainText);
+}
+
+
+/**
+ * Webhooks subscription with APIm server
+ * @param {???} app - loopback application
+ * @param {Object} apimanager - configuration pointing to APIm server
+ * @param {Object} operation - either WH_SUBSCRIBE or WH_UNSUBSCRIBE
+ * @param {callback} cb - callback that handles error
+ */
+function webhooksSubscribe(app, apimanager, operation, cb) {
+  logger.debug('webhooksSubscribe entry');
+
+  var whMethod, whTitle, whVerb, whStatusCode;
+  switch (operation) {
+    case WH_SUBSCRIBE:
+      whMethod = 'POST';
+      whTitle = 'This is a webhook subscription for the a catalog, subscribing to all available events specifically';
+      whVerb = 'subscribe';
+      whStatusCode = 201;
+      break;
+    case WH_UNSUBSCRIBE:
+      whMethod = 'DELETE';
+      whTitle = 'This is a webhook unsubscribe for the a catalog, unsubscribing to all available events specifically';
+      whVerb = 'unsubscribe';
+      whStatusCode = 204;
+      break;
+    default:
+      cb(new Error('Internal error during webhooks subscribe/unsubscribe'));
+      return;
+  }
+
+  async.series([
+    function(callback) {
+
+      var endpointurlObj = {
+        protocol: 'http',
+        hostname: ip.address(),
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/webhooks',
+      };
+      var endpointurl = url.format(endpointurlObj);
+      var body = {
+        enabled: 'true',
+        endpoint: endpointurl,
+        secret: 'notused',
+        subscriptions: [
+          'catalog',
+        ],
+        title: whTitle,
+      };
+
+      var headers = {
+        'content-type': 'application/json',
+        'x-ibm-client-id': apimanager.clientid,
+        accept: 'application/json',
+      };
+
+      if (logger.debug()) {
+        logger.debug(JSON.stringify(headers, null, 2));
+      }
+
+      var webhooksSubUrlObj = {
+        protocol: 'https',
+        hostname: apimanager.host,
+        port: apimanager.port,
+        pathname: '/v1/catalogs/' + apimanager.catalog + '/webhooks',
+        search: 'type=strong-gateway',
+      };
+      var webhooksSubUrl = url.format(webhooksSubUrlObj);
+
+      Request({
+        url: webhooksSubUrl,
+        method: whMethod,
+        json: body,
+        headers: headers,
+        agentOptions: {
+          rejectUnauthorized: false, //FIXME: need to eventually remove this
+        },
+      },
+      function(err, res, body) {
+        if (err) {
+          logger.error('Failed to communicate with %s: %s ', webhooksSubUrl, err);
+          return callback(err);
+        }
+
+        logger.debug('statusCode: ' + res.statusCode);
+        if (res.statusCode !== whStatusCode) {
+          logger.error(webhooksSubUrl, ' failed with: ', res.statusCode);
+          currentWebhook = undefined;
+          return callback(new Error(webhooksSubUrl + ' failed with: ' + res.statusCode));
+        } else {
+          logger.debug('Webhooks received from  API Connect server, id %s', body.id);
+          currentWebhook = body.id;
+        }
+
+        callback(null);
+      });
+    } ],
+    function(err) {
+      if (err) {
+        apimanager.webhooksOk = false;
+        logger.error('Unsuccessful webhooks ' + whVerb + ' with API Connect server');
+      } else {
+        apimanager.webhooksOk = true;
+        logger.info('Successful webhooks ' + whVerb + ' with API Connect server');
+      }
+      logger.debug('webhooksSubscribe exit');
+      cb(err);
+    });
 }
 
 
@@ -1338,3 +1483,16 @@ function updateSnapshot(app, uid, cb) {
       });
   });
 }
+
+function triggerReload(app, ctx) {
+  if (ctx.instance.webhook_id !== currentWebhook) {
+    logger.error('Received webhook ID %s does not match expected webhook ID %s',
+                 ctx.instance.webhook_id, currentWebhook);
+    return;
+  }
+  logger.debug('Received webhook ID %s matches expected webhook ID %s',
+               ctx.instance.webhook_id, currentWebhook);
+  loadData(app, apimanager, models, definitionsDir, false);
+}
+
+module.exports.triggerReloadFromWebhook = triggerReload;
