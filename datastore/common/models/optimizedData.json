@@ -18,7 +18,7 @@
     "catalog-name": "string",
     "organization-id": "string",
     "organization-name": "string",
-    "space-id": [],
+    "space-ids": [],
     "product-id": "string",
     "product-name": "string",
     "plan-id": "string",

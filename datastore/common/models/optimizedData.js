@@ -394,9 +394,9 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                       pieces.catalog['test-app-credentials'] &&
                       pieces.catalog.sandbox;
   var spaceEnabled = pieces.catalog['space-enabled'];
-  var regSpaceId = [];
+  var regSpaceIds = [];
   if (spaceEnabled && pieces.spaces && pieces.spaces.length) {
-    regSpaceId = pieces.spaces.map(function(space) { return space.id; });
+    regSpaceIds = pieces.spaces.map(function(space) { return space.id; });
   }
 
   async.each(
@@ -412,9 +412,9 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
           var apiNameVer = apiName + ':' + apiVersion;
           var apiId = api.id;
           logger.debug('apiNameVer:', apiNameVer, ' apiId:', apiId);
-          var spaceId = regSpaceId;
-          if (spaceEnabled && spaceId.length === 0 && api.spaces && api.spaces.length) {
-            spaceId = api.spaces.map(function(space) { return space.id; });
+          var spaceIds = regSpaceIds;
+          if (spaceEnabled && spaceIds.length === 0 && api.spaces && api.spaces.length) {
+            spaceIds = api.spaces.map(function(space) { return space.id; });
           }
 
           // Find the named property (in the plan) for this API
@@ -612,7 +612,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
           'catalog-name': 'string',
           'organization-id': 'string',
           'organization-name': 'string',
-          'space-id': [],
+          'space-ids': [],
           'product-id': 'string',
           'product-name': 'string',
           'plan-id': 'string',
@@ -665,7 +665,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'catalog-name': pieces.catalog.name,
             'organization-id': pieces.org.id,
             'organization-name': pieces.org.name,
-            'space-id': spaceId,
+            'space-ids': spaceIds,
             'api-id': api.id,
             'api-document': api['document-wo-assembly'],
             'api-document-resolved': api['document-resolved'],
