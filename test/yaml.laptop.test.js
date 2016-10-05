@@ -99,7 +99,15 @@ describe('Monitor modification on yaml files', function() {
   it('test file monitor change yaml', function(done) {
     fs.createReadStream(__dirname + '/definitions/yaml_monitor/yaml_1.0.0.yaml.mod')
        .pipe(fs.createWriteStream(__dirname + '/definitions/yaml/yaml_1.0.0.yaml'));
-    done();
+    var payload = 'reload data';
+    request
+      .put('/laptop/yaml/monitor')
+      .type('text/plain')
+      .send(payload)
+      .end(function(err, res) {
+        assert(!err, 'Unexpected error with context unit tests');
+        done();
+      });
   });
 
   it('test file monitor after change', function(done) {
