@@ -1,5 +1,53 @@
-2016-08-18, Version 1.5.0
+2016-10-06, Version 1.5.4
 =========================
+
+ * Update README.md (Om Goeckermann)
+
+ * Fix expected unsubscribe response code (Daniel Badt)
+
+ * Add webhooks unsubscribe (Daniel Badt)
+
+ * Address lint failures (Jon Palgon)
+
+ * Some fixes for webhooks (Daniel Badt)
+
+ * Initial changes for MGW webhooks (Daniel Badt)
+
+ * Change space array names to plural (Daniel Badt)
+
+ * uGW support for spaces (Daniel Badt)
+
+ * Initialize the test-app-cid-sec to true (juangmj)
+
+ * Allow test-app to call OAuth2 API (juangmj)
+
+ * Check arbitrary apikeys before fixed (Daniel Badt)
+
+ * Allow developers to configure plan and rate-limit (juangmj)
+
+ * Should not reject GET requests with payload (juangmj)
+
+ * Updates for the code review (juangmj)
+
+ * Update testcase for node 0.12 (juangmj)
+
+ * Reset limiter cache before the test begins (juangmj)
+
+ * Refactor the preflow middleware (juangmj)
+
+ * Remove the unused broken file (juangmj)
+
+ * Use `fs-extra` instead of `fs.extra` (Jon Palgon)
+
+ * Move config/default to test/definitions/default (Jon Palgon)
+
+ * Remove unused dependencies (Jon Palgon)
+
+ * Fix test case (Daniel Badt)
+
+ * Make IF statement more efficient (Daniel Badt)
+
+ * Allow swagger security ApiKeys to use arbitrary names (Daniel Badt)
 
  * Remove config dir if prev snapshot not loaded (Jon Palgon)
 
@@ -74,8 +122,6 @@
  * Fix rate limiting for multiple api matches (Daniel Badt)
 
  * Add missing test and temporarily force rate limit UT to pass (Jon Palgon)
-
- * Address lint failures (Jon Palgon)
 
  * Plan rate limiting UT w/ automatic subscription (Jon Palgon)
 
