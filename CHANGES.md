@@ -1,15 +1,5 @@
-2016-11-23, Version 1.6.0
+2016-11-23, Version 1.6.x
 =========================
-
- * Fix writeFileSync calls (Daniel Badt)
-
- * File chg should not trigger timer (Daniel Badt)
-
- * Misc. fixes for webhooks (Daniel Badt)
-
- * Update the datastore/README.md (juangmj)
-
- * this is the current template for readme files (Om Goeckermann)
 
  * added new information - entries for default application and plan (Om Goeckermann)
 
@@ -20,6 +10,9 @@
  * monitor local files for laptop experience (Clement)
 
  * Fix issue with webhooks unsubscribe (Daniel Badt)
+
+2016-10-06, Version 1.5.4
+=========================
 
  * Update README.md (Om Goeckermann)
 
