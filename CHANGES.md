@@ -1,3 +1,19 @@
+2016-10-11, Version 1.5.5
+=========================
+
+ * this is the current template for readme files (Om Goeckermann)
+
+ * added new information - entries for default application and plan (Om Goeckermann)
+
+ * fix timing issue of test case (Clement)
+
+ * fix indetation problem on test data (Clement)
+
+ * monitor local files for laptop experience (Clement)
+
+ * Fix issue with webhooks unsubscribe (Daniel Badt)
+
+
 2016-10-06, Version 1.5.4
 =========================
 
