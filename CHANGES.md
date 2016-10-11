@@ -1,5 +1,8 @@
-2016-11-23, Version 1.6.x
+
+2016-10-11, Version 1.5.5
 =========================
+
+ * this is the current template for readme files (Om Goeckermann)
 
  * added new information - entries for default application and plan (Om Goeckermann)
 
