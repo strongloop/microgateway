@@ -190,7 +190,7 @@ module.exports = function(app) {
         fs.watch(definitionsDir, function(event, filename) {
           if (filename !== '.datastore') {
             logger.debug('File changed in %s%s, reload data', definitionsDir, filename);
-            loadData(app, apimanager, models, true, uid);
+            loadData(app, apimanager, models, false, uid);
           }
         });
       }
