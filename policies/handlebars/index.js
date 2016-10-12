@@ -13,14 +13,14 @@ module.exports = function(config) {
     logger.debug('ENTER handlebars policy');
 
     if (_.isUndefined(props.source) || !_.isString(props.source)) {
-      flow.fail({name:'HandlebarsError', value: 'Missing Handlebars template'});
+      flow.fail({ name: 'HandlebarsError', value: 'Missing Handlebars template' });
       return;
     }
     if (props.output && !_.isString(props.output)) {
-      flow.fail({name:'HandlebarsError', value: 'Invalid output'});
+      flow.fail({ name: 'HandlebarsError', value: 'Invalid output' });
       return;
     }
-    var output = "message.body";
+    var output = 'message.body';
     if (props.output) {
       output = props.output;
     }
@@ -29,7 +29,7 @@ module.exports = function(config) {
       templateFn = Handlebars.compile(props.source);
       context.set(output, templateFn(context));
     } catch (e) {
-      flow.fail({name:'HandlebarsError', value: 'Invalid Handlebars template'});
+      flow.fail({ name: 'HandlebarsError', value: 'Invalid Handlebars template' });
       return;
     }
     logger.debug('EXIT');
