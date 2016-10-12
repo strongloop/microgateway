@@ -10,6 +10,9 @@ info:
     email: ibmapi@us.ibm.com
     url: http://www.ibm.com/apimanagement
 
+gateways:
+  - micro-gateway
+
 attach:
   - rest
   - soap
