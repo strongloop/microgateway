@@ -16,17 +16,9 @@ exports.storeDataStorePort = function(port) {
   try {
     var contents = JSON.parse(fs.readFileSync(localPath));
     contents.port = port;
-    fs.writeFile(localPath, JSON.stringify(contents), 'utf8', function(err) {
-      if (err) {
-        throw err;
-      }
-    });
+    fs.writeFileSync(localPath, JSON.stringify(contents), 'utf8');
   } catch (e) {
-    fs.writeFile(localPath, JSON.stringify({ port: port }), 'utf8', function(err) {
-      if (err) {
-        throw err;
-      }
-    });
+    fs.writeFileSync(localPath, JSON.stringify({ port: port }), 'utf8');
   }
 };
 
@@ -35,17 +27,9 @@ exports.setPreviousSnapshotDir = function(snapshotDir) {
   try {
     var contents = JSON.parse(fs.readFileSync(localPath));
     contents.snapshot = snapshotDir;
-    fs.writeFile(localPath, JSON.stringify(contents), 'utf8', function(err) {
-      if (err) {
-        throw err;
-      }
-    });
+    fs.writeFileSync(localPath, JSON.stringify(contents), 'utf8');
   } catch (e) {
-    fs.writeFile(localPath, JSON.stringify({ snapshot: snapshotDir }), 'utf8', function(err) {
-      if (err) {
-        throw err;
-      }
-    });
+    fs.writeFileSync(localPath, JSON.stringify({ snapshot: snapshotDir }), 'utf8');
   }
 };
 
