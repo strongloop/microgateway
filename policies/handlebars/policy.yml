@@ -1,0 +1,33 @@
+policy: 1.0.0
+
+info:
+  title: Handlebars
+  name: handlebars
+  version: 1.0.0
+  description: Handlebars Policy
+  contact:
+    name: IBM API Management
+    email: ibmapi@us.ibm.com
+    url: http://www.ibm.com/apimanagement
+
+attach:
+  - rest
+  - soap
+
+properties:
+  type: object
+  properties:
+    source:
+      label: Source
+      description: The Handlebars template to apply
+      default: Hello {{name}}!
+      type: string
+    output:
+      label: Output
+      description: The context object to write to
+      default: message.body
+      type: string
+  required:
+    - source
+  throw:
+    - HandlebarsError
