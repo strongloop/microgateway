@@ -121,6 +121,7 @@ module.exports = function(app) {
         }
       }
       process.env.ROOTCONFIGDIR = path.dirname(definitionsDir);
+      setPreviousSnapshotDir(definitionsDir);
       callback();
     },
     // stage the models
@@ -182,14 +183,14 @@ module.exports = function(app) {
     // load the data into the models
     function(err) {
       if (!err) {
-        loadData(app, apimanager, models, definitionsDir, true, uid);
+        loadData(app, apimanager, models, true, uid);
       }
       if (!apimanager.host) {
         //monitor the file changes, load data again if any changes
         fs.watch(definitionsDir, function(event, filename) {
           if (filename !== '.datastore') {
             logger.debug('File changed in %s%s, reload data', definitionsDir, filename);
-            loadData(app, apimanager, models, definitionsDir, uid);
+            loadData(app, apimanager, models, true, uid);
           }
         });
       }
@@ -201,10 +202,10 @@ module.exports = function(app) {
  * @param {???} app - loopback application
  * @param {Object} config - configuration pointing to APIm server
  * @param {Array} models - instances of ModelType to populate with data
- * @param {string} currdir - current snapshot symbolic link path
  * @param {bool} reload - set a timer to trigger a future reload
  */
-function loadData(app, apimanager, models, currdir, reload, uid) {
+function loadData(app, apimanager, models, reload, uid) {
+  var currdir = getPreviousSnapshotDir();
   var snapdir;
   var snapshotID = getSnapshotID();
   var populatedSnapshot = false;
@@ -286,14 +287,13 @@ function loadData(app, apimanager, models, currdir, reload, uid) {
                    app,
                    interval,
                    apimanager,
-                   models,
-                   snapdir);
+                   models);
     });
 }
 
-function scheduleLoadData(app, interval, apimanager, models, dir) {
+function scheduleLoadData(app, interval, apimanager, models) {
   if (apimanager.host) {
-    setTimeout(loadData, interval, app, apimanager, models, dir, true);
+    setTimeout(loadData, interval, app, apimanager, models, true);
   }
 }
 
@@ -502,12 +502,12 @@ function webhooksSubscribe(app, apimanager, operation, cb) {
           logger.error(webhooksSubUrl, ' failed with: ', res.statusCode);
           currentWebhook = undefined;
           return callback(new Error(webhooksSubUrl + ' failed with: ' + res.statusCode));
-        } else if (whMethod === WH_SUBSCRIBE) {
-          logger.debug('Webhooks subscribe received response %u from API Connect server, id %s',
+        } else if (operation === WH_SUBSCRIBE) {
+          logger.debug('Webhooks subscribe received response %d from API Connect server, id %s',
                        res.statusCode, body.id);
           currentWebhook = body.id;
-        } else if (whMethod === WH_UNSUBSCRIBE) {
-          logger.debug('Webhooks unsubscribe received response %u from API Connect server',
+        } else if (operation === WH_UNSUBSCRIBE) {
+          logger.debug('Webhooks unsubscribe received response %d from API Connect server',
                        res.statusCode);
           currentWebhook = undefined;
         }
@@ -1500,13 +1500,13 @@ function updateSnapshot(app, uid, cb) {
 
 function triggerReload(app, ctx) {
   if (ctx.instance.webhook_id !== currentWebhook) {
-    logger.error('Received webhook ID %s does not match expected webhook ID %s',
+    logger.warn('Received webhook ID %s does not match expected webhook ID %s',
                  ctx.instance.webhook_id, currentWebhook);
     return;
   }
   logger.debug('Received webhook ID %s matches expected webhook ID %s',
                ctx.instance.webhook_id, currentWebhook);
-  loadData(app, apimanager, models, definitionsDir, false);
+  loadData(app, apimanager, models, false);
 }
 
 module.exports.triggerReloadFromWebhook = triggerReload;
