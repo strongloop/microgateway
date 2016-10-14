@@ -1,3 +1,14 @@
+2016-10-14, Version 1.5.6
+=========================
+
+ * Fix writeFileSync calls (Daniel Badt)
+
+ * File chg should not trigger timer (Daniel Badt)
+
+ * Misc. fixes for webhooks (Daniel Badt)
+
+ * Update the datastore/README.md (juangmj)
+
 
 2016-10-11, Version 1.5.5
 =========================
