@@ -1,4 +1,10 @@
-2016-10-14, Version 1.5.6
+2016-10-24, Version 1.5.7
+=========================
+
+ * update shrinkwrap (Joseph Tary)
+
+
+2016-10-13, Version 1.5.6
 =========================
 
  * Fix writeFileSync calls (Daniel Badt)
