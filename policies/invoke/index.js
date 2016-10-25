@@ -188,7 +188,7 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
   }
 
   //when compression is true, we can only use chunks
-  if (!compression && !useChunk) {
+  if (!compression && !useChunk && verb !== 'GET' && verb !== 'HEAD' && verb !== 'OPTIONS') {
     options.headers['Content-Length'] = dataSz;
     logger.debug('[invoke] content-length = %d', dataSz);
   }

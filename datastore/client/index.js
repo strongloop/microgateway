@@ -254,7 +254,7 @@ exports.getAppInfo = function(snapshot, subscriptionId, clientId, done) {
 };
 
 //Find clinet(s) by the client id and the application id.
-exports.getClientById = function(snapshot, clientId, apiId, done) {
+function getClientById(snapshot, clientId, apiId, done) {
   logger.debug('getClientById entry');
 
   // build request to send to data-store
@@ -285,6 +285,7 @@ exports.getClientById = function(snapshot, clientId, apiId, done) {
     done(undefined, optimizedData);
   });
 };
+exports.getClientById = getClientById;
 
 //Look up the subscriptions and search whether the given client subscribes the
 //given API. If there is one, return the client information.
@@ -340,6 +341,22 @@ exports.getClientCredsById = function(snapshot, clientId, apiId, done) {
       }
     }
 
-    return done('no matched client');
+    //Give the last try to test the 'test-app' (auto subscription) from the optimizedData
+    getClientById(snapshot, clientId, apiId, function(error, result) {
+      if (error) {
+        return done(error);
+      }
+
+      if (result) {
+        var creds = {
+          'client-id': result[0]['client-id'],
+          'client-secret': result[0]['client-secret'],
+        };
+
+        return done(undefined, creds);
+      }
+
+      return done('no matched client');
+    });
   });
 };

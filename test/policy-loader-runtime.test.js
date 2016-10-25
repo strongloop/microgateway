@@ -8,6 +8,7 @@
 var mg;
 var supertest = require('supertest');
 var dsCleanupFile = require('./support/utils').dsCleanupFile;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 var request;
 
@@ -16,6 +17,9 @@ describe('policy loader version support test', function() {
     process.env.CONFIG_DIR = __dirname + '/definitions/policy-loader';
     process.env.NODE_ENV = 'production';
     process.env.POLICY_DIR = __dirname + '/definitions/policy-loader/location3';
+
+    resetLimiterCache();
+
     delete require.cache[require.resolve('../lib/microgw')];
     mg = require('../lib/microgw');
     mg.start(3000)

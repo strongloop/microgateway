@@ -34,8 +34,12 @@ module.exports = function checkSecurity(apidoc) {
     var keys = Object.keys(securityReq);
     var nQueryIds = 0;
     var nQuerySecrets = 0;
+    var nQueryExtIds = 0;
+    var nQueryExtSecrets = 0;
     var nHeaderIds = 0;
     var nHeaderSecrets = 0;
+    var nHeaderExtIds = 0;
+    var nHeaderExtSecrets = 0;
     var nQueryOther = 0;
     var nHeaderOther = 0;
 
@@ -52,6 +56,15 @@ module.exports = function checkSecurity(apidoc) {
               nHeaderIds++;
             } else if (securityDef.name === 'X-IBM-Client-Secret') {
               nHeaderSecrets++;
+            } else if (securityDef['x-ibm-apikey'] !== undefined) {
+              if (securityDef['x-ibm-apikey'] === 'clientid') {
+                nHeaderExtIds++;
+              } else if (securityDef['x-ibm-apikey'] === 'clientsecret') {
+                nHeaderExtSecrets++;
+              } else {
+                logger.warning(name + ': invalid x-ibm-apikey ' + securityDef['x-ibm-apikey'] +
+                               ' in securityDefinition: ' + securityDefName + ' ignored');
+              }
             } else {
               nHeaderOther++;
             }
@@ -60,13 +73,22 @@ module.exports = function checkSecurity(apidoc) {
               nQueryIds++;
             } else if (securityDef.name === 'client_secret') {
               nQuerySecrets++;
+            } else if (securityDef['x-ibm-apikey'] !== undefined) {
+              if (securityDef['x-ibm-apikey'] === 'clientid') {
+                nQueryExtIds++;
+              } else if (securityDef['x-ibm-apikey'] === 'clientsecret') {
+                nQueryExtSecrets++;
+              } else {
+                logger.warning(name + ': invalid x-ibm-apikey ' + securityDef['x-ibm-apikey'] +
+                               ' in securityDefinition: ' + securityDefName + ' ignored');
+              }
             } else {
               nQueryOther++;
             }
           } else {
             // Invalid swagger - bad "in" type
             logger.error(name + ': invalid securityDefinition: ' + securityDefName +
-                         ' invalid in:' + securityDef.in);
+                         ' invalid in: ' + securityDef.in);
             result = false;
           }
         }
@@ -78,8 +100,8 @@ module.exports = function checkSecurity(apidoc) {
     }
 
     // You cannot apply more than two API key security schemes to an API.
-    if (nQueryIds + nQuerySecrets + nQueryOther +
-        nHeaderIds + nHeaderSecrets + nHeaderOther > 2) {
+    if (nQueryIds + nQuerySecrets + nQueryExtIds + nQueryExtSecrets +
+        nHeaderIds + nHeaderSecrets + nHeaderExtIds + nHeaderExtSecrets > 2) {
       logger.error(name + ': security requirement contains more than two API ' +
                    'key security schemes');
       result = false;
@@ -87,7 +109,8 @@ module.exports = function checkSecurity(apidoc) {
 
     // If you apply an API key security scheme for client secret, you must also
     // apply an API key security scheme for client ID.
-    if ((!nQueryIds && nQuerySecrets) || (!nHeaderIds && nHeaderSecrets)) {
+    if ((!nQueryIds && nQuerySecrets) || (!nHeaderIds && nHeaderSecrets) ||
+        (!nQueryExtIds && nQueryExtSecrets) || (!nHeaderExtIds && nHeaderExtSecrets)) {
       logger.error(name + ': security requirement contains an API key ' +
                    'security scheme for client secret but none for client ID');
       result = false;
@@ -100,7 +123,7 @@ module.exports = function checkSecurity(apidoc) {
     // You can have at most one API key scheme of type client ID, regardless of
     // whether the client ID is sent in the request header or as a query
     // parameter.
-    if (nQueryIds + nHeaderIds > 1) {
+    if (nQueryIds + nQueryExtIds + nHeaderIds + nHeaderExtIds > 1) {
       logger.error(name + ': security requirement contains more than one API ' +
                    'key scheme of type client ID');
       result = false;
@@ -109,7 +132,7 @@ module.exports = function checkSecurity(apidoc) {
     // You can have at most one API key scheme of type client secret,
     // regardless of whether the client secret is sent in the request header
     // or as a query parameter.
-    if (nQuerySecrets + nHeaderSecrets > 1) {
+    if (nQuerySecrets + nQueryExtSecrets + nHeaderSecrets + nHeaderExtSecrets > 1) {
       logger.error(name + ': security requirement contains more than one API ' +
                    'key scheme of type client secret');
       result = false;

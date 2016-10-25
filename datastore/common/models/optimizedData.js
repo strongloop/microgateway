@@ -143,6 +143,7 @@ function ripCTX(ctx) {
   ctx.instance['plan-registration'].apis = []; // old list, wipe it
   locals.product = ctx.instance['plan-registration'].product;
   locals.plan = {};
+  locals.spaces = ctx.instance['plan-registration'].spaces || [];
 
   if (ctx.instance['plan-registration'].plan) {
     locals.plan.name = ctx.instance['plan-registration'].plan.name;
@@ -392,6 +393,11 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
   var createTestApp = pieces.catalog['test-app-enabled'] &&
                       pieces.catalog['test-app-credentials'] &&
                       pieces.catalog.sandbox;
+  var spaceEnabled = pieces.catalog['space-enabled'];
+  var regSpaceIds = [];
+  if (spaceEnabled && pieces.spaces && pieces.spaces.length) {
+    regSpaceIds = pieces.spaces.map(function(space) { return space.id; });
+  }
 
   async.each(
     pieces.application.credentials,
@@ -406,6 +412,10 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
           var apiNameVer = apiName + ':' + apiVersion;
           var apiId = api.id;
           logger.debug('apiNameVer:', apiNameVer, ' apiId:', apiId);
+          var spaceIds = regSpaceIds;
+          if (spaceEnabled && spaceIds.length === 0 && api.spaces && api.spaces.length) {
+            spaceIds = api.spaces.map(function(space) { return space.id; });
+          }
 
           // Find the named property (in the plan) for this API
           var apiProperty;
@@ -602,6 +612,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
           'catalog-name': 'string',
           'organization-id': 'string',
           'organization-name': 'string',
+          'space-ids': [],
           'product-id': 'string',
           'product-name': 'string',
           'plan-id': 'string',
@@ -643,6 +654,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'client-org-name': pieces.application.developerOrg ?
               pieces.application.developerOrg.name : '',
             'test-app-enabled': false,
+            'test-app-cid-sec': true,
             'plan-id': pieces.plan.id,
             'plan-name': pieces.plan.name,
             'plan-version': pieces.plan.version,
@@ -653,6 +665,7 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
             'catalog-name': pieces.catalog.name,
             'organization-id': pieces.org.id,
             'organization-name': pieces.org.name,
+            'space-ids': spaceIds,
             'api-id': api.id,
             'api-document': api['document-wo-assembly'],
             'api-document-resolved': api['document-resolved'],
@@ -677,8 +690,8 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                     return;
                   }
                   logger.debug('optimizedData created: %j', optimizedData);
-                  if (createTestApp && apiClientidSecurity) {
-                    createTestData(app, newOptimizedDataEntry, pieces, apiPathsTestApp,
+                  if (createTestApp) {
+                    createTestData(app, newOptimizedDataEntry, pieces, apiPathsTestApp, apiClientidSecurity,
                       function(err) {
                         if (err) {
                           apidone(err);
@@ -692,8 +705,8 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
                   }
                 }
               );
-            } else if (apiPathsTestApp.length !== 0 && createTestApp && apiClientidSecurity) {
-              createTestData(app, newOptimizedDataEntry, pieces, apiPathsTestApp,
+            } else if (apiPathsTestApp.length !== 0 && createTestApp) {
+              createTestData(app, newOptimizedDataEntry, pieces, apiPathsTestApp, apiClientidSecurity,
                 function(err) {
                   if (err) {
                     apidone(err);
@@ -714,10 +727,11 @@ function createOptimizedDataEntry(app, pieces, isWildcard, cb) {
     function(err) { cb(err); });
 }
 
-function createTestData(app, OptimizedDataEntry, pieces, apiPaths, cb) {
+function createTestData(app, OptimizedDataEntry, pieces, apiPaths, apiSecurity, cb) {
   OptimizedDataEntry['test-app-enabled'] = true;
   OptimizedDataEntry['client-id'] = pieces.catalog['test-app-credentials']['client-id'];
   OptimizedDataEntry['client-secret'] = pieces.catalog['test-app-credentials']['client-secret'];
+  OptimizedDataEntry['test-app-cid-sec'] = apiSecurity;
   OptimizedDataEntry['api-paths'] = apiPaths;
   OptimizedDataEntry['plan-rate-limit'] = undefined;
   app.models.optimizedData.create(

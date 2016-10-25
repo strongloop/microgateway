@@ -13,17 +13,20 @@ var fs = require('fs');
 var microgw = require('../lib/microgw');
 var supertest = require('supertest');
 var dsCleanup = require('./support/utils').dsCleanup;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 
 describe('Context variables testing with mock apim server', function() {
   var request, path, apiDocuments;
 
   before(function() {
+    process.env.CONFIG_DIR = __dirname + '/definitions/default';
     process.env.DATASTORE_PORT = 5000;
     process.env.APIMANAGER_PORT = 8081;
     process.env.APIMANAGER = '127.0.0.1';
     process.env.NODE_ENV = 'production';
 
+    resetLimiterCache();
     request = supertest('http://localhost:3000');
     path = __dirname + '/definitions/context';
     apiDocuments = getAPIDefinitions();
@@ -31,6 +34,7 @@ describe('Context variables testing with mock apim server', function() {
 
   after(function() {
     // delete environment variables
+    delete process.env.CONFIG_DIR;
     delete process.env.DATASTORE_PORT;
     delete process.env.APIMANAGER_PORT;
     delete process.env.APIMANAGER;

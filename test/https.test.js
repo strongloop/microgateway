@@ -10,6 +10,7 @@ var echo = require('./support/echo-server');
 var apimServer = require('./support/mock-apim-server/apim-server');
 var dsCleanup = require('./support/utils').dsCleanup;
 var dsCleanupFile = require('./support/utils').dsCleanupFile;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 var mg = require('../lib/microgw');
 
@@ -20,6 +21,8 @@ describe('HTTP and HTTPS in onprem in separate files', function() {
     process.env.NODE_ENV = 'production';
     process.env.APIMANAGER = '127.0.0.1';
     process.env.APIMANAGER_PORT = 8081;
+
+    resetLimiterCache();
     apimServer.start(
         process.env.APIMANAGER,
         process.env.APIMANAGER_PORT,

@@ -10,6 +10,7 @@ var microgw = require('../lib/microgw');
 var backend = require('./support/invoke-server');
 var apimServer = require('./support/mock-apim-server/apim-server');
 var dsCleanup = require('./support/utils').dsCleanup;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 describe('invokePolicy', function() {
 
@@ -23,6 +24,7 @@ describe('invokePolicy', function() {
     process.env.APIMANAGER_PORT = 8081;
     process.env.DATASTORE_PORT = 5000;
 
+    resetLimiterCache();
     apimServer.start(
             process.env.APIMANAGER,
             process.env.APIMANAGER_PORT,
@@ -45,6 +47,7 @@ describe('invokePolicy', function() {
     delete process.env.APIMANAGER_PORT;
     delete process.env.DATASTORE_PORT;
 
+    resetLimiterCache();
     dsCleanup(5000)
       .then(function() { return apimServer.stop(); })
       .then(function() { return microgw.stop(); })
@@ -68,6 +71,28 @@ describe('invokePolicy', function() {
       .expect(/z-transfer-encoding: undefined/)
       .expect(/z-user-agent: APIConnect\/5.0 \(MicroGateway\)/)
       .expect(200, /z-url: \/\/invoke\/basic/)
+      .end(function(err, res) {
+        done(err);
+      });
+  });
+
+
+  //invoke policy to get a request
+  it('get', function(done) {
+    this.timeout(10000);
+
+    //Two things are tested:
+    //1. a GET request with data should not be rejected by microgateway
+    //2. The invoke policy should not forward the Content-Length of a GET request
+    request
+      .get('/invoke/basic')
+      .set('Content-Length', '5')
+      .send('dummy')
+      .expect(/z-method: GET/)
+      .expect(/z-content-length: undefined/)
+      .expect(/z-transfer-encoding: undefined/)
+      .expect(/body: \n/)
+      .expect(200)
       .end(function(err, res) {
         done(err);
       });

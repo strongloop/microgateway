@@ -13,6 +13,7 @@ var microgw = require('../lib/microgw');
 var authServer = require('./support/auth-server');
 var apimServer = require('./support/mock-apim-server/apim-server');
 var dsCleanup = require('./support/utils').dsCleanup;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 function decodeToken(token) {
   //decode the access token into jwt token
@@ -73,6 +74,7 @@ describe('oauth2 token API', function() {
     process.env.APIMANAGER_PORT = 8081;
     process.env.DATASTORE_PORT = 5000;
 
+    resetLimiterCache();
     apimServer.start(
         process.env.APIMANAGER,
         process.env.APIMANAGER_PORT,
@@ -1574,6 +1576,9 @@ describe('oauth2 token API', function() {
         //.expect('X-Powered-By', 'MicroGateway')
         .end(function(err, res) {
           if (res) {
+            //empty body
+            assert(!res.headers['content-length'] || res.headers['content-length'] === '0');
+
             assert(res.headers['access-control-expose-headers']
                 .indexOf('X-RateLimit-Limit') !== -1);
           }
@@ -1609,6 +1614,33 @@ describe('oauth2 token API', function() {
           }
         });
     });
+  });
+
+  var testAppId = '0af99e4b-8d76-4add-bdc5-3aac1c374f21';
+  var testAppSecret = 'cB3eU4wQ4dF0oG5iK4dP4nU2wT6iE6kP8hF5rP8oK1iL4yD7pL';
+  //the 'test-app' should be able to call the oauth2 API
+  it('test-app-enabled', function(done) {
+    var data = {
+      grant_type: 'client_credentials',
+      client_id: testAppId,
+      client_secret: testAppSecret,
+      scope: 'weather stock' };
+
+    request.post('/oauth2/token/no_refresh')
+      .set('X-DUMMY-ID', 'foo')
+      .type('form')
+      .send(data)
+      .expect('Cache-Control', 'no-store')
+      .expect('Pragma', 'no-cache')
+      .expect('Content-Type', /application\/json/)
+      .expect(200)
+      .expect(function(res) {
+        assert(res.body.access_token);
+        assert(!res.body.refresh_token);
+      })
+      .end(function(err, res) {
+        done(err);
+      });
   });
 
 });

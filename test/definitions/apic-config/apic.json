@@ -1,0 +1,33 @@
+{
+    "COMMENT": "The APIs 'weather' and 'invoke' are public, they have no security requirement.",
+    "applications": {
+        "foo": {
+            "client-secret": "fooSecret",
+            "oauth-redirection-uri": "http://foo.com/redirect",
+            "subscription": "plan-b"
+        },
+        "bar": {
+            "client-secret": "barSecret",
+            "oauth-redirection-uri": "http://bar.com/redirect",
+            "subscription": "plan-a"
+        }
+    },
+    "plans": {
+        "plan-a": {
+            "apis": [
+                "invoke",
+                "stock-quote",
+                "weather"
+            ],
+            "hard-limit": false,
+            "rate-limit": "100/minute"
+        },
+        "plan-b": {
+            "apis": [
+                "bank-account"
+            ],
+            "hard-limit": true,
+            "rate-limit": "1/second"
+        }
+    }
+}

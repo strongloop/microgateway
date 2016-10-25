@@ -11,6 +11,7 @@ var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
 var dsCleanupFile = require('./support/utils').dsCleanupFile;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 describe('preflow and flow-engine integration', function() {
 
@@ -18,8 +19,11 @@ describe('preflow and flow-engine integration', function() {
   describe('test using default configuration', function() {
     var request;
     before(function(done) {
+      process.env.CONFIG_DIR = __dirname + '/definitions/default';
       process.env.APIMANAGER = '127.0.0.1';
       process.env.NODE_ENV = 'production';
+
+      resetLimiterCache();
       mg.start(3000)
         .then(function() { return echo.start(8889); })
         .then(function() {
@@ -34,6 +38,7 @@ describe('preflow and flow-engine integration', function() {
 
     after(function(done) {
       dsCleanupFile();
+      delete process.env.CONFIG_DIR;
       delete process.env.APIMANAGER;
       delete process.env.NODE_ENV;
       echo.stop()
@@ -474,6 +479,132 @@ describe('preflow and flow-engine integration', function() {
         .set('x-ibm-plan-id', 'apim:1.0.0:gold')
         .set('X-IBM-Client-Id', clientId2)
         .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
+      });
+
+    it('client_id=' + clientId2 +
+      ' secret=' + clientSecret3a +
+      ' (query) arbitrary id should invoke API3 (apim-lookup)',
+      function(done) {
+        request
+        .get('/v1/routes/test5?myQueryId=' + clientId2)
+        .expect(200, '/api3', done);
+      });
+
+    it('client_id=' + clientId2 +
+      ' secret=' + clientSecret3a +
+      ' (header) arbitrary id should invoke API3 (apim-lookup)',
+      function(done) {
+        request
+        .get('/v1/routes/test5')
+        .set('myHeaderId', clientId2)
+        .expect(200, '/api3', done);
+      });
+
+    it('client_id=' + clientId2 +
+      ' secret=' + clientSecret3a +
+      ' (query) arbitrary id/secret should invoke API3 (apim-lookup)',
+      function(done) {
+        request
+        .get('/v1/routes/test6?myQueryId=' + clientId2 +
+          '&myQuerySecret=' + clientSecret3a)
+        .expect(200, '/api3', done);
+      });
+
+    it('client_id=' + clientId2 +
+      ' secret=' + clientSecret3a +
+      ' (header) arbitrary id/secret should invoke API3 (apim-lookup)',
+      function(done) {
+        request
+        .get('/v1/routes/test6')
+        .set('myHeaderId', clientId2)
+        .set('myHeaderSecret', clientSecret3a)
+        .expect(200, '/api3', done);
+      });
+
+    it('client_id=' + clientIdBad +
+      ' secret=' + clientSecret3a +
+      ' (query) arbitrary id/secret invalid client ID value should fail API3 (apim-lookup)',
+      function(done) {
+        request
+        .get('/v1/routes/test6?myQueryId=' + clientIdBad +
+          '&myQuerySecret=' + clientSecret3a)
+        .expect(401, done);
+      });
+
+    it('client_id=' + clientIdBad +
+      ' secret=' + clientSecret3a +
+      ' (header) arbitrary id/secret invalid client ID value should fail API3 (apim-lookup)',
+      function(done) {
+        request
+        .get('/v1/routes/test6')
+        .set('myHeaderId', clientIdBad)
+        .set('myHeaderSecret', clientSecret3a)
+        .expect(401, done);
+      });
+
+    var clientIdBadName = 'BadName';
+    it(clientIdBadName + '=' + clientId2 +
+      ' secret=' + clientSecret3a +
+      ' (query) arbitrary id/secret invalid client ID name should fail API3 (apim-lookup)',
+      function(done) {
+        request
+        .get('/v1/routes/test6?' + clientIdBadName + '=' + clientId2 +
+          '&myQuerySecret=' + clientSecret3a)
+        .expect(401, done);
+      });
+
+    it(clientIdBadName + clientId2 +
+      ' secret=' + clientSecret3a +
+      ' (header) arbitrary id/secret invalid client ID name should fail API3 (apim-lookup)',
+      function(done) {
+        request
+        .get('/v1/routes/test6')
+        .set(clientIdBadName, clientId2)
+        .set('myHeaderSecret', clientSecret3a)
+        .expect(401, done);
+      });
+
+    it('client_id=' + clientId2 +
+      ' secret=' + clientSecret3Bad +
+      ' (query) arbitrary id/secret invalid client secret value should fail API3 (apim-lookup)',
+      function(done) {
+        request
+        .get('/v1/routes/test6?myQueryId=' + clientId2 +
+          '&myQuerySecret=' + clientSecret3Bad)
+        .expect(401, done);
+      });
+
+    it('client_id=' + clientId2 +
+      ' secret=' + clientSecret3Bad +
+      ' (header) arbitrary id/secret invalid client secret value should fail API3 (apim-lookup)',
+      function(done) {
+        request
+        .get('/v1/routes/test6')
+        .set('myHeaderId', clientId2)
+        .set('myHeaderSecret', clientSecret3Bad)
+        .expect(401, done);
+      });
+
+    var clientSecretBadName = 'BadName';
+    it(clientIdBadName + '=' + clientId2 +
+      ' ' + clientSecretBadName + '=' + clientSecret3a +
+      ' (query) arbitrary id/secret invalid client secret name should fail API3 (apim-lookup)',
+      function(done) {
+        request
+        .get('/v1/routes/test6?myQueryId=' + clientId2 +
+          '&' + clientSecretBadName + '=' + clientSecret3a)
+        .expect(401, done);
+      });
+
+    it(clientIdBadName + clientId2 +
+      ' ' + clientSecretBadName + '=' + clientSecret3a +
+      ' (header) arbitrary id/secret invalid client secret name should fail API3 (apim-lookup)',
+      function(done) {
+        request
+        .get('/v1/routes/test6')
+        .set('myHeaderId', clientId2)
+        .set(clientSecretBadName, clientSecret3a)
+        .expect(401, done);
       });
 
       /*

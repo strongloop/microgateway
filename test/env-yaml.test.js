@@ -11,6 +11,7 @@ var path = require('path');
 var should = require('should');
 var childproc = require('child_process');
 var dsCleanupFile = require('./support/utils').dsCleanupFile;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 var ENVPATH = path.resolve(__dirname, '../env.yaml');
 var ORIG_ENVFILE = null;
 var CHILD_ENV = null;
@@ -57,6 +58,7 @@ describe('Setting environment variables', function() {
 
   before(function(done) {
     process.env.DATASTORE_PORT = DATASTORE_PORT;
+    resetLimiterCache();
 
     preserveEnvFile();
     writeEnvFile(env);

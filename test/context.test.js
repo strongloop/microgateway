@@ -11,6 +11,7 @@ var debug = require('debug')('context-test');
 var loopback = require('loopback');
 var request = require('supertest');
 var urlParser = require('url');
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 var context = require('../lib/context');
 
@@ -18,6 +19,7 @@ var API_PATH_HEADER = 'X-API-PATH';
 
 describe('Context middleware', function() {
 
+  resetLimiterCache();
   describe('Request category variables', function() {
     var app = loopback();
     app.use(context());
@@ -417,7 +419,8 @@ describe('Context middleware', function() {
       });
 
       [ 'GET', 'HEAD', 'DELETE' ].forEach(function(method) {
-        it('should reject ' + method + ' method w/ payload', function(done) {
+        //microgateway issue #4: should not reject a GET request with payload
+        it.skip('should reject ' + method + ' method w/ payload', function(done) {
           request(app)
             .post('/foo')
             .set('X-METHOD-NAME', method)

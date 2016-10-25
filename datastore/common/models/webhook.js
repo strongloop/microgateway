@@ -4,8 +4,11 @@
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
 //var app = require('../../server/server');
+var app = require('../../server/server');
 var logger = require('apiconnect-cli-logger/logger.js')
         .child({ loc: 'microgateway:models:datastore:webhook' });
+var LoadModel = require('../../server/boot/load-model.js');
+
 
 module.exports = function(Webhooks) {
   Webhooks.observe(
@@ -17,9 +20,9 @@ module.exports = function(Webhooks) {
           logger.debug('new webhook received: %s',
             JSON.stringify(ctx.instance, null, 4));
         }
+        LoadModel.triggerReloadFromWebhook(app, ctx);
       }
       next();
     }
   );
 };
-

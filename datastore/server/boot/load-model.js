@@ -3,7 +3,7 @@
 // US Government Users Restricted Rights - Use, duplication or disclosure
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
-var fs = require('fs.extra');
+var fs = require('fs-extra');
 var path = require('path');
 var async = require('async');
 var YAML = require('yamljs');
@@ -12,6 +12,7 @@ var Crypto = require('crypto');
 var Request = require('request');
 var url = require('url');
 var checkSecurity = require('./check-security');
+var ip = require('ip');
 var logger = require('apiconnect-cli-logger/logger.js')
         .child({ loc: 'microgateway:datastore:server:boot:load-model' });
 var sgwapimpull = require('../../apim-pull');
@@ -28,6 +29,8 @@ var CONFIGDIR = environment.CONFIGDIR;
 var KEYNAME = environment.KEYNAME;
 
 var LAPTOP_RATELIMIT = environment.LAPTOP_RATELIMIT;
+var WH_SUBSCRIBE = 0;
+var WH_UNSUBSCRIBE = 1;
 
 var cliConfig = require('apiconnect-cli-config');
 
@@ -40,6 +43,9 @@ var version = '1.0.0';
 var mixedProtocols = false;
 var http = false;
 var https = false;
+var models = [];
+var apimanager = {};
+var currentWebhook;
 
 /**
  * Creates a model type
@@ -70,7 +76,6 @@ module.exports = function(app) {
   // to populate the relevant model(s)
   // This section would need to be updated whenever new models are added
   // to the data-store
-  var models = [];
   models.push(new ModelType('catalog', 'catalogs-'));
   models.push(new ModelType('api', 'apis-'));
   models.push(new ModelType('product', 'products-'));
@@ -85,11 +90,12 @@ module.exports = function(app) {
   if (process.env.APIMANAGER_REFRESH_INTERVAL) {
     maxRefreshInterval = process.env.APIMANAGER_REFRESH_INTERVAL;
   }
-  var apimanager = {
+  apimanager = {
     host: process.env[APIMANAGER],
     port: process.env[APIMANAGER_PORT],
     catalog: process.env[APIMANAGER_CATALOG],
     handshakeOk: false,
+    webhooksOk: false,
     startupRefresh: 1000, // 1 second
     maxRefresh: maxRefreshInterval };
 
@@ -115,6 +121,7 @@ module.exports = function(app) {
         }
       }
       process.env.ROOTCONFIGDIR = path.dirname(definitionsDir);
+      setPreviousSnapshotDir(definitionsDir);
       callback();
     },
     // stage the models
@@ -148,11 +155,44 @@ module.exports = function(app) {
         callback(); // TODO: treat as error
         //don't treat as error currently because UT depends on this
       });
+    },
+    function(callback) {
+      if (!apimanager.host) {
+        //if we don't have the APIM contact info, bail out
+        return callback();
+      }
+
+      webhooksSubscribe(app, apimanager, WH_UNSUBSCRIBE, function(err) {
+        if (err) {} // TODO: treat as error
+        callback();
+        //don't treat as error currently because UT depends on this
+      });
+    },
+    function(callback) {
+      if (!apimanager.host) {
+        //if we don't have the APIM contact info, bail out
+        return callback();
+      }
+
+      webhooksSubscribe(app, apimanager, WH_SUBSCRIBE, function(err) {
+        if (err) {} // TODO: treat as error
+        callback();
+        //don't treat as error currently because UT depends on this
+      });
     } ],
     // load the data into the models
     function(err) {
       if (!err) {
-        loadData(app, apimanager, models, definitionsDir, uid);
+        loadData(app, apimanager, models, true, uid);
+      }
+      if (!apimanager.host) {
+        //monitor the file changes, load data again if any changes
+        fs.watch(definitionsDir, function(event, filename) {
+          if (filename !== '.datastore') {
+            logger.debug('File changed in %s%s, reload data', definitionsDir, filename);
+            loadData(app, apimanager, models, false, uid);
+          }
+        });
       }
     });
 };
@@ -162,9 +202,10 @@ module.exports = function(app) {
  * @param {???} app - loopback application
  * @param {Object} config - configuration pointing to APIm server
  * @param {Array} models - instances of ModelType to populate with data
- * @param {string} currdir - current snapshot symbolic link path
+ * @param {bool} reload - set a timer to trigger a future reload
  */
-function loadData(app, apimanager, models, currdir, uid) {
+function loadData(app, apimanager, models, reload, uid) {
+  var currdir = getPreviousSnapshotDir();
   var snapdir;
   var snapshotID = getSnapshotID();
   var populatedSnapshot = false;
@@ -174,7 +215,8 @@ function loadData(app, apimanager, models, currdir, uid) {
       logger.debug('apimanager before pullFromAPIm: %j', apimanager);
       if (apimanager.host) {
           // && apimanager.handshakeOk << shouldn't call if handshake failed.. not ready #TODO
-          // don't look for successful handshake currently because UT depends on this
+          // && apimanager.webhooksOk << shouldn't call if handshake failed.. not ready #TODO
+          // don't look for successful handshake/webhooks currently because UT depends on this
         // we have an APIm, handshake succeeded, so try to pull data..
         pullFromAPIm(apimanager, currdir, snapshotID, function(err, dir) {
           if (err) {
@@ -206,6 +248,9 @@ function loadData(app, apimanager, models, currdir, uid) {
                  callback);
     } ],
     function(err, results) {
+      if (!reload) {
+        return;
+      }
       var interval = apimanager.maxRefresh;
       // if no error and APIs specified, do not agressively reload config
       if (!err && apimanager.host && (http || https)) {
@@ -213,7 +258,7 @@ function loadData(app, apimanager, models, currdir, uid) {
         // if the previous snapshot hasn't be loaded, delete it
         if (uid && snapshotID !== uid) {
           try {
-            fs.rmrfSync(currdir);
+            fs.removeSync(currdir);
           } catch (e) {
             logger.error(e);
             //continue
@@ -242,14 +287,13 @@ function loadData(app, apimanager, models, currdir, uid) {
                    app,
                    interval,
                    apimanager,
-                   models,
-                   snapdir);
+                   models);
     });
 }
 
-function scheduleLoadData(app, interval, apimanager, models, dir) {
+function scheduleLoadData(app, interval, apimanager, models) {
   if (apimanager.host) {
-    setTimeout(loadData, interval, app, apimanager, models, dir);
+    setTimeout(loadData, interval, app, apimanager, models, true);
   }
 }
 
@@ -371,6 +415,121 @@ function decryptAPIMResponse(body, private_key) {
 
 
 /**
+ * Webhooks subscription with APIm server
+ * @param {???} app - loopback application
+ * @param {Object} apimanager - configuration pointing to APIm server
+ * @param {Object} operation - either WH_SUBSCRIBE or WH_UNSUBSCRIBE
+ * @param {callback} cb - callback that handles error
+ */
+function webhooksSubscribe(app, apimanager, operation, cb) {
+  logger.debug('webhooksSubscribe entry');
+
+  var whMethod, whTitle, whVerb, whStatusCode;
+  switch (operation) {
+    case WH_SUBSCRIBE:
+      whMethod = 'POST';
+      whTitle = 'This is a webhook subscription for the a catalog, subscribing to all available events specifically';
+      whVerb = 'subscribe';
+      whStatusCode = 201;
+      break;
+    case WH_UNSUBSCRIBE:
+      whMethod = 'DELETE';
+      whTitle = 'This is a webhook unsubscribe for the a catalog, unsubscribing to all available events specifically';
+      whVerb = 'unsubscribe';
+      whStatusCode = 204;
+      break;
+    default:
+      cb(new Error('Internal error during webhooks subscribe/unsubscribe'));
+      return;
+  }
+
+  async.series([
+    function(callback) {
+
+      var endpointurlObj = {
+        protocol: 'http',
+        hostname: ip.address(),
+        port: process.env.DATASTORE_PORT,
+        pathname: '/api/webhooks',
+      };
+      var endpointurl = url.format(endpointurlObj);
+      var body = {
+        enabled: 'true',
+        endpoint: endpointurl,
+        secret: 'notused',
+        subscriptions: [
+          'catalog',
+        ],
+        title: whTitle,
+      };
+
+      var headers = {
+        'content-type': 'application/json',
+        'x-ibm-client-id': apimanager.clientid,
+        accept: 'application/json',
+      };
+
+      if (logger.debug()) {
+        logger.debug(JSON.stringify(headers, null, 2));
+      }
+
+      var webhooksSubUrlObj = {
+        protocol: 'https',
+        hostname: apimanager.host,
+        port: apimanager.port,
+        pathname: '/v1/catalogs/' + apimanager.catalog + '/webhooks',
+        search: 'type=strong-gateway',
+      };
+      var webhooksSubUrl = url.format(webhooksSubUrlObj);
+
+      Request({
+        url: webhooksSubUrl,
+        method: whMethod,
+        json: body,
+        headers: headers,
+        agentOptions: {
+          rejectUnauthorized: false, //FIXME: need to eventually remove this
+        },
+      },
+      function(err, res, body) {
+        if (err) {
+          logger.error('Failed to communicate with %s: %s ', webhooksSubUrl, err);
+          return callback(err);
+        }
+
+        logger.debug('statusCode: ' + res.statusCode);
+        if (res.statusCode !== whStatusCode) {
+          logger.error(webhooksSubUrl, ' failed with: ', res.statusCode);
+          currentWebhook = undefined;
+          return callback(new Error(webhooksSubUrl + ' failed with: ' + res.statusCode));
+        } else if (operation === WH_SUBSCRIBE) {
+          logger.debug('Webhooks subscribe received response %d from API Connect server, id %s',
+                       res.statusCode, body.id);
+          currentWebhook = body.id;
+        } else if (operation === WH_UNSUBSCRIBE) {
+          logger.debug('Webhooks unsubscribe received response %d from API Connect server',
+                       res.statusCode);
+          currentWebhook = undefined;
+        }
+
+        callback(null);
+      });
+    } ],
+    function(err) {
+      if (err) {
+        apimanager.webhooksOk = false;
+        logger.error('Unsuccessful webhooks ' + whVerb + ' with API Connect server');
+      } else {
+        apimanager.webhooksOk = true;
+        logger.info('Successful webhooks ' + whVerb + ' with API Connect server');
+      }
+      logger.debug('webhooksSubscribe exit');
+      cb(err);
+    });
+}
+
+
+/**
  * Attempt to handshake from APIm server
  * @param {???} app - loopback application
  * @param {Object} apimanager - configuration pointing to APIm server
@@ -466,7 +625,7 @@ function pullFromAPIm(apimanager, currdir, uid, cb) {
   // Have an APIm, grab latest if we can..
   var snapdir = path.join(process.env.ROOTCONFIGDIR, uid);
 
-  fs.mkdir(snapdir, function(err) {
+  fs.mkdirs(snapdir, function(err) {
     if (err) {
       logger.warn('Failed to create snapshot directory');
       logger.debug('pullFromAPIm exit(1)');
@@ -498,7 +657,7 @@ function pullFromAPIm(apimanager, currdir, uid, cb) {
       if (err) {
         logger.error(err);
         try {
-          fs.rmdirSync(snapdir);
+          fs.removeSync(snapdir);
         } catch (e) {
           logger.error(e);
           //continue
@@ -614,6 +773,11 @@ function loadConfigFromFS(app, apimanager, models, dir, uid, cb) {
   } else {
     var YAMLfiles = [];
     logger.debug('dir: ', dir);
+
+    //read the apic settings
+    var cfg = readApicConfig(dir);
+
+    //read the YAML files
     cliConfig.loadProject(dir).then(function(artifacts) {
       logger.debug('%j', artifacts);
       artifacts.forEach(
@@ -622,8 +786,9 @@ function loadConfigFromFS(app, apimanager, models, dir, uid, cb) {
             YAMLfiles.push(artifact.filePath);
           }
         });
+
       // populate data-store models with the file contents
-      populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb);
+      populateModelsWithLocalData(app, YAMLfiles, cfg, dir, uid, cb);
     });
   }
 }
@@ -642,47 +807,38 @@ function createAPIID(api) {
  * Populates data-store models with persisted content
  * @param {???} app - loopback application
  * @param {Array} YAMLfiles - list of yaml files to process (should only be swagger)
+ * @param {Object} apicCfg - the APIC config object
  * @param {string} dir - path to directory containing persisted data to load
  * @param {callback} cb - callback that handles error or successful completion
  */
-function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
+function populateModelsWithLocalData(app, YAMLfiles, apicCfg, dir, uid, cb) {
   logger.debug('populateModelsWithLocalData entry');
-  var apis = {};
-  var subscriptions = [ {
-    organization: {
-      id: 'defaultOrgID',
-      name: 'defaultOrgName',
-      title: 'defaultOrgTitle' },
-    catalog: {
-      id: 'defaultCatalogID',
-      name: 'defaultCatalogName',
-      title: 'defaultCatalogTitle' },
-    id: 'defaultSubsID',
-    application: {
-      id: 'defaultAppID',
-      title: 'defaultAppTitle',
-      'oauth-redirection-uri': 'https://localhost',
-      'app-credentials': [ {
-        'client-id': 'default',
-        'client-secret': 'CRexOpCRkV1UtjNvRZCVOczkUrNmGyHzhkGKJXiDswo=' } ] },
-    'developer-organization': {
-      id: 'defaultOrgID',
-      name: 'defaultOrgName',
-      title: 'defaultOrgTitle' },
-    'plan-registration': {
-      id: 'ALLPLANS' } } ];
 
-  var catalog = subscriptions[0].catalog;
-  catalog.organization = subscriptions[0].organization;
+  //default organization
+  var defaultOrg = {
+    id: 'defaultOrgID',
+    name: 'defaultOrgName',
+    title: 'defaultOrgTitle' };
+
+  //default catalog
+  var defaultCatalog = {
+    id: 'defaultCatalogID',
+    name: 'defaultCatalogName',
+    title: 'defaultCatalogTitle' };
+  defaultCatalog.organization = defaultOrg;
+
+  //the apis
+  var apis = {};
+
   async.series([
+    // 1. create the "api" instances
     function(seriesCallback) {
       async.forEach(YAMLfiles,
         function(file, fileCallback) {
           logger.debug('Loading data from %s', file);
           var readfile;
           try {
-            // read the content of the files into memory
-            // and parse as JSON
+            // read the content of the files into memory and parse as JSON
             readfile = YAML.load(file);
 
           } catch (e) {
@@ -734,10 +890,11 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
       );
       seriesCallback();
     },
+    // 2. create the "catalog" instances
     function(seriesCallback) {
-      catalog['snapshot-id'] = uid;
+      defaultCatalog['snapshot-id'] = uid;
       app.models['catalog'].create(
-        catalog,
+        defaultCatalog,
         function(err, mymodel) {
           if (err) {
             logger.error(err);
@@ -748,20 +905,17 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
           seriesCallback();
         });
     },
-    // create product with all the apis defined
+    // 3. create one "product" with all the apis defined
     function(seriesCallback) {
       var entry = {};
       // add catalog
-      entry.catalog = catalog;
+      entry.catalog = defaultCatalog;
       entry['snapshot-id'] = uid;
-      var rateLimit = '100/hour';
-      if (process.env[LAPTOP_RATELIMIT]) {
-        rateLimit = process.env[LAPTOP_RATELIMIT];
-      }
+
       entry.document = {
         product: '1.0.0',
         info: {
-          name: 'static product',
+          name: 'static-product',
           version: '1.0.0',
           title: 'static-product' },
         visibility: {
@@ -769,16 +923,51 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
             type: 'public' },
           subscribe: {
             type: 'authenticated' } },
-        apis: apis,
-        plans: {
+        apis: apis };
+
+      var rateLimit = '100/hour';
+      if (process.env[LAPTOP_RATELIMIT]) {
+        rateLimit = process.env[LAPTOP_RATELIMIT];
+      }
+
+      if (apicCfg && apicCfg.plans && apicCfg.applications) {
+        //add the configured plans
+        entry.document.plans = {};
+        //add plan and its APIs
+        for (var p in apicCfg.plans) {
+          var plan = apicCfg.plans[p];
+          if (typeof plan === 'object') {
+            var planApis = {};
+            for (var i in plan.apis) {
+              var name = plan.apis[i];
+              //add the api to plan if only if the api does exist
+              if (apis[name]) {
+                planApis[name] = {};
+              } else {
+                logger.warn('Cannot add the invalid api "%s" to plan "%s"',
+                        name, p);
+              }
+            }
+            entry.document.plans[p] = {
+              apis: planApis,
+              'rate-limit': {
+                value: plan['rate-limit'] || rateLimit,
+                'hard-limit': plan['hard-limit'] } };
+          }
+        }
+      } else {
+        //the default plan
+        entry.document.plans = {
           default: {
             apis: apis,
             'rate-limit': {
               value: rateLimit,
-              'hard-limit': true } } } };
+              'hard-limit': true } } };
+      }
+
       if (logger.debug()) {
-        logger.debug('creating static product and attaching apis: %s',
-                JSON.stringify(entry, null, 4));
+        logger.debug('creating static product and attaching apis to plans: %s',
+                JSON.stringify(entry, null, 2));
       }
 
       app.models.product.create(
@@ -793,13 +982,61 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
           seriesCallback();
         });
     },
-    // Hardcode default subscription for all plans
+    // 4. create the "subscriptions" instances
     function(seriesCallback) {
+      var subscriptions = [];
+      if (apicCfg && apicCfg.plans && apicCfg.applications) {
+        //add the configured plans
+        var idx = 0;
+        for (var k in apicCfg.applications) {
+          var theApp = apicCfg.applications[k];
+          //An application can subscribe only one plan in a given product. Since
+          //we have only one product defined for local data, the subscription of
+          //an app should be a string instead of array!
+          if (theApp && (!theApp.subscription || typeof theApp.subscription !== 'string')) {
+            logger.warn('The app "%s" does not subscribe a plan?', k);
+          } else if (typeof theApp === 'object') {
+            subscriptions[idx] = {
+              'snapshot-id': uid,
+              organization: defaultOrg,
+              'developer-organization': defaultOrg,
+              catalog: defaultCatalog,
+              id: 'defaultSubsID-' + k + '-static-product',
+              application: {
+                id: 'defaultAppID-' + k,
+                title: 'defaultAppTitle-' + idx,
+                'oauth-redirection-uri': (theApp['oauth-redirection-uri'] || 'https://localhost'),
+                'app-credentials': [ {
+                  'client-id': k,
+                  'client-secret': (theApp['client-secret'] || 'dummy') } ] },
+              'plan-registration': {
+                id: ('static-product:1.0.0:' + theApp.subscription) } };
+          }
+          idx++;
+        }
+      } else {
+        //the default subscription
+        subscriptions[0] = {
+          'snapshot-id': uid,
+          organization: defaultOrg,
+          'developer-organization': defaultOrg,
+          catalog: defaultCatalog,
+          id: 'defaultSubsID',
+          application: {
+            id: 'defaultAppID',
+            title: 'defaultAppTitle',
+            'oauth-redirection-uri': 'https://localhost',
+            'app-credentials': [ {
+              'client-id': 'default',
+              'client-secret': 'CRexOpCRkV1UtjNvRZCVOczkUrNmGyHzhkGKJXiDswo=' } ] },
+          'plan-registration': {
+            id: 'ALLPLANS' } };
+      }
+
       async.forEach(
         subscriptions,
         function(subscription, subsCallback) {
           var modelname = 'subscription';
-          subscription['snapshot-id'] = uid;
           app.models[modelname].create(
             subscription,
             function(err, mymodel) {
@@ -812,6 +1049,88 @@ function populateModelsWithLocalData(app, YAMLfiles, dir, uid, cb) {
               subsCallback();
             });
         });
+      seriesCallback();
+    },
+
+    // 5. create the "tls-profile" instances
+    function(seriesCallback) {
+      var modelname = 'tlsprofile';
+      async.forEachOf(
+        apicCfg['tls-profiles'],
+        function(profile, name, asyncCB) {
+          var instance = {
+            'snapshot-id': uid,
+            'org-id': defaultOrg.id,
+            id: 'defaultTlsProfile-' + name,
+            name: name,
+            public: false,
+            ciphers: [
+              'SSL_RSA_WITH_AES_256_CBC_SHA',
+              'SSL_RSA_WITH_AES_128_CBC_SHA',
+              'SSL_RSA_WITH_3DES_EDE_CBC_SHA',
+              'SSL_RSA_WITH_RCA_128_SHA',
+              'SSL_RSA_WITH_RCA_128_MD5' ],
+            protocols: [ 'TLSv11', 'TLSv12' ],
+            certs: [],
+            'mutual-auth': false };
+
+          if (profile.rejectUnauthorized === true) {
+            instance['mutual-auth'] = true;
+          }
+
+          if (Array.isArray(profile.secureProtocols)) {
+            instance.protocols = [];
+            profile.secureProtocols.forEach(function(protocol) {
+              switch (protocol) {
+                case 'TLSv1_method':
+                  instance.protocols.push('TLSv1');
+                  break;
+                case 'TLSv1_1_method':
+                  instance.protocols.push('TLSv11');
+                  break;
+                case 'TLSv1_2_method':
+                  instance.protocols.push('TLSv12');
+                  break;
+              }
+            });
+          }
+
+          if (typeof profile.key === 'object') {
+            instance['private-key'] = profile.key.content;
+          }
+
+          if (typeof profile.cert === 'object') {
+            instance.certs.push({
+              name: profile.cert.name,
+              cert: profile.cert.content,
+              'cert-type': 'INTERMEDIATE',
+              'cert-id': name + '-cert-' + profile.cert.name });
+          }
+
+          if (Array.isArray(profile.ca)) {
+            profile.ca.forEach(function(ca) {
+              if (typeof ca === 'object') {
+                instance.certs.push({
+                  name: ca.name,
+                  cert: ca.content,
+                  'cert-type': 'CLIENT',
+                  'cert-id': name + '-ca-cert-' + ca.name });
+              }
+            });
+          }
+
+          app.models[modelname].create(
+            instance,
+            function(err, mymodel) {
+              if (err) {
+                logger.error('Failed to populate a tls-profile:', err);
+              } else {
+                logger.debug('%s created: %j', modelname, mymodel);
+              }
+              asyncCB();
+            });
+        });
+
       seriesCallback();
     } ],
     function(err) { cb(err); });
@@ -903,6 +1222,101 @@ function expandAPIData(apidoc, dir) {
   }
   return apidoc;
 }
+
+/**
+ * Read the APIC config files, apic.json and apic-tls-profiles.json under the
+ * given directory. (Check test/definitions/apic-config/*.json for example)
+ *
+ * @param {string} dir - path to directory containing persisted data to load
+ * @return the parsed config
+ *   { "applications": { }, "plans": { }, "tls-profiles": { } }
+ */
+function readApicConfig(dir) {
+  var cfg = {};
+
+  var filename;
+  var parsed;
+  //read the apic.json
+  try {
+    filename = path.join(dir, 'apic.json');
+    if (fs.existsSync(filename)) {
+      parsed = JSON.parse(fs.readFileSync(filename));
+      cfg.applications = parsed.applications || {};
+      cfg.plans = parsed.plans || {};
+
+      //post-process: caculate the hash value of the client secret in apic.json
+      for (var a in cfg.applications) {
+        var app = cfg.applications[a];
+        if (typeof app === 'object') {
+          var plain_secret = app['client-secret'];
+          if (typeof plain_secret === 'string') {
+            var hash = Crypto.createHash('sha256').update(plain_secret).digest('base64');
+            app['client-secret'] = hash;
+          }
+        }
+      }
+    }
+  } catch (e1) {
+    logger.warn('Failed to read/parse apic.json:', e1);
+  }
+
+  //read the apic-tls-profiles.json
+  try {
+    filename = path.join(dir, 'apic-tls-profiles.json');
+    if (fs.existsSync(filename)) {
+      parsed = JSON.parse(fs.readFileSync(filename));
+      cfg['tls-profiles'] = parsed || {};
+
+      //post-process: read the key and cert file contents
+      for (var p in cfg['tls-profiles']) {
+        var profile = cfg['tls-profiles'][p];
+        if (typeof profile === 'object') {
+          if (profile.key && typeof profile.key === 'string') {
+            try {
+              profile.key = path.resolve(dir, profile.key);
+              profile.key = {
+                name: profile.key,
+                content: fs.readFileSync(profile.key) };
+            } catch (e) {
+              logger.warn('Failed to read the key file "%s":', profile.key, e);
+            }
+          }
+          if (profile.cert && typeof profile.cert === 'string') {
+            try {
+              profile.cert = path.resolve(dir, profile.cert);
+              profile.cert = {
+                name: profile.cert,
+                content: fs.readFileSync(profile.cert) };
+            } catch (e) {
+              logger.warn('Failed to read the cert file "%s":', profile.cert, e);
+            }
+          }
+          if (Array.isArray(profile.ca)) { //ca is an array
+            for (var q in profile.ca) {
+              try {
+                var ca = profile.ca[q];
+                ca = path.resolve(dir, ca);
+                ca = fs.readFileSync(ca);
+                profile.ca[q] = {
+                  name: profile.ca[q],
+                  content: ca };
+              } catch (e) {
+                logger.warn('Failed to read the ca file "%s":', ca, e);
+              }
+            }
+          } else {
+            profile.ca = [];
+          }
+        }
+      }
+    }
+  } catch (e2) {
+    logger.warn('Failed to read/parse apic-tls-profiles.json:', e2);
+  }
+
+  return cfg;
+}
+
 
 /*
 function loadAPIsFromYAML(listOfAPIs, dir) {
@@ -1083,3 +1497,16 @@ function updateSnapshot(app, uid, cb) {
       });
   });
 }
+
+function triggerReload(app, ctx) {
+  if (ctx.instance.webhook_id !== currentWebhook) {
+    logger.warn('Received webhook ID %s does not match expected webhook ID %s',
+                 ctx.instance.webhook_id, currentWebhook);
+    return;
+  }
+  logger.debug('Received webhook ID %s matches expected webhook ID %s',
+               ctx.instance.webhook_id, currentWebhook);
+  loadData(app, apimanager, models, false);
+}
+
+module.exports.triggerReloadFromWebhook = triggerReload;

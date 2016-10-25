@@ -17,6 +17,7 @@ var dsc = require('../datastore/client/index.js');
 var glob = require('glob');
 var touch = require('touch');
 var dsCleanupFile = require('./support/utils').dsCleanupFile;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 describe('data-store', function() {
   var request;
@@ -27,6 +28,8 @@ describe('data-store', function() {
     process.env.APIMANAGER = '127.0.0.1';
     process.env.APIMANAGER_REFRESH_INTERVAL = 15 * 1000; // 15 seconds
     process.env.NODE_ENV = 'production';
+
+    resetLimiterCache();
     echo.start(8889)
       .then(function() { return apimServer.start('127.0.0.1', 8890); })
       .then(function() { return microgw.start(3000); })

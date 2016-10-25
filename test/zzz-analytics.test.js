@@ -14,6 +14,7 @@ var analytics = require('./support/analytics-server');
 var fs = require('fs');
 var path = require('path');
 var dsCleanup = require('./support/utils').dsCleanup;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 var hasCopiedKeys;
 var privKey = path.resolve(__dirname, '..', 'id_rsa');
@@ -72,6 +73,7 @@ describe('analytics + invoke policy', function() {
   before(function(done) {
     //Use production instead of CONFIG_DIR: reading from apim instead of laptop
     process.env.NODE_ENV = 'production';
+    process.env.CONFIG_DIR = __dirname + '/definitions/default';
 
     //The apim server and datastore
     process.env.APIMANAGER = '127.0.0.1';
@@ -80,6 +82,7 @@ describe('analytics + invoke policy', function() {
     process.env.DATASTORE_PORT = 5000;
     delete require.cache[require.resolve('../lib/microgw')];
 
+    resetLimiterCache();
     copyKeys()
     .then(function() {
       return analytics.start(
@@ -102,6 +105,7 @@ describe('analytics + invoke policy', function() {
   });
 
   after(function(done) {
+    delete process.env.CONFIG_DIR;
     delete process.env.NODE_ENV;
     delete process.env.APIMANAGER;
     delete process.env.APIMANAGER_PORT;

@@ -9,6 +9,7 @@ var supertest = require('supertest');
 var echo = require('./support/echo-server');
 var mg = require('../lib/microgw');
 var dsCleanupFile = require('./support/utils').dsCleanupFile;
+var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 describe('set-variable policy', function() {
 
@@ -16,6 +17,8 @@ describe('set-variable policy', function() {
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/set-variable';
     process.env.NODE_ENV = 'production';
+
+    resetLimiterCache();
     mg.start(3000)
       .then(function() {
         return echo.start(8889);
