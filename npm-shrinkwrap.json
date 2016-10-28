@@ -57,7 +57,7 @@
       }
     },
     "apiconnect-cli-logger": {
-      "version": "1.2.1",
+      "version": "1.2.0",
       "from": "apiconnect-cli-logger@>=1.0.0 <2.0.0"
     },
     "apiconnect-validate": {
@@ -231,7 +231,7 @@
       "from": "buildmail@3.10.0"
     },
     "bunyan": {
-      "version": "1.8.3",
+      "version": "1.8.4",
       "from": "bunyan@>=1.7.1 <2.0.0"
     },
     "busboy": {
@@ -659,7 +659,7 @@
       "from": "finalhandler@0.5.0"
     },
     "flow-engine": {
-      "version": "1.1.2",
+      "version": "1.1.0",
       "from": "flow-engine@>=1.0.0 <2.0.0"
     },
     "for-in": {
@@ -668,7 +668,7 @@
     },
     "for-own": {
       "version": "0.1.4",
-      "from": "for-own@>=0.1.3 <0.2.0"
+      "from": "for-own@>=0.1.4 <0.2.0"
     },
     "forever-agent": {
       "version": "0.6.1",
@@ -1055,7 +1055,7 @@
       "from": "kind-of@>=3.0.2 <4.0.0"
     },
     "klaw": {
-      "version": "1.3.0",
+      "version": "1.3.1",
       "from": "klaw@>=1.0.0 <2.0.0"
     },
     "lazy-cache": {
@@ -1459,7 +1459,7 @@
       "from": "object-assign@>=1.0.0 <2.0.0"
     },
     "object.omit": {
-      "version": "2.0.0",
+      "version": "2.0.1",
       "from": "object.omit@>=2.0.0 <3.0.0"
     },
     "on-finished": {
@@ -1682,6 +1682,10 @@
       "version": "1.0.0",
       "from": "pug-walk@>=1.0.0 <2.0.0"
     },
+    "punycode": {
+      "version": "1.4.1",
+      "from": "punycode@>=1.4.1 <2.0.0"
+    },
     "q": {
       "version": "1.4.1",
       "from": "q@>=1.4.1 <2.0.0"
@@ -1751,16 +1755,12 @@
       "from": "repeating@>=1.1.0 <2.0.0"
     },
     "request": {
-      "version": "2.75.0",
+      "version": "2.76.0",
       "from": "request@>=2.69.0 <3.0.0",
       "dependencies": {
         "form-data": {
-          "version": "2.0.0",
-          "from": "form-data@>=2.0.0 <2.1.0"
-        },
-        "qs": {
-          "version": "6.2.1",
-          "from": "qs@>=6.2.0 <6.3.0"
+          "version": "2.1.1",
+          "from": "form-data@>=2.1.1 <2.2.0"
         }
       }
     },
@@ -1979,7 +1979,7 @@
       "from": "toposort@>=0.2.10 <0.3.0"
     },
     "tough-cookie": {
-      "version": "2.3.1",
+      "version": "2.3.2",
       "from": "tough-cookie@>=2.3.0 <2.4.0"
     },
     "traverse": {
