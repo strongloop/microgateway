@@ -1,3 +1,15 @@
+2016-10-28, Version 1.5.8
+=========================
+
+ * update shrinkwrap (Joseph Tary)
+
+ * update shrinkwrap (Jon Palgon)
+
+ * shrinkwrap (Jon Palgon)
+
+ * Update travis.yml (Jon Palgon)
+
+
 2016-10-24, Version 1.5.7
 =========================
 
@@ -83,6 +95,29 @@
 
  * Allow swagger security ApiKeys to use arbitrary names (Daniel Badt)
 
+
+2016-09-12, Version 1.5.3
+=========================
+
+ * update shrinkwrap (Jon Palgon)
+
+
+2016-09-09, Version 1.5.2
+=========================
+
+ * shrinkwrap (Jon Palgon)
+
+
+2016-08-25, Version 1.5.1
+=========================
+
+
+
+2016-08-22, Version 1.5.0
+=========================
+
+ * Update travis.yml (Jon Palgon)
+
  * Remove config dir if prev snapshot not loaded (Jon Palgon)
 
  * Skip token verification if oauth ctx exists (yihongwang)
@@ -156,6 +191,8 @@
  * Fix rate limiting for multiple api matches (Daniel Badt)
 
  * Add missing test and temporarily force rate limit UT to pass (Jon Palgon)
+
+ * Address lint failures (Jon Palgon)
 
  * Plan rate limiting UT w/ automatic subscription (Jon Palgon)
 
