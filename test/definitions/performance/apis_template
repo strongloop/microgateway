@@ -18,7 +18,7 @@
           "basePath": "/api001_base",
           "swagger": "2.0",
           "paths": {
-            "/path01": {
+            "/path_template": {
               "post": {
                   "responses": {
                      "200": {
@@ -31,10 +31,37 @@
                   "200": {
                     "description": "200 OK"
                   }
-                }
+                },
+                "security": [
+                  {
+                    "clientID": []
+                  }
+                ]
               }
             }
           },
+          "securityDefinitions": {
+            "oauth": {
+              "type": "oauth2",
+              "description": "",
+              "flow": "implicit",
+              "authorizationUrl": "https://localhost:5000/security/oauth2/authorize",
+              "scopes": {
+                "scope1": "scope1"
+              }
+            },
+            "clientID": {
+              "description": "",
+              "in": "header",
+              "name": "X-IBM-Client-Id",
+              "type": "apiKey"
+            }
+          },
+          "security": [
+            {
+              "clientID": []
+            }
+          ],
           "x-ibm-configuration": {
             "assembly": {
               "execute": [

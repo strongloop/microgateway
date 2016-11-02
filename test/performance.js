@@ -19,7 +19,7 @@ process.env.CATALOG_DIR = __dirname + '/definitions/performance/v1/catalogs/564b
 //TODO load template
 var apis_template = fs.readFileSync(process.env.CONFIG_DIR + '/apis_template');
 var apis_template_json = JSON.parse(apis_template);
-var path_template = JSON.stringify(apis_template_json[0].document.paths['/path01']);
+var path_template = JSON.stringify(apis_template_json[0].document.paths['/path_template']);
 var paths_template_json = JSON.parse(path_template);
 var products_template = fs.readFileSync(process.env.CONFIG_DIR + '/products_template');
 var products_template_json = JSON.parse(products_template);
@@ -28,10 +28,13 @@ var products_template_json = JSON.parse(products_template);
 var perf_config = JSON.parse(fs.readFileSync(process.env.CONFIG_DIR + '/perf_config'));
 var apis_number = perf_config.apis;
 var path_number = perf_config.paths;
+var security_enable = perf_config.security;
 
+// remove the template apis
+apis_template_json.pop();
 
 //TODO looping to create multiple api/path
-for (var i = 2; i <= apis_number; i++) {
+for (var i = 1; i <= apis_number; i++) {
   var apin = 'api' + ('000' + i).substr(-3);
 
   var apis_iter = JSON.parse(apis_template);
@@ -40,13 +43,23 @@ for (var i = 2; i <= apis_number; i++) {
   apis_iter[0].document.basePath = '/' + apin + '_base';
   apis_iter[0].id = apin;
 
-  // multiple path
+// multiple path
 
+// remove the template path
+  delete apis_iter[0].document.paths['/path_template'];
 
-  for (var j = 2; j <= path_number; j++) {
-    var pathn = 'path' + ('000' + j).substr(-2);
+// removing security setting
+  if (!security_enable) {
+    delete apis_iter[0].document['securityDefinitions'];
+    delete apis_iter[0].document['security'];
+    delete paths_template_json.get['security'];
+  }
+
+  for (var j = 1; j <= path_number; j++) {
+    var pathn = '/path' + ('000' + j).substr(-2);
     apis_iter[0].document.paths[pathn] = paths_template_json;
   }
+
   apis_template_json.push(apis_iter[0]);
 
   products_template_json[0].document.apis[apin] = { name: apin + ':1.0.0' };
@@ -55,7 +68,7 @@ for (var i = 2; i <= apis_number; i++) {
 }
 
 
-//TODO write "products" and "apis" file
+// write "products" and "apis" file
 fs.writeFile(process.env.CATALOG_DIR + '/apis', JSON.stringify(apis_template_json, null, 2), function(err) {
   if (err) {
     return console.log(err);
@@ -91,5 +104,3 @@ apimServer.start(
 
       //TODO inject traffic
       //TODO generate report
-
-

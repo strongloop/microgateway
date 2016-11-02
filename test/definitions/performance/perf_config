@@ -1,4 +1,5 @@
 {
-  "apis" : 2,
-  "paths" : 5
+  "apis" : 1,
+  "paths" : 2,
+  "security" : false
 }
