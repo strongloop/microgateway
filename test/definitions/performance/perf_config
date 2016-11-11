@@ -1,5 +1,6 @@
 {
-  "apis" : 1,
-  "paths" : 2,
-  "security" : false
+  "apis" : 2,
+  "paths" : 3,
+  "security" : true,
+  "ratelimit" : true
 }

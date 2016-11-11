@@ -13,27 +13,31 @@ var fs = require('fs');
 
 var mg = require('../lib/microgw');
 process.env.CONFIG_DIR = __dirname + '/definitions/performance';
-process.env.CATALOG_DIR = __dirname + '/definitions/performance/v1/catalogs/564b48aae4b0869c782edc2b';
+//process.env.CATALOG_DIR = __dirname + '/definitions/performance/v1/catalogs/564b48aae4b0869c782edc2b';
+process.env.CATALOG_DIR = __dirname + '/definitions/performance/v1/catalogs/5714b14ce4b0e6c6f7d287eb';
 
 
-//TODO load template
+// load template
 var apis_template = fs.readFileSync(process.env.CONFIG_DIR + '/apis_template');
 var apis_template_json = JSON.parse(apis_template);
 var path_template = JSON.stringify(apis_template_json[0].document.paths['/path_template']);
 var paths_template_json = JSON.parse(path_template);
 var products_template = fs.readFileSync(process.env.CONFIG_DIR + '/products_template');
 var products_template_json = JSON.parse(products_template);
+var subscriptions_template = fs.readFileSync(process.env.CONFIG_DIR + '/subscriptions_template');
+var subscriptions_template_json = JSON.parse(subscriptions_template);
 
-//TODO read config
+// read config
 var perf_config = JSON.parse(fs.readFileSync(process.env.CONFIG_DIR + '/perf_config'));
 var apis_number = perf_config.apis;
 var path_number = perf_config.paths;
 var security_enable = perf_config.security;
+var ratelimit_enable = perf_config.ratelimit;
 
 // remove the template apis
 apis_template_json.pop();
 
-//TODO looping to create multiple api/path
+// looping to create multiple api/path
 for (var i = 1; i <= apis_number; i++) {
   var apin = 'api' + ('000' + i).substr(-3);
 
@@ -53,6 +57,7 @@ for (var i = 1; i <= apis_number; i++) {
     delete apis_iter[0].document['securityDefinitions'];
     delete apis_iter[0].document['security'];
     delete paths_template_json.get['security'];
+    delete paths_template_json.post['security'];
   }
 
   for (var j = 1; j <= path_number; j++) {
@@ -63,12 +68,20 @@ for (var i = 1; i <= apis_number; i++) {
   apis_template_json.push(apis_iter[0]);
 
   products_template_json[0].document.apis[apin] = { name: apin + ':1.0.0' };
-  products_template_json[0].document.plans.gold.apis[apin] = {};
-
+  //products_template_json[0].document.plans.gold.apis[apin] = {};
 }
 
+// subscriptions is necessary for security in our testing scenario
+if (security_enable) {
+  subscriptions_template_json[0]['plan-registration'].apis = apis_template_json;
+  subscriptions_template_json[0]['plan-registration'].product = products_template_json[0];
+  delete subscriptions_template_json[0]['plan-registration'].product['url'];
+}
+else {
+  subscriptions_template_json = [];
+}
 
-// write "products" and "apis" file
+// write "products", "apis" and "subscriptions" file
 fs.writeFile(process.env.CATALOG_DIR + '/apis', JSON.stringify(apis_template_json, null, 2), function(err) {
   if (err) {
     return console.log(err);
@@ -81,6 +94,16 @@ fs.writeFile(process.env.CATALOG_DIR + '/products', JSON.stringify(products_temp
   }
 });
 
+// remove orgnization and catalog in "product" section
+if (security_enable) {
+  delete subscriptions_template_json[0]['plan-registration'].product.organization;
+  delete subscriptions_template_json[0]['plan-registration'].product.catalog;
+}
+fs.writeFile(process.env.CATALOG_DIR + '/subscriptions', JSON.stringify(subscriptions_template_json, null, 2), function(err) {
+  if (err) {
+    return console.log(err);
+  }
+});
 //TODO start system resource monitor
 
 process.env.CONFIG_DIR = __dirname + '/definitions/performance';
