@@ -8,12 +8,8 @@
 var echo = require('./support/echo-server');
 var apimServer = require('./support/mock-apim-server/apim-server');
 var fs = require('fs');
-// var dsCleanup = require('./support/utils').dsCleanup;
-// var dsCleanupFile = require('./support/utils').dsCleanupFile;
-
 var mg = require('../lib/microgw');
 process.env.CONFIG_DIR = __dirname + '/definitions/performance';
-//process.env.CATALOG_DIR = __dirname + '/definitions/performance/v1/catalogs/564b48aae4b0869c782edc2b';
 process.env.CATALOG_DIR = __dirname + '/definitions/performance/v1/catalogs/5714b14ce4b0e6c6f7d287eb';
 
 
@@ -68,7 +64,11 @@ for (var i = 1; i <= apis_number; i++) {
   apis_template_json.push(apis_iter[0]);
 
   products_template_json[0].document.apis[apin] = { name: apin + ':1.0.0' };
-  //products_template_json[0].document.plans.gold.apis[apin] = {};
+
+// add api to ratelimit plan
+  if (ratelimit_enable) {
+    products_template_json[0].document.plans.default.apis[apin] = {};
+  }
 }
 
 // subscriptions is necessary for security in our testing scenario
@@ -76,8 +76,7 @@ if (security_enable) {
   subscriptions_template_json[0]['plan-registration'].apis = apis_template_json;
   subscriptions_template_json[0]['plan-registration'].product = products_template_json[0];
   delete subscriptions_template_json[0]['plan-registration'].product['url'];
-}
-else {
+} else {
   subscriptions_template_json = [];
 }
 
@@ -99,13 +98,14 @@ if (security_enable) {
   delete subscriptions_template_json[0]['plan-registration'].product.organization;
   delete subscriptions_template_json[0]['plan-registration'].product.catalog;
 }
-fs.writeFile(process.env.CATALOG_DIR + '/subscriptions', JSON.stringify(subscriptions_template_json, null, 2), function(err) {
-  if (err) {
-    return console.log(err);
-  }
-});
-//TODO start system resource monitor
+fs.writeFile(process.env.CATALOG_DIR + '/subscriptions', JSON.stringify(subscriptions_template_json, null, 2),
+  function(err) {
+    if (err) {
+      return console.log(err);
+    }
+  });
 
+// start system resource monitor
 process.env.CONFIG_DIR = __dirname + '/definitions/performance';
 process.env.NODE_ENV = 'production';
 process.env.APIMANAGER = '127.0.0.1';

@@ -2,5 +2,5 @@
   "apis" : 2,
   "paths" : 3,
   "security" : true,
-  "ratelimit" : true
+  "ratelimit" : false
 }
