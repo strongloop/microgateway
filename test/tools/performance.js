@@ -5,13 +5,12 @@
 
 'use strict';
 
-var echo = require('./support/echo-server');
-var apimServer = require('./support/mock-apim-server/apim-server');
+var echo = require('../support/echo-server');
+var apimServer = require('../support/mock-apim-server/apim-server');
 var fs = require('fs');
-var mg = require('../lib/microgw');
-process.env.CONFIG_DIR = __dirname + '/definitions/performance';
-process.env.CATALOG_DIR = __dirname + '/definitions/performance/v1/catalogs/5714b14ce4b0e6c6f7d287eb';
-
+var mg = require('../../lib/microgw');
+process.env.CONFIG_DIR = __dirname + '/../definitions/performance';
+process.env.CATALOG_DIR = __dirname + '/../definitions/performance/v1/catalogs/5714b14ce4b0e6c6f7d287eb';
 
 // load template
 var apis_template = fs.readFileSync(process.env.CONFIG_DIR + '/apis_template');
@@ -66,8 +65,8 @@ for (var i = 1; i <= apis_number; i++) {
   products_template_json[0].document.apis[apin] = { name: apin + ':1.0.0' };
 
 // add api to ratelimit plan
-  if (ratelimit_enable) {
-    products_template_json[0].document.plans.default.apis[apin] = {};
+  if (!ratelimit_enable) {
+    delete products_template_json[0].document.plans.default['rate-limit'];
   }
 }
 
@@ -106,7 +105,7 @@ fs.writeFile(process.env.CATALOG_DIR + '/subscriptions', JSON.stringify(subscrip
   });
 
 // start system resource monitor
-process.env.CONFIG_DIR = __dirname + '/definitions/performance';
+process.env.CONFIG_DIR = __dirname + '/../definitions/performance';
 process.env.NODE_ENV = 'production';
 process.env.APIMANAGER = '127.0.0.1';
 process.env.APIMANAGER_PORT = 8081;
