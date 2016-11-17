@@ -1,7 +1,7 @@
 ## Handlebars Policy
 
 #### Overview
-It's a policy to apply a handlebars template. Values will be taken directly from the context.
+Use the handlebars policy to apply a handlebars template. Values will be taken directly from the context.
 
 #### Properties
 See the `policy.yml`
