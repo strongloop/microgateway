@@ -66,7 +66,7 @@ for (var i = 1; i <= apis_number; i++) {
 
 // add api to ratelimit plan
   if (!ratelimit_enable) {
-    delete products_template_json[0].document.plans.default['rate-limit'];
+    delete products_template_json[0].document.plans.default['rate-limits'];
   }
 }
 
@@ -114,9 +114,9 @@ apimServer.start(
   process.env.APIMANAGER,
   process.env.APIMANAGER_PORT,
   process.env.CONFIG_DIR)
-  .then(function() {
-    return mg.start(3000);
-  })
+  //.then(function() {
+  //  return mg.start(3000);
+  //})
   .then(function() {
     return echo.start(8889);
   })
