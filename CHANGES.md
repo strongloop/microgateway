@@ -9,7 +9,6 @@
 
  * Update to use config/project modules. (Rick Curtis)
 
-
 2016-10-13, Version 1.5.6
 =========================
 
