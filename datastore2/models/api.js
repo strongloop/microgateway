@@ -73,9 +73,7 @@ function generateMatchPaths(doc) {
     var o = { path: path };
     o['regex'] = makePathRegex(doc.basePath, path);
     o['score'] = calculateMatchingScore(path);
-    o['methods'] = _.keys(def).map(function(m) {
-      return m.toUpperCase();
-    });
+    o['methods'] = _.keys(def);
 
     result.push(o);
   });
@@ -85,14 +83,15 @@ function generateMatchPaths(doc) {
 exports.server = function(model) {
 
   model.beforeAdd = function(doc) {
-    doc['api-paths'] = generateMatchPaths(doc);
+    doc['x-ibm-api-paths'] = generateMatchPaths(doc);
     return Promise.resolve(doc);
   }
 
   model.matchRequest = function(snapshotId, method, path) {
+    method = method.toLowerCase();
     return model.db.query(function(doc, emit) {
       if (doc.snapshotId !== snapshotId) return;
-      var paths = doc['api-paths'];
+      var paths = doc['x-ibm-api-paths'];
       var matches = [];
       for (var i = 0; i < paths.length; i++) {
         if (paths[i].methods.indexOf(method) > -1) {

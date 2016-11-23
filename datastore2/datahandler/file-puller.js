@@ -15,6 +15,7 @@ var targetFiles = {
 };
 FilePuller.prototype.run = function(dataStore) {
   var self = this;
+  var organization, catalog;
   return fs.readdirAsync(self.dirName)
     .reduce(function(result, fileName) {
       var modelName = targetFiles[fileName];
@@ -24,6 +25,12 @@ FilePuller.prototype.run = function(dataStore) {
         var data = JSON.parse(content);
         if (fileName === 'apis') {
           data = data.map(function(doc) {
+            organization = organization || doc.organization; // microgw only run on single org/catalog
+            catalog = catalog || doc.catalog;
+            doc.document['x-ibm-organization'] = { id: organization.id, name: organization.name };
+            doc.document['x-ibm-catalog'] = { id: catalog.id, name: catalog.name };
+            doc.document['x-ibm-api-id'] = doc.id;
+            doc.document['x-ibm-api-state'] = doc.state;
             return doc.document;
           });
         }
@@ -32,6 +39,8 @@ FilePuller.prototype.run = function(dataStore) {
       });
     }, {})
     .then(function(docs) {
+      docs.organization = [organization];
+      docs.catalog = [catalog];
       return dataStore.models.snapshot.create(docs)
     });
 }
