@@ -28,6 +28,8 @@ var apis_number = perf_config.apis;
 var path_number = perf_config.paths;
 var security_enable = perf_config.security;
 var ratelimit_enable = perf_config.ratelimit;
+var subscription_number = perf_config.subscription;
+var credentials_number = perf_config.credentials;
 
 // remove the template apis
 apis_template_json.pop();
@@ -97,6 +99,30 @@ if (security_enable) {
   delete subscriptions_template_json[0]['plan-registration'].product.organization;
   delete subscriptions_template_json[0]['plan-registration'].product.catalog;
 }
+
+//multiple subscriptions
+if (subscription_number >= 1) {
+  for (var k = 1; k <= subscription_number; k++) {
+    var subn = 'sub' + ('00' + k).substr(-2);
+
+    var subscriptions_iter = JSON.parse(JSON.stringify(subscriptions_template_json[0]));
+    subscriptions_iter.id = subn;
+    subscriptions_iter.application.id = subn + '_application_id';
+
+    for (var n = 1; n <= credentials_number; n++) {
+      var credential_iter = JSON.parse(JSON.stringify(subscriptions_iter.application['app-credentials'][0]));
+      credential_iter.id = subn + '_app-credentials_' + n;
+      credential_iter['client-id'] = subn + '_client-id_' + n;
+      credential_iter['client-secret'] = subn + '_client-secret_' + n;
+      subscriptions_iter.application['app-credentials'].push(credential_iter);
+    }
+    // remove the credential from template
+    subscriptions_iter.application['app-credentials'].shift();
+    subscriptions_template_json.push(subscriptions_iter);
+  }
+  // remove the subcription from template
+  delete subscriptions_template_json.shift();
+}
 fs.writeFile(process.env.CATALOG_DIR + '/subscriptions', JSON.stringify(subscriptions_template_json, null, 2),
   function(err) {
     if (err) {
@@ -114,15 +140,14 @@ apimServer.start(
   process.env.APIMANAGER,
   process.env.APIMANAGER_PORT,
   process.env.CONFIG_DIR)
-  //.then(function() {
-  //  return mg.start(3000);
-  //})
+  .then(function() {
+    return mg.start(3000);
+  })
   .then(function() {
     return echo.start(8889);
   })
   .catch(function(err) {
     console.error(err);
   });
-
       //TODO inject traffic
       //TODO generate report

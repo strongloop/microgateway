@@ -2,5 +2,7 @@
   "apis" : 2,
   "paths" : 3,
   "security" : true,
-  "ratelimit" : false
+  "ratelimit" : false,
+  "subscription" : 1,
+  "credentials" : 3
 }
