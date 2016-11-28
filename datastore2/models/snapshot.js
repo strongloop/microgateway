@@ -8,6 +8,9 @@ function Snapshot() {
   this.models = {};
 }
 
+
+var snapshots = [];
+
 exports.server = function(model) {
 
   model.create = function(docs) {
@@ -41,33 +44,23 @@ exports.server = function(model) {
         throw new Error('no snapshot exist');
       }
       var snapshot = result.docs[0];
-      snapshot.refcount = snapshot.refcount || 0;
-      snapshot.refcount++;
-      return model.update(snapshot).then(function(resp) {
-        if (!resp.ok) {
-          throw new Error('fail to increase snapshot refcount');
-        }
-        return snapshot.id;
-      });
+      var lastSnapshot = snapshots[0];
+      if (!lastSnapshot || lastSnapshot.id !== snapshot.id) {
+        snapshots.unshift({id: snapshot.id, refcount: 1});
+      } else {
+        lastSnapshot.refcount++;
+      }
+      return snapshot.id;
     });
   }
 
   model.releaseCurrentSnapshot = function(snapshotId) {
-    var options = {
-      selector: { id: snapshotId },
-      limit: 1
-    };
-    return model.find(options).then(function(result) {
-      if (result.docs.length === 0) {
-        throw new Error('no snapshot exist');
+    _.some(snapshots, function(snapshot) {
+      if (snapshot.id === snapshotId) {
+        snapshot.refcount--;
+        // TODO: cleanup non-latest snapshot if refcount reach 0
+        return true;
       }
-      var snapshot = result.docs[0];
-      snapshot.refcount--;
-      return model.update(snapshot).then(function(resp) {
-        if (!resp.ok) {
-          throw new Error('fail to decrease snapshot refcount');
-        }
-      });
     });
   }
 
@@ -79,13 +72,5 @@ exports.server = function(model) {
       name: 'byTimestamp',
       ddoc: 'byTimestamp'
     }
-  }).then(function(d) {
-    return model.db.createIndex({
-      index: {
-        fields: ['id'],
-        name: 'byId',
-        ddoc: 'byId'
-      }
-    });
-  })
+  });
 }
