@@ -84,38 +84,38 @@ exports.server = function(model) {
 
   model.beforeAdd = function(doc) {
     doc['x-ibm-api-paths'] = generateMatchPaths(doc);
-    return Promise.resolve(doc);
+    return doc;
   }
 
   model.matchRequest = function(snapshotId, method, path) {
     method = method.toLowerCase();
-    return model.db.query(function(doc, emit) {
-      if (doc.snapshotId !== snapshotId) return;
-      var paths = doc['x-ibm-api-paths'];
-      var matches = [];
-      for (var i = 0; i < paths.length; i++) {
-        if (paths[i].methods.indexOf(method) > -1) {
-          var re = new RegExp(paths[i].regex);
-          if (re.test(path)) {
-            matches.push({
-              doc: doc,
-              path: paths[i].path,
-              method: method,
-              score: paths[i].score
-            });
+    var targets = [];
+    model.db.where(function(doc) {
+        if (doc.snapshotId !== snapshotId) return;
+        var paths = doc['x-ibm-api-paths'];
+        var matches = [];
+        for (var i = 0; i < paths.length; i++) {
+          if (paths[i].methods.indexOf(method) > -1) {
+            var re = new RegExp(paths[i].regex);
+            if (re.test(path)) {
+              matches.push({
+                doc: doc,
+                path: paths[i].path,
+                method: method,
+                score: paths[i].score
+              });
+            }
           }
         }
-      }
-      var target = null;
-      for (var i = 0; i < matches.length; i++) {
-        if (!target || matches[i].score < target.score)
-          target = matches[i];
-      }
-      if (target) emit(target);
-    }).then(function(result) {
-      return result.rows.sort(function(a, b) {
-        return b.key.score - a.key.score;
-      }).map(function(d) { return d.key });
+        var target = null;
+        for (var i = 0; i < matches.length; i++) {
+          if (!target || matches[i].score < target.score)
+            target = matches[i];
+        }
+        if (target) targets.push(target);
+      });
+    return targets.sort(function(a, b) {
+      return b.score - a.score;
     });
   }
 
@@ -152,7 +152,7 @@ exports.remote = function(model) {
   model.matchRequest = function(path) {
     return model.request('/matchRequest?snapshotId=' + snapshotId + '&path=' + path);
   }
-  
+
   model.findByPath = function(path) {
     return model.request('/findByPath?path=' + path);
   }

@@ -135,9 +135,7 @@
     "type-is": "^1.6.11",
     "uid-safe": "^2.1.1",
     "wlpn-password": "^1.0.0",
-    "pouchdb": "^6.0.7",
-    "pouchdb-memory": "^6.0.0",
-    "pouchdb-find": "^0.10.3",
+    "lokijs": "^1.4.1",
     "pluralize": "^3.0.0",
     "yamljs": "^0.2.4"
   },
