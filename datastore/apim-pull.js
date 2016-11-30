@@ -87,7 +87,7 @@ function apimpull(opts, cb) {
     try {
       indirFiles = fs.readdirSync(opts.indir);
     } catch (e) {
-      logger.error(e);
+      logger.info(e);
       // not fatal; continue
     }
   }
