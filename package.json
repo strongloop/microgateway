@@ -85,8 +85,9 @@
     "touch": "^1.0.0"
   },
   "dependencies": {
-    "apiconnect-cli-config": "^2.x",
     "apiconnect-cli-logger": "^1.x",
+    "apiconnect-config": "^1.x",
+    "apiconnect-project": "^1.x",
     "async": "^1.5.2",
     "auth-header": "^0.2.2",
     "basic-auth": "^1.0.3",
