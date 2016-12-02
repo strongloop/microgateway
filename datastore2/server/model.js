@@ -4,8 +4,8 @@ var pluralize = require('pluralize');
 var _ = require('lodash');
 var loki = require('lokijs');
 var store = new loki('datastore');
-// PouchDB.plugin(require('pouchdb-find'));
-
+var events = require('events');
+var util = require('util');
 
 function Model(name, dataStore) {
   if (!(this instanceof Model)) {
@@ -17,6 +17,8 @@ function Model(name, dataStore) {
   this.db = store.addCollection(name);
 }
 
+util.inherits(Model, events.EventEmitter);
+
 Model.prototype.addHook = function(hook) {
   if (typeof hook !== 'string')
     throw new Error('Model hook should be string for the module name')
@@ -25,19 +27,15 @@ Model.prototype.addHook = function(hook) {
     return model.server(this);
 }
 
-Model.prototype.beforeAdd = function(doc) {
-  return doc;
-}
-
 Model.prototype.add = function(doc) {
   var self = this;
   if (_.isArray(doc)) {
-    var docs = doc.map(function(d) {
-      return self.beforeAdd(d);
+    doc.forEach(function(d) {
+      self.emit('before add', d);
     });
-    return self.db.insert(docs);
+    return self.db.insert(doc);
   } else {
-    self.beforeAdd(doc);
+    self.emit('before add', doc);
     return self.db.insert(doc);
   }
 }

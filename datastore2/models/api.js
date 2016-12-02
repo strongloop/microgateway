@@ -82,10 +82,9 @@ function generateMatchPaths(doc) {
 
 exports.server = function(model) {
 
-  model.beforeAdd = function(doc) {
+  model.on('before add', function(doc) {
     doc['x-ibm-api-paths'] = generateMatchPaths(doc);
-    return doc;
-  }
+  });
 
   model.matchRequest = function(snapshotId, method, path) {
     method = method.toLowerCase();
