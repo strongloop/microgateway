@@ -9,7 +9,7 @@ var path = require('path');
 var fs = require('fs');
 var logger = require('apiconnect-cli-logger/logger.js')
                   .child({ loc: 'microgateway:datastore:common:utils' });
-var cliConfig = require('apiconnect-cli-config');
+var project = require('apiconnect-project');
 
 exports.storeDataStorePort = function(port) {
   var localPath = getDataStorePath();
@@ -47,7 +47,7 @@ function getDataStorePath() {
 
   var localPath = '.datastore';
   if (process.env.ORIG_CONFIG_DIR) {
-    var projectInfo = cliConfig.inspectPath(process.env.ORIG_CONFIG_DIR);
+    var projectInfo = project.inspectPath(process.env.ORIG_CONFIG_DIR);
     localPath = path.join(projectInfo.basePath, localPath);
   }
   logger.debug('.datastore path:', localPath);
