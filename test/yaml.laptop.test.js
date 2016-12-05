@@ -111,15 +111,17 @@ describe('Monitor modification on yaml files', function() {
   });
 
   it('test file monitor after change', function(done) {
-    var payload = 'hello world';
-    request
-      .put('/laptop/yaml/monitor')
-      .type('text/plain')
-      .send(payload)
-      .end(function(err, res) {
-        assert(!err, 'Unexpected error with context unit tests');
-        assert.deepEqual(res.text, 'hello world');
-        done();
-      });
+    setTimeout(function() {
+      var payload = 'hello world';
+      request
+        .put('/laptop/yaml/monitor')
+        .type('text/plain')
+        .send(payload)
+        .end(function(err, res) {
+          assert(!err, 'Unexpected error with context unit tests');
+          assert.deepEqual(res.text, 'hello world');
+          done();
+        });
+    }, 10000);
   });
 });
