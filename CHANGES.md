@@ -1,4 +1,16 @@
-2016-10-14, Version 1.5.6
+2016-12-06, Version 1.6.1
+=========================
+
+ * Ensure config/default dir is created (Daniel Badt)
+
+ * Fix git url (Krishna Raman)
+
+ * Add timeout to failing test. (Rick Curtis)
+
+ * Update to use config/project modules. (Rick Curtis)
+
+
+2016-10-13, Version 1.5.6
 =========================
 
  * Fix writeFileSync calls (Daniel Badt)
