@@ -119,40 +119,22 @@ exports.server = function(model) {
   }
 
   model.app.get('/matchRequest', function(req, res, next) {
-    model.matchRequest(req.query.snapshotId, req.method, req.query.path).then(function(result) {
-      res.send(result);
-      next();
-    }).catch(function(e) {
-      next(e);
-    });
-  });
 
-  // Server side implmentation for /findByPath
-  model.findByPath = function(path) {
-    var options = {selector: {}};
-    options.selector['paths.' + path] = { $exists: true};
-    return model.find(options);
-  }
-
-  model.app.get('/findByPath', function(req, res, next) {
-    model.findByPath(req.query.path).then(function(result) {
-      res.send(result);
-      next();
-    }).catch(function(e) {
-      next(e);
-    });
+    var apis = model.matchRequest(req.query.snapshotId, req.method, req.query.path);
+    res.send(apis);
+    next();
   });
 
 }
 
 // Remote method interface
 exports.remote = function(model) {
-  // TODO: model.request() not implemented yet
-  model.matchRequest = function(path) {
-    return model.request('/matchRequest?snapshotId=' + snapshotId + '&path=' + path);
+  model.matchRequest = function(snapshotId, method, path) {
+    return model.request({
+      method: 'GET',
+      uri: '/matchRequest',
+      qs: { snapshotId: snapshotId, method: method, path: path }
+    });
   }
 
-  model.findByPath = function(path) {
-    return model.request('/findByPath?path=' + path);
-  }
 }
