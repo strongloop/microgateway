@@ -1,3 +1,11 @@
+2016-12-08, Version 1.5.9
+=========================
+
+ * update shrinkwrap (Joseph Tary)
+
+ * Ensure config/default dir is created (Daniel Badt)
+
+
 2016-10-28, Version 1.5.8
 =========================
 
