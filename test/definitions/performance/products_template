@@ -67,9 +67,11 @@
           "title": "Default Plan",
           "description": "Default Plan",
           "approval": false,
-          "rate-limit": {
-            "hard-limit": false,
-            "value": "100/hour"
+          "rate-limits": {
+            "rate-limit-1": {
+              "hard-limit": false,
+              "value": "100/hour"
+            }
           }
         }
       }
