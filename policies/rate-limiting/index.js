@@ -8,8 +8,8 @@ var redisLimiter = require('./redis');
 var tokenBucketLimiter = require('./token-bucket');
 var logger = require('apiconnect-cli-logger/logger.js')
         .child({ loc: 'microgateway:policies:rate-limiting' });
-var env = require('../../utils/environment');
-var getInterval = require('./get-interval');
+var env = require('microgateway-util/utils/environment.js');
+var getInterval = require('microgateway-util/rate-limiting/get-interval.js');
 
 module.exports = function(options) {
   options = options || {};
