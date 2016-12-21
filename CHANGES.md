@@ -1,4 +1,15 @@
-2016-11-23, Version 1.6.0
+2016-12-06, Version 1.6.1
+=========================
+
+ * Ensure config/default dir is created (Daniel Badt)
+
+ * Fix git url (Krishna Raman)
+
+ * Add timeout to failing test. (Rick Curtis)
+
+ * Update to use config/project modules. (Rick Curtis)
+
+2016-10-13, Version 1.5.6
 =========================
 
  * Fix writeFileSync calls (Daniel Badt)
@@ -8,6 +19,10 @@
  * Misc. fixes for webhooks (Daniel Badt)
 
  * Update the datastore/README.md (juangmj)
+
+
+2016-10-11, Version 1.5.5
+=========================
 
  * this is the current template for readme files (Om Goeckermann)
 
@@ -20,6 +35,9 @@
  * monitor local files for laptop experience (Clement)
 
  * Fix issue with webhooks unsubscribe (Daniel Badt)
+
+2016-10-06, Version 1.5.4
+=========================
 
  * Update README.md (Om Goeckermann)
 

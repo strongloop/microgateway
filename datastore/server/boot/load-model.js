@@ -32,7 +32,7 @@ var LAPTOP_RATELIMIT = environment.LAPTOP_RATELIMIT;
 var WH_SUBSCRIBE = 0;
 var WH_UNSUBSCRIBE = 1;
 
-var cliConfig = require('apiconnect-cli-config');
+var project = require('apiconnect-project');
 
 var rootConfigPath = path.join(__dirname, '../../../config');
 var definitionsDir = path.join(rootConfigPath, 'default');
@@ -780,7 +780,7 @@ function loadConfigFromFS(app, apimanager, models, dir, uid, cb) {
     var cfg = readApicConfig(dir);
 
     //read the YAML files
-    cliConfig.loadProject(dir).then(function(artifacts) {
+    project.loadProject(dir).then(function(artifacts) {
       logger.debug('%j', artifacts);
       artifacts.forEach(
         function(artifact) {
