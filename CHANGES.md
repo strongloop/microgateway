@@ -1,7 +1,8 @@
 20##-##-##, Version 1.#.#
 =========================
- * split out datastore into separate repo
-
+ * Split out datastore into separate repo
+ 
+ * Fix message levels (error -> info)
 
 
 
