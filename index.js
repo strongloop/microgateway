@@ -20,7 +20,7 @@ try {
     env[k] = envjson[k];
   });
 } catch (e) {
-  logger.error('Fail to load environment variables: ', e);
+  logger.info('Fail to load environment variables: ', e);
 }
 
 Object.keys(env).forEach(function(k) {

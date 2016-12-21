@@ -6,14 +6,14 @@ management, monitization, and enforcement. The microgateway is fundamentally
 a proxy, securing and forwarding requests to backend APIs.
 
 It was created using StrongLoop technology and a series of middleware
-components. The package is customized to work with the apiconnect 
+components. The package is customized to work with the IBM API Connect 
 infrastructure that automatically communicates with the micro gateway to
 dynamically load APIs, Products, and Plans so that APIs are secured and
 processed in a seamless fashion.
 
 # Installation
 In the apiconnect laptop experience, the microgateway is automatically
-downloaded and setup by the laptop run and start functions. You do not
+downloaded and set up by the laptop run and start functions. You do not
 need to manually download and install it.
 
 If you would like to use `microgateway` as a standalone gateway,
