@@ -1,7 +1,7 @@
 # IBM API Connect Micro Gateway Data Store
 
 ## What is it?
-The data store is a loopback application for the data model of all API Connect artifacts needed by the Micro Gateway at runtime.  The data store is essential for proper API enforcement by the Micro Gateway, as the Micro Gateway queries the data store with each received request to determine the proper behavior where the desired behavior is defined by the content of the artifacts.
+The data store is a loopback application for the data model of all API Connect artifacts needed by the Micro Gateway at runtime.  The data store is essential proper API enforcement by the Micro Gateway, as the Micro Gateway queries the data store with each received request to determine the proper behavior where the desired behavior is defined by the content of the artifacts.
 
 ## How does it work?
 The artifacts consumed by the data store are created in one of the following ways:
