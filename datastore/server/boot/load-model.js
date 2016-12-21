@@ -424,21 +424,19 @@ function decryptAPIMResponse(body, private_key) {
 function webhooksSubscribe(app, apimanager, operation, cb) {
   logger.debug('webhooksSubscribe entry');
 
-  var whMethod, whTitle, whVerb, whStatusCode, whLogLevel;
+  var whMethod, whTitle, whVerb, whStatusCode;
   switch (operation) {
     case WH_SUBSCRIBE:
       whMethod = 'POST';
       whTitle = 'This is a webhook subscription for the a catalog, subscribing to all available events specifically';
       whVerb = 'subscribe';
       whStatusCode = 201;
-      whLogLevel = 'error';
       break;
     case WH_UNSUBSCRIBE:
       whMethod = 'DELETE';
       whTitle = 'This is a webhook unsubscribe for the a catalog, unsubscribing to all available events specifically';
       whVerb = 'unsubscribe';
       whStatusCode = 204;
-      whLogLevel = 'info';
       break;
     default:
       cb(new Error('Internal error during webhooks subscribe/unsubscribe'));
@@ -501,7 +499,7 @@ function webhooksSubscribe(app, apimanager, operation, cb) {
 
         logger.debug('statusCode: ' + res.statusCode);
         if (res.statusCode !== whStatusCode) {
-          logger[whLogLevel](webhooksSubUrl, ' failed with: ', res.statusCode);
+          logger.error(webhooksSubUrl, ' failed with: ', res.statusCode);
           currentWebhook = undefined;
           return callback(new Error(webhooksSubUrl + ' failed with: ' + res.statusCode));
         } else if (operation === WH_SUBSCRIBE) {
@@ -520,7 +518,7 @@ function webhooksSubscribe(app, apimanager, operation, cb) {
     function(err) {
       if (err) {
         apimanager.webhooksOk = false;
-        logger[whLogLevel]('Unsuccessful webhooks ' + whVerb + ' with API Connect server');
+        logger.error('Unsuccessful webhooks ' + whVerb + ' with API Connect server');
       } else {
         apimanager.webhooksOk = true;
         logger.info('Successful webhooks ' + whVerb + ' with API Connect server');
