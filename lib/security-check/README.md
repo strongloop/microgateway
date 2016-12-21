@@ -1,4 +1,4 @@
-In the `security-check` middleware, the information used to determine an API
+In the `security-check` middlware, the information used to determine an API
 match are the client Id/Secret, HTTP authorization header, or oauth2 access
 token. These credentials are validated in accordance with the swagger security
 requirements of individual API definitions.
