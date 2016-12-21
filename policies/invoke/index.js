@@ -8,7 +8,7 @@ var _ = require('lodash');
 var url = require('url');
 var qs = require('qs');
 var zlib = require('zlib');
-var dsc = require('../../datastore/client');
+var dsc = require('microgateway-datastore/client/index.js');
 
 ////one-time effort: read the cipher table into memory
 //var cipherTable;
