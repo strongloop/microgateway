@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "jscs ./",
+    "postinstall": "node utils/genkeycert",
     "pretest": "eslint ./",
     "start": "node .",
     "test": "mocha -t 600000"
@@ -138,6 +139,7 @@
     "type-is": "^1.6.11",
     "uid-safe": "^2.1.1",
     "wlpn-password": "^1.0.0",
+    "pem": "^1.8.3",
     "yamljs": "^0.2.4"
   },
   "APIConnectGateway": "1.0.0"
