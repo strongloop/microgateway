@@ -4,7 +4,7 @@
  
  * Fix message levels (error -> info)
 
-
+	* Remove key/cert and autogen in postinstall phase
 
 2016-12-06, Version 1.6.1
 =========================
