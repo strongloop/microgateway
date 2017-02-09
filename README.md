@@ -60,12 +60,12 @@ select the first rule where the condition evaluates to True.
 inspect the transaction
 * **set-variable** – Set a variable in the context
 
-# API Design Toolkit 
+# API Designer Toolkit 
 
 The API Designer toolkit provides a graphical interface for the 
 MicroGateway. You can download it using NPM via 
 `npm install -g apiconnect`. This toolkit can be also be used for 
-creating enterprise API defenitions using IBM API Connect, which 
+creating enterprise API definitions using IBM API Connect, which 
 provides features to create and manage APIs on an enterprise scale. 
 For more information, see https://developer.ibm.com/apiconnect/. 
 
