@@ -6,9 +6,9 @@ info:
   version: 1.0.0
   description: Handlebars Policy
   contact:
-    name: IBM API Management
+    name: IBM API Connect
     email: ibmapi@us.ibm.com
-    url: http://www.ibm.com/apimanagement
+    url: http://www.ibm.com/apiconnect
 
 gateways:
   - micro-gateway

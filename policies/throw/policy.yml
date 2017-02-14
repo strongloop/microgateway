@@ -6,9 +6,9 @@ info:
   version: 1.0.0
   description: Throw policy for the IBM API Connect
   contact:
-    name: IBM API Mesh Samples
-    url: https://www.ibm.com/apimesh
-    email: steve-product-manager@ibm.com
+    name: IBM API Connect
+    url: https://www.ibm.com/apiconnect
+    email: ibmapi@us.ibm.com
 
 properties:
   type: "object"
