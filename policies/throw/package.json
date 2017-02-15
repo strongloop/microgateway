@@ -7,11 +7,10 @@
     "policy",
     "api",
     "apiconnect",
-    "mesh",
     "throw"
   ],
   "author": "IBM",
-  "license": "ISC",
+  "license": "Apache 2.0",
   "dependencies": {
     "debug": "^2.x"
   },

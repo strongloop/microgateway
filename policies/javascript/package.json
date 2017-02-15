@@ -6,7 +6,6 @@
   "keywords": [
     "policy",
     "api",
-    "mesh",
     "javascript"
   ],
   "scripts": {
@@ -17,5 +16,5 @@
     "lodash": "^4.5.1"
   },
   "author": "IBM",
-  "license": "ISC"
+  "license": "Apache 2.0"
 }
