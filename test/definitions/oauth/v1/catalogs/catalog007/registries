@@ -2,7 +2,7 @@
     {
         "$note$": "tenant1.xml",
         "id": "registry1",
-        "url": "https://mgmt-lb:7203/v1/catalogs/catalog008/registries/registry1",
+        "url": "https://example.com:7203/v1/catalogs/catalog008/registries/registry1",
         "name": "ldap200",
         "title": "ldap200",
         "description": "OpenLDAP with Compose DN + Dynamic Group Authorization",
@@ -23,7 +23,7 @@
     {
         "$note$": "tenant1.xml",
         "id": "registry2",
-        "url": "https://mgmt-lb:7203/v1/catalogs/catalog008/registries/registry2",
+        "url": "https://example.com:7203/v1/catalogs/catalog008/registries/registry2",
         "name": "ldap203",
         "title": "ldap203",
         "description": "OpenLDAP with Compose DN + Dynamic Group Authorization",

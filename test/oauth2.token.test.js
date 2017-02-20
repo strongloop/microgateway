@@ -470,7 +470,7 @@ describe('oauth2 token API', function() {
         });
     });
 
-    //skip this for the LDAP server "dpautosrv1.dp.rtp.raleigh.ibm.com" is
+    //skip this for the LDAP server "example.com" is
     //sometimes not reachable.
     it.skip('user registry (LDAP) ok', function(done) {
       var data = {
@@ -499,7 +499,7 @@ describe('oauth2 token API', function() {
         });
     });
 
-    //skip this for the LDAP server "dpautosrv1.dp.rtp.raleigh.ibm.com" is
+    //skip this for the LDAP server "example.com" is
     //sometimes not reachable.
     it.skip('user registry (LDAP) incorrect password', function(done) {
       var data = {

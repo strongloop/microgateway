@@ -23,7 +23,7 @@
       "name": "foo-catalog",
       "sandbox": true,
       "title": "fooCatalog",
-      "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+      "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
       "portal-type": "BASIC",
       "gateway-url": "https://<gateway-cluster-address>/myOrg/foo-catalog",
       "is-saas": false
@@ -47,7 +47,7 @@
       "apis": [
         {
           "id": "5762173fe4b076e106cb6247",
-          "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb6247",
+          "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb6247",
           "state": "running",
           "organization": {
             "id": "573ada4ce4b091411e1e7b8f",
@@ -58,7 +58,7 @@
           },
           "catalog": {
             "id": "573d26bae4b091411e1e7bad",
-            "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+            "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
             "name": "foo-catalog",
             "title": "fooCatalog",
             "sandbox": true,
@@ -177,7 +177,7 @@
         },
         {
           "id": "5762173ee4b076e106cb6246",
-          "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173ee4b076e106cb6246",
+          "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173ee4b076e106cb6246",
           "state": "running",
           "organization": {
             "id": "573ada4ce4b091411e1e7b8f",
@@ -188,7 +188,7 @@
           },
           "catalog": {
             "id": "573d26bae4b091411e1e7bad",
-            "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+            "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
             "name": "foo-catalog",
             "title": "fooCatalog",
             "sandbox": true,
@@ -298,7 +298,7 @@
         },
         {
           "id": "5762173fe4b076e106cb6249",
-          "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb6249",
+          "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb6249",
           "state": "running",
           "organization": {
             "id": "573ada4ce4b091411e1e7b8f",
@@ -309,7 +309,7 @@
           },
           "catalog": {
             "id": "573d26bae4b091411e1e7bad",
-            "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+            "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
             "name": "foo-catalog",
             "title": "fooCatalog",
             "sandbox": true,
@@ -491,7 +491,7 @@
         },
         {
           "id": "5762173fe4b076e106cb6248",
-          "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb6248",
+          "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb6248",
           "state": "running",
           "organization": {
             "id": "573ada4ce4b091411e1e7b8f",
@@ -502,7 +502,7 @@
           },
           "catalog": {
             "id": "573d26bae4b091411e1e7bad",
-            "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+            "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
             "name": "foo-catalog",
             "title": "fooCatalog",
             "sandbox": true,
@@ -824,7 +824,7 @@
         },
         {
           "id": "5762173fe4b076e106cb624a",
-          "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb624a",
+          "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb624a",
           "state": "running",
           "organization": {
             "id": "573ada4ce4b091411e1e7b8f",
@@ -835,7 +835,7 @@
           },
           "catalog": {
             "id": "573d26bae4b091411e1e7bad",
-            "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+            "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
             "name": "foo-catalog",
             "title": "fooCatalog",
             "sandbox": true,
@@ -1014,7 +1014,7 @@
         },
         {
           "id": "5762173fe4b076e106cb624b",
-          "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb624b",
+          "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb624b",
           "state": "running",
           "organization": {
             "id": "573ada4ce4b091411e1e7b8f",
@@ -1025,7 +1025,7 @@
           },
           "catalog": {
             "id": "573d26bae4b091411e1e7bad",
-            "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+            "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
             "name": "foo-catalog",
             "title": "fooCatalog",
             "sandbox": true,
@@ -1309,7 +1309,7 @@
         }
       }
     },
-    "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/subscriptions/5762175ce4b076e106cb62ef"
+    "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad/subscriptions/5762175ce4b076e106cb62ef"
   },
   {
     "active": true,
@@ -1335,7 +1335,7 @@
       "name": "foo-catalog",
       "sandbox": true,
       "title": "fooCatalog",
-      "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+      "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
       "portal-type": "BASIC",
       "gateway-url": "https://<gateway-cluster-address>/myOrg/foo-catalog",
       "is-saas": false
@@ -1359,7 +1359,7 @@
       "apis": [
         {
           "id": "5762173fe4b076e106cb6247",
-          "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb6247",
+          "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb6247",
           "state": "running",
           "organization": {
             "id": "573ada4ce4b091411e1e7b8f",
@@ -1370,7 +1370,7 @@
           },
           "catalog": {
             "id": "573d26bae4b091411e1e7bad",
-            "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+            "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
             "name": "foo-catalog",
             "title": "fooCatalog",
             "sandbox": true,
@@ -1489,7 +1489,7 @@
         },
         {
           "id": "5762173ee4b076e106cb6246",
-          "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173ee4b076e106cb6246",
+          "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173ee4b076e106cb6246",
           "state": "running",
           "organization": {
             "id": "573ada4ce4b091411e1e7b8f",
@@ -1500,7 +1500,7 @@
           },
           "catalog": {
             "id": "573d26bae4b091411e1e7bad",
-            "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+            "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
             "name": "foo-catalog",
             "title": "fooCatalog",
             "sandbox": true,
@@ -1610,7 +1610,7 @@
         },
         {
           "id": "5762173fe4b076e106cb6248",
-          "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb6248",
+          "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad/apis/5762173fe4b076e106cb6248",
           "state": "running",
           "organization": {
             "id": "573ada4ce4b091411e1e7b8f",
@@ -1621,7 +1621,7 @@
           },
           "catalog": {
             "id": "573d26bae4b091411e1e7bad",
-            "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
+            "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad",
             "name": "foo-catalog",
             "title": "fooCatalog",
             "sandbox": true,
@@ -2040,6 +2040,6 @@
         }
       }
     },
-    "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/subscriptions/5762178de4b076e106cb6309"
+    "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad/subscriptions/5762178de4b076e106cb6309"
   }
 ]
