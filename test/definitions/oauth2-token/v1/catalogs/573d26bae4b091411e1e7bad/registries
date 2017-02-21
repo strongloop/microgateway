@@ -1,14 +1,14 @@
 [
   {
     "id":"574ea9c7e4b076e106cb4432",
-    "url":"https://dpvm210.tw.ibm.com/v1/catalogs/573d26bae4b091411e1e7bad/registries/574ea9c7e4b076e106cb4432",
+    "url":"https://example.com/v1/catalogs/573d26bae4b091411e1e7bad/registries/574ea9c7e4b076e106cb4432",
     "type":"ldap",
     "name":"userauth-ldap",
     "title":"UserAuth LDAP",
     "description":"",
     "org-id":"573ada4ce4b091411e1e7b8f",
     "ldap-config":{
-      "host":"dpautosrv1.dp.rtp.raleigh.ibm.com",
+      "host":"example.com",
       "port":389,
       "ssl":false,
       "authenticated-bind-admin-password":"dp40test",

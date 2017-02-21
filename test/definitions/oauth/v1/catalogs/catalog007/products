@@ -1,7 +1,7 @@
 [
     {
         "id": "product1",
-        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/catalog007/products/product1",
+        "url": "https://example.com/v1/catalogs/catalog007/products/product1",
         "state": "published",
         "visibility": {},
         "organization": {},
@@ -120,7 +120,7 @@
     },
     {
         "id": "product2",
-        "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/catalog007/products/product2",
+        "url": "https://example.com/v1/catalogs/catalog007/products/product2",
         "state": "published",
         "visibility": {},
         "organization": {},

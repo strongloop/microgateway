@@ -1,7 +1,7 @@
 [
   {
     "id":"575fca2ce4b076e106cb597b",
-    "url":"https://dpvm210.tw.ibm.com/v1/catalogs/573d26bae4b091411e1e7bad/tls-profiles/575fca2ce4b076e106cb597b",
+    "url":"https://example.com/v1/catalogs/573d26bae4b091411e1e7bad/tls-profiles/575fca2ce4b076e106cb597b",
     "name":"https-auth-tls-profile",
     "title":"HTTPS Auth TLS Profile",
     "description":"",

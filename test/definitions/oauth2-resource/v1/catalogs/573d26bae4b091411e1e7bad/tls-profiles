@@ -1,7 +1,7 @@
 [
   {
     "id": "574ea857e4b076e106cb4425",
-    "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/tls-profiles/574ea857e4b076e106cb4425",
+    "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad/tls-profiles/574ea857e4b076e106cb4425",
     "name": "tls-profile-no-mutual-auth",
     "title": "TLS Profile with no Mutal Auth",
     "description": "",
@@ -23,7 +23,7 @@
   },
   {
     "id": "575fca2ce4b076e106cb597b",
-    "url": "https://dpvm210.tw.ibm.com:443/v1/catalogs/573d26bae4b091411e1e7bad/tls-profiles/575fca2ce4b076e106cb597b",
+    "url": "https://example.com:443/v1/catalogs/573d26bae4b091411e1e7bad/tls-profiles/575fca2ce4b076e106cb597b",
     "name": "https-auth-tls-profile",
     "title": "HTTPS Auth TLS Profile",
     "description": "",
