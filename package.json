@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "lint": "jscs ./",
-    "postinstall": "node utils/genkeycert",
     "pretest": "eslint ./",
     "start": "node .",
     "test": "mocha -t 600000"
