@@ -1,7 +1,7 @@
 [
    {
       "id": "564b7b3ae4b0869c782eddaf",
-      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
+      "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
       "state": "published",
       "visibility": {
          "view": {
@@ -24,7 +24,7 @@
       },
       "catalog": {
          "id": "564b48aae4b0869c782edc2b",
-         "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+         "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b",
          "name": "sb",
          "title": "Sandbox",
          "sandbox": true,
@@ -72,7 +72,7 @@
    },
    {
       "id": "564b7b3ae4b0869c782eddaf",
-      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
+      "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
       "state": "published",
       "visibility": {
          "view": {
@@ -95,7 +95,7 @@
       },
       "catalog": {
          "id": "564b48aae4b0869c782edc2b",
-         "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+         "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b",
          "name": "sb",
          "title": "Sandbox",
          "sandbox": true,
@@ -143,7 +143,7 @@
    },
    {
       "id": "564b7b3ae4b0869c782eddaf",
-      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
+      "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
       "state": "published",
       "visibility": {
          "view": {
@@ -166,7 +166,7 @@
       },
       "catalog": {
          "id": "564b48aae4b0869c782edc2b",
-         "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+         "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b",
          "name": "sb",
          "title": "Sandbox",
          "sandbox": true,
@@ -214,7 +214,7 @@
    },
    {
       "id": "564b7b3ae4b0869c782eddaf",
-      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
+      "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
       "state": "published",
       "visibility": {
          "view": {
@@ -237,7 +237,7 @@
       },
       "catalog": {
          "id": "564b48aae4b0869c782edc2b",
-         "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+         "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b",
          "name": "sb",
          "title": "Sandbox",
          "sandbox": true,
@@ -285,7 +285,7 @@
    },
    {
       "id": "564b7b3ae4b0869c782eddaf",
-      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
+      "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
       "state": "published",
       "visibility": {
          "view": {
@@ -308,7 +308,7 @@
       },
       "catalog": {
          "id": "564b48aae4b0869c782edc2b",
-         "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+         "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b",
          "name": "sb",
          "title": "Sandbox",
          "sandbox": true,
@@ -356,7 +356,7 @@
    },
    {
       "id": "564b7b3ae4b0869c782eddaf",
-      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
+      "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
       "state": "published",
       "visibility": {
          "view": {
@@ -379,7 +379,7 @@
       },
       "catalog": {
          "id": "564b48aae4b0869c782edc2b",
-         "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+         "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b",
          "name": "sb",
          "title": "Sandbox",
          "sandbox": true,
@@ -427,7 +427,7 @@
    },
    {
       "id": "564b7b3ae4b0869c782eddaf",
-      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
+      "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
       "state": "published",
       "visibility": {
          "view": {
@@ -450,7 +450,7 @@
       },
       "catalog": {
          "id": "564b48aae4b0869c782edc2b",
-         "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+         "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b",
          "name": "sb",
          "title": "Sandbox",
          "sandbox": true,
@@ -498,7 +498,7 @@
    },
    {
       "id": "564b7b3ae4b0869c782eddaf",
-      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
+      "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
       "state": "published",
       "visibility": {
          "view": {
@@ -521,7 +521,7 @@
       },
       "catalog": {
          "id": "564b48aae4b0869c782edc2b",
-         "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+         "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b",
          "name": "sb",
          "title": "Sandbox",
          "sandbox": true,
@@ -569,7 +569,7 @@
    },
    {
       "id": "564b7b3ae4b0869c782eddaf",
-      "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
+      "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/products/564b7b3ae4b0869c782eddaf",
       "state": "published",
       "visibility": {
          "view": {
@@ -592,7 +592,7 @@
       },
       "catalog": {
          "id": "564b48aae4b0869c782edc2b",
-         "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b",
+         "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b",
          "name": "sb",
          "title": "Sandbox",
          "sandbox": true,

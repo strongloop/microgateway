@@ -1,7 +1,7 @@
 [
   {
     "id": "subscr1",
-    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/catalog007/subscriptions/subscr1",
+    "url": "https://example.com/v1/catalogs/catalog007/subscriptions/subscr1",
     "organization": {},
     "catalog": {},
     "active": true,
@@ -153,7 +153,7 @@
   },
   {
     "id": "subscr2",
-    "url": "https://mgmt-lb/v1/catalogs/catalog007/subscriptions/subscr2",
+    "url": "https://example.com/v1/catalogs/catalog007/subscriptions/subscr2",
     "organization": {},
     "catalog": {},
     "active": true,
@@ -304,7 +304,7 @@
   },
   {
     "id": "subscr3",
-    "url": "https://mgmt-lb/v1/catalogs/catalog007/subscriptions/subscr3",
+    "url": "https://example.com/v1/catalogs/catalog007/subscriptions/subscr3",
     "organization": {},
     "catalog": {},
     "active": true,

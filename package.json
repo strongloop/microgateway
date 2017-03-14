@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:strongloop/microgateway.git"
+    "url": "git+https://github.com/strongloop/microgateway.git"
   },
   "keywords": [
     "ibm",
@@ -121,6 +121,8 @@
     "loopback-component-explorer": "^2.3.0",
     "loopback-connector-redis": "0.0.3",
     "lru-cache": "^4.0.0",
+    "microgateway-datastore": "^1.x",
+    "microgateway-util": "^1.x",
     "moment": "^2.11.2",
     "multer": "^1.1.0",
     "osenv": "^0.1.3",
@@ -136,6 +138,7 @@
     "type-is": "^1.6.11",
     "uid-safe": "^2.1.1",
     "wlpn-password": "^1.0.0",
+    "pem": "^1.8.3",
     "yamljs": "^0.2.4"
   },
   "APIConnectGateway": "1.0.0"

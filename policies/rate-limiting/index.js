@@ -1,15 +1,15 @@
-// Copyright IBM Corp. 2016. All Rights Reserved.
+// © Copyright IBM Corporation 2016,2017.
 // Node module: microgateway
-// US Government Users Restricted Rights - Use, duplication or disclosure
-// restricted by GSA ADP Schedule Contract with IBM Corp.
+// LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
+
 
 'use strict';
 var redisLimiter = require('./redis');
 var tokenBucketLimiter = require('./token-bucket');
 var logger = require('apiconnect-cli-logger/logger.js')
         .child({ loc: 'microgateway:policies:rate-limiting' });
-var env = require('../../utils/environment');
-var getInterval = require('./get-interval');
+var env = require('microgateway-util/utils/environment.js');
+var getInterval = require('microgateway-util/rate-limiting/get-interval.js');
 
 module.exports = function(options) {
   options = options || {};

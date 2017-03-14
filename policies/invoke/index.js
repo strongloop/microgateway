@@ -1,14 +1,14 @@
-// Copyright IBM Corp. 2016. All Rights Reserved.
+// © Copyright IBM Corporation 2016,2017.
 // Node module: microgateway
-// US Government Users Restricted Rights - Use, duplication or disclosure
-// restricted by GSA ADP Schedule Contract with IBM Corp.
+// LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
+
 
 'use strict';
 var _ = require('lodash');
 var url = require('url');
 var qs = require('qs');
 var zlib = require('zlib');
-var dsc = require('../../datastore/client');
+var dsc = require('microgateway-datastore/client/index.js');
 
 ////one-time effort: read the cipher table into memory
 //var cipherTable;

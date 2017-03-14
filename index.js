@@ -1,7 +1,6 @@
-// Copyright IBM Corp. 2016. All Rights Reserved.
+// © Copyright IBM Corporation 2016,2017.
 // Node module: microgateway
-// US Government Users Restricted Rights - Use, duplication or disclosure
-// restricted by GSA ADP Schedule Contract with IBM Corp.
+// LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
 var path = require('path');
 var YAML = require('yamljs');
@@ -20,7 +19,7 @@ try {
     env[k] = envjson[k];
   });
 } catch (e) {
-  logger.error('Fail to load environment variables: ', e);
+  logger.info('Fail to load environment variables: ', e);
 }
 
 Object.keys(env).forEach(function(k) {

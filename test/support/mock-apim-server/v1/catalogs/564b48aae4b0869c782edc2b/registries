@@ -1,7 +1,7 @@
 [
   {
     "id": "56bbacbae4b0f7b17cf97540",
-    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/registries/56bbacbae4b0f7b17cf97540",
+    "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/registries/56bbacbae4b0f7b17cf97540",
     "name": "ldap1",
     "type": "ldap",
     "title": "ldap1",
@@ -32,7 +32,7 @@
   },
   {
     "id": "56bbacbae4b0f7b17cf97540",
-    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/registries/56bbacbae4b0f7b17cf97540",
+    "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/registries/56bbacbae4b0f7b17cf97540",
     "name": "ldap2",
     "type": "ldap",
     "title": "ldap2",
@@ -63,7 +63,7 @@
   },
   {
     "id": "56bbacbae4b0f7b17cf97540",
-    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/registries/56bbacbae4b0f7b17cf97540",
+    "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/registries/56bbacbae4b0f7b17cf97540",
     "name": "ldap-tls",
     "type": "ldap",
     "title": "ldap-tls",
@@ -94,7 +94,7 @@
   },
   {
     "id": "56bbacbae4b0f7b17cf97540",
-    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/registries/56bbacbae4b0f7b17cf97540",
+    "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/registries/56bbacbae4b0f7b17cf97540",
     "name": "basic-ldap-compose-upn-no-group-auth",
     "type": "ldap",
     "title": "basic-ldap-compose-upn-no-group-auth",
@@ -123,7 +123,7 @@
   },
   {
     "id": "56bbacbae4b0f7b17cf97540",
-    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/registries/56bbacbae4b0f7b17cf97540",
+    "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/registries/56bbacbae4b0f7b17cf97540",
     "name": "compose-upn",
     "type": "ldap",
     "title": "compose-upn",
@@ -145,7 +145,7 @@
   },
   {
     "id": "56bbacbae4b0f7b17cf97540",
-    "url": "https://sjsldev249.dev.ciondemand.com/v1/catalogs/564b48aae4b0869c782edc2b/registries/56bbacbae4b0f7b17cf97540",
+    "url": "https://example.com/v1/catalogs/564b48aae4b0869c782edc2b/registries/56bbacbae4b0f7b17cf97540",
     "name": "compose-upn-dynamic-group-auth",
     "type": "ldap",
     "title": "compose-upn-dynamic-group-auth",

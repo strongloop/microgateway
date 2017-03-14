@@ -8,8 +8,8 @@ info:
   appliesTo:
     - API
   contact:
-    name: IBM API Management
-    url: http://www.ibm.com/apimanagement
+    name: IBM API Connect
+    url: http://www.ibm.com/apiconnect
     email: ibmapi@us.ibm.com
 
 attach:

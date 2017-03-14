@@ -1,7 +1,7 @@
-// Copyright IBM Corp. 2016. All Rights Reserved.
+// © Copyright IBM Corporation 2016,2017.
 // Node module: microgateway
-// US Government Users Restricted Rights - Use, duplication or disclosure
-// restricted by GSA ADP Schedule Contract with IBM Corp.
+// LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
+
 
 'use strict';
 
@@ -53,7 +53,10 @@ describe('invokePolicy', function() {
       .then(function() { return microgw.stop(); })
       .then(function() { return backend.stop(); })
       .then(done, done)
-      .catch(done);
+      .catch(function(err) {
+        console.log(err);
+        done(err);
+      });
   });
 
   var data = { msg: 'Hello world' };
@@ -174,7 +177,7 @@ describe('invokePolicy', function() {
 
     request
       .get('/invoke/dynHost')
-      .set('X-TEST-HOSTNAME', 'cannot.be.valid.com')
+      .set('X-TEST-HOSTNAME', 'cannotbevalidcom')
       .expect(function(res, done) {
         if (res.res.statusCode !== 500) {
           throw new Error('status code should be 500');
@@ -184,7 +187,7 @@ describe('invokePolicy', function() {
         }
       })
       .expect(/"name":"ConnectionError"/)
-      .expect(/getaddrinfo ENOTFOUND cannot.be.valid.com/,
+      .expect(/getaddrinfo ENOTFOUND cannotbevalidcom/,
               done);
   });
 

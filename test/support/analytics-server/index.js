@@ -1,7 +1,7 @@
-// Copyright IBM Corp. 2016. All Rights Reserved.
+// © Copyright IBM Corporation 2016,2017.
 // Node module: microgateway
-// US Government Users Restricted Rights - Use, duplication or disclosure
-// restricted by GSA ADP Schedule Contract with IBM Corp.
+// LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
+
 
 /*eslint-env node */
 'use strict';
@@ -15,7 +15,7 @@ var options = require('./httpsOptions');
 var fs = require('fs');
 var path = require('path');
 var bdParser = require('body-parser');
-var env = require('../../../utils/environment');
+var env = require('microgateway-util/utils/environment.js');
 var crypto = require('crypto');
 var constants = require('constants');
 var qs = require('querystring');

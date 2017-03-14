@@ -1,0 +1,20 @@
+{
+  "name": "handlebars",
+  "version": "1.0.0",
+  "description": "Handlebars Policy",
+  "main": "index.js",
+  "keywords": [
+    "policy",
+    "api",
+    "handlebars"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "handlebars": "^4.0.5",
+    "lodash": "^4.5.1"
+  },
+  "author": "IBM",
+  "license": "Apache 2.0"
+}
