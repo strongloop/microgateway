@@ -1,7 +1,7 @@
 20##-##-##, Version 1.#.#
 =========================
  * Split out datastore into separate repo
- 
+
  * Fix message levels (error -> info)
 
  * Remove key/cert and autogen in postinstall phase
@@ -43,6 +43,94 @@
  * monitor local files for laptop experience (Clement)
 
  * Fix issue with webhooks unsubscribe (Daniel Badt)
+
+2016-10-06, Version 1.5.4
+=========================
+
+ * Update README.md (Om Goeckermann)
+
+ * Fix expected unsubscribe response code (Daniel Badt)
+
+ * Add webhooks unsubscribe (Daniel Badt)
+
+ * Address lint failures (Jon Palgon)
+
+ * Some fixes for webhooks (Daniel Badt)
+
+ * Initial changes for MGW webhooks (Daniel Badt)
+
+ * Change space array names to plural (Daniel Badt)
+
+ * uGW support for spaces (Daniel Badt)
+
+ * Initialize the test-app-cid-sec to true (juangmj)
+
+ * Allow test-app to call OAuth2 API (juangmj)
+
+ * Check arbitrary apikeys before fixed (Daniel Badt)
+
+ * Allow developers to configure plan and rate-limit (juangmj)
+
+ * Should not reject GET requests with payload (juangmj)
+
+ * Updates for the code review (juangmj)
+
+ * Update testcase for node 0.12 (juangmj)
+
+ * Reset limiter cache before the test begins (juangmj)
+
+ * Refactor the preflow middleware (juangmj)
+
+ * Remove the unused broken file (juangmj)
+
+ * Use `fs-extra` instead of `fs.extra` (Jon Palgon)
+
+ * Move config/default to test/definitions/default (Jon Palgon)
+
+ * Remove unused dependencies (Jon Palgon)
+
+ * Fix test case (Daniel Badt)
+
+ * Make IF statement more efficient (Daniel Badt)
+
+ * Allow swagger security ApiKeys to use arbitrary names (Daniel Badt)
+
+ * Ensure config/default dir is created (Daniel Badt)
+
+ * Fix git url (Krishna Raman)
+
+ * Add timeout to failing test. (Rick Curtis)
+
+ * Update to use config/project modules. (Rick Curtis)
+
+
+2016-10-13, Version 1.5.6
+=========================
+
+ * Fix writeFileSync calls (Daniel Badt)
+
+ * File chg should not trigger timer (Daniel Badt)
+
+ * Misc. fixes for webhooks (Daniel Badt)
+
+ * Update the datastore/README.md (juangmj)
+
+
+2016-10-11, Version 1.5.5
+=========================
+
+ * this is the current template for readme files (Om Goeckermann)
+
+ * added new information - entries for default application and plan (Om Goeckermann)
+
+ * fix timing issue of test case (Clement)
+
+ * fix indetation problem on test data (Clement)
+
+ * monitor local files for laptop experience (Clement)
+
+ * Fix issue with webhooks unsubscribe (Daniel Badt)
+
 
 2016-10-06, Version 1.5.4
 =========================
