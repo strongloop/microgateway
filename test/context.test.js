@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var _ = require('lodash');
@@ -18,7 +17,6 @@ var context = require('../lib/context');
 var API_PATH_HEADER = 'X-API-PATH';
 
 describe('Context middleware', function() {
-
   resetLimiterCache();
   describe('Request category variables', function() {
     var app = loopback();
@@ -52,12 +50,11 @@ describe('Context middleware', function() {
                          ctx.get('request.authorization'));
 
       resp.send(result);
-
     });
 
     function verifyResponse(res, expected) {
       var variables = [ 'verb', 'path', 'search', 'querystring',
-          'content-type', 'authorization' ];
+        'content-type', 'authorization' ];
       variables.forEach(function(value) {
         assert.strictEqual(res.body[value], expected[value],
                            'request.' + value);
@@ -73,12 +70,12 @@ describe('Context middleware', function() {
       // remove the headers not in testing scope
       var headers = res.body.headers;
       var removeHeader = [ 'accept-encoding',
-                           'connection',
-                           'content-length',
-                           'content-type',
-                           'host',
-                           'user-agent',
-                           API_PATH_HEADER.toLowerCase() ];
+        'connection',
+        'content-length',
+        'content-type',
+        'host',
+        'user-agent',
+        API_PATH_HEADER.toLowerCase() ];
       removeHeader.forEach(function(value) {
         delete headers[value];
       });
@@ -272,7 +269,6 @@ describe('Context middleware', function() {
           .send(new Buffer([ 0x01, 0x02 ]))
           .expect(200, '', done); // when res.send(undefined), '' is received
       });
-
     }); // end of 'should normalize HTTP content-type' test
 
     describe('should produce req.path according to api.basepath', function() {
@@ -419,7 +415,7 @@ describe('Context middleware', function() {
       });
 
       [ 'GET', 'HEAD', 'DELETE' ].forEach(function(method) {
-        //microgateway issue #4: should not reject a GET request with payload
+        // microgateway issue #4: should not reject a GET request with payload
         it.skip('should reject ' + method + ' method w/ payload', function(done) {
           request(app)
             .post('/foo')
@@ -437,7 +433,6 @@ describe('Context middleware', function() {
         });
       });
     }); // end of 'should reject/ignore non-empty payload when needed' test
-
   }); // end of 'Request category variables test
 
   describe('Message category variables', function() {
@@ -470,7 +465,6 @@ describe('Context middleware', function() {
                           ctx.get('request.headers')));
 
         resp.send('done');
-
       });
 
       it('should work with HTTP GET method', function(done) {
@@ -518,7 +512,6 @@ describe('Context middleware', function() {
           .expect(200, 'done', done);
       });
     }); // end of 'should contain headers and body properties' test
-
   }); // end of Message category variables test
 
   describe('Read-only variables', function() {
@@ -526,23 +519,23 @@ describe('Context middleware', function() {
     app.use(context());
     app.use(function(req, resp) {
       var roVars = [ 'request.verb',
-                     'request.uri',
-                     'request.path',
-                     'request.headers',
-                     'request.content-type',
-                     'request.date',
-                     'request.authorization',
+        'request.uri',
+        'request.path',
+        'request.headers',
+        'request.content-type',
+        'request.date',
+        'request.authorization',
                      // 'request.body', request.body is writable till preflow phase set it to read-only
-                     'system.datetime',
-                     'system.time.hour',
-                     'system.time.minute',
-                     'system.time.seconds',
-                     'system.date.day-of-week',
-                     'system.date.day-of-month',
-                     'system.date.month',
-                     'system.date.year',
-                     'system.timezone',
-                     'system' ];
+        'system.datetime',
+        'system.time.hour',
+        'system.time.minute',
+        'system.time.seconds',
+        'system.date.day-of-week',
+        'system.date.day-of-month',
+        'system.date.month',
+        'system.date.year',
+        'system.timezone',
+        'system' ];
       var ctx = req.ctx;
 
       roVars.forEach(function(varName) {
@@ -742,6 +735,5 @@ describe('Context middleware', function() {
         });
       });
     });
-
   }); // end of Create context middleware with options test
 });

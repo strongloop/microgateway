@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var supertest = require('supertest');
@@ -35,7 +34,6 @@ describe('HTTP and HTTPS in separate files', function() {
         done(new Error('expect error'));
       });
   });
-
 });
 
 describe('HTTP and HTTPS in same file', function() {
@@ -61,11 +59,9 @@ describe('HTTP and HTTPS in same file', function() {
         done(new Error('expect error'));
       });
   });
-
 });
 
 describe('HTTPS in laptop experience w/ env var', function() {
-
   var request, httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
@@ -112,11 +108,9 @@ describe('HTTPS in laptop experience w/ env var', function() {
         done(new Error('expect error'));
       });
   });
-
 });
 
 describe('HTTPS in laptop experience w/ pfx', function() {
-
   var request, httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
@@ -163,11 +157,9 @@ describe('HTTPS in laptop experience w/ pfx', function() {
         done(new Error('expect error'));
       });
   });
-
 });
 
 describe('HTTPS in laptop experience w/ pfx obfuscated password', function() {
-
   var request, httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
@@ -214,12 +206,9 @@ describe('HTTPS in laptop experience w/ pfx obfuscated password', function() {
         done(new Error('expect error'));
       });
   });
-
 });
 
-
 describe('HTTPS in laptop experience w/ default TLS', function() {
-
   var request, httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
@@ -264,7 +253,6 @@ describe('HTTPS in laptop experience w/ default TLS', function() {
         done(new Error('expect error'));
       });
   });
-
 });
 
 describe('HTTP in laptop experience when HTTPS not specified', function() {
@@ -301,11 +289,9 @@ describe('HTTP in laptop experience when HTTPS not specified', function() {
       .get('/http/http')
       .expect(200, done);
   });
-
 });
 
 describe('HTTPS in laptop experience when HTTPS explicitly specified', function() {
-
   var request, httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
@@ -350,11 +336,9 @@ describe('HTTPS in laptop experience when HTTPS explicitly specified', function(
         done(new Error('expect error'));
       });
   });
-
 });
 
 describe('HTTPS in laptop experience when schemes not specified', function() {
-
   var request, httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
@@ -399,7 +383,6 @@ describe('HTTPS in laptop experience when schemes not specified', function() {
         done(new Error('expect error'));
       });
   });
-
 });
 
 /*  NEED ROOT ACCESS
@@ -478,7 +461,6 @@ describe('HTTP port in ENV in laptop experience when HTTPS not specified', funct
       .get('/http/http')
       .expect(200, done);
   });
-
 });
 
 /*  NEED ROOT ACCESS
@@ -533,7 +515,6 @@ describe('HTTPS no port specified in laptop experience when HTTPS explicitly spe
 */
 
 describe('HTTPS port in ENV in laptop experience when HTTPS explicitly specified', function() {
-
   var request, httprequest;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/httpsexplicit';
@@ -580,5 +561,4 @@ describe('HTTPS port in ENV in laptop experience when HTTPS explicitly specified
         done(new Error('expect error'));
       });
   });
-
 });

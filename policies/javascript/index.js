@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 var vm = require('vm');
 var _ = require('lodash');
@@ -19,9 +18,9 @@ function consoleProxy(log) {
    logger.trace()
    */
 
-  //function fatal() {
+  // function fatal() {
   //  log.fatal.apply(log, arguments);
-  //}
+  // }
 
   function error() {
     log.error.apply(log, arguments);
@@ -35,21 +34,21 @@ function consoleProxy(log) {
     log.info.apply(log, arguments);
   }
 
-  //function debug() {
+  // function debug() {
   //  log.debug.apply(log, arguments);
-  //}
+  // }
 
   function trace() {
     log.debug.apply(log, arguments);
   }
 
   return {
-    //fatal: fatal,
+    // fatal: fatal,
     error: error,
     warn: warn,
     log: info,
     info: info,
-    //debug: debug,
+    // debug: debug,
     trace: trace };
 }
 
@@ -62,11 +61,11 @@ module.exports = function(config) {
       flow.fail({ name: 'JavaScriptError', value: 'Invalid JavaScript code' });
       return;
     }
-    //need to wrap the code snippet into a function first
+    // need to wrap the code snippet into a function first
     try {
       var script = new vm.Script('(function() {' + props.source + '\n})()');
-      //use context as this to run the wrapped function
-      //and also console for logging
+      // use context as this to run the wrapped function
+      // and also console for logging
       var origProto = Object.getPrototypeOf(context);
       var newProto = Object.create(origProto);
       newProto.console = consoleProxy(flow.logger);
@@ -84,7 +83,7 @@ module.exports = function(config) {
       }
     }
   };
-  //disable param resolving
+  // disable param resolving
   javascriptPolicyHandler.skipParamResolving = true;
   return javascriptPolicyHandler;
 };

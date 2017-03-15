@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var debug = require('debug')('micro-gateway:apim-server2');
@@ -26,7 +25,6 @@ var app = express();
 var test1 = false;
 var test2 = false;
 
-
 var server;
 exports.start = function(h, p) {
   var port = p || PORT;
@@ -38,7 +36,6 @@ exports.start = function(h, p) {
     });
   });
 };
-
 
 exports.stop = function() {
   return new Promise(function(resolve, reject) {
@@ -104,7 +101,7 @@ app.post('/v1/*', upload.array(), function(req, res) {
   test2 = true;
 });
 
-//for analytics
+// for analytics
 app.post('/x2020/v1/events/_bulk', function(req, res) {
   res.status(200);
   res.end();

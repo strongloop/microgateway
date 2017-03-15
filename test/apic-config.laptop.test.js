@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var supertest = require('supertest');
@@ -17,7 +16,7 @@ describe('[Dev Experience]', function() {
     process.env.NODE_ENV = 'production';
     mg.start(3000)
       .then(function() {
-        //API servers: http @8889, https @8890
+        // API servers: http @8889, https @8890
         return backend.start(8889);
       })
       .then(function() {
@@ -51,7 +50,7 @@ describe('[Dev Experience]', function() {
         });
     });
 
-    //the foo fails to fulfill the security requirement
+    // the foo fails to fulfill the security requirement
     it('the app foo does not subscribe the API stock-quote', function(done) {
       request.get('/stock/quote')
         .query({ symbol: 'IBM' })
@@ -74,7 +73,7 @@ describe('[Dev Experience]', function() {
         });
     });
 
-    //a public API has no security requirement to check
+    // a public API has no security requirement to check
     it('the API weather is public', function(done) {
       request.get('/weather/temperature')
         .expect(200, /{ "temperature": "27C" }/)
@@ -83,8 +82,8 @@ describe('[Dev Experience]', function() {
         });
     });
 
-    //although 'foo' doesn't subscript the public API 'weather', the request
-    //should still be processed.
+    // although 'foo' doesn't subscript the public API 'weather', the request
+    // should still be processed.
     it('the app foo can execute the public API weather without subscription', function(done) {
       request.get('/weather/temperature')
         .set('X-IBM-Client-Id', 'foo')
@@ -96,7 +95,7 @@ describe('[Dev Experience]', function() {
     });
 
     it('the app foo calls the API bank-account (rate-limite=1/second) twice', function(done) {
-      //wait for one second before testing the rate limit
+      // wait for one second before testing the rate limit
       setTimeout(
         function() {
           request.get('/account/balance')
@@ -104,11 +103,11 @@ describe('[Dev Experience]', function() {
             .set('X-IBM-Client-Secret', 'fooSecret')
             .expect(200, /{ "id": "foo", "balance": 23501 }/)
             .end(function(err1, res) {
-              //the request should be rejected when the rate limit is reached
+              // the request should be rejected when the rate limit is reached
               request.get('/account/balance')
                 .set('X-IBM-Client-Id', 'foo')
                 .set('X-IBM-Client-Secret', 'fooSecret')
-                .expect(429) //too many requests
+                .expect(429) // too many requests
                 .end(function(err2, res) {
                   done(err1 || err2);
                 });
@@ -117,7 +116,7 @@ describe('[Dev Experience]', function() {
         1000);
     });
 
-    //the rate limit is not yet reached
+    // the rate limit is not yet reached
     it('the app bar calls the API stock-quote (rate-limite=100/minute) twice', function(done) {
       request.get('/stock/quote')
         .query({ symbol: 'IBM' })
@@ -137,9 +136,9 @@ describe('[Dev Experience]', function() {
     });
   });
 
-  //Configure TLS profiles in apic-tls-profiles.json
+  // Configure TLS profiles in apic-tls-profiles.json
   describe('[apic-tls-profiles.json]', function() {
-    //invoke with the defined TLS profile
+    // invoke with the defined TLS profile
     it('invoke an HTTPs API (w/ a tls-profile)', function(done) {
       request.get('/invoke')
         .expect(200, /z-host: localhost:8890/)
@@ -148,6 +147,5 @@ describe('[Dev Experience]', function() {
         });
     });
   });
-
 });
 

@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 var javascriptPolicy = require('../policies/javascript')();
 var should = require('should');
@@ -147,8 +146,8 @@ describe('javascript policy', function() {
       javascriptPolicy({ source: code }, context, flow);
     });
 
-    //// using let
-    //it('should be able to use let', function(done) {
+    /// / using let
+    // it('should be able to use let', function(done) {
     //  var context = { request: { uri: 'http://localhost/foo' } };
     //  var code = 'let a = "bar"; request.uri = "http://localhost/" + a;';
 
@@ -157,7 +156,7 @@ describe('javascript policy', function() {
     //    context.request.uri.should.exactly('http://localhost/bar');
     //    done();
     //  });
-    //});
+    // });
 
     // try catch
     it('should be able to use try/catch', function(done) {
@@ -182,8 +181,8 @@ describe('javascript policy', function() {
       javascriptPolicy({ source: code }, context, flow);
     });
 
-    //// using arrow function
-    //it('should be able to use arrow function', function(done) {
+    /// / using arrow function
+    // it('should be able to use arrow function', function(done) {
     //  var context = { request: { uri: 'http://localhost/foo' }, myval: '1' };
     //  var code = 'var total = 0;' +
     //    '[1, 2, 3].forEach(function(val) {' +
@@ -202,7 +201,7 @@ describe('javascript policy', function() {
     //      stream: process.stdout,
     //      level: 'debug' }) };
     //  javascriptPolicy({ source: code }, context, flow);
-    //});
+    // });
 
     // no require
     it('should not be able to call require()', function(done) {

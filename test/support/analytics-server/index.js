@@ -2,8 +2,7 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
-/*eslint-env node */
+/* eslint-env node */
 'use strict';
 
 var express = require('express');
@@ -23,7 +22,6 @@ var url = require('url');
 
 var doneCB;
 
-
 var server;
 exports.start = function(port, definition) {
   return new Promise(function(resolve) {
@@ -31,7 +29,7 @@ exports.start = function(port, definition) {
     var rawParser = bdParser.raw({ type: '*/*' });
     var app = express();
 
-    //for analytics event publish
+    // for analytics event publish
     app.post('/v1/catalogs/*/analytics', rawParser, function(req, res, next) {
       logger.debug('got analytics event', req.headers);
       var urlParts = url.parse(req.originalUrl || req.url);
@@ -45,7 +43,7 @@ exports.start = function(port, definition) {
         res.end();
       } else {
         if (doneCB) {
-          //passing empty string back and fail the validation
+          // passing empty string back and fail the validation
           doneCB('');
           doneCB = undefined;
         }
@@ -55,13 +53,13 @@ exports.start = function(port, definition) {
       next();
     });
 
-    //for handshake
+    // for handshake
     var handshakeURI = '/v1/catalogs/' +
         process.env[env.APIMANAGER_CATALOG] + '/handshake/';
 
     app.post(handshakeURI, function(req, res, next) {
       logger.debug('got handshake request, headers:', req.headers);
-      //get pub key
+      // get pub key
       var pubKey = fs.readFileSync(path.resolve(__dirname, '..', '..', '..', env.KEYNAME + '.pub'));
       var encKey = crypto.randomBytes(32);
 
@@ -117,5 +115,4 @@ exports.setOneTimeDoneCB = function(cb) {
     doneCB = cb;
   }
 };
-
 

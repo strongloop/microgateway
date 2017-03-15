@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var supertest = require('supertest');
@@ -12,7 +11,6 @@ var dsCleanupFile = require('./support/utils').dsCleanupFile;
 var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 describe('urlrewrite', function() {
-
   var request;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/default';
@@ -44,7 +42,6 @@ describe('urlrewrite', function() {
       .then(done, done);
   });
 
-
   function tests(env) {
     var clientId1 = 'fb82cb59-ba95-4c34-8612-e63697d7b845';
     it('client_id=' + clientId1 + ' (query) should invoke API1 (apim-lookup)',
@@ -53,10 +50,8 @@ describe('urlrewrite', function() {
         .get('/apim/sb/v1/ascents?client_id=' + clientId1)
         .expect(200, '/api1', done);
       });
-
   }
 
   tests('apim');
-
 });
 

@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var url = require('url');
@@ -16,7 +15,7 @@ var dsCleanup = require('./support/utils').dsCleanup;
 var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 function decodeToken(token) {
-  //decode the access token into jwt token
+  // decode the access token into jwt token
   var plain = token.split('.');
   var jwtTkn = JSON.parse(new Buffer(plain[1], 'base64').toString('utf-8'));
 
@@ -29,7 +28,7 @@ function decodeAMP(url) {
 
 function sendAZRequest(request, done, testCallBack) {
   return function(done) {
-    //send the AZ request to the /authorize endpoint
+    // send the AZ request to the /authorize endpoint
     request.get('/oauth2/authorize')
       .query({ client_id: clientId })
       .query({ response_type: 'code' })
@@ -46,7 +45,7 @@ function sendAZRequest(request, done, testCallBack) {
           var match = actionURL.exec(res.text);
           var match2 = transactionID.exec(res.text);
 
-          //user authentication
+          // user authentication
           request.post(decodeAMP(match[1]))
             .set('cookie', cookie[0].split(';')[0])
             .send('j_username=root')
@@ -66,10 +65,10 @@ var clientSecret = 'oJ2xB4aM0tB5pP3aS5dF8oS1jB5hA1dI5dR0dW1sJ0gG6nK0xU';
 describe('oauth2 token API', function() {
   var request;
   before(function(done) {
-    //Use production instead of CONFIG_DIR: reading from apim instead of laptop
+    // Use production instead of CONFIG_DIR: reading from apim instead of laptop
     process.env.NODE_ENV = 'production';
 
-    //The apim server and datastore
+    // The apim server and datastore
     process.env.APIMANAGER = '127.0.0.1';
     process.env.APIMANAGER_PORT = 8081;
     process.env.DATASTORE_PORT = 5000;
@@ -105,7 +104,7 @@ describe('oauth2 token API', function() {
       .catch(done);
   });
 
-  //for the HTTPS connection
+  // for the HTTPS connection
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
   it('api', function(done) {
@@ -144,25 +143,25 @@ describe('oauth2 token API', function() {
           assert(res.body.access_token);
           assert(res.body.refresh_token);
 
-          //all request headers should not be included in the response
+          // all request headers should not be included in the response
           assert(!res.headers['x-dummy-id'] && !res.headers['X-DUMMY-ID']);
 
           assert.equal(res.body.scope, 'weather stock');
 
           var jwtTkn1 = decodeToken(res.body.access_token);
           var jwtTkn2 = decodeToken(res.body.refresh_token);
-          //the jwt id should not be undefined
+          // the jwt id should not be undefined
           assert(jwtTkn1.jti);
           assert(jwtTkn2.jti);
 
-          //token should be issued to this client
+          // token should be issued to this client
           assert.equal(jwtTkn1.aud, clientId);
           assert.equal(jwtTkn2.aud, clientId);
 
-          //access token should expire in 7 seconds
+          // access token should expire in 7 seconds
           assert(res.body.expires_in, 7);
           assert.equal(7, (jwtTkn1.exp - jwtTkn1.iat) / 1000);
-          //while refresh token should expire in 12 seconds
+          // while refresh token should expire in 12 seconds
           assert.equal(12, (jwtTkn2.exp - jwtTkn2.iat) / 1000);
         })
         .end(function(err, res) {
@@ -241,7 +240,7 @@ describe('oauth2 token API', function() {
         .send(data)
         .expect(400)
         .expect(function(res) {
-          //check the error and error description
+          // check the error and error description
           assert.equal(res.body.error,
                   'invalid_request');
           assert.equal(res.body.error_description,
@@ -268,10 +267,10 @@ describe('oauth2 token API', function() {
         .expect('Pragma', 'no-cache')
         .expect('Content-Type', /application\/json/)
         .expect(function(res) {
-          //all request headers should not be included in the response
+          // all request headers should not be included in the response
           assert(!res.headers['x-dummy-id'] && !res.headers['X-DUMMY-ID']);
 
-          //check the error and error description
+          // check the error and error description
           assert.equal(res.body.error,
                   'invalid_scope');
           assert.equal(res.body.error_description,
@@ -293,7 +292,7 @@ describe('oauth2 token API', function() {
         .send(data)
         .expect(400)
         .expect(function(res) {
-          //check the error and error description
+          // check the error and error description
           assert.equal(res.body.error,
                   'invalid_request');
           assert.equal(res.body.error_description,
@@ -316,7 +315,7 @@ describe('oauth2 token API', function() {
         .send(data)
         .expect(401)
         .expect(function(res) {
-          //check the error and error description
+          // check the error and error description
           assert.equal(res.body.error,
                   'invalid_client');
           assert.equal(res.body.error_description,
@@ -326,7 +325,6 @@ describe('oauth2 token API', function() {
           done(err);
         });
     });
-
   });
 
   describe('token endpoint - password', function() {
@@ -355,19 +353,19 @@ describe('oauth2 token API', function() {
           var jwtTkn1 = decodeToken(res.body.access_token);
           var jwtTkn2 = decodeToken(res.body.refresh_token);
 
-          //the jwt id should not be undefined
+          // the jwt id should not be undefined
           assert(jwtTkn1.jti);
           assert(jwtTkn2.jti);
 
-          //token should be issued to this client
+          // token should be issued to this client
           assert.equal(jwtTkn1.aud, clientId);
           assert.equal(jwtTkn2.aud, clientId);
 
-          //access token should expire in 7 seconds
+          // access token should expire in 7 seconds
           assert(res.body.expires_in, 7);
           assert.equal(7, (jwtTkn1.exp - jwtTkn1.iat) / 1000);
 
-          //while refresh token should expire in 12 seconds
+          // while refresh token should expire in 12 seconds
           assert.equal(12, (jwtTkn2.exp - jwtTkn2.iat) / 1000);
         })
         .end(function(err, res) {
@@ -388,7 +386,7 @@ describe('oauth2 token API', function() {
         .send(data)
         .expect(400)
         .expect(function(res) {
-          //check the error and error description
+          // check the error and error description
           assert.equal(res.body.error,
                   'invalid_request');
           assert.equal(res.body.error_description,
@@ -399,7 +397,7 @@ describe('oauth2 token API', function() {
         });
     });
 
-    //client_secret is not required for public client
+    // client_secret is not required for public client
     it('public client does not provide client_secret', function(done) {
       var data = {
         grant_type: 'password',
@@ -434,7 +432,7 @@ describe('oauth2 token API', function() {
         .send(data)
         .expect(400)
         .expect(function(res) {
-          //check the error and error description
+          // check the error and error description
           assert.equal(res.body.error,
                   'invalid_request');
           assert.equal(res.body.error_description,
@@ -459,7 +457,7 @@ describe('oauth2 token API', function() {
         .send(data)
         .expect(403)
         .expect(function(res) {
-          //check the error and error description
+          // check the error and error description
           assert.equal(res.body.error,
                   'invalid_grant');
           assert.equal(res.body.error_description,
@@ -470,8 +468,8 @@ describe('oauth2 token API', function() {
         });
     });
 
-    //skip this for the LDAP server "example.com" is
-    //sometimes not reachable.
+    // skip this for the LDAP server "example.com" is
+    // sometimes not reachable.
     it.skip('user registry (LDAP) ok', function(done) {
       var data = {
         grant_type: 'password',
@@ -499,8 +497,8 @@ describe('oauth2 token API', function() {
         });
     });
 
-    //skip this for the LDAP server "example.com" is
-    //sometimes not reachable.
+    // skip this for the LDAP server "example.com" is
+    // sometimes not reachable.
     it.skip('user registry (LDAP) incorrect password', function(done) {
       var data = {
         grant_type: 'password',
@@ -515,7 +513,7 @@ describe('oauth2 token API', function() {
         .send(data)
         .expect(403)
         .expect(function(res) {
-          //check the error and error description
+          // check the error and error description
           assert.equal(res.body.error,
                   'invalid_grant');
           assert.equal(res.body.error_description,
@@ -579,7 +577,6 @@ describe('oauth2 token API', function() {
           done(err);
         });
     });
-
   });
 
   describe('token endpoint - authorization code', function() {
@@ -591,7 +588,7 @@ describe('oauth2 token API', function() {
           var uri = url.parse(res.header.location, true);
           var code = uri.query.code;
 
-          //get the access token with the AZ code
+          // get the access token with the AZ code
           var data = {
             grant_type: 'authorization_code',
             client_id: clientId,
@@ -615,19 +612,19 @@ describe('oauth2 token API', function() {
               var jwtTkn1 = decodeToken(res2.body.access_token);
               var jwtTkn2 = decodeToken(res2.body.refresh_token);
 
-              //the jwt id should not be undefined
+              // the jwt id should not be undefined
               assert(jwtTkn1.jti);
               assert(jwtTkn2.jti);
 
-              //token should be issued to this client
+              // token should be issued to this client
               assert.equal(jwtTkn1.aud, clientId);
               assert.equal(jwtTkn2.aud, clientId);
 
-              //access token should expire in 7 seconds
+              // access token should expire in 7 seconds
               assert(res2.body.expires_in, 7);
               assert.equal(7, (jwtTkn1.exp - jwtTkn1.iat) / 1000);
 
-              //while refresh token should expire in 12 seconds
+              // while refresh token should expire in 12 seconds
               assert.equal(12, (jwtTkn2.exp - jwtTkn2.iat) / 1000);
             })
             .end(function(err2) {
@@ -647,7 +644,7 @@ describe('oauth2 token API', function() {
           var uri = url.parse(res.header.location, true);
           var code = uri.query.code;
 
-          //get the access token with the AZ code
+          // get the access token with the AZ code
           var data = {
             grant_type: 'authorization_code',
             client_id: clientId,
@@ -660,20 +657,20 @@ describe('oauth2 token API', function() {
             .send(data)
             .expect(401)
             .expect(function(res2) {
-              //check the error and error description
+              // check the error and error description
               assert.equal(res2.body.error,
                       'invalid_client');
               assert.equal(res2.body.error_description,
                       'Authentication error');
 
-              //The previous AZ code should have been deleted
+              // The previous AZ code should have been deleted
               data.client_secret = clientSecret;
               request.post('/oauth2/token')
                 .type('form')
                 .send(data)
                 .expect(403)
                 .expect(function(res3) {
-                  //check the error and error description
+                  // check the error and error description
                   assert.equal(res3.body.error,
                           'invalid_grant');
                   assert.equal(res3.body.error_description,
@@ -700,7 +697,7 @@ describe('oauth2 token API', function() {
           var uri = url.parse(res.header.location, true);
           var code = uri.query.code;
 
-          //get the access token with the AZ code
+          // get the access token with the AZ code
           var data = {
             grant_type: 'authorization_code',
             client_id: clientId,
@@ -712,7 +709,7 @@ describe('oauth2 token API', function() {
             .send(data)
             .expect(403)
             .expect(function(res2) {
-              //check the error and error description
+              // check the error and error description
               assert.equal(res2.body.error,
                       'invalid_grant');
               assert.equal(res2.body.error_description,
@@ -735,7 +732,7 @@ describe('oauth2 token API', function() {
           var uri = url.parse(res.header.location, true);
           var code = uri.query.code;
 
-          //get the access token with the AZ code
+          // get the access token with the AZ code
           var data = {
             grant_type: 'authorization_code',
             client_id: clientId,
@@ -749,7 +746,7 @@ describe('oauth2 token API', function() {
             .send(data)
             .expect(403)
             .expect(function(res2) {
-              //check the error and error description
+              // check the error and error description
               assert.equal(res2.body.error,
                       'invalid_grant');
               assert.equal(res2.body.error_description,
@@ -764,9 +761,9 @@ describe('oauth2 token API', function() {
       })();
     });
 
-    //Check the section 4.1.3, there is no scope parameter for the grant type
-    //'authorization_code'. So the scope will just be ignored, no matter it is
-    //matched or now.
+    // Check the section 4.1.3, there is no scope parameter for the grant type
+    // 'authorization_code'. So the scope will just be ignored, no matter it is
+    // matched or now.
     it('scope should be ignored', function(done) {
       sendAZRequest(request, done, function(err, res) {
         assert(!err, 'Unexpected error with sendAZRequest().');
@@ -775,13 +772,13 @@ describe('oauth2 token API', function() {
           var uri = url.parse(res.header.location, true);
           var code = uri.query.code;
 
-          //get the access token with the AZ code
+          // get the access token with the AZ code
           var data = {
             grant_type: 'authorization_code',
             client_id: clientId,
             client_secret: clientSecret,
             code: code,
-            scope: 'foo bar', //this will be ignored
+            scope: 'foo bar', // this will be ignored
             redirect_uri: 'https://myApp.com/foo' };
 
           request.post('/oauth2/token')
@@ -789,7 +786,7 @@ describe('oauth2 token API', function() {
             .send(data)
             .expect(200)
             .expect(function(res2) {
-              //The scope was set to 'weather' in the sendAZRequest()
+              // The scope was set to 'weather' in the sendAZRequest()
               assert.equal(res2.body.scope, 'weather');
             })
             .end(function(err2) {
@@ -802,7 +799,7 @@ describe('oauth2 token API', function() {
     });
 
     it('without the required AZ code', function(done) {
-      //get the access token with the AZ code
+      // get the access token with the AZ code
       var data = {
         grant_type: 'authorization_code',
         client_id: clientId,
@@ -814,7 +811,7 @@ describe('oauth2 token API', function() {
         .send(data)
         .expect(400)
         .expect(function(res) {
-          //check the error and error description
+          // check the error and error description
           assert.equal(res.body.error,
                   'invalid_request');
           assert.equal(res.body.error_description,
@@ -848,7 +845,6 @@ describe('oauth2 token API', function() {
           done(err);
         });
     });
-
   });
 
   describe('token endpoint - refresh token', function() {
@@ -859,7 +855,7 @@ describe('oauth2 token API', function() {
         client_secret: clientSecret,
         scope: 'stock weather' };
 
-      //request the access token
+      // request the access token
       request.post('/oauth2/token')
         .type('form')
         .send(data1)
@@ -873,7 +869,7 @@ describe('oauth2 token API', function() {
             client_secret: clientSecret,
             refresh_token: refreshToken,
             scope: 'stock weather' };
-          //exchange the refresh token with the access token
+          // exchange the refresh token with the access token
           request.post('/oauth2/token')
             .type('form')
             .send(data2)
@@ -889,24 +885,23 @@ describe('oauth2 token API', function() {
 
               var jwtTkn1 = decodeToken(res2.body.access_token);
               var jwtTkn2 = decodeToken(res2.body.refresh_token);
-              //the jwt id should not be undefined
+              // the jwt id should not be undefined
               assert(jwtTkn1.jti);
               assert(jwtTkn2.jti);
 
-              //token should be issued to this client
+              // token should be issued to this client
               assert.equal(jwtTkn1.aud, clientId);
               assert.equal(jwtTkn2.aud, clientId);
 
-              //access token should expire in 7 seconds
+              // access token should expire in 7 seconds
               assert(res2.body.expires_in, 7);
               assert.equal(7, (jwtTkn1.exp - jwtTkn1.iat) / 1000);
-              //while refresh token should expire in 12 seconds
+              // while refresh token should expire in 12 seconds
               assert.equal(12, (jwtTkn2.exp - jwtTkn2.iat) / 1000);
             })
             .end(function(err, res) {
               done(err);
             });
-
         })
         .end(function(err, res) {
           assert(!err);
@@ -920,7 +915,7 @@ describe('oauth2 token API', function() {
         client_secret: clientSecret,
         scope: 'stock weather' };
 
-      //request the access token
+      // request the access token
       request.post('/oauth2/token')
         .type('form')
         .send(data1)
@@ -932,11 +927,11 @@ describe('oauth2 token API', function() {
             grant_type: 'refresh_token',
             client_id: clientId,
             client_secret: clientSecret,
-            //The scope is optional for refresh token
-            //scope: 'stock weather'
+            // The scope is optional for refresh token
+            // scope: 'stock weather'
             refresh_token: refreshToken };
 
-          //exchange the refresh token with the access token
+          // exchange the refresh token with the access token
           request.post('/oauth2/token')
             .type('form')
             .send(data2)
@@ -948,7 +943,6 @@ describe('oauth2 token API', function() {
             .end(function(err, res) {
               done(err);
             });
-
         })
         .end(function(err, res) {
           assert(!err);
@@ -962,7 +956,7 @@ describe('oauth2 token API', function() {
         client_secret: clientSecret,
         scope: 'weather' };
 
-      //request the access token
+      // request the access token
       request.post('/oauth2/token')
         .type('form')
         .send(data1)
@@ -975,10 +969,10 @@ describe('oauth2 token API', function() {
             client_id: clientId,
             client_secret: clientSecret,
             refresh_token: refreshToken,
-            //Oops! stock was not granted
+            // Oops! stock was not granted
             scope: 'stock weather' };
 
-          //exchange the refresh token with the access token
+          // exchange the refresh token with the access token
           request.post('/oauth2/token')
             .type('form')
             .send(data2)
@@ -992,15 +986,14 @@ describe('oauth2 token API', function() {
             .end(function(err, res) {
               done(err);
             });
-
         })
         .end(function(err, res) {
           assert(!err);
         });
     });
 
-    //clients are not allowed to get refresh token from the token endpoint A,
-    //and then renew the access token from the token endpoint B.
+    // clients are not allowed to get refresh token from the token endpoint A,
+    // and then renew the access token from the token endpoint B.
     it('must not renew the access token using the other API', function(done) {
       var data1 = {
         grant_type: 'client_credentials',
@@ -1008,7 +1001,7 @@ describe('oauth2 token API', function() {
         client_secret: clientSecret,
         scope: 'stock weather' };
 
-      //request the access token
+      // request the access token
       request.post('/oauth2/token')
         .type('form')
         .send(data1)
@@ -1023,8 +1016,8 @@ describe('oauth2 token API', function() {
             refresh_token: refreshToken,
             scope: 'stock weather' };
 
-          //exchange the refresh token using the wrong API endpoint
-          //the refresh token won't be recognized
+          // exchange the refresh token using the wrong API endpoint
+          // the refresh token won't be recognized
           request.post('/public/oauth2/token')
             .type('form')
             .send(data2)
@@ -1038,16 +1031,15 @@ describe('oauth2 token API', function() {
             .end(function(err, res) {
               done(err);
             });
-
         })
         .end(function(err, res) {
           assert(!err);
         });
     });
 
-    //a public client doesn't need to authenticate with AZ server
+    // a public client doesn't need to authenticate with AZ server
     it('public client may skip authentication', function(done) {
-      //no client_secret is provided
+      // no client_secret is provided
       var data1 = {
         grant_type: 'password',
         username: 'root',
@@ -1062,7 +1054,7 @@ describe('oauth2 token API', function() {
         .expect(function(res1) {
           var refreshToken = res1.body.refresh_token;
 
-          //no client_secret is provided for the authentication
+          // no client_secret is provided for the authentication
           var data2 = {
             grant_type: 'refresh_token',
             client_id: clientId,
@@ -1080,16 +1072,15 @@ describe('oauth2 token API', function() {
             .end(function(err, res) {
               done(err);
             });
-
         })
         .end(function(err, res) {
           assert(!err);
         });
     });
 
-    //if client_secret is provided, it will always be validated
+    // if client_secret is provided, it will always be validated
     it('even public client must not provide invalid secret', function(done) {
-      //no client_secret is provided
+      // no client_secret is provided
       var data1 = {
         grant_type: 'password',
         username: 'root',
@@ -1097,7 +1088,7 @@ describe('oauth2 token API', function() {
         client_id: clientId,
         scope: 'stock weather' };
 
-      //request the access token
+      // request the access token
       request.post('/public/oauth2/token')
         .type('form')
         .send(data1)
@@ -1105,7 +1096,7 @@ describe('oauth2 token API', function() {
         .expect(function(res1) {
           var refreshToken = res1.body.refresh_token;
 
-          //invalid client_secret is provided
+          // invalid client_secret is provided
           var data2 = {
             grant_type: 'refresh_token',
             client_id: clientId,
@@ -1113,13 +1104,13 @@ describe('oauth2 token API', function() {
             refresh_token: refreshToken,
             scope: 'stock weather' };
 
-          //exchange the refresh token with the access token
+          // exchange the refresh token with the access token
           request.post('/public/oauth2/token')
             .type('form')
             .send(data2)
             .expect(401)
             .expect(function(res2) {
-              //check the error and error description
+              // check the error and error description
               assert.equal(res2.body.error,
                       'invalid_client');
               assert.equal(res2.body.error_description,
@@ -1128,7 +1119,6 @@ describe('oauth2 token API', function() {
             .end(function(err, res) {
               done(err);
             });
-
         })
         .end(function(err, res) {
           assert(!err);
@@ -1144,7 +1134,7 @@ describe('oauth2 token API', function() {
         client_secret: clientSecret,
         scope: 'stock weather' };
 
-      //request the access token
+      // request the access token
       request.post('/oauth2/token')
         .type('form')
         .send(data1)
@@ -1152,20 +1142,20 @@ describe('oauth2 token API', function() {
         .expect(function(res1) {
           var refreshToken = res1.body.refresh_token;
 
-          //no client_secret is provided
+          // no client_secret is provided
           var data2 = {
             grant_type: 'refresh_token',
             client_id: clientId,
             refresh_token: refreshToken,
             scope: 'stock weather' };
 
-          //exchange the refresh token with the access token
+          // exchange the refresh token with the access token
           request.post('/oauth2/token')
             .type('form')
             .send(data2)
             .expect(400)
             .expect(function(res2) {
-              //check the error and error description
+              // check the error and error description
               assert.equal(res2.body.error,
                        'invalid_request');
               assert.equal(res2.body.error_description,
@@ -1174,7 +1164,6 @@ describe('oauth2 token API', function() {
             .end(function(err, res) {
               done(err);
             });
-
         })
         .end(function(err, res) {
           assert(!err);
@@ -1189,7 +1178,7 @@ describe('oauth2 token API', function() {
         refresh_token: 'CANNOT_BE_VALID',
         scope: 'stock weather' };
 
-      //exchange the refresh token with the access token
+      // exchange the refresh token with the access token
       request.post('/oauth2/token')
         .type('form')
         .send(data)
@@ -1213,7 +1202,7 @@ describe('oauth2 token API', function() {
                        'jE0NjYwNjQwMDMwNjR9.K-IVR5f442G0MhIBfQMMybjKm_J1LPrUM0xhPaNC82c',
         scope: 'stock weather' };
 
-      //exchange the refresh token with the access token
+      // exchange the refresh token with the access token
       request.post('/oauth2/token')
         .type('form')
         .send(data)
@@ -1239,7 +1228,7 @@ describe('oauth2 token API', function() {
         .send(data)
         .expect(200)
         .expect(function(res) {
-          //only access token is issued but not refresh token
+          // only access token is issued but not refresh token
           assert(res.body.access_token);
 
           assert(res.body.expires_in, 7);
@@ -1270,7 +1259,7 @@ describe('oauth2 token API', function() {
         .send(data)
         .expect(400)
         .expect(function(res) {
-          //check the error and error description
+          // check the error and error description
           assert.equal(res.body.error,
                   'unsupported_grant_type');
           assert.equal(res.body.error_description,
@@ -1289,7 +1278,7 @@ describe('oauth2 token API', function() {
         client_secret: clientSecret,
         scope: 'stock weather' };
 
-      //request the access token
+      // request the access token
       request.post('/oauth2/token')
         .type('form')
         .send(data1)
@@ -1307,12 +1296,12 @@ describe('oauth2 token API', function() {
           console.log('Waiting for %d seconds to test expired refresh token...',
                   timeout / 1000);
           setTimeout(function() {
-            //exchange the refresh token with the access token
+            // exchange the refresh token with the access token
             request.post('/oauth2/token')
               .type('form')
               .send(data2)
               .expect(function(res2) {
-                //check the error and error description
+                // check the error and error description
                 assert.equal(res2.body.error,
                         'invalid_grant');
                 assert.equal(res2.body.error_description,
@@ -1338,12 +1327,12 @@ describe('oauth2 token API', function() {
         client_secret: clientSecret,
         scope: 'stock weather' };
 
-      //request the access token
+      // request the access token
       request.post('/oauth2/token')
         .type('form')
         .send(data1)
         .expect(function(res1) {
-          var refreshToken = res1.body.refresh_token; //the first one
+          var refreshToken = res1.body.refresh_token; // the first one
 
           var data2 = {
             grant_type: 'refresh_token',
@@ -1351,11 +1340,11 @@ describe('oauth2 token API', function() {
             client_secret: clientSecret,
             scope: 'stock weather' };
 
-          //exchange the refresh token for another two (=3-1) times
+          // exchange the refresh token for another two (=3-1) times
           (function testRefreshTokenCount(token, count) {
             data2.refresh_token = token;
 
-            //exchange the refresh token with the access token
+            // exchange the refresh token with the access token
             request.post('/oauth2/token')
               .type('form')
               .send(data2)
@@ -1366,14 +1355,14 @@ describe('oauth2 token API', function() {
                 if (count > 0) {
                   var jwtTkn = decodeToken(res2.body.refresh_token);
 
-                  //token should be issued to this client
+                  // token should be issued to this client
                   assert.equal(jwtTkn.aud, clientId);
                   assert.equal(12, (jwtTkn.exp - jwtTkn.iat) / 1000);
 
-                  //another exchange
+                  // another exchange
                   testRefreshTokenCount(res2.body.refresh_token, count - 1);
                 } else {
-                  //This time, no refresh token should be returned.
+                  // This time, no refresh token should be returned.
                   assert(!res2.body.refresh_token);
                   done(err);
                 }
@@ -1385,7 +1374,7 @@ describe('oauth2 token API', function() {
         });
     });
 
-    //same refresh token can only be used for only one time
+    // same refresh token can only be used for only one time
     it('cannot be used again', function(done) {
       var data1 = {
         grant_type: 'client_credentials',
@@ -1393,7 +1382,7 @@ describe('oauth2 token API', function() {
         client_secret: clientSecret,
         scope: 'stock weather' };
 
-      //request the access token
+      // request the access token
       request.post('/oauth2/token')
         .type('form')
         .send(data1)
@@ -1405,11 +1394,11 @@ describe('oauth2 token API', function() {
             refresh_token: res1.body.refresh_token,
             scope: 'stock weather' };
 
-          //Use the same refresh token twice. The second time should fail
+          // Use the same refresh token twice. The second time should fail
           function test() {
             var count = 2;
             return function testRefreshToken() {
-              //exchange the refresh token with the access token
+              // exchange the refresh token with the access token
               request.post('/oauth2/token')
                 .type('form')
                 .send(data2)
@@ -1417,11 +1406,11 @@ describe('oauth2 token API', function() {
                   assert(!err, 'Unexpected error');
                   count--;
                   if (count > 0) {
-                    //the access token is successfully received
+                    // the access token is successfully received
                     assert(res2.body.access_token);
                     testRefreshToken();
                   } else {
-                    //failed to request an access token with a used refresh token
+                    // failed to request an access token with a used refresh token
                     assert(!res2.body.access_token);
                     assert(!res2.body.refresh_token);
 
@@ -1443,7 +1432,7 @@ describe('oauth2 token API', function() {
         });
     });
 
-    //The given refresh token should be deleted if there is any auth error.
+    // The given refresh token should be deleted if there is any auth error.
     it('auth error should revoke the token', function(done) {
       var data1 = {
         grant_type: 'client_credentials',
@@ -1451,7 +1440,7 @@ describe('oauth2 token API', function() {
         client_secret: clientSecret,
         scope: 'stock weather' };
 
-      //request the access token
+      // request the access token
       request.post('/oauth2/token')
         .type('form')
         .send(data1)
@@ -1462,13 +1451,13 @@ describe('oauth2 token API', function() {
             refresh_token: res1.body.refresh_token,
             scope: 'stock weather' };
 
-          //The refresh token will be revoked if there is auth error
+          // The refresh token will be revoked if there is auth error
           function test() {
             var count = 2;
             return function testRefreshToken() {
               data2['client_secret'] = (count > 1 ? 'badpass' : clientSecret);
 
-              //exchange the refresh token with the access token
+              // exchange the refresh token with the access token
               request.post('/oauth2/token')
                 .type('form')
                 .send(data2)
@@ -1476,7 +1465,7 @@ describe('oauth2 token API', function() {
                   assert(!err, 'Unexpected error');
                   count--;
                   if (count > 0) {
-                    //auth error
+                    // auth error
                     assert(!res2.body.access_token);
                     assert(!res2.body.refresh_token);
 
@@ -1485,10 +1474,10 @@ describe('oauth2 token API', function() {
                     assert.equal(res2.body.error_description,
                             'Authentication error');
 
-                    //call one more time
+                    // call one more time
                     testRefreshToken();
                   } else {
-                    //failed to request an access token with a used refresh token
+                    // failed to request an access token with a used refresh token
                     assert(!res2.body.access_token);
                     assert(!res2.body.refresh_token);
 
@@ -1497,7 +1486,7 @@ describe('oauth2 token API', function() {
                     assert.equal(res2.body.error_description,
                             'Invalid refresh token');
 
-                    //test is done
+                    // test is done
                     done();
                   }
                 });
@@ -1533,7 +1522,7 @@ describe('oauth2 token API', function() {
         });
     });
 
-    //the client doesn't subscribe the plan that include the api
+    // the client doesn't subscribe the plan that include the api
     it('unregistered client', function(done) {
       var clientId2 = '20fd2370-4346-4961-9db7-abdc6d58b3f8';
       var clientSecret2 = 'V1fI2vF1tL0sG1vX6bF7sM7qW2pM7gP1aA3oG5dF8iF4oU1rN7';
@@ -1550,7 +1539,7 @@ describe('oauth2 token API', function() {
         .send(data)
         .expect(401)
         .expect(function(res) {
-          //check the error and error description
+          // check the error and error description
           assert.equal(res.body.error,
                   'invalid_client');
           assert.equal(res.body.error_description,
@@ -1572,11 +1561,11 @@ describe('oauth2 token API', function() {
         .expect(200)
         .expect('Access-Control-Allow-Origin', 'http://example.com')
         .expect('Access-Control-Allow-Methods', 'POST,OPTIONS')
-        //.expect('Access-Control-Allow-Headers', 'X-DUMMY-ID,Content-Type')
-        //.expect('X-Powered-By', 'MicroGateway')
+        // .expect('Access-Control-Allow-Headers', 'X-DUMMY-ID,Content-Type')
+        // .expect('X-Powered-By', 'MicroGateway')
         .end(function(err, res) {
           if (res) {
-            //empty body
+            // empty body
             assert(!res.headers['content-length'] || res.headers['content-length'] === '0');
 
             assert(res.headers['access-control-expose-headers']
@@ -1587,7 +1576,7 @@ describe('oauth2 token API', function() {
     });
 
     it('actual request', function(done) {
-      //send the AZ request to the /authorize endpoint
+      // send the AZ request to the /authorize endpoint
       request.get('/oauth2/authorize')
         .set('X-DUMMY-ID', 'dummy')
         .set('Origin', 'http://myApp.com')
@@ -1618,7 +1607,7 @@ describe('oauth2 token API', function() {
 
   var testAppId = '0af99e4b-8d76-4add-bdc5-3aac1c374f21';
   var testAppSecret = 'cB3eU4wQ4dF0oG5iK4dP4nU2wT6iE6kP8hF5rP8oK1iL4yD7pL';
-  //the 'test-app' should be able to call the oauth2 API
+  // the 'test-app' should be able to call the oauth2 API
   it('test-app-enabled', function(done) {
     var data = {
       grant_type: 'client_credentials',
@@ -1642,5 +1631,4 @@ describe('oauth2 token API', function() {
         done(err);
       });
   });
-
 });

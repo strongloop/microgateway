@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var supertest = require('supertest');
@@ -13,7 +12,6 @@ var dsCleanupFile = require('./support/utils').dsCleanupFile;
 var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 describe('operation rate limiting test', function() {
-
   var request;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/default';
@@ -258,5 +256,4 @@ describe('operation rate limiting test', function() {
   }
 
   tests('apim');
-
 });

@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var supertest = require('supertest');
@@ -14,7 +13,6 @@ var dsCleanup = require('./support/utils').dsCleanup;
 var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 describe('basic auth policy', function() {
-
   var request;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/basic';
@@ -60,7 +58,6 @@ describe('basic auth policy', function() {
   });
 
   describe('Basic Auth with LDAP', function() {
-
     it('should fail due to missing LDAP registry', function(done) {
       request
       .post('/basic/path-1')
@@ -114,7 +111,6 @@ describe('basic auth policy', function() {
         .auth('user1', 'capstone123')
         .expect(401, done);
       });
-
     });
 
     describe('With TLS', function() {
@@ -126,7 +122,7 @@ describe('basic auth policy', function() {
       });
     });
 
-    //describe('With long reply time', function() {
+    // describe('With long reply time', function() {
     //  it('should timeout', function(done) {
     //    this.timeout(15000);
     //    request
@@ -134,12 +130,10 @@ describe('basic auth policy', function() {
     //    .auth('slow', 'slowpass')
     //    .expect(401, done);
     //  });
-    //});
-
+    // });
   });
 
   describe('Basic Auth with HTTP', function() {
-
     it('should pass using http with root:Hunter2', function(done) {
       request
       .get('/basic/path-2')
@@ -154,15 +148,13 @@ describe('basic auth policy', function() {
       .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
     });
 
-    //it('should timeout', function(done) {
+    // it('should timeout', function(done) {
     //  this.timeout(150000);
     //  request
     //  .get('/basic/slow-basic-http')
     //  .auth('root', 'Hunter2')
     //  .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
-    //});
-
-
+    // });
   });
 
   describe('Basic Auth with HTTPS', function() {
@@ -180,12 +172,12 @@ describe('basic auth policy', function() {
       .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
     });
 
-    //it('should timeout', function(done) {
+    // it('should timeout', function(done) {
     //  this.timeout(15000);
     //  request
     //  .get('/basic/slow-basic-https')
     //  .auth('root', 'Hunter2')
     //  .expect(401, { name: 'PreFlowError', message: 'unable to process the request' }, done);
-    //});
+    // });
   });
 });

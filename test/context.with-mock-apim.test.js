@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var _ = require('lodash');
@@ -14,7 +13,6 @@ var microgw = require('../lib/microgw');
 var supertest = require('supertest');
 var dsCleanup = require('./support/utils').dsCleanup;
 var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
-
 
 describe('Context variables testing with mock apim server', function() {
   var request, path, apiDocuments;
@@ -169,16 +167,14 @@ describe('Context variables testing with mock apim server', function() {
 
       request
         .get('/v1/routes?client_id=612caa59-9649-491f-99b7-d9a941c4bd2e')
-        //.set('x-ibm-client-id', '612caa59-9649-491f-99b7-d9a941c4bd2e')
-        //.set('x-ibm-client-secret', 'k5YeP1pA1l+QBRq8fdtTDx7+qC/Dim7mSZyS1yRo8ww=')
+        // .set('x-ibm-client-id', '612caa59-9649-491f-99b7-d9a941c4bd2e')
+        // .set('x-ibm-client-secret', 'k5YeP1pA1l+QBRq8fdtTDx7+qC/Dim7mSZyS1yRo8ww=')
         .expect(function(res) {
           verifyResponse(res.body, expected);
         })
         .end(done);
     });
-
   });
-
 
   describe('with organization / catalog shortname in path', function() {
     before(function(done) {
@@ -258,16 +254,14 @@ describe('Context variables testing with mock apim server', function() {
 
       request
         .get('/apim/sb/v1/routes?client_id=612caa59-9649-491f-99b7-d9a941c4bd2e')
-        //.set('x-ibm-client-id', '612caa59-9649-491f-99b7-d9a941c4bd2e')
-        //.set('x-ibm-client-secret', 'k5YeP1pA1l+QBRq8fdtTDx7+qC/Dim7mSZyS1yRo8ww=')
+        // .set('x-ibm-client-id', '612caa59-9649-491f-99b7-d9a941c4bd2e')
+        // .set('x-ibm-client-secret', 'k5YeP1pA1l+QBRq8fdtTDx7+qC/Dim7mSZyS1yRo8ww=')
         .expect(function(res) {
           verifyResponse(res.body, expected);
         })
         .end(done);
     });
-
   });
-
 
   function verifyResponse(actual, expected) {
     // compare and remove the variables whose value changes per environment
@@ -277,7 +271,6 @@ describe('Context variables testing with mock apim server', function() {
     delete expected.api.endpoint.address;
 
     assert.deepEqual(actual, expected);
-
   }
 
   function getAPIDefinitions() {
@@ -292,5 +285,4 @@ describe('Context variables testing with mock apim server', function() {
     });
     return result;
   }
-
 });

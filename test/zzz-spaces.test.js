@@ -2,8 +2,7 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
-/*eslint-env node, mocha*/
+/* eslint-env node, mocha */
 'use strict';
 
 var supertest = require('supertest');
@@ -24,7 +23,6 @@ var srcPrivKey = path.resolve(__dirname, 'definitions',
 var srcPubKey = path.resolve(__dirname, 'definitions',
         'analytics', 'id_rsa.pub');
 
-
 function copyKeys() {
   return new Promise(function(resolve, reject) {
     try {
@@ -38,7 +36,7 @@ function copyKeys() {
     } catch (e) {}
 
     try {
-      //need to copy keys
+      // need to copy keys
       var buf1 = fs.readFileSync(srcPrivKey);
       var buf2 = fs.readFileSync(srcPubKey);
       fs.writeFileSync(privKey, buf1);
@@ -68,14 +66,13 @@ function delKeys() {
 }
 
 describe('analytics + invoke policy', function() {
-
   var request;
   before(function(done) {
-    //Use production instead of CONFIG_DIR: reading from apim instead of laptop
+    // Use production instead of CONFIG_DIR: reading from apim instead of laptop
     process.env.NODE_ENV = 'production';
     process.env.CONFIG_DIR = __dirname + '/definitions/default';
 
-    //The apim server and datastore
+    // The apim server and datastore
     process.env.APIMANAGER = '127.0.0.1';
     process.env.APIMANAGER_PORT = 8081;
     process.env.APIMANAGER_CATALOG = '564b48aae4b0869c782edc2b';
@@ -123,13 +120,13 @@ describe('analytics + invoke policy', function() {
 
   var data = { msg: 'Hello world' };
 
-  //invoke policy to post a request
+  // invoke policy to post a request
   it('single record', function(done) {
     this.timeout(10000);
 
-    //pass the done cb to analytics moc server
+    // pass the done cb to analytics moc server
     analytics.setOneTimeDoneCB(function(event) {
-      //may check the payload if needed
+      // may check the payload if needed
       event = event || '';
       var records = event.trim().split('\n').filter(function(item) {
         if (item && item.length === 0) {
@@ -147,10 +144,9 @@ describe('analytics + invoke policy', function() {
       .expect(200, /z-url: \/\/invoke\/basic/)
       .end(function(err) {
         if (err) {
-          //no need to wait for the analytics moc server
+          // no need to wait for the analytics moc server
           done(err);
         }
       });
   });
-
 });

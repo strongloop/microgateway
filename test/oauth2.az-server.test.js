@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var _ = require('lodash');
@@ -18,14 +17,13 @@ var authServer = require('./support/auth-server');
 var apimServer = require('./support/mock-apim-server/apim-server');
 
 describe('oauth2 AZ-server', function() {
-
   describe('default login form - authenticated', function() {
     var request;
     before(function(done) {
-      //Use production instead of CONFIG_DIR: reading from apim instead of laptop
+      // Use production instead of CONFIG_DIR: reading from apim instead of laptop
       process.env.NODE_ENV = 'production';
 
-      //The apim server and datastore
+      // The apim server and datastore
       process.env.APIMANAGER = '127.0.0.1';
       process.env.APIMANAGER_PORT = 8000;
       process.env.DATASTORE_PORT = 4000;
@@ -323,7 +321,7 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function(err2, res2) {
               try {
-                //get login form again with error message
+                // get login form again with error message
                 assert(res2.statusCode === 200, 'not 200');
                 assert(res2.header['www-authenticate'] === undefined,
                     'extra www-authenticate header');
@@ -364,7 +362,7 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function(err2, res2) {
               try {
-                //get login form again with error message
+                // get login form again with error message
                 assert(res2.statusCode === 200, 'not 200');
                 assert(res2.header['www-authenticate'] === undefined,
                     'extra www-authenticate header');
@@ -379,16 +377,15 @@ describe('oauth2 AZ-server', function() {
           }
         });
     });
-
   });
 
   describe('basic - authenticated', function() {
     var request;
     before(function(done) {
-      //Use production instead of CONFIG_DIR: reading from apim instead of laptop
+      // Use production instead of CONFIG_DIR: reading from apim instead of laptop
       process.env.NODE_ENV = 'production';
 
-      //The apim server and datastore
+      // The apim server and datastore
       process.env.APIMANAGER = '127.0.0.1';
       process.env.APIMANAGER_PORT = 8000;
       process.env.DATASTORE_PORT = 4000;
@@ -570,14 +567,13 @@ describe('oauth2 AZ-server', function() {
     });
   });
 
-
   describe('custom login form - authenticated', function() {
     var request;
     before(function(done) {
-      //Use production instead of CONFIG_DIR: reading from apim instead of laptop
+      // Use production instead of CONFIG_DIR: reading from apim instead of laptop
       process.env.NODE_ENV = 'production';
 
-      //The apim server and datastore
+      // The apim server and datastore
       process.env.APIMANAGER = '127.0.0.1';
       process.env.APIMANAGER_PORT = 8000;
       process.env.DATASTORE_PORT = 4000;
@@ -661,7 +657,6 @@ describe('oauth2 AZ-server', function() {
             done(e);
           }
         });
-
     });
 
     it('green path - code', function(done) {
@@ -791,7 +786,6 @@ describe('oauth2 AZ-server', function() {
             done(e);
           }
         });
-
     });
 
     it('invalid transaction id - code', function(done) {
@@ -862,7 +856,7 @@ describe('oauth2 AZ-server', function() {
                 assert(res2.header['www-authenticate'] === undefined,
                     'extra www-authenticate header');
                 assert(/Custom Login Form/.test(res2.text), 'not custom form');
-                //check the specific string in custom form when login fails
+                // check the specific string in custom form when login fails
                 assert(res2.text.indexOf('Failed to login! At least one of') !== -1);
                 done(err2);
               } catch (e2) {
@@ -873,7 +867,6 @@ describe('oauth2 AZ-server', function() {
             done(e);
           }
         });
-
     });
 
     it('user login failed - code', function(done) {
@@ -906,7 +899,7 @@ describe('oauth2 AZ-server', function() {
                 assert(res2.header['www-authenticate'] === undefined,
                     'extra www-authenticate header');
                 assert(/Custom Login Form/.test(res2.text), 'not custom form');
-                //check the specific string in custom form when login fails
+                // check the specific string in custom form when login fails
                 assert(res2.text.indexOf('Failed to login! At least one of') !== -1);
                 done(err2);
               } catch (e2) {
@@ -945,12 +938,12 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function(err2, res2) {
               try {
-                //login failed, get login page again
+                // login failed, get login page again
                 assert(res2.statusCode === 200, 'not 200');
                 assert(res2.header['www-authenticate'] === undefined,
                     'extra www-authenticate header');
                 assert(/Custom Login Form/.test(res2.text), 'not custom form');
-                //check the specific string in custom form when login fails
+                // check the specific string in custom form when login fails
                 assert(res2.text.indexOf('Failed to login! At least one of') !== -1);
                 done(err2);
               } catch (e2) {
@@ -962,16 +955,15 @@ describe('oauth2 AZ-server', function() {
           }
         });
     });
-
   });
 
   describe('redirect', function() {
     var request;
     before(function(done) {
-      //Use production instead of CONFIG_DIR: reading from apim instead of laptop
+      // Use production instead of CONFIG_DIR: reading from apim instead of laptop
       process.env.NODE_ENV = 'production';
 
-      //The apim server and datastore
+      // The apim server and datastore
       process.env.APIMANAGER = '127.0.0.1';
       process.env.APIMANAGER_PORT = 8000;
       process.env.DATASTORE_PORT = 4000;
@@ -1064,7 +1056,6 @@ describe('oauth2 AZ-server', function() {
             done(e);
           }
         });
-
     });
 
     it('green path - code', function(done) {
@@ -1335,16 +1326,15 @@ describe('oauth2 AZ-server', function() {
           }
         });
     });
-
   });
 
   describe('basic - default consent', function() {
     var request;
     before(function(done) {
-      //Use production instead of CONFIG_DIR: reading from apim instead of laptop
+      // Use production instead of CONFIG_DIR: reading from apim instead of laptop
       process.env.NODE_ENV = 'production';
 
-      //The apim server and datastore
+      // The apim server and datastore
       process.env.APIMANAGER = '127.0.0.1';
       process.env.APIMANAGER_PORT = 8000;
       process.env.DATASTORE_PORT = 4000;
@@ -1574,7 +1564,6 @@ describe('oauth2 AZ-server', function() {
         });
     });
 
-
     it('select fewer scopes - token', function(done) {
       request.get('/security/oauth2/authorize')
         .query({ client_id: '2609421b-4a69-40d7-8f13-44bdf3edd18f' })
@@ -1777,16 +1766,15 @@ describe('oauth2 AZ-server', function() {
           }
         });
     });
-
   });
 
   describe('default login form - default consent', function() {
     var request;
     before(function(done) {
-      //Use production instead of CONFIG_DIR: reading from apim instead of laptop
+      // Use production instead of CONFIG_DIR: reading from apim instead of laptop
       process.env.NODE_ENV = 'production';
 
-      //The apim server and datastore
+      // The apim server and datastore
       process.env.APIMANAGER = '127.0.0.1';
       process.env.APIMANAGER_PORT = 8000;
       process.env.DATASTORE_PORT = 4000;
@@ -2109,7 +2097,7 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function(err2, res2) {
               try {
-                //login fails, get login form again
+                // login fails, get login form again
                 assert(res2.statusCode === 200, 'not 200');
                 assert(res2.header['www-authenticate'] === undefined,
                     'extra www-authenticate header');
@@ -2150,7 +2138,7 @@ describe('oauth2 AZ-server', function() {
             .send('transaction_id=' + match2[1])
             .end(function(err2, res2) {
               try {
-                //login fails, get login form again
+                // login fails, get login form again
                 assert(res2.statusCode === 200, 'not 200');
                 assert(res2.header['www-authenticate'] === undefined,
                     'extra www-authenticate header');
@@ -2443,10 +2431,10 @@ describe('oauth2 AZ-server', function() {
   describe('basic - custom consent', function() {
     var request;
     before(function(done) {
-      //Use production instead of CONFIG_DIR: reading from apim instead of laptop
+      // Use production instead of CONFIG_DIR: reading from apim instead of laptop
       process.env.NODE_ENV = 'production';
 
-      //The apim server and datastore
+      // The apim server and datastore
       process.env.APIMANAGER = '127.0.0.1';
       process.env.APIMANAGER_PORT = 8000;
       process.env.DATASTORE_PORT = 4000;
@@ -2880,10 +2868,10 @@ describe('oauth2 AZ-server', function() {
   describe('basic - bad custom consent', function() {
     var request;
     before(function(done) {
-      //Use production instead of CONFIG_DIR: reading from apim instead of laptop
+      // Use production instead of CONFIG_DIR: reading from apim instead of laptop
       process.env.NODE_ENV = 'production';
 
-      //The apim server and datastore
+      // The apim server and datastore
       process.env.APIMANAGER = '127.0.0.1';
       process.env.APIMANAGER_PORT = 8000;
       process.env.DATASTORE_PORT = 4000;
@@ -2972,7 +2960,6 @@ describe('oauth2 AZ-server', function() {
           }
         });
     });
-
   });
 
   describe('custom consent form - non-end-2-end', function() {
@@ -2992,7 +2979,6 @@ describe('oauth2 AZ-server', function() {
     });
 
     after(function(done) {
-
       apimServer.stop()
         .then(done, done)
         .catch(done);
@@ -3002,7 +2988,7 @@ describe('oauth2 AZ-server', function() {
 
     it('no input fields element', function(done) {
       var server = { _respond: function(oauth2, ctx, cb) {
-        //in this test case, this shouldn't be called
+        // in this test case, this shouldn't be called
       } };
       var handler = customConsentForm(
         {
@@ -3019,7 +3005,7 @@ describe('oauth2 AZ-server', function() {
 
     it('no form element', function(done) {
       var server = { _respond: function(oauth2, ctx, cb) {
-        //in this test case, this shouldn't be called
+        // in this test case, this shouldn't be called
       } };
       var handler = customConsentForm(
         {
@@ -3036,7 +3022,7 @@ describe('oauth2 AZ-server', function() {
 
     it('no approve button', function(done) {
       var server = { _respond: function(oauth2, ctx, cb) {
-        //in this test case, this shouldn't be called
+        // in this test case, this shouldn't be called
       } };
       var handler = customConsentForm(
         {
@@ -3053,7 +3039,7 @@ describe('oauth2 AZ-server', function() {
 
     it('check element replacement', function(done) {
       var server = { _respond: function(oauth2, ctx, cb) {
-        //in this test case, this shouldn't be called
+        // in this test case, this shouldn't be called
       } };
       var handler = customConsentForm(
         {
@@ -3086,9 +3072,7 @@ describe('oauth2 AZ-server', function() {
         done(error === 'route' ? undefined : error);
       });
     });
-
   });
-
 });
 
 /*

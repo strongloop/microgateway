@@ -2,11 +2,12 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
+'use strict';
 
 var Promise = require('bluebird');
 var fs = require('fs');
 var https = require('https');
-var static = require('node-static');
+var nstatic = require('node-static');
 
 var server;
 
@@ -27,7 +28,7 @@ exports.start = function(host, port, path) {
       key: fs.readFileSync(__dirname + '/key.pem'),
       cert: fs.readFileSync(__dirname + '/cert.pem') };
 
-    var files = new static.Server(path);
+    var files = new nstatic.Server(path);
 
     function serveFiles(request, response) {
       files.serve(request, response, function(err, res) {
@@ -47,7 +48,6 @@ exports.start = function(host, port, path) {
         resolve();
       }
     });
-
   });
 };
 
@@ -59,5 +59,5 @@ exports.stop = function() {
   });
 };
 
-//exports.start(host,port);
+// exports.start(host,port);
 

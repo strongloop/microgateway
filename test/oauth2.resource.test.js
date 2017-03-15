@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var Promise = require('bluebird');
@@ -18,15 +17,14 @@ var echo = require('./support/echo-server');
 var dsCleanup = require('./support/utils').dsCleanup;
 var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
-//var configDir = path.join(__dirname, 'definitions', 'oauth');
+// var configDir = path.join(__dirname, 'definitions', 'oauth');
 var configDir = path.join(__dirname, 'definitions', 'oauth2-resource');
 
 var request, NODE_TLS_REJECT_UNAUTHORIZED;
 
 describe('oauth testing onprem', function() {
-
   before(function(done) {
-    //process.env.CONFIG_DIR = configDir;
+    // process.env.CONFIG_DIR = configDir;
     process.env.NODE_ENV = 'production';
     process.env.APIMANAGER = '127.0.0.1';
     process.env.APIMANAGER_PORT = 8081;
@@ -84,17 +82,15 @@ describe('oauth testing onprem', function() {
   });
 
   describe('Bad tokens', function() {
-
     it('Attempt to access resource - wrong scope', function(done) {
       requestAccessTokenClientCredentials('stock:info').then(function(tokens) {
         request.get('/stock/quote?symbol=IBM')
           .set('authorization', 'Bearer ' + tokens.access_token)
-          //.expect(401)
+          // .expect(401)
           .expect(403)  // TODO verify what response code we should expect here
           .end(done);
       }, done);
     });
-
 
     it('Attempt to access resource with expired token', function(done) {
       var access_token = 'eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJMRjJtMVdXQTVHQURrRFA5MjgzTXFwMVh3Y0dId' +
@@ -182,7 +178,6 @@ describe('oauth testing onprem', function() {
         .expect(401)
         .end(done);
     });
-
   });
 });
 

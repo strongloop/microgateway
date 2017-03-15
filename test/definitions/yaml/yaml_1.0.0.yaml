@@ -39,7 +39,7 @@ x-ibm-configuration:
                     title: set-variable
                     actions:
                       - set: message.body
-                        value: hello
+                        value: hello world
                 - set-variable:
                     title: set-content-type
                     actions:

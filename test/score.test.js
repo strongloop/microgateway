@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var supertest = require('supertest');
@@ -12,7 +11,6 @@ var dsCleanupFile = require('./support/utils').dsCleanupFile;
 var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 describe('matching score test', function() {
-
   var request;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/default';
@@ -42,7 +40,6 @@ describe('matching score test', function() {
       .then(function() { return mg.stop(); })
       .then(done, done);
   });
-
 
   function tests(env) {
     var clientId1 = '612caa59-9649-491f-99b7-d9a941c4bd2e';
@@ -100,5 +97,4 @@ describe('matching score test', function() {
   }
 
   tests('apim');
-
 });
