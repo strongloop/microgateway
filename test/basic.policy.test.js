@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var supertest = require('supertest');
@@ -13,7 +12,6 @@ var dsCleanupFile = require('./support/utils').dsCleanupFile;
 var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 describe('basic auth policy', function() {
-
   var request;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/default';
@@ -82,5 +80,4 @@ describe('basic auth policy', function() {
       .send({ date: 'today', route: '66' })
       .expect(200, '{"date":"today","route":"66"}', done);
   });
-
 });

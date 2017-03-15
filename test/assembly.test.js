@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var _ = require('lodash');
@@ -14,7 +13,6 @@ var dsCleanupFile = require('./support/utils').dsCleanupFile;
 var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 describe('preflow and flow-engine integration', function() {
-
   // using the config/default configuration files
   describe('test using default configuration', function() {
     var request;
@@ -45,7 +43,6 @@ describe('preflow and flow-engine integration', function() {
         .then(function() { return mg.stop(); })
         .then(done, done);
     });
-
 
     var clientId1 = 'fb82cb59-ba95-4c34-8612-e63697d7b845';
     it('client_id=' + clientId1 + ' (query) should invoke API1 (apim-lookup) active=true, state=ACTIVE',
@@ -618,7 +615,6 @@ describe('preflow and flow-engine integration', function() {
        */
   }); // end of 'test using default configuration' test block
 
-
   // using the test/definitions/assembly configuration files
   describe('test using test/assembly configuration', function() {
     var request;
@@ -733,7 +729,5 @@ describe('preflow and flow-engine integration', function() {
         });
       });
     });
-
   });  // end of 'test using test/assembly configuration' test block
-
 });

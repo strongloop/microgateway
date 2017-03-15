@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var express = require('express');
@@ -12,7 +11,6 @@ var context = require('../lib/context');
 var errhandler = require('../lib/error-handler');
 
 describe('Error middleware', function() {
-
   it('should return default status code and message', function(done) {
     var app = express();
     app.use(context());
@@ -73,5 +71,4 @@ describe('Error middleware', function() {
       .get('/')
       .expect('X-Error', 'Not working', done);
   });
-
 });

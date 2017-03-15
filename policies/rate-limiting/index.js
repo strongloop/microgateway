@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 var redisLimiter = require('./redis');
 var tokenBucketLimiter = require('./token-bucket');
@@ -67,5 +66,4 @@ module.exports = function(options) {
     scope = scope || '*';
     return scope;
   }
-
 };

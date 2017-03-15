@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var supertest = require('supertest');
@@ -14,7 +13,6 @@ var dsCleanupFile = require('./support/utils').dsCleanupFile;
 var fs = require('fs');
 
 describe('general laptop', function() {
-
   var request;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/yaml';
@@ -50,11 +48,9 @@ describe('general laptop', function() {
       .send(payload)
       .expect(200, done);
   });
-
 });
 
 describe('Monitor modification on yaml files', function() {
-
   var request;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/yaml';

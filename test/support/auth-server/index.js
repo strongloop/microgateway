@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var Promise = require('bluebird');
@@ -22,9 +21,9 @@ function theApplication(req, resp) {
   });
 
   req.on('end', function() {
-    //general cases
+    // general cases
     try {
-      //authenticate first
+      // authenticate first
       var authHdr = req.headers.authorization;
       if (authHdr) {
         var results = ah.parse(authHdr).values;
@@ -58,7 +57,7 @@ function theApplication(req, resp) {
         return;
       }
 
-      //prepare the 200 response
+      // prepare the 200 response
       resp.writeHead(200);
       resp.write('Authentication OK');
       resp.end();
@@ -71,13 +70,13 @@ function theApplication(req, resp) {
   });
 }
 
-//two servers: Sarah and Sandy
+// two servers: Sarah and Sandy
 var sarahKeyf = fs.readFileSync(__dirname + '/sarah.key');
 var sarahCertf = fs.readFileSync(__dirname + '/sarah.crt');
 
 var users = require('./users');
 
-//The server 'Sarah'
+// The server 'Sarah'
 var sslOpts = {
   key: sarahKeyf,
   cert: sarahCertf,
@@ -106,9 +105,9 @@ function theDPAuthApp(userCfg) {
     });
 
     req.on('end', function() {
-      //general cases
+      // general cases
       try {
-        //authenticate first
+        // authenticate first
         var authHdr = req.headers.authorization;
         if (req.url !== '/' && authHdr && accounts) {
           var results = ah.parse(authHdr).values;
@@ -138,7 +137,7 @@ function theDPAuthApp(userCfg) {
           }
         }
 
-        //prepare the 200 response
+        // prepare the 200 response
         resp.writeHeader(200, { 'IBM-App-User': 'tonyf' });
         resp.write('<response>');
         resp.end();
@@ -152,14 +151,14 @@ function theDPAuthApp(userCfg) {
   };
 }
 
-//This http Auth server is only used for DataPower backend servers
+// This http Auth server is only used for DataPower backend servers
 exports.dpAuth = function(port, userCfg) {
   if (port === undefined) {
     port = 3000;
   }
 
   return new Promise(function(resolve, reject) {
-    //One http server
+    // One http server
     dpBackendServer = http.createServer(theDPAuthApp(userCfg));
     dpBackendServer.listen(port);
     console.log('DataPower Auth server (http) is listening at port %d.', port);
@@ -176,15 +175,14 @@ exports.dpAuth = function(port, userCfg) {
   });
 };
 
-
 exports.start = function(port) {
   if (port === undefined) {
     port = 3000;
   }
 
   return new Promise(function(resolve, reject) {
-    //One http server
-    //httpServer = http.createServer(app);
+    // One http server
+    // httpServer = http.createServer(app);
     httpServer = http.createServer(theApplication);
     httpServer.listen(port);
     console.log('Auth server (http) is listening at port %d.', port);

@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var _ = require('lodash');
@@ -14,7 +13,6 @@ var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 var mg = require('../lib/microgw');
 
 describe('Context variables in laptop experience', function() {
-
   var request;
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/context';
@@ -65,8 +63,8 @@ describe('Context variables in laptop experience', function() {
           endpoint: {
             address: '*',
             hostname: 'localhost' },
-          //id: 'context:1.0.0',
-          //method: 'GET',
+          // id: 'context:1.0.0',
+          // method: 'GET',
           name: 'context',
           org: {
             id: 'defaultOrgID',
@@ -270,7 +268,6 @@ describe('Context variables in laptop experience', function() {
       });
   });
 
-
   it('should produce request.parameters for mixed multiple parts', function(done) {
     var payload = 'hello world';
     request
@@ -441,10 +438,7 @@ describe('Context variables in laptop experience', function() {
           done();
         });
       });
-
     });
-
-
   }); // end of 'should parse body according to API consumes' test block
 
   describe('should provide consistent GET response', function() {
@@ -460,7 +454,6 @@ describe('Context variables in laptop experience', function() {
         .set('content-type', 'application/json')
         .expect(200, { name: 'request.body', value: (new Buffer(0)).toJSON() }, done);
     });
-
   }); // end of 'should provide consistent GET response w/ or w/o content-type header' test block
 
   it('should provide vendor extensions', function(done) {
@@ -472,6 +465,4 @@ describe('Context variables in laptop experience', function() {
           'creditcard',
           'paypal' ] }, done);
   });
-
-
 });

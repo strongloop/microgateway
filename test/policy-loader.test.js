@@ -2,11 +2,10 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var policyLoader = require('../lib/policy-loader');
-var should = require('should'); //eslint-disable-line no-unused-vars
+var should = require('should'); // eslint-disable-line no-unused-vars
 var path = require('path');
 
 describe('policy-loader', function() {
@@ -45,7 +44,7 @@ describe('policy-loader', function() {
       var context = {};
       function next() {};
       policies.mypolicy1({}, context, next);
-      //the second mypolicy1 override the first one
+      // the second mypolicy1 override the first one
       context.policyName.should.exactly('mypolicy1a').and.be.a.String();
       policies.mypolicy2({}, context, next);
       context.policyName.should.exactly('mypolicy2').and.be.a.String();
@@ -58,18 +57,18 @@ describe('policy-loader', function() {
 
   describe('error cases', function() {
     // FIXME jcbelles: Didn't we decide to allow relative paths?
-    //it('should throw error if not abs path', function() {
+    // it('should throw error if not abs path', function() {
     //    should.throws(function() {
     //        policyLoader.create(path.resolve('..', 'policies'));
     //    });
-    //});
+    // });
 
     // FIXME jcbelles: Please verify this shouldn't bring down the gateway.
-    //it('should throw error if path is incorrect', function() {
+    // it('should throw error if path is incorrect', function() {
     //    should.throws(function() {
     //        policyLoader.create(path.resolve(__dirname, 'policies'));
     //    });
-    //});
+    // });
 
     it('should not fail if path is incorrect', function() {
       var pl = policyLoader.create(path.resolve(__dirname, 'policies'));
@@ -107,7 +106,7 @@ describe('policy-loader', function() {
       var context = {};
       function next() {};
       policies.mypolicy1({}, context, next);
-      //the second mypolicy1 override the first one
+      // the second mypolicy1 override the first one
       context.policyName.should.exactly('mypolicy1a').and.be.a.String();
       done();
     });
@@ -131,7 +130,7 @@ describe('policy-loader', function() {
       var context = {};
       function next() {};
       policies.mypolicy1({}, context, next);
-      //the second mypolicy1 can't override the first one
+      // the second mypolicy1 can't override the first one
       context.policyName.should.exactly('mypolicy1').and.be.a.String();
       done();
     });
@@ -168,7 +167,7 @@ describe('policy-loader', function() {
       var context = {};
       function next() {};
       policies.mypolicy1({}, context, next);
-      //the second mypolicy1 override the first one
+      // the second mypolicy1 override the first one
       context.policyName.should.exactly('mypolicy1').and.be.a.String();
       done();
     });

@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var _ = require('lodash');
@@ -14,7 +13,6 @@ var Promise = require('bluebird');
 var userfile = path.join(__dirname, 'users.json');
 
 module.exports = function(server, authreq) {
-
   var users = {};
 
   function authorize(req, res, next) {
@@ -80,7 +78,7 @@ module.exports = function(server, authreq) {
 
     server.search('ou=myorg,ou=com', authorize, function(req, res, next) {
       _.forEach(users, function(user) {
-      //for (var user of users.values()) {
+      // for (var user of users.values()) {
         if (req.filter.matches(user.attributes)) {
           res.send(user);
         }
@@ -90,7 +88,7 @@ module.exports = function(server, authreq) {
     });
     server.search('uid=alice,ou=people,dc=sixfour1,dc=com', authorize, function(req, res, next) {
       _.forEach(users, function(user) {
-      //for (var user of users.values()) {
+      // for (var user of users.values()) {
         if (req.filter.matches(user.attributes) &&
             user.dn === 'uid=alice, ou=people, dc=sixfour1, dc=com') {
           res.send(user);

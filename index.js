@@ -2,6 +2,8 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
+'use strict';
+
 var path = require('path');
 var YAML = require('yamljs');
 var logger = require('apiconnect-cli-logger/logger.js')

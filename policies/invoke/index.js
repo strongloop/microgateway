@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 var _ = require('lodash');
 var url = require('url');
@@ -10,25 +9,24 @@ var qs = require('qs');
 var zlib = require('zlib');
 var dsc = require('microgateway-datastore/client/index.js');
 
-////one-time effort: read the cipher table into memory
-//var cipherTable;
-//try {
+/// /one-time effort: read the cipher table into memory
+// var cipherTable;
+// try {
 //  //the mapping table of TLS to OpenSSL ciphersuites
 //  cipherTable = require(__dirname + '/../../lib/cipher-suites.json');
-//}
-//catch (err) {
+// }
+// catch (err) {
 //  logger.error('Warning! Cannot read the cipher table for invoke policy. %s',
 //          err);
 //  cipherTable = {};
-//}
-
+// }
 
 /**
  * Do the real work of the invoke policy: read the property and decide the
  * parameters, establish the connection after everything is ready.
  */
 function _main(props, context, next, logger, writeDst, tlsProfile) {
-  //the default settings and error object
+  // the default settings and error object
   var readSrc;
   var options;
   var isSecured;
@@ -44,7 +42,7 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
     options = url.parse(props['target-url']);
   }
 
-  //target-url
+  // target-url
   if (!options || !options.hostname || !options.protocol ||
           (options.protocol !== 'http:' && options.protocol !== 'https:')) {
     error.message = 'Invalid target-url: "' + props['target-url'] + '"';
@@ -60,7 +58,7 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
     logger.info('[invoke] url: %s', maskQueryStringInURL(options.href));
   }
 
-  //verb: default to request.verb
+  // verb: default to request.verb
   verb = props.verb ? String(props.verb).toUpperCase() :
           (context.request ? context.request.verb.toUpperCase() : undefined);
   if (verb !== 'POST' && verb !== 'GET' && verb !== 'PUT' &&
@@ -74,14 +72,14 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
   }
   logger.debug('[invoke] verb: %s', verb);
 
-  //http-version: 1.1
+  // http-version: 1.1
   if (props['http-version'] && props['http-version'] !== '1.1') {
     error.message = 'Invalid http-version: "' + props['http-version'] + '"';
     next(error);
     return;
   }
 
-  //timeout: between 1 to 86400 seconds
+  // timeout: between 1 to 86400 seconds
   if (!isNaN(parseInt(props.timeout, 10))) {
     var tmp = parseInt(props.timeout, 10);
     if (tmp < 1) {
@@ -94,12 +92,12 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
   }
   logger.debug('[invoke] timeout: %s seconds', timeout);
 
-  //authentication
+  // authentication
   if (props.username && props.password) {
     options.auth = props.username + ':' + props.password;
   }
 
-  //readSrc: decide where to read the data
+  // readSrc: decide where to read the data
   if (props.input) {
     if (typeof props.input === 'string') {
       var theIn = context.get(props.input);
@@ -121,15 +119,15 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
     readSrc = context.message;
   }
 
-  //clone the readSrc.headers, because some headers need to be excluded
+  // clone the readSrc.headers, because some headers need to be excluded
   options.headers = _.clone(readSrc.headers);
 
-  //The headers that should not be copied
+  // The headers that should not be copied
   var excludes = [ 'host', 'connection', 'content-length', 'transfer-encoding' ];
-  //deal with the user-agent: default, custom, remove, nochange
+  // deal with the user-agent: default, custom, remove, nochange
   excludes.push('user-agent');
 
-  //test if the content-type is urlencoded
+  // test if the content-type is urlencoded
   var isFormUrlEncoded;
 
   for (var hn in options.headers) {
@@ -147,15 +145,15 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
       excludes.splice(index, 1);
     }
 
-    //early exit
+    // early exit
     if (excludes.length === 0 && isFormUrlEncoded) {
       break;
     }
   }
-  //inject the *default* User-Agent
+  // inject the *default* User-Agent
   options.headers['User-Agent'] = 'APIConnect/5.0 (MicroGateway)';
 
-  //prepare the data and dataSz
+  // prepare the data and dataSz
   data = (readSrc.body === undefined ? '' : readSrc.body);
   if (!Buffer.isBuffer(data) && typeof data !== 'string') {
     if (typeof data === 'object') {
@@ -170,41 +168,41 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
   }
   dataSz = data.length;
 
-  //chunked-upload
+  // chunked-upload
   if (props['chunked-upload'] && props['chunked-upload'] !== 'false') {
     useChunk = true;
   }
   logger.debug('[invoke] useChunk: %s', useChunk);
 
-  //compression
+  // compression
   if (props.compression === true || props.compression === 'true') {
     compression = true;
   }
   logger.debug('[invoke] compression: %s', compression);
 
-  //Compress the data or not
+  // Compress the data or not
   if (compression) {
     options.headers['Content-Encoding'] = 'gzip';
   }
 
-  //when compression is true, we can only use chunks
+  // when compression is true, we can only use chunks
   if (!compression && !useChunk && verb !== 'GET' && verb !== 'HEAD' && verb !== 'OPTIONS') {
     options.headers['Content-Length'] = dataSz;
     logger.debug('[invoke] content-length = %d', dataSz);
   }
-  //sensitive data
-  //logger.debug('[invoke] w/ headers: %j', options.headers, {});
+  // sensitive data
+  // logger.debug('[invoke] w/ headers: %j', options.headers, {});
 
-  //setup the HTTPs settings
+  // setup the HTTPs settings
   var http = isSecured ? require('https') : require('http');
   if (isSecured) {
     options.agent = false; // do we really want to set this?  no conn pooling
     options.rejectUnauthorized = false;
     if (tlsProfile) {
-      //key
+      // key
       options.key = tlsProfile['private-key'];
 
-      //cert
+      // cert
       for (var c in tlsProfile.certs) {
         if (tlsProfile.certs[c]['cert-type'] === 'PUBLIC') {
           options.cert = tlsProfile.certs[c].cert;
@@ -212,14 +210,13 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
         }
       }
 
-      //ca list
+      // ca list
       options.ca = [];
       for (var p in tlsProfile.certs) {
         if (tlsProfile.certs[p]['cert-type'] === 'CLIENT') {
           logger.debug('[invoke] uses the ca.name: %s',
                   tlsProfile.certs[p].name);
           options.ca.push(tlsProfile.certs[p].cert);
-
         }
       }
 
@@ -227,7 +224,7 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
         options.rejectUnauthorized = true;
         logger.debug('[invoke] rejectUnauthorized = true');
       }
-      //secureProtocol
+      // secureProtocol
       if (tlsProfile.protocols && Array.isArray(tlsProfile.protocols)) {
         for (var j = 0; j < tlsProfile.protocols.length; j++) {
           switch (tlsProfile.protocols[j]) {
@@ -251,11 +248,11 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
         }
       }
 
-      //use default ciphers
+      // use default ciphers
       options.honorCipherOrder = true;
       options.ciphers = 'HIGH:MEDIUM:!aNULL:!eNULL:!RC4:@STRENGTH';
-      //var ciphers = [];
-      //if (tlsProfile.ciphers && Array.isArray(tlsProfile.ciphers)) {
+      // var ciphers = [];
+      // if (tlsProfile.ciphers && Array.isArray(tlsProfile.ciphers)) {
       //  for (var k=0; k<tlsProfile.ciphers.length; k++) {
       //    var cipher = cipherTable[tlsProfile.ciphers[k]];
       //    if (cipher) {
@@ -266,21 +263,21 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
       //      logger.warn("[invoke] unknown cipher: %s", tlsProfile.ciphers[k]);
       //  }
       //  options.ciphers = ciphers.join(':');
-      //}
+      // }
     }
   }
 
-  //write the request
+  // write the request
   var request;
   try {
     request = http.request(options, function(response) {
-      //read the response
+      // read the response
       writeDst.status = {
         code: response.statusCode,
         reason: response.reasonPhrase };
       writeDst.headers = {};
 
-      //note: there is no response.rawHeaders for node v0.10.43
+      // note: there is no response.rawHeaders for node v0.10.43
       var rhrs = response.rawHeaders || response.headers;
       for (var i = 0; i < rhrs.length; i += 2) {
         writeDst.headers[rhrs[i]] = rhrs[i + 1];
@@ -294,10 +291,10 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
       response.on('end', function() {
         logger.info('[invoke] done');
 
-        //Decide whether the body should be a Buffer or JSON object.
-        //If the content-type says it is a JSON object, try to parse it.
+        // Decide whether the body should be a Buffer or JSON object.
+        // If the content-type says it is a JSON object, try to parse it.
         var tmp = Buffer.concat(chunks);
-        var cEncode = response.headers['content-encoding']; //ex: gzip
+        var cEncode = response.headers['content-encoding']; // ex: gzip
         var cType = response.headers['content-type'];
 
         if (!cEncode) {
@@ -312,11 +309,11 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
                   'Leave it as a Buffer object', cType, e);
             }
           }
-          //TODO: parse XML and check SOAPError when applicable?
+          // TODO: parse XML and check SOAPError when applicable?
         }
         writeDst.body = tmp;
 
-        //Let Express itself to decide the final transfer-encoding
+        // Let Express itself to decide the final transfer-encoding
         var discard = [ 'transfer-encoding' ];
         for (var m in discard) {
           var tbd = discard[m];
@@ -328,7 +325,7 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
           }
         }
 
-        //Only 2xx is considered as a success. Otherwise, an OperationError.
+        // Only 2xx is considered as a success. Otherwise, an OperationError.
         if (/^2/.test(String(response.statusCode))) {
           logger.info('[invoke] received a %d response', writeDst.status.code);
           next();
@@ -350,7 +347,7 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
     return;
   }
 
-  //setup the timeout callback
+  // setup the timeout callback
   request.setTimeout(timeout * 1000, function() {
     logger.error('[invoke] The invoke policy is timeouted.');
 
@@ -361,7 +358,7 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
     request.abort();
   });
 
-  //setup the error callback
+  // setup the error callback
   request.on('error', function(err) {
     logger.error('[invoke] request failed: %s', err);
 
@@ -396,13 +393,13 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
 function invoke(props, context, flow) {
   var logger = flow.logger;
 
-  //writeDst: first thing, decide where to write the response
+  // writeDst: first thing, decide where to write the response
   if (context.message === undefined) {
-    context.message = {}; //In fact, this should never happen
+    context.message = {}; // In fact, this should never happen
   }
   var writeDst = context.message;
 
-  //stop on error, default to the ConnectionError only
+  // stop on error, default to the ConnectionError only
   var stopOnError = [ 'ConnectionError' ];
   var isDone = false;
   function _next(v) {
@@ -412,7 +409,7 @@ function invoke(props, context, flow) {
       if (v) {
         if (v.name !== 'PropertyError' &&
                 stopOnError.indexOf(v.name) === -1) {
-          //ignore the error. Will continue with the next policy
+          // ignore the error. Will continue with the next policy
           logger.info('[invoke] ignore the error "%s" and continue', v.name);
 
           if (v.name === 'ConnectionError') {
@@ -423,7 +420,7 @@ function invoke(props, context, flow) {
 
           flow.proceed();
         } else {
-          //fail with the error
+          // fail with the error
           if (v.name === 'ConnectionError') {
             v.status = {
               code: 500,

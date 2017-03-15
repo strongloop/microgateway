@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var supertest = require('supertest');
@@ -15,7 +14,6 @@ var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 var mg = require('../lib/microgw');
 
 describe('HTTP and HTTPS in onprem in separate files', function() {
-
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/combined1';
     process.env.NODE_ENV = 'production';
@@ -54,11 +52,9 @@ describe('HTTP and HTTPS in onprem in separate files', function() {
         done(new Error('expect error'));
       });
   });
-
 });
 
 describe('HTTP and HTTPS in onprem in same file', function() {
-
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/https/combined2';
     process.env.NODE_ENV = 'production';
@@ -95,7 +91,6 @@ describe('HTTP and HTTPS in onprem in same file', function() {
         done(new Error('expect error'));
       });
   });
-
 });
 
 describe('HTTPS in onprem w/ env var', function() {
@@ -160,7 +155,6 @@ describe('HTTPS in onprem w/ env var', function() {
         done(new Error('expect error'));
       });
   });
-
 });
 
 describe('HTTPS in onprem w/ pfx', function() {
@@ -225,7 +219,6 @@ describe('HTTPS in onprem w/ pfx', function() {
         done(new Error('expect error'));
       });
   });
-
 });
 
 describe('HTTPS in onprem w/ default TLS', function() {
@@ -288,7 +281,6 @@ describe('HTTPS in onprem w/ default TLS', function() {
         done(new Error('expect error'));
       });
   });
-
 });
 
 describe('HTTP in onprem when HTTPS not specified', function() {
@@ -338,7 +330,6 @@ describe('HTTP in onprem when HTTPS not specified', function() {
       .get('/http/http')
       .expect(200, done);
   });
-
 });
 
 describe('HTTPS in onprem when HTTPS explicitly specified', function() {
@@ -401,7 +392,6 @@ describe('HTTPS in onprem when HTTPS explicitly specified', function() {
         done(new Error('expect error'));
       });
   });
-
 });
 
 describe('HTTPS in onprem when schemes not specified', function() {
@@ -464,7 +454,6 @@ describe('HTTPS in onprem when schemes not specified', function() {
         done(new Error('expect error'));
       });
   });
-
 });
 
 /*  NEED ROOT ACCESS
@@ -567,7 +556,6 @@ describe('HTTP port in ENV in onprem when HTTPS not specified', function() {
       .get('/http/http')
       .expect(200, done);
   });
-
 });
 
 /*  NEED ROOT ACCESS
@@ -697,5 +685,4 @@ describe('HTTPS port in ENV in onprem when HTTPS explicitly specified', function
         done(new Error('expect error'));
       });
   });
-
 });

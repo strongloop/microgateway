@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 var handlebarsPolicy = require('../policies/handlebars')();
 var should = require('should');
@@ -10,7 +9,6 @@ var bunyan = require('bunyan');
 var flowEngine = require('flow-engine');
 
 describe('handlebars policy', function() {
-
   it('should be able to read a property in the context', function(done) {
     var context = flowEngine.createContext();
     context.set('request.uri', 'http://localhost/foo');
@@ -129,5 +127,4 @@ describe('handlebars policy', function() {
     };
     handlebarsPolicy({ source: source, output: output }, context, flow);
   });
-
 });

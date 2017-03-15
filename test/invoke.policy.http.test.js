@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var supertest = require('supertest');
@@ -13,13 +12,12 @@ var dsCleanup = require('./support/utils').dsCleanup;
 var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
 
 describe('invokePolicy', function() {
-
   var request;
   before(function(done) {
-    //Use production instead of CONFIG_DIR: reading from apim instead of laptop
+    // Use production instead of CONFIG_DIR: reading from apim instead of laptop
     process.env.NODE_ENV = 'production';
 
-    //The apim server and datastore
+    // The apim server and datastore
     process.env.APIMANAGER = '127.0.0.1';
     process.env.APIMANAGER_PORT = 8081;
     process.env.DATASTORE_PORT = 5000;
@@ -61,11 +59,11 @@ describe('invokePolicy', function() {
 
   var data = { msg: 'Hello world' };
 
-  //invoke policy to post a request
+  // invoke policy to post a request
   it('post', function(done) {
     this.timeout(10000);
 
-    //by default, chunk-uploaded is false
+    // by default, chunk-uploaded is false
     request
       .post('/invoke/basic')
       .send(data)
@@ -79,14 +77,13 @@ describe('invokePolicy', function() {
       });
   });
 
-
-  //invoke policy to get a request
+  // invoke policy to get a request
   it('get', function(done) {
     this.timeout(10000);
 
-    //Two things are tested:
-    //1. a GET request with data should not be rejected by microgateway
-    //2. The invoke policy should not forward the Content-Length of a GET request
+    // Two things are tested:
+    // 1. a GET request with data should not be rejected by microgateway
+    // 2. The invoke policy should not forward the Content-Length of a GET request
     request
       .get('/invoke/basic')
       .set('Content-Length', '5')
@@ -101,12 +98,12 @@ describe('invokePolicy', function() {
       });
   });
 
-  //This testcase is to verify the invoke policy will urlencode the form data
-  //before sending them to the api server
+  // This testcase is to verify the invoke policy will urlencode the form data
+  // before sending them to the api server
   it('form-urlencoded-1', function(done) {
     this.timeout(10000);
 
-  //POST application/x-www-form-urlencoded
+  // POST application/x-www-form-urlencoded
     request
       .post('/invoke/encode')
       .type('form')
@@ -116,14 +113,14 @@ describe('invokePolicy', function() {
       .expect(/z-method: POST/)
       .expect(/z-content-type: application\/x-www-form-urlencoded/)
       .expect(200, /body: foo=hello&bar=123&baz%5B0%5D=qux&baz%5B1%5D=quux/)
-                        //foo=hello&bar=123&baz[0]=qux&baz[1]=quux
+                        // foo=hello&bar=123&baz[0]=qux&baz[1]=quux
       .end(function(err, res) {
         done(err);
       });
   });
 
-  //This testcase is to verify the invoke policy will parse the urlencoded data
-  //after receiving them from the api server
+  // This testcase is to verify the invoke policy will parse the urlencoded data
+  // after receiving them from the api server
   it('form-urlencoded-2', function(done) {
     this.timeout(10000);
 
@@ -136,8 +133,8 @@ describe('invokePolicy', function() {
       });
   });
 
-  //This testcase is to verify the post-flow should urlencode the message.body
-  //when the content-type is x-www-form-urlencoded
+  // This testcase is to verify the post-flow should urlencode the message.body
+  // when the content-type is x-www-form-urlencoded
   it('post-flow-should-urlencode-the-form-data', function(done) {
     this.timeout(10000);
 
@@ -160,7 +157,7 @@ describe('invokePolicy', function() {
       .expect(200, /z-url: \/\/invoke\/basic/, done);
   });
 
-  //a HEAD response has no body
+  // a HEAD response has no body
   it('head', function(done) {
     this.timeout(10000);
 
@@ -169,9 +166,9 @@ describe('invokePolicy', function() {
       .expect(200, /^$/, done);
   });
 
-  //An invalid host will lead to a ConnectionError. By default, the invoke
-  //policy stops on ConnectionError. A ConnectionError returns with status of
-  //"500: URL Open error".
+  // An invalid host will lead to a ConnectionError. By default, the invoke
+  // policy stops on ConnectionError. A ConnectionError returns with status of
+  // "500: URL Open error".
   it('host-not-found', function(done) {
     this.timeout(10000);
 
@@ -191,9 +188,9 @@ describe('invokePolicy', function() {
               done);
   });
 
-  //The invoke policy receives a 500 error from the server.
-  //Any non-2xx response is considered as an OperationError.
-  //However, by default, invoke only stops on ConnectionError
+  // The invoke policy receives a 500 error from the server.
+  // Any non-2xx response is considered as an OperationError.
+  // However, by default, invoke only stops on ConnectionError
   it('test-500-response-default', function(done) {
     this.timeout(10000);
 
@@ -204,9 +201,9 @@ describe('invokePolicy', function() {
       .expect(500, /This is a 500 response./, done);
   });
 
-  //The invoke policy receives a 303 response from the server.
-  //Any non-2xx response is considered as an OperationError.
-  //However, by default, invoke only stops on ConnectionError
+  // The invoke policy receives a 303 response from the server.
+  // Any non-2xx response is considered as an OperationError.
+  // However, by default, invoke only stops on ConnectionError
   it('test-303-response-default', function(done) {
     this.timeout(10000);
 
@@ -217,8 +214,8 @@ describe('invokePolicy', function() {
       .expect(303, /This is a 303 response./, done);
   });
 
-  //The invoke policy receives a 303 response from the server.
-  //The invoke policy stops on OperationError
+  // The invoke policy receives a 303 response from the server.
+  // The invoke policy stops on OperationError
   it('test-stop-on-303-response', function(done) {
     this.timeout(10000);
 
@@ -228,8 +225,8 @@ describe('invokePolicy', function() {
       .expect(303, /'OperationError' 303: undefined is caught!/, done);
   });
 
-  //The invoke policy receives a 203 response from the server.
-  //The invoke policy stops on OperationError
+  // The invoke policy receives a 203 response from the server.
+  // The invoke policy stops on OperationError
   it('test-stop-on-203-response', function(done) {
     this.timeout(10000);
 
@@ -290,7 +287,7 @@ describe('invokePolicy', function() {
   it('compress-data', function(done) {
     this.timeout(10000);
 
-    //when data is compressed, use the chunked encoding
+    // when data is compressed, use the chunked encoding
     request
       .post('/invoke/testCompression')
       .set('X-RAW-DATA', 'Hello World')
@@ -316,7 +313,7 @@ describe('invokePolicy', function() {
   it('just-in-time', function(done) {
     this.timeout(10000);
 
-    //request returned before timeout
+    // request returned before timeout
     request
       .get('/invoke/timeout5Sec')
       .set('X-DELAY-ME', '2')
@@ -326,7 +323,7 @@ describe('invokePolicy', function() {
   it('request-timeouted', function(done) {
     this.timeout(10000);
 
-    //the request timeouted
+    // the request timeouted
     request
       .get('/invoke/timeout5Sec')
       .set('X-DELAY-ME', '7')
@@ -335,19 +332,19 @@ describe('invokePolicy', function() {
       .expect(500, done);
   });
 
-  /////////////////////// HTTPS servers ///////////////////////
-  //8890: The server is "Sarah", whose CA is root
-  //8891: The server is "Sandy", whose CA is root2
-  //8892: The server is using TLS10, "ProtocolTLS10"
-  //8893: The server uses only some ciphers, "LimitedCiphers"
-  //8894: The server uses alice and bob as the CA. Incorrect usage?
-  //8895: 'Sarah' uses the CA 'root' to authenticate clients
-  //8896: 'Sarah' uses the CA 'root2' to authenticate clients
-  //8897: 'Sandy' uses the CA 'root2' to authenticate clients
-  /////////////////////////////////////////////////////////////
+  /// //////////////////// HTTPS servers ///////////////////////
+  // 8890: The server is "Sarah", whose CA is root
+  // 8891: The server is "Sandy", whose CA is root2
+  // 8892: The server is using TLS10, "ProtocolTLS10"
+  // 8893: The server uses only some ciphers, "LimitedCiphers"
+  // 8894: The server uses alice and bob as the CA. Incorrect usage?
+  // 8895: 'Sarah' uses the CA 'root' to authenticate clients
+  // 8896: 'Sarah' uses the CA 'root2' to authenticate clients
+  // 8897: 'Sandy' uses the CA 'root2' to authenticate clients
+  /// //////////////////////////////////////////////////////////
 
-  //This is to test if client can skip the validation of server's certificate.
-  //By default, yes (to be consistent with edge gateway)
+  // This is to test if client can skip the validation of server's certificate.
+  // By default, yes (to be consistent with edge gateway)
   it('https-basic', function(done) {
     this.timeout(10000);
 
@@ -368,9 +365,9 @@ describe('invokePolicy', function() {
       .expect(200, done);
   });
 
-  //Use the certificate of Sarah's Root CA to authenticate the Sarah. OK
-  //Note: the common name of Sarah must be domain name or localhost. Otherwise,
-  //You might get an error "Host: localhost. is not cert\'s CN: Sarah".
+  // Use the certificate of Sarah's Root CA to authenticate the Sarah. OK
+  // Note: the common name of Sarah must be domain name or localhost. Otherwise,
+  // You might get an error "Host: localhost. is not cert\'s CN: Sarah".
   it('https-server-sarah-OK', function(done) {
     this.timeout(10000);
 
@@ -382,7 +379,7 @@ describe('invokePolicy', function() {
       .expect(200, done);
   });
 
-  //Use Sarah's own certificate to authenticate Sarah. NG
+  // Use Sarah's own certificate to authenticate Sarah. NG
   it('https-server-sarah-NG', function(done) {
     this.timeout(10000);
 
@@ -405,9 +402,9 @@ describe('invokePolicy', function() {
       .expect(299, /Unexpect \'PropertyError\' Cannot find the TLS profile "not-found"/, done);
   });
 
-  //openssl s_client -tls1_2 -CAfile root.crt -connect localhost:port
-  //openssl s_client -tls1 -CAfile root.crt -connect localhost:port
-  //Both of server and client use the TLS v1.0
+  // openssl s_client -tls1_2 -CAfile root.crt -connect localhost:port
+  // openssl s_client -tls1 -CAfile root.crt -connect localhost:port
+  // Both of server and client use the TLS v1.0
   it('require-tls10', function(done) {
     this.timeout(10000);
 
@@ -431,10 +428,10 @@ describe('invokePolicy', function() {
       .expect(500, done);
   });
 
-  ////cipher mapping table for each TLS versions:
-  ////https://www.openssl.org/docs/manmaster/apps/ciphers.html#CIPHER_LIST_FORMAT
-  ////both of server and client support the cipher 'TLS_RSA_WITH_3DES_EDE_CBC_SHA'
-  //it('use-cipher-TLS_RSA_WITH_3DES_EDE_CBC_SHA', function(done) {
+  /// /cipher mapping table for each TLS versions:
+  /// /https://www.openssl.org/docs/manmaster/apps/ciphers.html#CIPHER_LIST_FORMAT
+  /// /both of server and client support the cipher 'TLS_RSA_WITH_3DES_EDE_CBC_SHA'
+  // it('use-cipher-TLS_RSA_WITH_3DES_EDE_CBC_SHA', function(done) {
   //  this.timeout(10000);
   //
   //  request
@@ -442,12 +439,12 @@ describe('invokePolicy', function() {
   //    .set('X-HTTPS-PORT', '8892')
   //    .set('X-TLS-PROFILE', 'use-cipher-TLS_RSA_WITH_3DES_EDE_CBC_SHA')
   //    .expect(200, done);
-  //});
+  // });
   //
-  ////client requires a cipher which is disalloed by server
-  ////The EPROTO error is due to the "!ECDHE-RSA-AES128-SHA256" in server side.
-  ////The cipher is available but is not allowed.
-  //it('use-cipher-TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256', function(done) {
+  /// /client requires a cipher which is disalloed by server
+  /// /The EPROTO error is due to the "!ECDHE-RSA-AES128-SHA256" in server side.
+  /// /The cipher is available but is not allowed.
+  // it('use-cipher-TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256', function(done) {
   //  this.timeout(10000);
   //
   //  request
@@ -455,11 +452,11 @@ describe('invokePolicy', function() {
   //    .set('X-HTTPS-PORT', '8893')
   //    .set('X-TLS-PROFILE', 'use-cipher-TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256')
   //    .expect(299, /Error: write EPROTO/, done);
-  //});
+  // });
   //
-  ////client requires the PSK cipher that is not available at server
-  ////'no ciphers available'
-  //it('use-cipher-PSK_WITH_CAMELLIA_128_CBC_SHA256', function(done) {
+  /// /client requires the PSK cipher that is not available at server
+  /// /'no ciphers available'
+  // it('use-cipher-PSK_WITH_CAMELLIA_128_CBC_SHA256', function(done) {
   //  this.timeout(10000);
   //
   //  request
@@ -467,10 +464,10 @@ describe('invokePolicy', function() {
   //    .set('X-HTTPS-PORT', '8893')
   //    .set('X-TLS-PROFILE', 'use-cipher-PSK_WITH_CAMELLIA_128_CBC_SHA256')
   //    .expect(299, /SSL23_CLIENT_HELLO:no ciphers available/, done);
-  //});
+  // });
 
-  //The client expects the server to be Sarah and uses the CA 'root' for auth.
-  //However, the server is Sandy who should be authenticated using 'root2'.
+  // The client expects the server to be Sarah and uses the CA 'root' for auth.
+  // However, the server is Sandy who should be authenticated using 'root2'.
   it('unexected-https-server', function(done) {
     this.timeout(10000);
 
@@ -483,8 +480,8 @@ describe('invokePolicy', function() {
       .expect(500, done);
   });
 
-  //'sarah' at 8895 is authenticated by 'root' and uses 'root' to authenticate
-  //its client too. So both of 'alice' and 'bob' will be good
+  // 'sarah' at 8895 is authenticated by 'root' and uses 'root' to authenticate
+  // its client too. So both of 'alice' and 'bob' will be good
   it('mutual-auth-ok', function(done) {
     this.timeout(10000);
 
@@ -519,8 +516,8 @@ describe('invokePolicy', function() {
       .expect(500, done);
   });
 
-  //'sarah' at 8896 is authenticated by 'root' and uses 'root2' to authenticate
-  //its client too. So only 'sandy' will be good
+  // 'sarah' at 8896 is authenticated by 'root' and uses 'root2' to authenticate
+  // its client too. So only 'sandy' will be good
   it('mutual-auth-ok-3', function(done) {
     this.timeout(10000);
 
@@ -544,8 +541,8 @@ describe('invokePolicy', function() {
       .expect(500, done);
   });
 
-  //'sandy' at 8897 is authenticated by 'root2' and uses 'root2' to authenticate
-  //its client too. Son only 'sandy' will be good
+  // 'sandy' at 8897 is authenticated by 'root2' and uses 'root2' to authenticate
+  // its client too. Son only 'sandy' will be good
   it('mutual-auth-ok-4', function(done) {
     this.timeout(10000);
 
@@ -569,7 +566,7 @@ describe('invokePolicy', function() {
       .expect(500, done);
   });
 
-  //to read the data and headers from somewhere other than the context.message
+  // to read the data and headers from somewhere other than the context.message
   it('test-input', function(done) {
     this.timeout(10000);
 
@@ -582,7 +579,7 @@ describe('invokePolicy', function() {
       .expect(200, /body: This is a custom body message/, done);
   });
 
-  //to save the result of invoke policy somewhere other than the context.message
+  // to save the result of invoke policy somewhere other than the context.message
   it('test-output', function(done) {
     this.timeout(10000);
 
@@ -592,10 +589,10 @@ describe('invokePolicy', function() {
       .expect(202, /You are accepted/, done);
   });
 
-  //The api server returns a message of length 5 and header 'Content-Length:5'.
-  //Then a set-variable policy modifies the message without changing the
-  //Content-Length. Let's see what'll happen.
-  //It turns out that express will update the Content-Length
+  // The api server returns a message of length 5 and header 'Content-Length:5'.
+  // Then a set-variable policy modifies the message without changing the
+  // Content-Length. Let's see what'll happen.
+  // It turns out that express will update the Content-Length
   it('test-content-length', function(done) {
     this.timeout(10000);
 
@@ -605,7 +602,7 @@ describe('invokePolicy', function() {
       .expect(200, /This is a very long message/, done);
   });
 
-  //the returned body might be parsed as JSON depending on the content-type
+  // the returned body might be parsed as JSON depending on the content-type
   it('test-json', function(done) {
     this.timeout(10000);
 
@@ -613,5 +610,4 @@ describe('invokePolicy', function() {
       .get('/invoke/testJSON')
       .expect(200, /The quantity is 150 and the price is 23/, done);
   });
-
 });

@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var Promise = require('bluebird');
@@ -25,7 +24,7 @@ function theApplication(req, resp) {
   });
 
   req.on('end', function() {
-    //special cases
+    // special cases
     if (req.url === '/500') {
       resp.writeHead(500);
       resp.write('This is a test for 500 error');
@@ -34,7 +33,7 @@ function theApplication(req, resp) {
     } else if (req.url === '/form-urlencoded') {
       var postData = qs.stringify({ foo: 'bar', baz: [ 'qux', 'quux' ], corge: '' });
       resp.writeHead(200, { 'Content-Type': 'application/x-www-form-urlencoded',
-                  'Content-Length': postData.length });
+        'Content-Length': postData.length });
       resp.write(postData);
       resp.end();
       return;
@@ -57,10 +56,10 @@ function theApplication(req, resp) {
 
     var query = url.parse(req.url, true).query;
     if (query.status) {
-      //status code should not negative. Delay for a few seconds and let
-      //the client to run into timeout (or the ConnectionError).
+      // status code should not negative. Delay for a few seconds and let
+      // the client to run into timeout (or the ConnectionError).
       if (query.status === '-1') {
-        //delay the response a little bit
+        // delay the response a little bit
         console.log('Bad parameter. Delaying for seconds...');
         setTimeout(function() {
           resp.writeHead(500);
@@ -75,9 +74,9 @@ function theApplication(req, resp) {
       return;
     }
 
-    //general cases
+    // general cases
     try {
-      //authenticate first
+      // authenticate first
       var authHdr = req.headers.authorization;
       if (authHdr) {
         var results = ah.parse(authHdr).values;
@@ -106,7 +105,7 @@ function theApplication(req, resp) {
         }
       }
 
-      //prepare the 200 response
+      // prepare the 200 response
       var buffer = Buffer.concat(chunks);
       var encoding = req.headers['content-encoding'];
 
@@ -127,8 +126,7 @@ function theApplication(req, resp) {
         data += 'z-secret-2: ' + req.headers['x-secret-msg2'] + '\n';
       }
 
-
-      //uncompress the request body
+      // uncompress the request body
       if (encoding === 'gzip') {
         zlib.gunzip(buffer, function(err, out) {
           if (err) {
@@ -148,7 +146,7 @@ function theApplication(req, resp) {
           console.log('Server is going to take %d seconds to process', delay);
         }
 
-        //delay the response a little bit
+        // delay the response a little bit
         setTimeout(function() {
           data += 'body: ' + buffer + '\n';
           resp.write(data);
@@ -164,32 +162,32 @@ function theApplication(req, resp) {
   });
 }
 
-//two servers: Sarah and Sandy
+// two servers: Sarah and Sandy
 var sarahKeyf = fs.readFileSync(__dirname + '/sarah.key');
 var sarahCertf = fs.readFileSync(__dirname + '/sarah.crt');
 var sandyKeyf = fs.readFileSync(__dirname + '/sandy.key');
 var sandyCertf = fs.readFileSync(__dirname + '/sandy.crt');
-//two clients: Alice and Bob
+// two clients: Alice and Bob
 var aliceCertf = fs.readFileSync(__dirname + '/alice.crt');
 var bobCertf = fs.readFileSync(__dirname + '/bob.crt');
 var rootCertf = fs.readFileSync(__dirname + '/root.crt');
 var root2Certf = fs.readFileSync(__dirname + '/root2.crt');
 
-//The server 'Sarah'
+// The server 'Sarah'
 var sslOpts4Server = {
   key: sarahKeyf,
   cert: sarahCertf,
   agent: false,
 };
 
-//The server 'Sandy'
+// The server 'Sandy'
 var sslOpts4ServerSandy = {
   key: sandyKeyf,
   cert: sandyCertf,
   agent: false,
 };
 
-//The server supports only TLS 1.0
+// The server supports only TLS 1.0
 var sslOpts4ServerTls10 = {
   key: sarahKeyf,
   cert: sarahCertf,
@@ -197,28 +195,28 @@ var sslOpts4ServerTls10 = {
   secureProtocol: 'TLSv1_method',
   honorCipherOrder: true,
   ciphers: [ 'DES-CBC3-SHA',
-             '!RC4',
-             'HIGH',
-             '!MD5',
-             '!aNULL' ].join(':'),
+    '!RC4',
+    'HIGH',
+    '!MD5',
+    '!aNULL' ].join(':'),
 };
 
-//The server supports only some ciphers
+// The server supports only some ciphers
 var sslOpts4ServerWithCiphers = {
   key: sarahKeyf,
   cert: sarahCertf,
   agent: false,
   honorCipherOrder: true,
   ciphers: [ '!ECDHE-RSA-AES128-SHA256',
-             'DHE-RSA-AES128-SHA256',
-             'AES128-GCM-SHA256',
-             '!RC4',
-             'HIGH',
-             '!MD5',
-             '!aNULL' ].join(':'),
+    'DHE-RSA-AES128-SHA256',
+    'AES128-GCM-SHA256',
+    '!RC4',
+    'HIGH',
+    '!MD5',
+    '!aNULL' ].join(':'),
 };
 
-//The server talks with only Alice and Bob
+// The server talks with only Alice and Bob
 var sslOpts4ServerForAliceAndBob = {
   key: sarahKeyf,
   cert: sarahCertf,
@@ -227,7 +225,7 @@ var sslOpts4ServerForAliceAndBob = {
   rejectUnauthorized: true,
   ca: [ aliceCertf, bobCertf ] };
 
-//The server 'sarah' authenticates its clients with 'root'
+// The server 'sarah' authenticates its clients with 'root'
 var sslOpts4SarahUsesCaRoot = {
   key: sarahKeyf,
   cert: sarahCertf,
@@ -236,7 +234,7 @@ var sslOpts4SarahUsesCaRoot = {
   rejectUnauthorized: true,
   ca: [ rootCertf ] };
 
-//The server 'sarah' authenticates its clients with 'root2'
+// The server 'sarah' authenticates its clients with 'root2'
 var sslOpts4SarahUsesCaRoot2 = {
   key: sarahKeyf,
   cert: sarahCertf,
@@ -245,7 +243,7 @@ var sslOpts4SarahUsesCaRoot2 = {
   rejectUnauthorized: true,
   ca: [ root2Certf ] };
 
-//The server 'sandy' authenticates its clients with 'root2'
+// The server 'sandy' authenticates its clients with 'root2'
 var sslOpts4SandyUsesCaRoot2 = {
   key: sarahKeyf,
   cert: sarahCertf,
@@ -272,8 +270,8 @@ exports.start = function(port) {
   }
 
   return new Promise(function(resolve, reject) {
-    //One http server
-    //httpServer = http.createServer(app);
+    // One http server
+    // httpServer = http.createServer(app);
     httpServer = http.createServer(theApplication).listen(port);
     console.log('HTTP server is listening at port %d.', port);
 
@@ -285,9 +283,9 @@ exports.start = function(port) {
       console.log('HTTP server receives an abort: %s', e);
     });
 
-    //Four https servers
+    // Four https servers
     for (var i = 0; i < sslOpts.length; i++) {
-      //httpsServers[i] = https.createServer(sslOpts[i][1], app);
+      // httpsServers[i] = https.createServer(sslOpts[i][1], app);
       httpsServers[i] = https.createServer(sslOpts[i][1], theApplication)
         .listen(port + 1 + i);
       console.log('HTTPS server (%s) is listening at port %d.',

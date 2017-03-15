@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 var Promise = require('bluebird');
 var url = require('url');
@@ -22,9 +21,8 @@ var configDir = path.join(__dirname, 'definitions', 'oauth2-ctx');
 var request, NODE_TLS_REJECT_UNAUTHORIZED;
 
 describe('oauth ctx testing', function() {
-
   before(function(done) {
-    //process.env.CONFIG_DIR = configDir;
+    // process.env.CONFIG_DIR = configDir;
     process.env.NODE_ENV = 'production';
     process.env.APIMANAGER = '127.0.0.1';
     process.env.APIMANAGER_PORT = 8081;
@@ -89,7 +87,6 @@ describe('oauth ctx testing', function() {
     request.get('/use-oauth/no-oauth')
       .expect(200, /undefined/);
   });
-
 });
 
 function requestAccessToken(scope) {
@@ -135,7 +132,7 @@ function convertToDate(ISOStr) {
   return new Date(ISOStr.replace(
     /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):\d{2}(\w{3})/,
     function($0, $1, $2, $3, $4, $5, $6) {
-      return MM[ $2 - 1 ] + ' ' + $3 + ', ' + $1 + ' - ' + $4 % 12 +
+      return MM[$2 - 1] + ' ' + $3 + ', ' + $1 + ' - ' + $4 % 12 +
         ':' + $5 + (+$4 > 12 ? 'PM' : 'AM') + ' ' + $6;
     }
   ));

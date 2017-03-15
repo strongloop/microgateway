@@ -4,6 +4,7 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
+'use strict';
 
 var pem = require('pem');
 var fs = require('fs');

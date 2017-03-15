@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 var JsonRefs = require('json-refs');
 var Validator = require('jsonschema').Validator;
@@ -15,7 +14,7 @@ module.exports = function(config) {
     var def = props.definition;
     var stopProceed = false;
     if (def === 'request') {
-      //post:
+      // post:
       //    summary: ''
       //    description: ''
       //    parameters:
@@ -41,8 +40,8 @@ module.exports = function(config) {
 
             var error = {
               name: 'ValidateError',
-              message: 'Validation on request parameter '
-                + parameter.name + ' is failed. Error: ' + result.errors,
+              message: 'Validation on request parameter ' +
+                parameter.name + ' is failed. Error: ' + result.errors,
               status: { code: 400 } };
             flow.fail(error);
             stopProceed = true;
@@ -50,7 +49,7 @@ module.exports = function(config) {
         }
       });
     } else if (def === 'response') {
-      //put:
+      // put:
       //    responses:
       //      200:
       //        description: put 200 OK
@@ -94,7 +93,7 @@ module.exports = function(config) {
         logger.debug('No validation is performed due to no validation schema found');
       }
     } else if (def) {
-      //- validate:
+      // - validate:
       //    title: validate
       //    definition: '#/definitions/Error'
 

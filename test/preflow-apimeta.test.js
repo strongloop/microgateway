@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var supertest = require('supertest');
@@ -11,13 +10,12 @@ var apimServer = require('./support/mock-apim-server/apim-server');
 var dsCleanup = require('./support/utils').dsCleanup;
 
 describe('preflow-apimeta', function() {
-
   var request;
   before(function(done) {
-    //Use production instead of CONFIG_DIR: reading from apim instead of laptop
+    // Use production instead of CONFIG_DIR: reading from apim instead of laptop
     process.env.NODE_ENV = 'production';
 
-    //The apim server and datastore
+    // The apim server and datastore
     process.env.APIMANAGER = '127.0.0.1';
     process.env.APIMANAGER_PORT = 8081;
     process.env.DATASTORE_PORT = 5000;
@@ -195,5 +193,4 @@ describe('preflow-apimeta', function() {
         done(err);
       });
   });
-
 });

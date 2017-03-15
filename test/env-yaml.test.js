@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var fs = require('fs');
@@ -45,7 +44,6 @@ function writeEnvFile(envobj) {
   fs.writeFileSync(ENVPATH, yamlstr);
 }
 
-
 describe('Setting environment variables', function() {
   var DATASTORE_PORT = 55555;
   var env = {
@@ -54,7 +52,6 @@ describe('Setting environment variables', function() {
     APIMANAGER_PORT: 11111,
     APIMANAGER: '127.0.0.1',
     NODE_ENV: 'production' };
-
 
   before(function(done) {
     process.env.DATASTORE_PORT = DATASTORE_PORT;
@@ -71,7 +68,6 @@ describe('Setting environment variables', function() {
       CHILD_ENV = msg;
       done();
     });
-
   });
 
   after(function() {

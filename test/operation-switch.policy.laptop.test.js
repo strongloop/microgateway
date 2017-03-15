@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var mg = require('../lib/microgw');
@@ -43,7 +42,6 @@ describe('switchPolicyTesting', function() {
   it('switchOnOperationId2', switchOnOperationId2);
   it('switchOnOperationId3', switchOnOperationId3);
   it('switchNoCase', switchNoCase);
-
 });
 
 function switchOnVerbAndPath(doneCB) {
@@ -66,7 +64,7 @@ function switchOnOperationId3(doneCB) {
     .expect(500, /Deleting orders is not allowed/, doneCB);
 }
 
-//Cannot Get /order
+// Cannot Get /order
 function switchNoCase(doneCB) {
   request.get('/order')
     .expect(500, doneCB);

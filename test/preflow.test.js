@@ -2,7 +2,6 @@
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
-
 'use strict';
 
 var mg = require('../lib/microgw');
@@ -62,7 +61,6 @@ describe('preflow testing', function() {
           rootBasePathMultiVarPathWithSlashAtEnd);
   it('should fail with "/rootbasepath/a/b" - rootBasePathMultiVarPathFail',
           rootBasePathMultiVarPathFail);
-
 });
 
 describe('ro-context testing', function() {
@@ -91,17 +89,17 @@ describe('ro-context testing', function() {
 
   it('should not able to modify read-only context variables', function(doneCB) {
     var roCtx = [ 'client.app.id',
-                  'client.app.name',
-                  'client.app.secret',
-                  'client.org.id',
-                  'client',
-                  'plan.id',
-                  'plan.name',
-                  'plan.version',
-                  'plan.rate-limit',
-                  'plan',
-                  'env.path',
-                  'env' ];
+      'client.app.name',
+      'client.app.secret',
+      'client.org.id',
+      'client',
+      'plan.id',
+      'plan.name',
+      'plan.version',
+      'plan.rate-limit',
+      'plan',
+      'env.path',
+      'env' ];
     var failed = [];
     var counter = 0;
     for (var index = 0, len = roCtx.length; index < len; index++) {
@@ -114,18 +112,17 @@ describe('ro-context testing', function() {
           failed.push(roCtx[index]);
         }
         counter++;
-        //checking the last one
+        // checking the last one
         if (counter === roCtx.length) {
           if (failed.length === 0) {
             doneCB();
           } else {
-            doneCB(new Error('the following ctx vars failed: '
-                + JSON.stringify(failed)));
+            doneCB(new Error('the following ctx vars failed: ' +
+                JSON.stringify(failed)));
           }
         }
       });
     }
-
   });
 });
 
@@ -162,11 +159,9 @@ describe('preflow testing', function() {
   it('should pass with "/api/missingQueryParameterID" - missingQueryParameterID', missingQueryParameterID);
   it('should pass with "/api/twoClientIDs" - twoClientIDs', twoClientIDs);
   it('should pass with "/api/twoClientSecrets" - twoClientSecrets', twoClientSecrets);
-
 });
 
 describe('preflow testing onprem', function() {
-
   before(function(done) {
     process.env.CONFIG_DIR = __dirname + '/definitions/preflow/security';
     process.env.NODE_ENV = 'production';
@@ -216,7 +211,6 @@ describe('preflow testing onprem', function() {
   it('should pass with "/api/missingQueryParameterID" - onprem missingQueryParameterID', missingQueryParameterID);
   it('should pass with "/api/twoClientIDs" - onprem twoClientIDs', twoClientIDs);
   it('should pass with "/api/twoClientSecrets" - onprem twoClientSecrets', twoClientSecrets);
-
 });
 
 function pathWithSlashAtEnd(doneCB) {
