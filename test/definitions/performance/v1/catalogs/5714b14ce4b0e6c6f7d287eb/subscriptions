@@ -1,0 +1,431 @@
+[
+  {
+    "id": "575f9724e4b06d109c285a2e",
+    "url": "https://172.16.154.175/v1/catalogs/5714b14ce4b0e6c6f7d287eb/subscriptions/575f9724e4b06d109c285a2e",
+    "organization": {
+      "id": "5714857ee4b0e6c6f7d28767",
+      "name": "microgateway-ut",
+      "title": "microgateway-ut",
+      "tags": [],
+      "members": []
+    },
+    "catalog": {
+      "id": "5714b14ce4b0e6c6f7d287eb",
+      "url": "https://172.16.154.175/v1/catalogs/5714b14ce4b0e6c6f7d287eb",
+      "name": "oauth2-ut",
+      "title": "oauth2-ut",
+      "sandbox": false,
+      "default": false,
+      "custom-portal-url": "https://dpvm176.tw.ibm.com/portal",
+      "portal-type": "ADVANCED",
+      "gateway-url": "https://172.16.154.162:5000",
+      "is-saas": false
+    },
+    "active": true,
+    "application": {
+      "id": "5744289de4b06d109c274449",
+      "title": "OAuthApp",
+      "enabled": true,
+      "state": "ACTIVE",
+      "description": "",
+      "oauth-redirection-uri": "https://localhost:5000/use-oauth/getinfo",
+      "app-credentials": [
+        {
+          "id": "5744289de4b06d109c27444a",
+          "client-id": "2609421b-4a69-40d7-8f13-44bdf3edd18f",
+          "client-secret": "BYFFcgO4hHEn0CnDkhYeiH6uxj0GER/Pq0Wi7uDO4cg="
+        }
+      ],
+      "test-app": false
+    },
+    "developer-organization": {
+      "id": "57442568e4b06d109c2743cb",
+      "name": "org-66fd3",
+      "title": "yhwang",
+      "tags": [],
+      "members": []
+    },
+    "plan-registration": {
+      "id": "prod-use-oauth:1.0.0:default",
+      "product": {
+        "id": "575f970ee4b06d109c2859e9",
+        "state": "published",
+        "visibility": {
+          "view": {
+            "enabled": true,
+            "type": "public",
+            "tags": [],
+            "orgs": []
+          },
+          "subscribe": {
+            "enabled": true,
+            "type": "authenticated",
+            "tags": [],
+            "orgs": []
+          }
+        },
+        "document": {
+          "product": "1.0.0",
+          "info": {
+            "name": "prod-use-oauth",
+            "title": "prod-use-oauth",
+            "version": "1.0.0"
+          },
+          "visibility": {
+            "view": {
+              "enabled": true,
+              "type": "public",
+              "tags": [],
+              "orgs": []
+            },
+            "subscribe": {
+              "enabled": true,
+              "type": "authenticated",
+              "tags": [],
+              "orgs": []
+            }
+          },
+          "apis": {
+            "api001": {
+              "name": "api001:1.0.0"
+            },
+            "api002": {
+              "name": "api002:1.0.0"
+            }
+          },
+          "plans": {
+            "default": {
+              "title": "Default Plan",
+              "description": "Default Plan",
+              "approval": false,
+              "rate-limit": {
+                "hard-limit": false,
+                "value": "100/hour"
+              }
+            }
+          }
+        }
+      },
+      "plan": {
+        "name": "default",
+        "title": "Default Plan"
+      },
+      "apis": [
+        {
+          "id": "api001",
+          "url": "https://172.16.154.175/v1/catalogs/5714b14ce4b0e6c6f7d287eb/apis/575f970de4b06d109c2859e7",
+          "state": "running",
+          "organization": {
+            "id": "5714857ee4b0e6c6f7d28767",
+            "name": "microgateway-ut",
+            "title": "microgateway-ut",
+            "tags": [],
+            "members": []
+          },
+          "catalog": {
+            "id": "5714b14ce4b0e6c6f7d287eb",
+            "url": "https://172.16.154.175/v1/catalogs/5714b14ce4b0e6c6f7d287eb",
+            "name": "oauth2-ut",
+            "title": "oauth2-ut",
+            "sandbox": false,
+            "default": false,
+            "custom-portal-url": "https://dpvm176.tw.ibm.com/portal",
+            "portal-type": "ADVANCED",
+            "gateway-url": "https://172.16.154.162:5000",
+            "is-saas": false
+          },
+          "document": {
+            "swagger": "2.0",
+            "info": {
+              "version": "1.0.0",
+              "title": "api001",
+              "x-ibm-name": "api001"
+            },
+            "host": "",
+            "basePath": "/api001_base",
+            "paths": {
+              "/path01": {
+                "post": {
+                  "responses": {
+                    "200": {
+                      "description": "200 OK"
+                    }
+                  },
+                  "security": [
+                    {
+                      "clientID": []
+                    }
+                  ]
+                },
+                "get": {
+                  "responses": {
+                    "200": {
+                      "description": "200 OK"
+                    }
+                  },
+                  "security": [
+                    {
+                      "clientID": []
+                    }
+                  ]
+                }
+              },
+              "/path02": {
+                "post": {
+                  "responses": {
+                    "200": {
+                      "description": "200 OK"
+                    }
+                  },
+                  "security": [
+                    {
+                      "clientID": []
+                    }
+                  ]
+                },
+                "get": {
+                  "responses": {
+                    "200": {
+                      "description": "200 OK"
+                    }
+                  },
+                  "security": [
+                    {
+                      "clientID": []
+                    }
+                  ]
+                }
+              },
+              "/path03": {
+                "post": {
+                  "responses": {
+                    "200": {
+                      "description": "200 OK"
+                    }
+                  },
+                  "security": [
+                    {
+                      "clientID": []
+                    }
+                  ]
+                },
+                "get": {
+                  "responses": {
+                    "200": {
+                      "description": "200 OK"
+                    }
+                  },
+                  "security": [
+                    {
+                      "clientID": []
+                    }
+                  ]
+                }
+              }
+            },
+            "securityDefinitions": {
+              "oauth": {
+                "type": "oauth2",
+                "description": "",
+                "flow": "implicit",
+                "authorizationUrl": "https://localhost:5000/security/oauth2/authorize",
+                "scopes": {
+                  "scope1": "scope1"
+                }
+              },
+              "clientID": {
+                "description": "",
+                "in": "header",
+                "name": "X-IBM-Client-Id",
+                "type": "apiKey"
+              }
+            },
+            "security": [
+              {
+                "clientID": []
+              }
+            ],
+            "x-ibm-configuration": {
+              "assembly": {
+                "execute": [
+                  {
+                    "javascript": {
+                      "title": "javascript",
+                      "source": "message.body = { text: 'Hello OAuth2' };"
+                    }
+                  }
+                ]
+              },
+              "enforced": true,
+              "testable": true,
+              "phase": "realized",
+              "cors": {
+                "enabled": true
+              }
+            },
+            "schemes": [
+              "http"
+            ]
+          }
+        },
+        {
+          "id": "api002",
+          "url": "https://172.16.154.175/v1/catalogs/5714b14ce4b0e6c6f7d287eb/apis/575f970de4b06d109c2859e7",
+          "state": "running",
+          "organization": {
+            "id": "5714857ee4b0e6c6f7d28767",
+            "name": "microgateway-ut",
+            "title": "microgateway-ut",
+            "tags": [],
+            "members": []
+          },
+          "catalog": {
+            "id": "5714b14ce4b0e6c6f7d287eb",
+            "url": "https://172.16.154.175/v1/catalogs/5714b14ce4b0e6c6f7d287eb",
+            "name": "oauth2-ut",
+            "title": "oauth2-ut",
+            "sandbox": false,
+            "default": false,
+            "custom-portal-url": "https://dpvm176.tw.ibm.com/portal",
+            "portal-type": "ADVANCED",
+            "gateway-url": "https://172.16.154.162:5000",
+            "is-saas": false
+          },
+          "document": {
+            "swagger": "2.0",
+            "info": {
+              "version": "1.0.0",
+              "title": "api002",
+              "x-ibm-name": "api002"
+            },
+            "host": "",
+            "basePath": "/api002_base",
+            "paths": {
+              "/path01": {
+                "post": {
+                  "responses": {
+                    "200": {
+                      "description": "200 OK"
+                    }
+                  },
+                  "security": [
+                    {
+                      "clientID": []
+                    }
+                  ]
+                },
+                "get": {
+                  "responses": {
+                    "200": {
+                      "description": "200 OK"
+                    }
+                  },
+                  "security": [
+                    {
+                      "clientID": []
+                    }
+                  ]
+                }
+              },
+              "/path02": {
+                "post": {
+                  "responses": {
+                    "200": {
+                      "description": "200 OK"
+                    }
+                  },
+                  "security": [
+                    {
+                      "clientID": []
+                    }
+                  ]
+                },
+                "get": {
+                  "responses": {
+                    "200": {
+                      "description": "200 OK"
+                    }
+                  },
+                  "security": [
+                    {
+                      "clientID": []
+                    }
+                  ]
+                }
+              },
+              "/path03": {
+                "post": {
+                  "responses": {
+                    "200": {
+                      "description": "200 OK"
+                    }
+                  },
+                  "security": [
+                    {
+                      "clientID": []
+                    }
+                  ]
+                },
+                "get": {
+                  "responses": {
+                    "200": {
+                      "description": "200 OK"
+                    }
+                  },
+                  "security": [
+                    {
+                      "clientID": []
+                    }
+                  ]
+                }
+              }
+            },
+            "securityDefinitions": {
+              "oauth": {
+                "type": "oauth2",
+                "description": "",
+                "flow": "implicit",
+                "authorizationUrl": "https://localhost:5000/security/oauth2/authorize",
+                "scopes": {
+                  "scope1": "scope1"
+                }
+              },
+              "clientID": {
+                "description": "",
+                "in": "header",
+                "name": "X-IBM-Client-Id",
+                "type": "apiKey"
+              }
+            },
+            "security": [
+              {
+                "clientID": []
+              }
+            ],
+            "x-ibm-configuration": {
+              "assembly": {
+                "execute": [
+                  {
+                    "javascript": {
+                      "title": "javascript",
+                      "source": "message.body = { text: 'Hello OAuth2' };"
+                    }
+                  }
+                ]
+              },
+              "enforced": true,
+              "testable": true,
+              "phase": "realized",
+              "cors": {
+                "enabled": true
+              }
+            },
+            "schemes": [
+              "http"
+            ]
+          }
+        }
+      ]
+    }
+  }
+]
