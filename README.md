@@ -93,6 +93,7 @@ request is complete.  The **postflow** and **error-handler** middlewares work
 together to return the results back to the client making the request.
 
 ![alt text][microgateway-components]
+
 [microgateway-components]: https://github.com/strongloop/microgateway/blob/master/images/readme/MicroGatewayArchitecture2.png "Microgateway Component Structure"
 
 The **urlrewrite** middleware simply modifies the prefix of the URL under
@@ -105,6 +106,7 @@ Any middleware or policy can add, modify or remove variables from the context.
 Here are some of the context variables that are automatically populated:
 
 ![alt text][context-variables-part1]
+
 [context-variables-part1]: https://github.com/strongloop/microgateway/blob/master/images/readme/ContextVariablesPart1.png "Microgateway Context Variables"
 
 One object that is particularly important is the **message** object. The
@@ -116,6 +118,7 @@ placed in the **message** object. At the end of the flow, the contents of the
 Here are some other context variables:
 
 ![alt text][context-variables-part2]
+
 [context-variables-part2]: https://github.com/strongloop/microgateway/blob/master/images/readme/ContextVariablesPart2.png "Microgateway Context Variables"
 
 The **request** object is another important object. It holds all of the
