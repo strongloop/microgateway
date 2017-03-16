@@ -48,3 +48,4 @@ This value will be need for the "X-IBM-Client-Id" header.
 - Under "Thread Group", add a "HTTP Request". Set hostname, port and path.
 - Under "HTTP Request" add a "HTTP Header Manager". Add a Header named "X-IBM-Client-Id" and set the value "sub01_client-id_1"
 - Under "Thread Group", add a "Summary Report".
+(please see jmeter_sample.jmx)
