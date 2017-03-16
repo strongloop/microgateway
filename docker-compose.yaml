@@ -1,0 +1,25 @@
+version: '2'
+
+services:
+  microgateway:
+    build: .
+    environment:
+      - PORT=80
+    container_name: microgateway
+    networks:
+      - microgateway
+
+  nginx:
+    build: nginx
+    environment:
+      - GATEWAY_DNS=microgateway
+    ports:
+      - "443:443"
+    container_name: nginx
+    depends_on:
+      - microgateway
+    networks:
+      - microgateway
+
+networks:
+  microgateway:
