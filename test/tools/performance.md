@@ -27,6 +27,7 @@ User can set following configurations in `perf_config` file
 
 ```
 
+
 #### Performance Test Step-by-step
 Step 1. Modify `$HOME/microgateway/test/definitions/performance/perf_config` file to 
 configure the microgateway that will be launched later. (ie. how many apis, etc)
@@ -35,13 +36,14 @@ Step 2. If security is enabled and subscription number is larger than 1, check t
 "client-id" property of "application" in 
 `$HOME/microgateway/test/definitions/performance/v1/catalogs/5714b14ce4b0e6c6f7d287eb/subscription` file.
 This value will be need for the "X-IBM-Client-Id" header.
-  
 
-#### CURL command Examples
-- security enabled
+Step 3. go to `$HOME/microgateway/test/tools` and execute the command to start the 
+MicroGateway.
 ```
-    curl -H "X-IBM-Client-Id:sub01_client-id_1" -d@payload.txt localhost:3000/api001_base/path01
+cd $HOME/microgateway/test
+node performance.js
 ```
+Step 4. send traffic from traffic loading utility (jmeter or ab)
 
 #### JMeter config Examples
 - Under "Test Plan", add a "Thread Group". Config the "Thread Group" as you wish.
@@ -49,3 +51,9 @@ This value will be need for the "X-IBM-Client-Id" header.
 - Under "HTTP Request" add a "HTTP Header Manager". Add a Header named "X-IBM-Client-Id" and set the value "sub01_client-id_1"
 - Under "Thread Group", add a "Summary Report".
 (please see jmeter_sample.jmx)
+
+#### Apache Bench command Examples
+- security enabled
+```
+    ab -n 100 -c 2 -H "X-IBM-Client-Id:sub01_client-id_1" -p payload.txt http://localhost:3000/api001_base/path01
+```
