@@ -1,17 +1,18 @@
-FROM tatsushid/tinycore-node:6.6
-ENV NODE_ENV production
+FROM node:6-alpine
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-ENV REGISTRY http://9.10.79.72:4873/
-# ENV REGISTRY http://apiconnect01.rchland.ibm.com:4873/
-COPY package.json /usr/src/app/
-RUN npm config set registry $REGISTRY \
-  && npm install --production
+COPY package.json index.js ./
+COPY lib lib/
+COPY utils utils/
+COPY config config/
+COPY policies policies/
 
-COPY . /usr/src/app
+ARG NPM_REGISTRY
+ENV npm_config_registry ${NPM_REGISTRY:-https://registry.npmjs.com}
+RUN npm install --prod --quiet --depth 0
 
-EXPOSE 3000
+ENV NODE_ENV production
 
-CMD [ "npm", "start" ]
+CMD [ "node", "index.js" ]
