@@ -100,7 +100,7 @@ if (security_enable) {
   delete subscriptions_template_json[0]['plan-registration'].product.catalog;
 }
 
-//multiple subscriptions
+// multiple subscriptions
 if (subscription_number >= 1) {
   for (var k = 1; k <= subscription_number; k++) {
     var subn = 'sub' + ('00' + k).substr(-2);
@@ -149,5 +149,5 @@ apimServer.start(
   .catch(function(err) {
     console.error(err);
   });
-      //TODO inject traffic
-      //TODO generate report
+      // TODO inject traffic
+      // TODO generate report
