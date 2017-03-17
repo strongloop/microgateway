@@ -101,7 +101,7 @@ the processing of the request is complete.  The **postflow** and
 back to the client making the request.
 
 ![alt text][microgateway-components]
-[microgateway-components]: https://github.com/ibm-apiconnect/microgateway/blob/master/images/readme/MicroGatewayArchitecture2.png "MicroGateway Component Structure"
+[microgateway-components]: https://github.com/strongloop/microgateway/blob/master/images/readme/MicroGatewayArchitecture2.png "MicroGateway Component Structure"
  
 The  **urlrewrite** middleware simply modifies the prefix of the 
 URL under certain conditions.  For the most part, this is 
@@ -116,7 +116,7 @@ Here are some of the context variables that are
 automatically populated:
 
 ![alt text][context-variables-part1]
-[context-variables-part1]: https://github.com/ibm-apiconnect/microgateway/blob/master/images/readme/ContextVariablesPart1.png "MicroGateway Context Variables"
+[context-variables-part1]: https://github.com/strongloop/microgateway/blob/master/images/readme/ContextVariablesPart1.png "MicroGateway Context Variables"
 
 One object that is particularly important is the **message** object.  
 The **message** object contains the payload that was received from 
@@ -128,7 +128,7 @@ back to the client.
 Here are some other context variables:
  
 ![alt text][context-variables-part2]
-[context-variables-part2]: https://github.com/ibm-apiconnect/microgateway/blob/master/images/readme/ContextVariablesPart2.png "MicroGateway Context Variables"
+[context-variables-part2]: https://github.com/strongloop/microgateway/blob/master/images/readme/ContextVariablesPart2.png "MicroGateway Context Variables"
  
 The **request** object is another important object.  It holds all of 
 the information about the original request that was received by the 
@@ -176,7 +176,7 @@ Following are the steps to install and run a stand alone microgateway
 Step 1. Clone the microgateway repository
 ```
 cd $HOME
-git clone https://github.com/ibm-apiconnect/microgateway.git
+git clone https://github.com/strongloop/microgateway.git
 ```
 
 Step 2. Populate all of the necessary dependencies for the project
