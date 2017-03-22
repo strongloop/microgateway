@@ -71,7 +71,7 @@
       "name": "Yi-hong Wang"
     }
   ],
-  "license": "SEE LICENSE IN LICENSE.txt",
+  "license": "Apache-2.0",
   "devDependencies": {
     "bunyan": "^1.7.1",
     "debug": "^2.2.0",
