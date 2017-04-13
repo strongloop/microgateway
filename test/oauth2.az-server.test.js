@@ -34,7 +34,7 @@ describe('oauth2 AZ-server', function() {
           process.env.APIMANAGER_PORT,
           __dirname + '/definitions/oauth2-az/default-form-authenticated')
         .then(function() { return microgw.start(5000); })
-        .then(function() { return authServer.start(7000); })
+        .then(function() { return authServer.start(7100); })
         .then(function() {
           request = supertest('https://localhost:5000');
         })
@@ -395,7 +395,7 @@ describe('oauth2 AZ-server', function() {
           process.env.APIMANAGER_PORT,
           __dirname + '/definitions/oauth2-az/basic-authenticated')
         .then(function() { return microgw.start(5000); })
-        .then(function() { return authServer.start(7000); })
+        .then(function() { return authServer.start(7100); })
         .then(function() {
           request = supertest('https://localhost:5000');
         })
@@ -583,7 +583,7 @@ describe('oauth2 AZ-server', function() {
           process.env.APIMANAGER_PORT,
           __dirname + '/definitions/oauth2-az/custom-form-authenticated')
         .then(function() { return microgw.start(5000); })
-        .then(function() { return authServer.start(7000); })
+        .then(function() { return authServer.start(7100); })
         .then(function() {
           request = supertest('https://localhost:5000');
         })
@@ -973,7 +973,7 @@ describe('oauth2 AZ-server', function() {
           process.env.APIMANAGER_PORT,
           __dirname + '/definitions/oauth2-az/redirect')
         .then(function() { return microgw.start(5000); })
-        .then(function() { return authServer.start(7000); })
+        .then(function() { return authServer.start(7100); })
         .then(function() {
           request = supertest('https://localhost:5000');
         })
@@ -1344,7 +1344,7 @@ describe('oauth2 AZ-server', function() {
           process.env.APIMANAGER_PORT,
           __dirname + '/definitions/oauth2-az/basic-default-consent')
         .then(function() { return microgw.start(5000); })
-        .then(function() { return authServer.start(7000); })
+        .then(function() { return authServer.start(7100); })
         .then(function() {
           request = supertest('https://localhost:5000');
         })
@@ -1784,7 +1784,7 @@ describe('oauth2 AZ-server', function() {
           process.env.APIMANAGER_PORT,
           __dirname + '/definitions/oauth2-az/default-form-default-consent')
         .then(function() { return microgw.start(5000); })
-        .then(function() { return authServer.start(7000); })
+        .then(function() { return authServer.start(7100); })
         .then(function() {
           request = supertest('https://localhost:5000');
         })
@@ -2444,7 +2444,7 @@ describe('oauth2 AZ-server', function() {
           process.env.APIMANAGER_PORT,
           __dirname + '/definitions/oauth2-az/basic-custom-consent')
         .then(function() { return microgw.start(5000); })
-        .then(function() { return authServer.start(7000); })
+        .then(function() { return authServer.start(7100); })
         .then(function() {
           request = supertest('https://localhost:5000');
         })
@@ -2881,7 +2881,7 @@ describe('oauth2 AZ-server', function() {
           process.env.APIMANAGER_PORT,
           __dirname + '/definitions/oauth2-az/basic-bad-custom-consent')
         .then(function() { return microgw.start(5000); })
-        .then(function() { return authServer.start(7000); })
+        .then(function() { return authServer.start(7100); })
         .then(function() {
           request = supertest('https://localhost:5000');
         })
