@@ -10,6 +10,7 @@ var backend = require('./support/invoke-server');
 var apimServer = require('./support/mock-apim-server/apim-server');
 var dsCleanup = require('./support/utils').dsCleanup;
 var resetLimiterCache = require('../lib/rate-limit/util').resetLimiterCache;
+var zlib = require('zlib');
 
 describe('invokePolicy', function() {
   var request;
@@ -287,6 +288,12 @@ describe('invokePolicy', function() {
   it('compress-data', function(done) {
     this.timeout(10000);
 
+    // gzip compression header includes a platform bit which means different
+    // platforms actually produce _slightly_ different gzip compression results
+    // depending on the platform.
+    // see https://github.com/nodejs/node/issues/12244
+    const gzHelloWorld = zlib.gzipSync('Hello World').toString('base64');
+
     // when data is compressed, use the chunked encoding
     request
       .post('/invoke/testCompression')
@@ -294,7 +301,7 @@ describe('invokePolicy', function() {
       .expect(/z-content-encoding: gzip/)
       .expect(/z-content-length: undefined/)
       .expect(/z-transfer-encoding: chunked/)
-      .expect(/raw: H4sIAAAAAAAAA\/NIzcnJVwjPL8pJAQBWsRdKCwAAAA==/)
+      .expect(new RegExp(`raw: ${gzHelloWorld}`))
       .expect(200, /body: Hello World/, done);
   });
 
