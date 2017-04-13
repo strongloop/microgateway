@@ -36,7 +36,7 @@ describe('oauth ctx testing', function() {
             process.env.APIMANAGER,
             process.env.APIMANAGER_PORT,
             configDir)
-      .then(function() { return authServer.start(7000); })
+      .then(function() { return authServer.start(7100); })
       .then(function() { return mg.start(3000); })
       .then(function() {
         request = supertest('https://localhost:3000');

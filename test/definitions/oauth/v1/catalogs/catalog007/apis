@@ -286,7 +286,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -623,7 +623,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -954,7 +954,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -1402,7 +1402,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -2840,7 +2840,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -4171,7 +4171,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -6615,7 +6615,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -6949,7 +6949,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -7147,7 +7147,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -7344,7 +7344,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -8921,7 +8921,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -9255,7 +9255,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -9590,7 +9590,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -9928,7 +9928,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -10255,7 +10255,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -10589,7 +10589,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -10923,7 +10923,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -11257,7 +11257,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -11591,7 +11591,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -11925,7 +11925,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -12259,7 +12259,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -14278,7 +14278,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {
@@ -14674,7 +14674,7 @@
           },
           "authentication": {
             "x-ibm-authentication-url": {
-              "url": "http://localhost:7000/basic-auth"
+              "url": "http://localhost:7100/basic-auth"
             }
           },
           "authorization": {

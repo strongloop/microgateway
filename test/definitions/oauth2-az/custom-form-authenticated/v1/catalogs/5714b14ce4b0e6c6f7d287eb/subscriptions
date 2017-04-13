@@ -513,7 +513,7 @@
                 },
                 "authentication": {
                   "x-ibm-authentication-url": {
-                    "url": "http://localhost:7000/"
+                    "url": "http://localhost:7100/"
                   }
                 },
                 "authorization": {
