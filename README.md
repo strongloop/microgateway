@@ -172,14 +172,14 @@ cd $HOME/microgateway
 npm install
 ```
 
-Step 3. Change current working directory to the test directory
+Step 3. Change current working directory to the root directory
 ```
-cd $HOME/microgateway/test
+cd $HOME/microgateway/
 ```
 
 Step 4. Create a startup script that sets environment variables and starts up
 the Microgateway. The script file is a simple node.js JavaScript file shown
-below. Create this file in the `$HOME/microgateway/test` directory.
+below. Create this file in the `$HOME/microgateway/` directory.
 
 Note:  The CONFIG_DIR is the folder containing the yaml files holding the API
 definitions that you wish to enforce.
@@ -192,7 +192,7 @@ var mg = require('../lib/microgw');
 var fs = require('fs');
 
 // config dir
-process.env.CONFIG_DIR = __dirname + '/definitions/sample';
+process.env.CONFIG_DIR = __dirname + '/definitions/myapp';
 process.env.NODE_ENV = 'production';
 mg.start(3000);
 ```
@@ -200,7 +200,7 @@ mg.start(3000);
 Step 4. Create a yaml file to define the API. Place the yaml file in the folder
 identified by the `CONFIG_DIR` environment variable created in the startup script.
 For this example, we are creating the file sample_1.0.0.yaml in the
-`$HOME/microgateway/test/definitions/sample` directory. Note that you can place
+`$HOME/microgateway/definitions/myapp` directory. Note that you can place
 several yaml files in this directory and all will be pulled in and used by the
 Microgateway.
 ```
@@ -229,9 +229,9 @@ schemes:
   - http
 ```
 
-Step 5. From the test directory, execute the command to start the Microgateway.
+Step 5. From the root directory, execute the command to start the Microgateway.
 ```
-cd $HOME/microgateway/test
+cd $HOME/microgateway/
 node sample.js
 ```
 
@@ -241,7 +241,7 @@ Step 6. Send a curl command to test the API. It should return the
 curl http://localhost:3000/sample/echo
 ```
 
-For more information on the internal specifics of the Microgatewayy, you may
+For more information on the internal specifics of the Microgateway, you may
 want to look at the microgateway/test directory. All middleware components
 have one or more test suites to exercise their interfaces and logic.
 
