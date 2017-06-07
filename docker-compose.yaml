@@ -12,7 +12,7 @@ services:
   nginx:
     build: nginx
     environment:
-      - GATEWAY_DNS=microgateway
+      - GATEWAY_DNS=microgateway:80
     ports:
       - "443:443"
     container_name: nginx
