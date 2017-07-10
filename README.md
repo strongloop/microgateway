@@ -188,7 +188,7 @@ definitions that you wish to enforce.
 //
 'use strict';
 
-var mg = require('../lib/microgw');
+var mg = require('./lib/microgw');
 var fs = require('fs');
 
 // config dir
