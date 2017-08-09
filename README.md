@@ -197,7 +197,7 @@ process.env.NODE_ENV = 'production';
 mg.start(3000);
 ```
 
-Step 4. Create a yaml file to define the API. Place the yaml file in the folder
+Step 5. Create a yaml file to define the API. Place the yaml file in the folder
 identified by the `CONFIG_DIR` environment variable created in the startup script.
 For this example, we are creating the file sample_1.0.0.yaml in the
 `$HOME/microgateway/definitions/myapp` directory. Note that you can place
@@ -229,13 +229,13 @@ schemes:
   - http
 ```
 
-Step 5. From the root directory, execute the command to start the Microgateway.
+Step 6. From the root directory, execute the command to start the Microgateway.
 ```
 cd $HOME/microgateway/
 node sample.js
 ```
 
-Step 6. Send a curl command to test the API. It should return the
+Step 7. Send a curl command to test the API. It should return the
 `{“text”:”Hello World”}` JSON object.
 ```
 curl http://localhost:3000/sample/echo
