@@ -1,3 +1,8 @@
+2017-10-12, Version 1.6.4
+=========================
+
+ * Add sub-type for the loopback model (Gary Tu)
+
 2017-04-03, Version 1.6.3
 =========================
 
