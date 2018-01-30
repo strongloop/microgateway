@@ -1,5 +1,7 @@
 # Introduction
 
+This is fork with datastore cache for http-responses. To enable it you must set env var DATASTORE_USE_LOCAL_CACHE=true.
+
 The Microgateway is an developer-focused, extensible gateway framework written
 in Node.js for enforcing access to Microservices & APIs - https://developer.ibm.com/apiconnect/. It supports the
 following core features:
