@@ -13,7 +13,6 @@ var env = {
   APIMANAGER_CATALOG: '',
   APIMANAGER_PORT: 443,
   APIMANAGER_REFRESH_INTERVAL: 15 * 1000 * 60,
-  DATASTORE_USE_LOCAL_CACHE: process.env.DATASTORE_USE_LOCAL_CACHE,
 };
 
 try {
@@ -33,5 +32,4 @@ Object.keys(env).forEach(function(k) {
 });
 
 // Should we do any extra sanity checks here?
-
 require('./lib/microgw.js').start(process.env.PORT);
