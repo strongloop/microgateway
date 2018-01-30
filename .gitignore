@@ -22,3 +22,4 @@ coverage
 test/definitions/policy-loader/token
 env.yaml
 gw_skel
+.idea
