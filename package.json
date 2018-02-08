@@ -111,7 +111,7 @@
     "lodash": "^4.2.1",
     "loopback": "^2.26.2",
     "lru-cache": "^4.0.0",
-    "microgateway-datastore": "^1.x",
+    "microgateway-datastore": "^1.0.2",
     "microgateway-util": "^1.x",
     "moment": "^2.11.2",
     "multer": "^1.1.0",
