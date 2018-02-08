@@ -3,7 +3,6 @@
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
 'use strict';
-
 var path = require('path');
 var YAML = require('yamljs');
 var logger = require('apiconnect-cli-logger/logger.js')
@@ -13,7 +12,8 @@ var env = {
   NODE_ENV: 'production',
   APIMANAGER_CATALOG: '',
   APIMANAGER_PORT: 443,
-  APIMANAGER_REFRESH_INTERVAL: 15 * 1000 * 60 };
+  APIMANAGER_REFRESH_INTERVAL: 15 * 1000 * 60,
+};
 
 try {
   var envjson = YAML.load(path.join(__dirname, '/env.yaml'));
@@ -32,5 +32,4 @@ Object.keys(env).forEach(function(k) {
 });
 
 // Should we do any extra sanity checks here?
-
 require('./lib/microgw.js').start(process.env.PORT);
