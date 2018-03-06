@@ -3,6 +3,7 @@
 // US Government Users Restricted Rights - Use, duplication or disclosure
 // restricted by GSA ADP Schedule Contract with IBM Corp.
 
+var fs = require('fs');
 var path = require('path');
 var YAML = require('yamljs');
 var logger = require('apiconnect-cli-logger/logger.js')
@@ -15,10 +16,15 @@ var env = {
   APIMANAGER_REFRESH_INTERVAL: 15 * 1000 * 60 };
 
 try {
-  var envjson = YAML.load(path.join(__dirname, '/env.yaml'));
-  Object.keys(envjson).forEach(function(k) {
-    env[k] = envjson[k];
-  });
+  var envPath = path.join(__dirname, '/env.yaml');
+  if (!fs.existsSync(envPath)) {
+    logger.warn('File not exist: env.yaml');
+  } else {
+    var envjson = YAML.load(envPath);
+    Object.keys(envjson).forEach(function(k) {
+      env[k] = envjson[k];
+    });
+  }
 } catch (e) {
   logger.error('Fail to load environment variables: ', e);
 }
