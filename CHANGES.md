@@ -1,3 +1,8 @@
+2018-03-07, Version 1.6.7
+=========================
+
+ * Check existence of the env.yaml file
+
 2017-10-26, Version 1.6.6
 =========================
 
