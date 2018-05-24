@@ -53,7 +53,9 @@ to the Assembly extension to the swagger definition:
 * **operation-switch** – Given a set of conditions on the operation, select the
   first rule where the condition evaluates to True.
 * **throw** – Throw an exception
-* **invoke** – Retrieve a resource using HTTP or HTTPS
+* **invoke** – Retrieve a resource using HTTP or HTTPS. Currently supported HTTP
+  request methods or verbs are
+  `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`.
 * **javascript** – Execute a JavaScript program to manipulate or inspect the
   transaction
 * **set-variable** – Set a variable in the context
