@@ -1,0 +1,10 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.12.0
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  'npm:lodash:20180130':
+    - microgateway-datastore > loopback-component-explorer > lodash:
+        patched: '2018-07-03T05:58:40.089Z'
+    - microgateway-datastore > loopback-component-explorer > loopback-swagger > lodash:
+        patched: '2018-07-03T05:58:40.089Z'
