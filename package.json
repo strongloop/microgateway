@@ -7,7 +7,9 @@
     "lint": "eslint .",
     "pretest": "eslint .",
     "start": "node .",
-    "test": "mocha -t 600000"
+    "test": "mocha -t 600000",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "engines": {
     "node": ">=4.0.0"
@@ -128,7 +130,9 @@
     "type-is": "^1.6.11",
     "uid-safe": "^2.1.1",
     "pem": "^1.8.3",
-    "yamljs": "^0.2.4"
+    "yamljs": "^0.2.4",
+    "snyk": "^1.88.0"
   },
-  "APIConnectGateway": "1.0.0"
+  "APIConnectGateway": "1.0.0",
+  "snyk": true
 }
