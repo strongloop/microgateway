@@ -1,5 +1,7 @@
 # Introduction
 
+This is fork with datastore cache for http-responses. To enable it you must set env var DATASTORE_USE_LOCAL_CACHE=true.
+
 The Microgateway is an developer-focused, extensible gateway framework written
 in Node.js for enforcing access to Microservices & APIs - https://developer.ibm.com/apiconnect/. It supports the
 following core features:
@@ -51,7 +53,9 @@ to the Assembly extension to the swagger definition:
 * **operation-switch** – Given a set of conditions on the operation, select the
   first rule where the condition evaluates to True.
 * **throw** – Throw an exception
-* **invoke** – Retrieve a resource using HTTP or HTTPS
+* **invoke** – Retrieve a resource using HTTP or HTTPS. Currently supported HTTP
+  request methods or verbs are
+  `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`.
 * **javascript** – Execute a JavaScript program to manipulate or inspect the
   transaction
 * **set-variable** – Set a variable in the context
