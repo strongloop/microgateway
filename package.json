@@ -85,8 +85,8 @@
   },
   "dependencies": {
     "apiconnect-cli-logger": "^1.x",
-    "apiconnect-config": "^1.x",
-    "apiconnect-project": "^1.x",
+    "apiconnect-config": "^2.0.0",
+    "apiconnect-project": "^2.0.0",
     "async": "^1.5.2",
     "auth-header": "^0.2.2",
     "basic-auth": "^1.0.3",
