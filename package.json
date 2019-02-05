@@ -88,7 +88,7 @@
     "apiconnect-config": "^1.x",
     "apiconnect-project": "^1.x",
     "async": "^1.5.2",
-    "auth-header": "^0.2.2",
+    "auth-header": "^0.3.0",
     "basic-auth": "^1.0.3",
     "bluebird": "^3.3.3",
     "body-parser": "^1.14.2",
