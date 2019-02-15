@@ -1,6 +1,6 @@
 {
   "name": "microgateway",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "description": "API Connect MicroGateway",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "test": "mocha -t 600000"
   },
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=8"
   },
   "repository": {
     "type": "git",
@@ -77,16 +77,16 @@
     "debug": "^2.2.0",
     "eslint": "^3.17.1",
     "eslint-config-loopback": "^8.0.0",
-    "mocha": "^2.4.5",
+    "mocha": "^5.2.0",
     "node-static": "^0.7.7",
     "should": "^8.2.1",
-    "supertest": "^1.1.0",
+    "supertest": "^3.4.2",
     "touch": "^1.0.0"
   },
   "dependencies": {
     "apiconnect-cli-logger": "^1.x",
-    "apiconnect-config": "^1.x",
-    "apiconnect-project": "^1.x",
+    "apiconnect-config": "^2.0.0",
+    "apiconnect-project": "^2.0.0",
     "async": "^1.5.2",
     "auth-header": "^0.2.2",
     "basic-auth": "^1.0.3",
@@ -109,7 +109,7 @@
     "ldapjs": "^1.0.0",
     "limiter": "^1.1.0",
     "lodash": "^4.2.1",
-    "loopback": "^2.26.2",
+    "loopback": "^3.25.0",
     "lru-cache": "^4.0.0",
     "microgateway-datastore": "^1.0.2",
     "microgateway-util": "^1.x",
