@@ -1,8 +1,9 @@
-// © Copyright IBM Corporation 2016,2017.
+// © Copyright IBM Corporation 2016,2019.
 // Node module: microgateway
 // LICENSE: Apache 2.0, https://www.apache.org/licenses/LICENSE-2.0
 
 'use strict';
+var fs = require('fs');
 var path = require('path');
 var YAML = require('yamljs');
 var logger = require('apiconnect-cli-logger/logger.js')
@@ -16,10 +17,15 @@ var env = {
 };
 
 try {
-  var envjson = YAML.load(path.join(__dirname, '/env.yaml'));
-  Object.keys(envjson).forEach(function(k) {
-    env[k] = envjson[k];
-  });
+  var envPath = path.join(__dirname, '/env.yaml');
+  if (!fs.existsSync(envPath)) {
+    logger.warn('File not exist: env.yaml');
+  } else {
+    var envjson = YAML.load(envPath);
+    Object.keys(envjson).forEach(function(k) {
+      env[k] = envjson[k];
+    });
+  }
 } catch (e) {
   logger.info('Fail to load environment variables: ', e);
 }

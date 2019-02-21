@@ -164,7 +164,7 @@ describe('invokePolicy', function() {
 
     request
       .head('/invoke/basic')
-      .expect(200, /^$/, done);
+      .expect(200, {}, done);
   });
 
   // An invalid host will lead to a ConnectionError. By default, the invoke
@@ -605,7 +605,7 @@ describe('invokePolicy', function() {
 
     request
       .get('/invoke/testContentLength')
-      .expect('Content-Length', 95)
+      .expect('Content-Length', '95')
       .expect(200, /This is a very long message/, done);
   });
 

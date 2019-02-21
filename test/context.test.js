@@ -373,7 +373,7 @@ describe('Context middleware', function() {
           .auth(username, password)
           .expect(200, {
             scheme: 'Basic',
-            params: [],
+            params: {},
             token: encoded }, done);
       });
 
