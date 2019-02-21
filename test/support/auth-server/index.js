@@ -82,6 +82,7 @@ var sslOpts = {
   cert: sarahCertf,
   agent: false,
   requestCert: true,
+  rejectUnauthorized: false,
 };
 
 var httpServer;
