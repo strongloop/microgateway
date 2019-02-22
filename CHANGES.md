@@ -1,10 +1,152 @@
-20##-##-##, Version 1.#.#
+2019-02-22, Version 1.7.0
 =========================
- * Split out datastore into separate repo
 
- * Fix message levels (error -> info)
+ * Add the shrinkwrap file (Gary Tu)
 
- * Remove key/cert and autogen in postinstall phase
+ * Add appName in analytics data (Gary Tu)
+
+ * Exit mocha test promptly (Gary Tu)
+
+ * Fix failed tests for node/dep version upgrade (Gary Tu)
+
+ * Rebase with 1.6.x and update vulnerable deps (Gary Tu)
+
+ * docs: add statement for supported HTTP verbs (biniam)
+
+ * - package.json version up for datastore (Anton Korotkikh)
+
+ * - downgrade to es5 (Anton Korotkikh)
+
+ * readme (Anton Korotkikh)
+
+ * cash fix (Anton Korotkikh)
+
+ * env fixes (Anton Korotkikh)
+
+ * env var fix (Anton Korotkikh)
+
+ * - some changes for using cached datastore (Anton Korotkikh)
+
+ * Double Step 4 (Ludovic)
+
+ * Modified readme instructions to fix script typo (Ozair Sheikh)
+
+ * Issues with Dockerizing nginx with microgateway (Ozair Sheikh)
+
+ * test: avoid using port 7000 in tests (Ryan Graham)
+
+ * Add config for building on Travis (Ryan Graham)
+
+ * fix platform-specific compression test failure (Ryan Graham)
+
+ * Fix DBCS issue (#63) (Jeremy Geddes)
+
+ * use conventional license format and annotation (Ryan Graham)
+
+ * Fix the shell scipt (Raymond Feng)
+
+ * Link to our developer page (Tony Ffrench)
+
+ * add back redis and ip modules (Anthony Ffrench)
+
+ * basic nginx TLS termination (Anthony Ffrench)
+
+ * cleanup the dockerfile, rm unused deps (Anthony Ffrench)
+
+ * add ab command example (Clement)
+
+ * add jmeter example (Clement)
+
+ * update performance readme (Clement)
+
+ * fix linter failures (Anthony Ffrench)
+
+ * update products_template (cwsu)
+
+ * multiple subscription and credentials (cwsu)
+
+ * change to new rate-limit format (cwsu)
+
+ * fix path problem (cwsu)
+
+ * ratelmit config (cwsu)
+
+ * create tools folder and draft a md file (cwsu)
+
+ * perf test framework security part (Clement)
+
+ * add security settings (Clement)
+
+ * first draft of perf test (Clement)
+
+ * Fix the image references (Tony Ffrench)
+
+ * README.md formating cleanup (Anthony Ffrench)
+
+ * modernize the eslint config, engine>4 (Anthony Ffrench)
+
+ * pick a better invalid hostname (Anthony Ffrench)
+
+ * revert .gitignore (Clement)
+
+ * remove genkeycert script (Clement)
+
+ * change path from develop to master (Clement)
+
+ * fix the image link in README.md (Clement)
+
+ * restore key and cert (Clement)
+
+ * Change sensitive domain to example.com (Clement)
+
+ * correct info (Clement)
+
+ * add Ozair to maintainers list (Clement)
+
+ * add/modify docs for open source (Clement)
+
+ * Spelling corrections (Timothy Smith)
+
+ * Updated README.md for Open Source (Timothy Smith)
+
+ * modify copyright for open source (Clement)
+
+ * merge in fixes and changes for gateway director (#28) (Jeremy Geddes)
+
+ * change dependancy to user reference for now (Jeremy R Geddes)
+
+ * move from index.js to datastore.js (Jeremy R Geddes)
+
+ * format issue (Jeremy Geddes)
+
+ * add note about key/gen changes (Jeremy Geddes)
+
+ * Remove key/cert and autogen in postinstall phase (#18) (Gary Tu)
+
+ * add message change note.. (Jeremy Geddes)
+
+ * Issue/error msgs (#20) (Daniel Badt)
+
+ * Datastore repo split (#26) (Jeremy Geddes)
+
+ * Rebase off master, missed merges (Krishna Raman)
+
+ * Ensure config/default dir is created (Daniel Badt)
+
+ * Add timeout to failing test. (Rick Curtis)
+
+ * Small change to trigger ci. (Rick Curtis)
+
+ * Update to use config/project modules. (Rick Curtis)
+
+ * Fix git url (Krishna Raman)
+
+ * Add gateways section (Chris Bygrave)
+
+ * Tidy up whitespace (Chris Bygrave)
+
+ * Add a handlebars policy & tests (Chris Bygrave)
+
 
 2016-12-06, Version 1.6.1
 =========================
@@ -17,92 +159,6 @@
 
  * Update to use config/project modules. (Rick Curtis)
 
-2016-10-13, Version 1.5.6
-=========================
-
- * Fix writeFileSync calls (Daniel Badt)
-
- * File chg should not trigger timer (Daniel Badt)
-
- * Misc. fixes for webhooks (Daniel Badt)
-
- * Update the datastore/README.md (juangmj)
-
-
-2016-10-11, Version 1.5.5
-=========================
-
- * this is the current template for readme files (Om Goeckermann)
-
- * added new information - entries for default application and plan (Om Goeckermann)
-
- * fix timing issue of test case (Clement)
-
- * fix indetation problem on test data (Clement)
-
- * monitor local files for laptop experience (Clement)
-
- * Fix issue with webhooks unsubscribe (Daniel Badt)
-
-2016-10-06, Version 1.5.4
-=========================
-
- * Update README.md (Om Goeckermann)
-
- * Fix expected unsubscribe response code (Daniel Badt)
-
- * Add webhooks unsubscribe (Daniel Badt)
-
- * Address lint failures (Jon Palgon)
-
- * Some fixes for webhooks (Daniel Badt)
-
- * Initial changes for MGW webhooks (Daniel Badt)
-
- * Change space array names to plural (Daniel Badt)
-
- * uGW support for spaces (Daniel Badt)
-
- * Initialize the test-app-cid-sec to true (juangmj)
-
- * Allow test-app to call OAuth2 API (juangmj)
-
- * Check arbitrary apikeys before fixed (Daniel Badt)
-
- * Allow developers to configure plan and rate-limit (juangmj)
-
- * Should not reject GET requests with payload (juangmj)
-
- * Updates for the code review (juangmj)
-
- * Update testcase for node 0.12 (juangmj)
-
- * Reset limiter cache before the test begins (juangmj)
-
- * Refactor the preflow middleware (juangmj)
-
- * Remove the unused broken file (juangmj)
-
- * Use `fs-extra` instead of `fs.extra` (Jon Palgon)
-
- * Move config/default to test/definitions/default (Jon Palgon)
-
- * Remove unused dependencies (Jon Palgon)
-
- * Fix test case (Daniel Badt)
-
- * Make IF statement more efficient (Daniel Badt)
-
- * Allow swagger security ApiKeys to use arbitrary names (Daniel Badt)
-
- * Ensure config/default dir is created (Daniel Badt)
-
- * Fix git url (Krishna Raman)
-
- * Add timeout to failing test. (Rick Curtis)
-
- * Update to use config/project modules. (Rick Curtis)
-
 
 2016-10-13, Version 1.5.6
 =========================
@@ -134,6 +190,31 @@
 
 2016-10-06, Version 1.5.4
 =========================
+
+
+
+2016-11-23, Version 1.6.0
+=========================
+
+ * Fix writeFileSync calls (Daniel Badt)
+
+ * File chg should not trigger timer (Daniel Badt)
+
+ * Misc. fixes for webhooks (Daniel Badt)
+
+ * Update the datastore/README.md (juangmj)
+
+ * this is the current template for readme files (Om Goeckermann)
+
+ * added new information - entries for default application and plan (Om Goeckermann)
+
+ * fix timing issue of test case (Clement)
+
+ * fix indetation problem on test data (Clement)
+
+ * monitor local files for laptop experience (Clement)
+
+ * Fix issue with webhooks unsubscribe (Daniel Badt)
 
  * Update README.md (Om Goeckermann)
 
