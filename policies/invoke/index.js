@@ -166,6 +166,9 @@ function _main(props, context, next, logger, writeDst, tlsProfile) {
       data = String(data);
     }
   }
+  if (typeof data === 'string') {
+    data = new Buffer(data, 'utf8');
+  }
   dataSz = data.length;
 
   // chunked-upload
